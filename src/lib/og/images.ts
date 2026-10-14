@@ -40,14 +40,15 @@ async function readSource(src: string): Promise<Buffer | null> {
  * An image as a data URL Satori can draw, cropped to w×h (2x for crispness), or null if it can't be
  * loaded. Fetching ourselves means a slow or broken image never breaks the whole share card.
  */
-export async function loadImage(src: string | undefined, w: number, h: number): Promise<string | null> {
+export async function loadImage(src: string | undefined, w: number, h: number, opts: { gray?: boolean } = {}): Promise<string | null> {
   if (!src) return null;
   try {
     const buf = await readSource(src);
     if (!buf) return null;
     const sharp = await getSharp();
     if (sharp) {
-      const out = await sharp(buf).resize(Math.round(w * 2), Math.round(h * 2), { fit: 'cover' }).jpeg({ quality: 82 }).toBuffer();
+      const img = sharp(buf).resize(Math.round(w * 2), Math.round(h * 2), { fit: 'cover' });
+      const out = await (opts.gray ? img.grayscale().modulate({ brightness: 0.95 }).linear(1.15, -12) : img).jpeg({ quality: 82 }).toBuffer();
       return `data:image/jpeg;base64,${out.toString('base64')}`;
     }
     const type = SNIFF.find(([, test]) => test(buf))?.[0];
