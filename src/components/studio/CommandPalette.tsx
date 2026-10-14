@@ -33,7 +33,7 @@ export function CommandPalette({ open, onOpenChange, add, url, canPublish, onPub
       className={cn(CHROME, 'sc-pop top-[18%] max-w-[560px] translate-y-0 rounded-[20px] border-[var(--line)] bg-[var(--surface)]')}>
       <CommandInput placeholder="Type a command or search…" className="text-[15px]" />
       <CommandList className="max-h-[min(420px,60dvh)] px-1.5 pb-2">
-        <CommandEmpty>Nothing matches. Try “note”, “neon” or “publish”.</CommandEmpty>
+        <CommandEmpty>Nothing matches. Try “note”, “washi” or “publish”.</CommandEmpty>
         <CommandGroup heading="Add">
           <CommandItem className={item} onSelect={run(() => add(newNote()))}>{chip('var(--brand-butter)', Type)}Add a note</CommandItem>
           <CommandItem className={item} onSelect={run(() => add(newSection()))}>{chip('var(--brand-sky)', Heading)}Add a section title</CommandItem>
