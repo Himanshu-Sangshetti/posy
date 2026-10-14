@@ -53,6 +53,7 @@ export function pageClasses(page: Page): string {
     'posy-page',
     `posy-layout-${t.layout}`,
     `posy-style-${t.style}`,
+    `posy-preset-${t.preset}`,
     t.style !== 'minimal' ? 'posy-top' : t.layout === 'bento' && t.align === 'center' ? 'posy-center' : t.layout === 'bento' ? 'posy-side' : 'posy-center',
     `posy-bg-${t.background.style}`,
     t.background.grain && 'posy-grain',

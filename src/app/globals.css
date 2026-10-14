@@ -627,3 +627,16 @@ body.ac-body { background: var(--bg); font-family: var(--font-sans); }
 .ac-term > div:first-child > div > div:nth-child(3) { background: #4a463e !important; }
 .ac-term .ac-tl { color: #8f897c; font-family: var(--font-geist-mono), monospace; font-size: 11.5px; }
 .ac-btn-primary:disabled { opacity: .38; box-shadow: none; }
+
+/* ================= Desk surfaces: real wood and paper (CC0, ambientCG; see public/looks/CREDITS.md) ================= */
+.posy-style-cozy .posy-backdrop::after { background: url(/looks/desk/paper.jpg) center / 640px; mix-blend-mode: multiply; opacity: .55; }
+.posy-style-cozy.posy-preset-oak .posy-backdrop { background: #caa77c url(/looks/desk/oak.jpg) center / 1000px; }
+.posy-style-cozy.posy-preset-slate .posy-backdrop { background: #2a1d16 url(/looks/desk/walnut.jpg) center / 1000px; }
+.posy-style-cozy:is(.posy-preset-oak, .posy-preset-slate) .posy-backdrop::after { mix-blend-mode: normal; opacity: 1;
+  background: radial-gradient(90vw 70vw at 22% -10%, rgb(255 236 200 / .22), transparent 60%), radial-gradient(120vw 90vw at 50% 50%, transparent 55%, rgb(0 0 0 / .28)); }
+.posy-style-cozy.posy-preset-slate .posy-backdrop::after { background: radial-gradient(80vw 60vw at 22% -10%, rgb(255 210 150 / .16), transparent 60%), radial-gradient(120vw 90vw at 50% 50%, rgb(0 0 0 / .25), rgb(0 0 0 / .62)); }
+.posy-style-cozy.posy-preset-oak .dk-profile, .posy-style-cozy.posy-preset-oak .posy-section { text-shadow: 0 1px 0 rgb(255 240 215 / .35); }
+.posy-style-cozy .dk-pol { background: var(--dk-white) url(/looks/desk/paper.jpg) center / 360px; background-blend-mode: multiply; }
+.posy-style-cozy .dk-note { background-image: linear-gradient(170deg, color-mix(in oklab, var(--paper) 75%, white), var(--paper)), url(/looks/desk/paper.jpg); background-size: auto, 300px; background-blend-mode: multiply; }
+.posy-style-cozy.posy-preset-oak .posy-bio { color: #3b2d1f; }
+.posy-style-cozy.posy-preset-slate .posy-bio { color: #d9cfc3; }
