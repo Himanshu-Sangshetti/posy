@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/media/hero.webp" alt="A Posy page: profile on the left, pastel tiles on the right" width="900">
+  <img src="docs/media/hero.webp" alt="A Posy desk page: a polaroid, a sticky note, a stamp and a record on a soft pastel desk" width="900">
 </p>
 
 <h1 align="center">Posy</h1>
@@ -20,7 +20,7 @@ and you can export your whole page as JSON at any time.
 - **Fast.** Server-rendered, works with JavaScript turned off, entrance animations in pure CSS.
 
 <p align="center">
-  <img src="docs/media/studio.webp" alt="The Posy studio with the theme panel open" width="900">
+  <img src="docs/media/studio.webp" alt="The Posy studio with the Design panel open" width="900">
 </p>
 
 ## Run it yourself
@@ -80,7 +80,7 @@ Dashboard pages: **Analytics** (views and clicks per tile), **Agents** (API keys
 **Settings** (change username, export your page as JSON, delete your account).
 
 <p align="center">
-  <img src="docs/media/add.webp" alt="Adding a tile by pasting a GitHub link" width="900">
+  <img src="docs/media/add.webp" alt="Adding a tile by pasting a link" width="900">
 </p>
 
 ## Themes
@@ -88,7 +88,7 @@ Dashboard pages: **Analytics** (views and clicks per tile), **Agents** (API keys
 Cream · Lavender · Mint · Sky · Peach · Paper · Blush · Sage · Midnight · Mocha · Dusk · Ocean, plus any accent colour, backgrounds, tile styles, hover effects and font pairs.
 
 <p align="center">
-  <img src="docs/media/themes.webp" alt="Posy themes" width="900">
+  <img src="docs/media/themes.webp" alt="The same desk page in cream, lavender, midnight and mint" width="900">
 </p>
 
 ## Tiles
