@@ -40,7 +40,7 @@ export function EditorialTile({ tile, index, editing }: { tile: Tile; index: num
   const showImage = (tile.type === 'image' || tile.type === 'video' || tile.type === 'music' || (tile.size !== 's' && m.image));
   return (
     <article className={cn('ed-item', `ed-t-${tile.type}`, showImage && m.image && 'ed-has-img')}>
-      {showImage && (
+      {showImage && (vid || m.image) && (
         <figure className="ed-fig">
           {vid ? <VideoPlayer id={vid} title={undefined} editing={editing} thumb={tile.type === 'video' && tile.image ? asset(tile.image) : undefined} /> : m.image && <Img src={m.image} />}
         </figure>

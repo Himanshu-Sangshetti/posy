@@ -1,5 +1,6 @@
 /* ================= Shared bits for non-soft styles ================= */
 .posy-row-st { display: block; color: var(--text); }
+.st-head { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
 .st-head textarea, .st-head input { color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; text-align: inherit; line-height: inherit; text-shadow: inherit; }
 .st-head .st-edit-name, .st-head .st-edit-bio { display: block; width: 100%; field-sizing: content; }
 .st-head .st-edit-caption { width: auto; min-width: 8ch; field-sizing: content; }
@@ -172,7 +173,7 @@ a.posy-tile:hover .tm-text b::before { color: var(--bg); }
 .posy-style-editorial .posy-social-row a:hover { background: var(--text); color: var(--bg); transform: none; }
 .posy-style-editorial .posy-grid { --gap: 34px; }
 .posy-style-editorial .posy-grid-wrap + .posy-grid-wrap { margin-top: 64px; }
-.posy-style-editorial .posy-section { padding-bottom: 10px; margin-bottom: 26px; border-bottom: 1px solid var(--text); font-family: var(--font-body); font-weight: 500; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--text); }
+.posy-style-editorial .posy-section { padding: 10px 0 0; margin-bottom: 22px; border-top: 3px double var(--text); font-family: var(--font-body); font-weight: 500; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--text); }
 .ed-item { display: flex; flex-direction: column; gap: 8px; height: 100%; padding-top: 12px; border-top: 1px solid var(--text); overflow: hidden; }
 .ed-fig { position: relative; flex: 1; min-height: 0; margin: 0 0 6px; overflow: hidden; background: var(--secondary, var(--line)); }
 .ed-fig img, .ed-fig button img { width: 100%; height: 100%; object-fit: cover; transition: transform .9s cubic-bezier(.2,.8,.2,1); }
@@ -208,3 +209,17 @@ a.posy-tile:hover .tm-text b::before { color: var(--bg); }
 .posy-style-editorial .posy-size-w .ed-fig { aspect-ratio: 16 / 9; }
 .posy-style-editorial .posy-size-t .ed-fig { aspect-ratio: 3 / 4; }
 .posy-style-editorial .ed-quote { min-height: 120px; align-items: flex-start; padding-top: 16px; }
+
+/* ================= Long names shrink to fit (--nlen is the name's length, set by StyleHeader) ================= */
+.posy-style-cozy .posy-name { font-size: max(40px, calc(68px * 11 / max(11, var(--nlen, 0)))); }
+.posy-style-cozy.posy-layout-list .posy-name { font-size: max(40px, calc(64px * 11 / max(11, var(--nlen, 0)))); }
+.posy-style-terminal .tm-name { font-size: max(32px, calc(68px * 11 / max(11, var(--nlen, 0)))); }
+.posy-style-neon .nn-name { font-size: max(26px, calc(50px * 13 / max(13, var(--nlen, 0)))); }
+.posy-style-editorial .ed-name { font-size: max(36px, calc(64px * 9 / max(9, var(--nlen, 0)))); }
+@container page (min-width: 700px) {
+  .posy-style-cozy .posy-name { font-size: max(52px, calc(104px * 11 / max(11, var(--nlen, 0)))); }
+  .posy-style-cozy.posy-layout-list .posy-name { font-size: max(52px, calc(64px * 11 / max(11, var(--nlen, 0)))); }
+  .posy-style-terminal .tm-name { font-size: max(40px, calc(96px * 11 / max(11, var(--nlen, 0)))); }
+  .posy-style-neon .nn-name { font-size: max(34px, calc(84px * 13 / max(13, var(--nlen, 0)))); }
+  .posy-style-editorial .ed-name { font-size: max(48px, calc(128px * 9 / max(9, var(--nlen, 0)))); }
+}

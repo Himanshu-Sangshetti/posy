@@ -75,7 +75,7 @@ export function tileBackground(tile: Tile, index: number, brandHex?: string): st
 }
 
 /** The order "auto" tiles take their colours in: warm and cool alternate, so neighbours never clash. */
-const AUTO_TINTS = ['lilac', 'peach', 'mint', 'butter', 'sky', 'rose'] as const satisfies readonly (typeof TINTS)[number][];
+const AUTO_TINTS = ['peach', 'lilac', 'mint', 'butter', 'sky', 'rose'] as const satisfies readonly (typeof TINTS)[number][];
 
 /** True when a brand colour is saturated enough to tint a tile (black/white brands are not). */
 export function isColourful(hex: string) {
