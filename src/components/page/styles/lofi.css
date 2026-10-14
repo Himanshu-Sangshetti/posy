@@ -108,3 +108,5 @@
   background: linear-gradient(180deg, color-mix(in oklab, var(--bg) 55%, transparent), color-mix(in oklab, var(--bg) 30%, transparent) 40%, color-mix(in oklab, var(--bg) 78%, transparent)); }
 .posy-style-lofi.dark .lf-name, .posy-style-lofi.dark .posy-bio, .posy-style-lofi.dark .lf-status { text-shadow: 0 2px 18px rgb(0 0 0 / .6); }
 .posy-style-lofi.dark .lf-win { background: color-mix(in oklab, var(--surface) 72%, transparent); }
+.posy-style-lofi.posy-preset-violet { --lf-art: url(/looks/lofi/room-violet.jpg); }
+.posy-style-lofi.posy-preset-sunset { --lf-art: url(/looks/lofi/train-sunset.jpg); }
