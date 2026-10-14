@@ -13,7 +13,8 @@ export const clip = (s: string, n: number) => {
   const flat = s.replace(/\s+/g, ' ').trim();
   if (flat.length <= n) return flat;
   const cut = flat.slice(0, n);
-  return (cut.slice(0, Math.max(cut.lastIndexOf(' '), n * 0.6)) || cut).replace(/[\s,.;:–-]+$/, '') + '…';
+  const at = cut.lastIndexOf(' ');
+  return cut.slice(0, at >= n * 0.5 ? at : n).replace(/[\s,.;:–-]+$/, '') + '…';
 };
 
 /** Strip **bold** and [text](url) markup from tile and bio text. */
@@ -61,3 +62,25 @@ export const faviconKind = (style: unknown): (typeof FAVICON_STYLES)[number] =>
 /** Drop symbols and emoji the share-image fonts have no glyph for (they would draw as empty boxes). */
 export const safe = (s: string) =>
   s.replace(/[^\u0020-\u024F\u2010-\u2027\u2030-\u203A\u20AC]/gu, '').replace(/\s{2,}/g, ' ').trim();
+
+/** A tiny deterministic pattern from a string, so each person gets their own block of "ASCII". */
+export function blockPattern(seed: string, cols: number, rows: number): number[][] {
+  let h = 2166136261;
+  for (const ch of seed) h = Math.imul(h ^ ch.codePointAt(0)!, 16777619) >>> 0;
+  const next = () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0) / 4294967296);
+  const half = Math.ceil(cols / 2);
+  return Array.from({ length: rows }, () => {
+    const left = Array.from({ length: half }, () => { const v = next(); return v < 0.34 ? 0 : v < 0.55 ? 1 : v < 0.8 ? 2 : 3; });
+    return [...left, ...[...left].reverse().slice(cols % 2)]; // mirrored: reads as a little glyph
+  });
+}
+
+const GLOW: Record<string, string> = { peach: '#ff8a3d', butter: '#f4ff52', mint: '#3dffb5', sky: '#2be4ff', lilac: '#b26bff', rose: '#ff3ea5' };
+export const CYAN = '#2be4ff';
+
+/** Glow colour for a tile, as on the page: its chosen colour, or a cycle that starts at the accent. */
+export function glowFor(accent: string, color: string | undefined, i: number) {
+  if (color === 'accent' || color === 'surface') return accent;
+  if (color && GLOW[color]) return GLOW[color];
+  return [accent, CYAN, '#b26bff', '#3dffb5'][i % 4];
+}

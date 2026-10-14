@@ -29,11 +29,11 @@ export async function pageForUser(userId: string) {
   return db.select().from(pages).where(eq(pages.userId, userId)).get();
 }
 
-export async function createPage(userId: string, username: string, name: string, tpl: TemplateId) {
+export async function createPage(userId: string, username: string, name: string, tpl: TemplateId, page?: PageData) {
   const u = username.trim().toLowerCase();
   const check = await checkUsername(u);
   if (!check.ok) throw new Error(check.reason);
-  const data = template(tpl, name);
+  const data = page ?? template(tpl, name);
   const row = { id: nanoid(12), userId, username: u, draft: data, published: data, version: 1, publishedAt: new Date() };
   await db.insert(pages).values(row);
   return row;

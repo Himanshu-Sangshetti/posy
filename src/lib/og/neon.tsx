@@ -7,21 +7,12 @@ import { fontPair, type FontSpec } from './fonts';
 import { loadImage } from './images';
 import type { OgInput, OgStyle } from './index';
 import { Glyph, bitsFor, socialsOf, type Bit } from './shared';
-import { alpha, clip, fitSize, initials, mix, plain, safe } from './util';
+import { CYAN, alpha, clip, fitSize, glowFor, initials, mix, plain, safe } from './util';
 
-const GLOW: Record<string, string> = { peach: '#ff8a3d', butter: '#f4ff52', mint: '#3dffb5', sky: '#2be4ff', lilac: '#b26bff', rose: '#ff3ea5' };
-const CYAN = '#2be4ff';
 const MONO: FontSpec = { family: 'Geist Mono', weight: 400 };
 const CHAKRA: FontSpec = { family: 'Chakra Petch', weight: 700 };
 const CHAKRA_M: FontSpec = { family: 'Chakra Petch', weight: 500 };
 const BODY: FontSpec = { family: 'Geist', weight: 400 };
-
-/** Glow colour for a tile, as on the page: its chosen colour, or a cycle that starts at the accent. */
-export function glowFor(accent: string, color: string | undefined, i: number) {
-  if (color === 'accent' || color === 'surface') return accent;
-  if (color && GLOW[color]) return GLOW[color];
-  return [accent, CYAN, '#b26bff', '#3dffb5'][i % 4];
-}
 
 const cut = (w: number, h: number, c: number) => [[1.5, 1.5], [w - c, 1.5], [w - 1.5, c], [w - 1.5, h - 1.5], [c, h - 1.5], [1.5, h - c]].map(p => p.join(',')).join(' ');
 

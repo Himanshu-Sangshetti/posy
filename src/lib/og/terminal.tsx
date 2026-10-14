@@ -6,24 +6,12 @@ import type { FontSpec } from './fonts';
 import { loadImage } from './images';
 import type { OgInput, OgStyle } from './index';
 import { Glyph, bitsFor, socialsOf, type Bit } from './shared';
-import { alpha, clip, fitSize, plain, safe, slug } from './util';
+import { alpha, blockPattern, clip, fitSize, plain, safe, slug } from './util';
 
 const MONO: FontSpec = { family: 'IBM Plex Mono', weight: 400 };
 const MONO_B: FontSpec = { family: 'IBM Plex Mono', weight: 600 };
 const PIXEL: FontSpec = { family: 'VT323', weight: 400 };
 const F = '"IBM Plex Mono"';
-
-/** A tiny deterministic pattern from a string, so each person gets their own block of "ASCII". */
-export function blockPattern(seed: string, cols: number, rows: number): number[][] {
-  let h = 2166136261;
-  for (const ch of seed) h = Math.imul(h ^ ch.codePointAt(0)!, 16777619) >>> 0;
-  const next = () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0) / 4294967296);
-  const half = Math.ceil(cols / 2);
-  return Array.from({ length: rows }, () => {
-    const left = Array.from({ length: half }, () => { const v = next(); return v < 0.34 ? 0 : v < 0.55 ? 1 : v < 0.8 ? 2 : 3; });
-    return [...left, ...[...left].reverse().slice(cols % 2)]; // mirrored: reads as a little glyph
-  });
-}
 
 function Box({ b, w, h, t }: { b: Bit; w: number; h: number; t: Theme }) {
   const line = alpha(t.text, 0.3);

@@ -99,6 +99,8 @@ test('public page extras: llms.txt, JSON and share image', async ({ page }) => {
   expect((await (await page.request.get(`/api/v1/public/${u}`)).json()).username).toBe(u);
   const og = await page.request.get(`/${u}/og.png`);
   expect(og.headers()['content-type']).toContain('image/png');
+  const icon = await page.request.get(`/${u}/favicon.png`);
+  expect(icon.headers()['content-type']).toContain('image/png');
 });
 
 test('the hosted MCP server lets an agent edit and publish with an API key', async ({ page, request }) => {

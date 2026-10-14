@@ -1,4 +1,5 @@
 import { parsePage, newId, type Page } from './schema';
+import type { StyleId } from './styles';
 
 export const TEMPLATES = {
   desk: { label: 'Cozy', note: 'Polaroids, notes and records' },
@@ -109,4 +110,17 @@ export function template(id: TemplateId, name: string): Page {
     default:
       return parsePage({ profile, theme: { style: 'cozy', preset: 'cream', font: 'editorial', layout: 'bento' }, tiles: [] });
   }
+}
+
+/** The sample content shown for each style when you start from it. */
+export const STYLE_STARTERS: Record<StyleId, TemplateId> = { cozy: 'desk', editorial: 'writer', terminal: 'developer', neon: 'night', soft: 'creator' };
+
+/** A new page from independent choices: style, layout and colours (plus sample content or an empty page). */
+export function starterPage(o: { name: string; style: StyleId; layout?: 'bento' | 'list'; preset?: string; empty?: boolean }): Page {
+  const base = template(STYLE_STARTERS[o.style], o.name);
+  return parsePage({
+    ...base,
+    theme: { ...base.theme, ...(o.layout ? { layout: o.layout } : {}), ...(o.preset ? { preset: o.preset } : {}) },
+    tiles: o.empty ? [] : base.tiles,
+  });
 }
