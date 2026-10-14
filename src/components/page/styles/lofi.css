@@ -79,3 +79,23 @@
 .posy-style-lofi.posy-layout-list .st-head-lofi { grid-template-columns: 1fr; justify-items: center; text-align: center; }
 .posy-style-lofi.posy-layout-list .lf-intro { justify-items: center; }
 .posy-style-lofi .posy-footer a { font-family: var(--font-geist-mono), monospace; letter-spacing: .14em; text-transform: uppercase; font-size: 11px; }
+
+/* ================= Lofi in daylight (Daydream): crisp white windows, thin ink lines, a warped grid, clay clouds ================= */
+.lf-clouds { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
+.posy-contained .lf-clouds { position: absolute; }
+.posy-style-lofi:not(.dark) { --lf-edge: var(--text); --lf-2: #4d7cff; }
+.posy-style-lofi:not(.dark) .posy-backdrop::before { inset: 4% 3% auto auto; width: min(760px, 70vw); height: min(600px, 80vh); opacity: .32;
+  background: url(/looks/lofi/warp-grid.svg) center / contain no-repeat; -webkit-mask-image: none; mask-image: none; }
+.posy-style-lofi:not(.dark) .posy-backdrop::after { background: radial-gradient(50% 40% at 80% 10%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 70%); }
+.posy-style-lofi:not(.dark) .lf-win { background: var(--surface); border-color: var(--text); border-radius: 0; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
+.posy-style-lofi:not(.dark) .posy-tile:hover .lf-win { border-color: var(--text); box-shadow: 6px 6px 0 var(--accent); translate: -2px -2px; }
+.posy-style-lofi:not(.dark) .lf-bar { border-bottom-color: var(--text); color: var(--text); font-size: 12px; }
+.posy-style-lofi:not(.dark) .posy-tile:hover .lf-bar { background: var(--text); color: var(--bg); }
+.posy-style-lofi:not(.dark) .lf-name { text-shadow: none; font-weight: 600; }
+.posy-style-lofi:not(.dark) .lf-glyph { filter: none; }
+.posy-style-lofi:not(.dark) .lf-ht::after { opacity: .35; mix-blend-mode: multiply; background: radial-gradient(circle, rgb(0 0 0 / .14) 0 .7px, transparent 1.1px) 0 0 / 4px 4px; }
+.posy-style-lofi:not(.dark) .posy-social-row a, .posy-style-lofi:not(.dark) .posy-social-row > div > span { border-radius: 0; background: var(--surface); box-shadow: inset 0 0 0 1px var(--text); }
+.posy-style-lofi:not(.dark) .lf-note::after { background: var(--accent); }
+.lf-meta { display: flex; align-items: center; gap: 14px; margin-top: 4px; color: var(--text); }
+.lf-clock { font-family: var(--font-geist-mono), monospace; font-size: 12px; letter-spacing: .08em; }
+.lf-barcode { height: 22px; width: auto; fill: currentColor; }

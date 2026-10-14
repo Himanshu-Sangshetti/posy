@@ -11,6 +11,7 @@ import { TileContent, tileHref, brandHex, RichText, ListItem, BrandIcon } from '
 import { deskTilt } from './desk';
 import { StyleHeader, StyleTile, StyleRow, headerClass, socialsInHeader, type StyleId } from './styles';
 import { Halftone } from './styles/lofi';
+import { Clouds3D } from './Clouds3D';
 import { placeTiles, canvasHeight, readingOrder, boxSize } from '@/lib/canvas-layout';
 import type { TilePos } from '@/lib/schema';
 import './canvas.css';
@@ -43,6 +44,7 @@ export function PageFrame({ page, children, profile, className, interactive = tr
   return (
     <div className={cn(pageClasses(page), className)} style={{ ...pageStyle(page), colorScheme: isDark(page) ? 'dark' : 'light' }}>
       <Backdrop />
+      {page.theme.style === 'lofi' && <Clouds3D dark={isDark(page)} />}
       <MotionProvider enabled={page.theme.motion}>
         <div className="posy-layout">
           {profile ?? <Profile page={page} interactive={interactive} />}

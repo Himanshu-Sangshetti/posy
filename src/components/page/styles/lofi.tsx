@@ -4,7 +4,7 @@ import { ArrowUpRight, Mail, Minus, Play, ShoppingBag, X } from 'lucide-react';
 import type { Tile } from '@/lib/schema';
 import { asset, cn } from '@/lib/utils';
 import { hostOf, youtubeId } from '@/lib/url';
-import { VideoPlayer } from '../islands';
+import { LiveClock, VideoPlayer } from '../islands';
 import { BrandIcon, RichText } from '../tiles';
 import { tileMeta, compact } from './meta';
 import type { HeaderSlots } from './types';
@@ -45,6 +45,19 @@ function Bar({ name }: { name: string }) {
   );
 }
 
+/** A barcode that is the same for the same name, like a sticker on a sketchbook. */
+function Barcode({ seed }: { seed: string }) {
+  let h = 2166136261; const bars: number[] = [];
+  for (const ch of seed + 'posy') h = Math.imul(h ^ ch.codePointAt(0)!, 16777619) >>> 0;
+  for (let i = 0; i < 34; i++) { h = Math.imul(h ^ (h >>> 13), 2246822507) >>> 0; bars.push(1 + (h % 3)); }
+  let x = 0;
+  return (
+    <svg className="lf-barcode" viewBox={`0 0 ${bars.reduce((a, b) => a + b + 1.5, 0)} 24`} aria-hidden>
+      {bars.map((w, i) => { const r = <rect key={i} x={x} y={0} width={w} height={24} />; x += w + 1.5; return r; })}
+    </svg>
+  );
+}
+
 export function LofiHeader({ name, slots }: { name: string; slots: HeaderSlots }) {
   return (
     <>
@@ -59,6 +72,7 @@ export function LofiHeader({ name, slots }: { name: string; slots: HeaderSlots }
         {slots.bio && <div className="posy-bio">{slots.bio}</div>}
         {slots.caption && <p className="lf-status"><i aria-hidden />{slots.caption}</p>}
         {slots.socials}
+        <div className="lf-meta"><LiveClock /><Barcode seed={name} /></div>
       </div>
     </>
   );

@@ -5,6 +5,13 @@ import { useEffect, useRef, useState } from 'react';
 import { Link2, Play, Share2, Check } from 'lucide-react';
 import { hostOf } from '@/lib/url';
 
+/** A small live clock, like a desktop menubar (Lofi). Renders the time on the server too, so nothing jumps. */
+export function LiveClock() {
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => { setNow(new Date()); const id = setInterval(() => setNow(new Date()), 15_000); return () => clearInterval(id); }, []);
+  return <time className="lf-clock" suppressHydrationWarning>{now ? now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '--:--'}</time>;
+}
+
 export function Favicon({ url }: { url: string }) {
   const [failed, setFailed] = useState(false);
   const ref = useRef<HTMLImageElement>(null);

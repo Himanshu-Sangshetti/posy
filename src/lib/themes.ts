@@ -41,6 +41,7 @@ const LOOKS = {
   yomogi: plain({ id: 'yomogi', name: 'Yomogi', bg: '#e3e6d8', surface: '#f1f2ea', text: '#1f241c', muted: '#5d6556', line: '#cdd3c0', accent: '#b5432e' }),
   sumi: dark({ id: 'sumi', name: 'Sumi', bg: '#1a1917', surface: '#22211e', text: '#ece6da', muted: '#9a9384', line: '#33312c', accent: '#d4533b' }),
   // Lofi
+  daydream: plain({ id: 'daydream', name: 'Daydream', bg: '#eeeefb', surface: '#ffffff', text: '#121212', muted: '#5b5b70', line: '#121212', accent: '#ff3d9a' }),
   'night-blue': dark({ id: 'night-blue', name: 'Night', bg: '#121a33', surface: '#18213f', text: '#e8ebff', muted: '#8d95c2', line: '#26305a', accent: '#8f7cff' }),
   violet: dark({ id: 'violet', name: 'Violet hour', bg: '#170f2b', surface: '#1f1638', text: '#f1eaff', muted: '#9d8fc4', line: '#2e2350', accent: '#c77dff' }),
   rain: dark({ id: 'rain', name: 'Rain', bg: '#0f1a1f', surface: '#15232a', text: '#e3f1f3', muted: '#85a3a8', line: '#213740', accent: '#5fd4d0' }),
