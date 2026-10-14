@@ -513,29 +513,12 @@ a.posy-obj.posy-tile:hover, .posy-obj.posy-tile:hover { box-shadow: none; rotate
 /* ================= App chrome (auth, onboarding, dashboard) in the desk style ================= */
 .posy-app { --font-head: var(--font-serif); --head-weight: 400; --head-track: -0.015em; }
 .posy-app .posy-backdrop { position: fixed; }
-.app-card { position: relative; border-radius: 6px; background: var(--dk-white); color: #2d2723; box-shadow: var(--dk-shadow); padding: 22px; }
-@media (min-width: 640px) { .app-card { padding: 28px; } }
 .app-h1 { font-family: var(--font-serif); font-weight: 400; font-size: 52px; line-height: .95; letter-spacing: -0.02em; }
 @media (min-width: 640px) { .app-h1 { font-size: 68px; } }
 .app-h1 i, .app-h2 i { font-style: italic; color: color-mix(in oklab, var(--accent) 70%, var(--text)); }
 .app-h2 { font-family: var(--font-serif); font-weight: 400; font-size: 28px; line-height: 1.05; letter-spacing: -0.01em; }
 .app-lede { margin-top: 12px; max-width: 54ch; font-size: 16px; line-height: 1.55; color: var(--muted); }
 .app-num { font-family: var(--font-serif); font-size: 56px; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-.app-hand { font-family: var(--font-caveat), cursive; font-weight: 600; }
-.app-step { display: inline-grid; place-items: center; width: 34px; height: 34px; margin-right: 10px; border-radius: 50%; background: var(--tint-butter); color: #5a4710; font-family: var(--font-caveat), cursive; font-size: 22px; font-weight: 700; rotate: -6deg; vertical-align: 4px; }
-.app-tape { position: absolute; top: -12px; left: 50%; width: 104px; height: 26px; translate: -50% 0; rotate: -2deg; opacity: .9;
-  background: repeating-linear-gradient(45deg, color-mix(in oklab, var(--tint-rose) 80%, transparent) 0 8px, color-mix(in oklab, var(--tint-rose) 45%, white 30%) 8px 16px); }
-.app-nav { display: flex; align-items: center; gap: 4px; }
-.app-nav a { position: relative; padding: 8px 12px; font-size: 15px; color: var(--muted); transition: color .2s; }
-.app-nav a:hover { color: var(--text); }
-.app-nav a[aria-current="page"] { color: var(--text); }
-.app-nav a[aria-current="page"]::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: 0; height: 8px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5 Q 25 1 50 4.5 T 98 3' fill='none' stroke='%23e39b6f' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
-.app-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 999px; background: #2d2723; color: #fff; font-size: 14.5px; font-weight: 500; transition: transform .2s, opacity .2s; }
-.app-btn:active { transform: scale(.98); } .app-btn:disabled { opacity: .45; }
-.app-btn-ghost { background: transparent; color: #2d2723; box-shadow: inset 0 0 0 1px rgb(45 39 35 / .16); }
-.app-btn-ghost:hover { background: rgb(45 39 35 / .05); }
-.posy-app .app-card input, .posy-app .app-card [data-slot="input"] { background: #fff; }
 
 /* ================= Posy brand: plum ink, soft paper, five pastels. Applies to all app chrome and posy.page. =================
    Type: Fraunces (display, soft), DM Sans (interface), JetBrains Mono (labels, ASCII). */
@@ -554,12 +537,6 @@ a.posy-obj.posy-tile:hover, .posy-obj.posy-tile:hover { box-shadow: none; rotate
 }
 .posy-app .app-h1, .posy-app .app-h2, .posy-app .app-num { font-variation-settings: "SOFT" 100, "WONK" 1; font-weight: 400; }
 .posy-app .app-h1 i, .posy-app .app-h2 i { font-style: italic; color: var(--brand-deep); }
-.posy-app .app-card { color: var(--brand-ink); }
-.posy-app .app-btn { background: var(--brand-ink); }
-.posy-app .app-btn:hover { background: color-mix(in oklab, var(--brand-ink) 86%, var(--brand-deep)); }
-.posy-app .app-btn-ghost { background: transparent; color: var(--brand-ink); box-shadow: inset 0 0 0 1px rgb(36 31 46 / .18); }
-.posy-app .app-nav a[aria-current="page"]::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5 Q 25 1 50 4.5 T 98 3' fill='none' stroke='%23a98be0' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E"); }
-.posy-app .app-step { background: var(--tint-lilac); color: var(--brand-deep); }
 
 /* studio-chrome =============================================================   Editor chrome (top bar, dock, panels, dialogs, toasts). Always brand-coloured, whatever the page theme is.
    Use as `posy-app sc-chrome` on chrome containers and on portalled content. */
@@ -636,6 +613,7 @@ body.ac-body { background: var(--bg); font-family: var(--font-sans); }
 .ac-seg { display: inline-flex; gap: 2px; padding: 4px; border: 1px solid var(--line); border-radius: 999px; background: rgb(255 253 250 / .8); }
 .ac-seg a, .ac-seg button { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; border-radius: 999px; font-size: 14px; font-weight: 500; color: var(--muted); transition: background .2s, color .2s; outline: none; }
 .ac-seg a:hover, .ac-seg button:hover { color: var(--text); }
+@media (max-width: 639px) { nav.ac-seg > a { flex: 1 1 auto; justify-content: center; padding: 0 8px; font-size: 13.5px; } }
 .ac-seg a:focus-visible, .ac-seg button:focus-visible { box-shadow: 0 0 0 2px var(--ring); }
 .ac-seg a[aria-current="page"], .ac-seg [aria-pressed="true"] { background: var(--ac-lilac-bg); color: var(--ac-deep); box-shadow: inset 0 0 0 1px rgb(112 72 184 / .18); }
 .ac-input { height: 44px !important; border-radius: 12px !important; border: 1px solid var(--input) !important; background: var(--surface) !important; padding-inline: 14px !important; font-size: 15px !important; box-shadow: none !important; transition: border-color .15s, box-shadow .15s; }
