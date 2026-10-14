@@ -21,7 +21,7 @@ export const POST = authed(async (userId, req) => {
   if (STYLE_IDS.includes(b.style)) {
     page = starterPage({
       name, style: b.style as StyleId,
-      layout: b.layout === 'list' ? 'list' : b.layout === 'bento' ? 'bento' : undefined,
+      layout: (['bento', 'list', 'canvas'] as const).find(l => l === b.layout),
       preset: typeof b.preset === 'string' && b.preset in THEMES ? b.preset : undefined,
       empty: b.empty === true,
     });

@@ -56,17 +56,18 @@ export function template(id: TemplateId, name: string): Page {
       });
     case 'night':
       return parsePage({
-        profile: { ...profile, bio: 'Building weird things after dark. Synths, shaders, side projects.', location: 'Night city' },
-        theme: { style: 'lofi', preset: 'night-blue', font: 'lofi', layout: 'bento' },
+        profile: { ...profile, bio: 'Building weird things after dark. Synths, shaders, side projects.', location: 'online now' },
+        theme: { style: 'lofi', preset: 'daydream', font: 'lofi', layout: 'canvas' },
+        // A collage: windows overlap and lean a little, like a desktop left open.
         tiles: ids([
           { type: 'social', platform: 'github', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'x', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'youtube', handle: 'yourname', size: 's' },
-          { type: 'image', src: '/samples/flowers.jpg', caption: 'render_042.png', size: 'w' },
-          { type: 'text', text: 'Now: shipping a tiny synth in the browser.', color: 'sky', size: 's' },
-          { type: 'github', repo: 'vercel/next.js', size: 's' },
-          { type: 'music', url: 'https://open.spotify.com/', title: 'Night drive', artist: 'Spotify', image: '/samples/petunia.jpg', size: 'w' },
-          { type: 'link', url: 'https://example.com', title: 'Devlog', description: 'What I built this week', size: 'w' },
+          { type: 'image', src: '/samples/flowers.jpg', caption: 'render_042.png', size: 'l', pos: { x: 16, y: 40, w: 600, h: 452, r: -1.5, z: 1 } },
+          { type: 'text', text: 'Now: shipping a tiny synth in the browser.', size: 's', pos: { x: 560, y: 0, w: 300, h: 232, r: 2.5, z: 3 } },
+          { type: 'github', repo: 'vercel/next.js', size: 's', pos: { x: 900, y: 56, w: 284, h: 284, r: -2, z: 2 } },
+          { type: 'music', url: 'https://open.spotify.com/', title: 'Night drive', artist: 'Spotify', image: '/samples/petunia.jpg', size: 'w', pos: { x: 640, y: 300, w: 544, h: 252, r: 1, z: 4 } },
+          { type: 'link', url: 'https://example.com', title: 'Devlog', description: 'What I built this week', size: 'w', pos: { x: 96, y: 520, w: 480, h: 228, r: 1.5, z: 5 } },
         ]),
       });
     case 'creator':
@@ -116,7 +117,7 @@ export function template(id: TemplateId, name: string): Page {
 export const STYLE_STARTERS: Record<StyleId, TemplateId> = { cozy: 'desk', minimal: 'creator', washi: 'writer', lofi: 'night' };
 
 /** A new page from independent choices: style, layout and colours (plus sample content or an empty page). */
-export function starterPage(o: { name: string; style: StyleId; layout?: 'bento' | 'list'; preset?: string; empty?: boolean }): Page {
+export function starterPage(o: { name: string; style: StyleId; layout?: 'bento' | 'list' | 'canvas'; preset?: string; empty?: boolean }): Page {
   const base = template(STYLE_STARTERS[o.style], o.name);
   return parsePage({
     ...base,

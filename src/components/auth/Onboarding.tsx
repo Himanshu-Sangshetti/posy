@@ -11,7 +11,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Badge } from '@/components/ui/badge';
 import { STYLE_PALETTES, type StyleId } from '@/lib/styles';
 
-type StyleOpt = { id: string; label: string; note: string; preset: string; locked: boolean; preview: ReactNode };
+type StyleOpt = { id: string; label: string; note: string; preset: string; layout: Layout; locked: boolean; preview: ReactNode };
+type Layout = 'bento' | 'list' | 'canvas';
 type ThemeOpt = { id: string; name: string; bg: string; accent: string; text: string; dark: boolean; locked: boolean };
 // Starter ids kept as data attributes so the choice is easy to script (the style's sample content).
 const STARTER: Record<string, string> = { cozy: 'desk', minimal: 'creator', washi: 'writer', lofi: 'night' };
@@ -21,7 +22,7 @@ export function Onboarding({ initialUsername, styles, themes, host }: { initialU
   const [name, setName] = useState(initialUsername.toLowerCase());
   const [check, setCheck] = useState<{ ok: boolean; reason?: string } | null>(null);
   const [style, setStyle] = useState('cozy');
-  const [layout, setLayout] = useState<'bento' | 'list'>('bento');
+  const [layout, setLayout] = useState<Layout>(styles.find(x => x.id === 'cozy')?.layout ?? 'bento');
   const [preset, setPreset] = useState(styles.find(x => x.id === 'cozy')?.preset ?? 'cream');
   const [empty, setEmpty] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -44,6 +45,7 @@ export function Onboarding({ initialUsername, styles, themes, host }: { initialU
   function pickStyle(id: string, focus = false) {
     setStyle(id);
     setPreset(styles.find(x => x.id === id)?.preset ?? 'cream');
+    setLayout(styles.find(x => x.id === id)?.layout ?? 'bento');
     if (focus) setTimeout(() => (document.querySelector(`[data-style="${id}"]`) as HTMLElement | null)?.focus(), 0);
   }
   const previewSrc = `/onboarding/preview?style=${style}&layout=${layout}&preset=${preset}${empty ? '&empty=1' : ''}`;
@@ -101,11 +103,13 @@ export function Onboarding({ initialUsername, styles, themes, host }: { initialU
 
           <section className="grid gap-4">
             <div><p className="ac-eyebrow">02 · Layout</p><h2 className="ac-display ac-h2 mt-2">How tiles <i>sit</i></h2></div>
-            <div role="radiogroup" aria-label="Layout" className="grid grid-cols-2 gap-3">
-              {([['bento', 'Bento', 'A mosaic of tiles of different sizes.'], ['list', 'List', 'One clean column, like a link in bio.']] as const).map(([id, label, note]) => (
+            <div role="radiogroup" aria-label="Layout" className="grid grid-cols-3 gap-3">
+              {([['bento', 'Grid', 'A mosaic of tiles of different sizes.'], ['list', 'List', 'One clean column, like a link in bio.'], ['canvas', 'Canvas', 'Place anything anywhere, overlap and tilt.']] as const).map(([id, label, note]) => (
                 <button key={id} type="button" role="radio" data-layout={id} aria-checked={layout === id} onClick={() => setLayout(id)} className="ac-opt">
                   <span aria-hidden className="grid h-14 content-center gap-1.5 rounded-[10px] bg-[var(--bg)] px-4">
-                    {id === 'bento'
+                    {id === 'canvas'
+                      ? <span className="relative mx-auto block h-11 w-3/4"><i className="absolute left-0 top-1 h-7 w-10 rotate-[-4deg] rounded-[3px] border border-[var(--text)] bg-[var(--surface)]" /><i className="absolute left-7 top-3 h-7 w-11 rotate-[3deg] rounded-[3px] border border-[var(--text)] bg-[var(--surface)]" /><i className="absolute right-0 top-0 h-6 w-8 rotate-[-2deg] rounded-[3px] border border-[var(--text)] bg-[var(--surface)]" /></span>
+                      : id === 'bento'
                       ? <span className="grid grid-cols-3 grid-rows-2 gap-1.5"><i className="col-span-2 h-5 rounded-[5px] bg-[var(--ac-rose)]" /><i className="h-5 rounded-[5px] bg-[var(--ac-sky)]" /><i className="h-5 rounded-[5px] bg-[var(--ac-mint)]" /><i className="col-span-2 h-5 rounded-[5px] bg-[var(--ac-butter)]" /></span>
                       : <span className="mx-auto grid w-3/4 gap-1.5"><i className="h-3 rounded-full bg-[var(--ac-lilac)]" /><i className="h-3 rounded-full bg-[var(--ac-rose)]" /><i className="h-3 rounded-full bg-[var(--ac-mint)]" /></span>}
                   </span>
@@ -156,7 +160,7 @@ export function Onboarding({ initialUsername, styles, themes, host }: { initialU
 
       <div className="ac-card sticky bottom-4 z-20 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 bg-[rgb(255_253_250/.92)] p-3 pl-5 backdrop-blur-md">
         <p className="ac-mono min-w-0 max-w-full flex-1 basis-60 truncate text-[12.5px] text-[var(--muted)]">
-          <span className="text-[var(--text)]">{host}/{name || 'yourname'}</span> · {styleLabel} · {layout === 'bento' ? 'Bento' : 'List'} · {themeName}
+          <span className="text-[var(--text)]">{host}/{name || 'yourname'}</span> · {styleLabel} · {layout === 'bento' ? 'Grid' : layout === 'list' ? 'List' : 'Canvas'} · {themeName}
         </p>
         <div className="flex items-center gap-3">
           {error && <p role="alert" className="text-[13.5px] text-[#b23a1c]">{error}</p>}

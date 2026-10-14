@@ -13,7 +13,7 @@ export default async function OnboardingPreview({ searchParams }: { searchParams
   const style = (STYLE_IDS.includes(q.style as StyleId) ? q.style : 'cozy') as StyleId;
   const page = starterPage({
     name: user.name, style,
-    layout: q.layout === 'list' ? 'list' : 'bento',
+    layout: (['bento', 'list', 'canvas'] as const).find(l => l === q.layout),
     preset: q.preset && q.preset in THEMES ? q.preset : undefined,
     empty: q.empty === '1',
   });
