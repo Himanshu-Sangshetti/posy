@@ -1,30 +1,48 @@
 # Editing Posy with an AI agent
 
-Posy keeps your whole page in one file, `content/page.json`, described by a JSON Schema at
-`schema/page.schema.json`. That makes it easy for Claude Code, Cursor, Codex or any other agent to
-edit your page safely.
+Every Posy account has an API key page (**Agents** in the dashboard), a hosted MCP server, a REST API
+and a CLI. Agents edit your **draft**; nothing goes live until `publish` is called.
+
+## Connect
+
+1. Create a key on the **Agents** page (it's shown once).
+2. Connect your agent:
+
+```bash
+# Claude Code
+claude mcp add --transport http posy https://YOUR-POSY/api/mcp --header "Authorization: Bearer posy_..."
+```
+
+Cursor, Codex and other MCP clients: add an HTTP server at `https://YOUR-POSY/api/mcp` with the header
+`Authorization: Bearer posy_...`. The Agents page has copy-paste snippets for each.
+
+## MCP tools
+
+| tool | what it does |
+|---|---|
+| `get_page` | Draft (profile, theme, tiles with ids), public URL, version, unpublished-changes flag |
+| `add_tile` | Add from a link, email, `owner/repo` or note (auto-detected), or a full tile object |
+| `update_tile` / `remove_tile` / `move_tile` | Change fields, delete, reorder by id |
+| `set_theme` | Preset, accent, font, radius, layout, alignment, background, tile style, hover effect, avatar |
+| `set_profile` | Name, bio, avatar, location |
+| `publish` | Make the draft live |
+| `list_options` | Allowed values for themes, fonts, backgrounds, sizes, colours and platforms |
 
 ## Prompts that work
 
-> Add my GitHub repo `owner/name` as a wide tile under "Projects".
+> Add my GitHub repo `owner/name` as a wide tile under "Projects", then publish.
 
-> Switch the theme to lavender with the rounded font and the centred layout.
+> Switch to the lavender theme with an aurora background and glass tiles.
 
 > Make a "Writing" section with links to my three latest posts: …
 
-> Reorder the tiles so my newest project comes first.
-
-If the studio is open (`npm run dev`, then `/edit`), it picks up the agent's changes within a second
-or two. The studio refuses to overwrite a file that changed underneath it, so you and your agent can
-work at the same time.
-
 ## Rules for agents
 
-1. Edit `content/page.json` only. Keep `"$schema"` at the top.
-2. Every tile needs a unique `id` (for example `"t-" + 7 random characters`) and a `type`.
-3. Sizes: `s` (1×1), `w` (2×1), `t` (1×2), `l` (2×2). `heading` tiles start a new section.
-4. Colours: `auto`, `surface`, `accent` or a pastel tint (`peach`, `butter`, `mint`, `sky`, `lilac`, `rose`).
-5. Run `npm run posy -- validate` after editing. It prints the exact field that's wrong.
+1. Start with `get_page`. Tiles have stable ids.
+2. Sizes: `s` (1×1), `w` (2×1), `t` (1×2), `l` (2×2). `heading` tiles start a new section.
+3. Colours: `auto`, `surface`, `accent` or a pastel tint (`peach`, `butter`, `mint`, `sky`, `lilac`, `rose`).
+4. Keep pages calm: a few well-chosen tiles beat many. Ask before deleting things the user added.
+5. Edits are version-checked, so an agent and the person in the studio can work at the same time.
 
 ## Tile types
 
@@ -34,23 +52,35 @@ work at the same time.
 | `social` | `platform`, `handle` | platforms are listed in the schema; `email` works too |
 | `text` | `text` | supports `**bold**`, `*italic*` and `[links](https://…)` |
 | `heading` | `text` | section title, always full width |
-| `image` | `src` | local files go in `public/` and are referenced as `/file.jpg` |
+| `image` | `src` | uploaded or external image URL |
 | `video` | `url` | YouTube |
 | `music` | `url` | Spotify track, album, playlist, artist or show |
-| `github` | `repo` (`owner/name`) | stars, description and language are filled in at build time |
+| `github` | `repo` (`owner/name`) | stars, description and language are filled in automatically |
+
+The JSON Schema for a whole page is in `schema/page.schema.json` (`npm run schema` regenerates it).
+
+## REST and public JSON
+
+```bash
+curl -H "Authorization: Bearer posy_..." https://YOUR-POSY/api/v1/page
+curl -X POST -H "Authorization: Bearer posy_..." -H "Content-Type: application/json" \
+  -d '{"input":"https://github.com/owner/repo"}' https://YOUR-POSY/api/v1/page/tiles
+curl -X POST -H "Authorization: Bearer posy_..." https://YOUR-POSY/api/v1/page/publish
+curl https://YOUR-POSY/api/v1/public/USERNAME      # anyone can read a published page
+```
+
+Each published page also has a plain-text version at `/<username>/llms.txt`.
 
 ## The CLI
 
-Agents that prefer commands can use the CLI instead of editing JSON by hand:
-
 ```bash
+export POSY_URL=https://YOUR-POSY POSY_API_KEY=posy_...
+npm run posy -- get
 npm run posy -- add https://github.com/owner/repo --size w
 npm run posy -- add "Open to freelance work" --color mint
-npm run posy -- theme midnight --font soft --layout split
-npm run posy -- list
+npm run posy -- theme --preset midnight --font soft --tiles glass
+npm run posy -- profile --bio "Designer and tinkerer"
 npm run posy -- remove t-abc1234
-npm run posy -- validate
+npm run posy -- publish
+npm run posy -- export my-page.json   # also: import <file>, validate <file>
 ```
-
-`add` understands profile links (X, Instagram, GitHub, LinkedIn, YouTube, Bluesky and 20+ more),
-YouTube and Spotify links, image URLs, `owner/repo`, email addresses and plain text.

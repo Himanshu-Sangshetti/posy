@@ -95,3 +95,57 @@ test('public page extras: llms.txt, JSON and share image', async ({ page }) => {
   const og = await page.request.get(`/${u}/og.png`);
   expect(og.headers()['content-type']).toContain('image/png');
 });
+
+test('the hosted MCP server lets an agent edit and publish with an API key', async ({ page, request }) => {
+  const username = await newUser(page);
+  const key = (await page.request.post('/api/auth/api-key/create', { data: { name: 'mcp' }, headers: { Origin: 'http://localhost:3211' } }).then(r => r.json())).key;
+  const headers = { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' };
+  let id = 0;
+  const rpc = async (method: string, params: unknown = {}) => {
+    const res = await request.post('/api/mcp', { headers, data: { jsonrpc: '2.0', id: ++id, method, params } });
+    expect(res.status()).toBe(200);
+    const body = await res.text();
+    const line = body.split('\n').find(l => l.startsWith('data:'));
+    return JSON.parse(line ? line.slice(5) : body);
+  };
+  const call = async (name: string, args: unknown = {}) => {
+    const r = await rpc('tools/call', { name, arguments: args });
+    expect(r.result.isError).toBeFalsy();
+    return r.result.content[0].text as string;
+  };
+
+  const anon = await request.post('/api/mcp', { headers: { ...headers, Authorization: 'Bearer posy_wrong' }, data: { jsonrpc: '2.0', id: 99, method: 'tools/list' } });
+  expect(anon.status()).toBe(401);
+
+  const tools = (await rpc('tools/list')).result.tools.map((t: { name: string }) => t.name);
+  expect(tools).toEqual(expect.arrayContaining(['get_page', 'add_tile', 'update_tile', 'remove_tile', 'move_tile', 'set_theme', 'set_profile', 'publish']));
+
+  await call('set_profile', { bio: 'Edited over MCP' });
+  await call('add_tile', { input: 'Hello from MCP' });
+  await call('set_theme', { preset: 'lavender' });
+  const state = JSON.parse(await call('get_page'));
+  expect(JSON.stringify(state)).toContain('Hello from MCP');
+  await call('publish');
+
+  const visitor = await page.context().browser()!.newPage();
+  await visitor.goto(`http://localhost:3211/${username}`);
+  await expect(visitor.getByText('Edited over MCP')).toBeVisible();
+  await expect(visitor.getByText('Hello from MCP')).toBeVisible();
+  await visitor.close();
+});
+
+test('export your page and delete your account', async ({ page }) => {
+  const u = await newUser(page);
+  await page.goto('/settings');
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download page.json' }).click();
+  const file = await download;
+  const exported = JSON.parse(await (await import('node:fs/promises')).readFile((await file.path())!, 'utf8'));
+  expect(exported.profile.name).toBe('Test Person');
+
+  await page.getByRole('button', { name: 'Delete account' }).click();
+  await page.getByPlaceholder('Your password').fill('pastel-garden-42');
+  await page.getByRole('button', { name: 'Delete forever' }).click();
+  await page.waitForURL(url => url.pathname === '/' || url.pathname === '/signup' || url.pathname === '/login');
+  expect((await page.request.get(`/${u}`)).status()).toBe(404);
+});

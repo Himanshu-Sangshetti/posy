@@ -9,45 +9,75 @@
 ---
 
 When Linktree bought Bento and shut it down, a lot of people lost a page they loved. Posy is the
-page that can't be taken away: it builds to plain static files you can host anywhere for free,
-and the whole page lives in one file you control.
+page that can't be taken away: it's open source, you can run it yourself with one Docker command,
+and you can export your whole page as JSON at any time.
 
-- **Looks good by default.** Eight pastel and dark themes, four font pairs, soft spring animations.
+- **Looks good by default.** Twelve pastel and dark themes, ten font pairs, soft spring animations.
 - **A calm editor.** Paste any link and it becomes the right tile. Drag to reorder. Click to edit. That's it.
-- **Yours forever.** Static export to GitHub Pages, Vercel, Netlify or any web server. No account, no lock-in.
-- **Agent friendly.** One `page.json` with a JSON Schema, a CLI, and a studio that updates live when your agent edits the file.
+- **Yours forever.** Self-host with Docker or Vercel, export your page as JSON whenever you like. No lock-in.
+- **Agent friendly.** API keys, a REST API, a hosted MCP server and a CLI. The studio updates live when your agent edits the page.
 - **Fast.** Server-rendered, works with JavaScript turned off, entrance animations in pure CSS.
 
 <p align="center">
   <img src="docs/media/studio.webp" alt="The Posy studio with the theme panel open" width="900">
 </p>
 
-## Get your page
+## Run it yourself
 
-1. Click **Use this template** on GitHub (or fork the repo).
-2. In your new repo: **Settings → Pages → Source: GitHub Actions**.
-3. Edit your page (below), push, and it's live at `https://<you>.github.io/<repo>/`.
+### Docker
 
-Want your own domain? Add it under Settings → Pages. It's free.
+```bash
+docker build -t posy .
+docker run -p 3000:3000 -v posy-data:/data \
+  -e NEXT_PUBLIC_SITE_URL=http://localhost:3000 \
+  -e BETTER_AUTH_URL=http://localhost:3000 \
+  -e BETTER_AUTH_SECRET=$(openssl rand -base64 32) \
+  posy
+```
 
-## Edit your page
+Or `docker compose up` (change `BETTER_AUTH_SECRET` in `docker-compose.yml` first). Open
+http://localhost:3000 and sign up. **The first account owns the instance, then sign-ups close.**
+Your page lives at `/` and at `/<username>`. Data (SQLite) is stored in the `/data` volume, and
+migrations run on start.
+
+### From source
 
 ```bash
 npm install
-npm run dev
+npm run dev        # http://localhost:3000
 ```
 
-Open **http://localhost:3000/edit**. Everything you change is saved to `content/page.json`.
+Everything is optional locally; see [.env.example](.env.example).
+
+### Configuration
+
+| Variable | Default | What it does |
+|---|---|---|
+| `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` | Public URL (share links, OG images) |
+| `BETTER_AUTH_URL` / `BETTER_AUTH_SECRET` | | Required in production. Secret: `openssl rand -base64 32` |
+| `POSY_SIGNUP` | `first-user` | `open` lets anyone sign up, `closed` disables sign-up |
+| `POSY_ROOT` | `owner-page` | `marketing` shows a landing page at `/` instead (for a hosted multi-user site) |
+| `POSY_DATA_DIR` | `~/.posy` in dev, `.data` in production (`/data` in Docker) | Where the SQLite file and uploads live |
+| `DATABASE_URL`, `DATABASE_AUTH_TOKEN` | local file | Use Turso / libSQL instead |
+| `BLOB_READ_WRITE_TOKEN` | | Vercel Blob for uploads on Vercel |
+| `GITHUB_CLIENT_ID/SECRET`, `GOOGLE_CLIENT_ID/SECRET` | | Enable social sign-in |
+| `GITHUB_TOKEN` | | Higher GitHub API limit for repo tiles |
+
+## Using the studio
+
+Sign in and open **Edit**.
 
 | | |
 |---|---|
 | **Add** | Press <kbd>Add</kbd>, or paste a link anywhere on the page. Profiles, YouTube, Spotify, GitHub repos, images and emails are recognised automatically. |
 | **Arrange** | Drag tiles. Pick a size: small, wide, tall or large. |
-| **Style** | Theme, accent colour, font, corners, layout, from the palette button. |
+| **Style** | Theme, backgrounds, tile styles, fonts, corners and layout, from the palette button. |
 | **Undo** | <kbd>⌘Z</kbd> / <kbd>⇧⌘Z</kbd>. <kbd>Delete</kbd> removes the selected tile, <kbd>Esc</kbd> deselects. |
-| **Share** | Set your page's address to get a QR code. |
+| **Publish** | Edits are saved to a draft. **Publish** makes them live. |
+| **Share** | QR code and link for your page. |
 
-Drop images straight onto the page to add them. They're resized and saved into `public/uploads`.
+Dashboard pages: **Analytics** (views and clicks per tile), **Agents** (API keys and setup snippets),
+**Settings** (change username, export your page as JSON, delete your account).
 
 <p align="center">
   <img src="docs/media/add.webp" alt="Adding a tile by pasting a GitHub link" width="900">
@@ -55,10 +85,10 @@ Drop images straight onto the page to add them. They're resized and saved into `
 
 ## Themes
 
-Cream · Lavender · Mint · Sky · Peach · Paper · Midnight · Mocha, plus any accent colour.
+Cream · Lavender · Mint · Sky · Peach · Paper · Blush · Sage · Midnight · Mocha · Dusk · Ocean, plus any accent colour, backgrounds, tile styles, hover effects and font pairs.
 
 <p align="center">
-  <img src="docs/media/themes.webp" alt="All eight Posy themes" width="900">
+  <img src="docs/media/themes.webp" alt="Posy themes" width="900">
 </p>
 
 ## Tiles
@@ -76,36 +106,37 @@ Cream · Lavender · Mint · Sky · Peach · Paper · Midnight · Mocha, plus an
 
 ## Edit with your AI agent
 
-Ask Claude Code, Cursor or Codex to change `content/page.json`, e.g. *"add my repo owner/name as a
-wide tile under Projects and switch to the lavender theme"*. If the studio is open, the change appears
-within a second. See [docs/ai-agents.md](docs/ai-agents.md) for the rules agents should follow.
-
-There's also a CLI:
+Create an API key on the **Agents** page, then connect your agent to the hosted MCP server:
 
 ```bash
+claude mcp add --transport http posy http://localhost:3000/api/mcp \
+  --header "Authorization: Bearer posy_..."
+```
+
+Ask it, for example, *"add my repo owner/name as a wide tile and switch to the lavender theme, then
+publish"*. If the studio is open, the change appears within seconds. There's also a REST API
+(`/api/v1/page`), a public JSON view of any page (`/api/v1/public/<username>`), `llms.txt` pages,
+and a CLI:
+
+```bash
+export POSY_URL=http://localhost:3000 POSY_API_KEY=posy_...
 npm run posy -- add https://x.com/you
-npm run posy -- add owner/repo --size w
-npm run posy -- theme midnight --font soft
-npm run posy -- validate
+npm run posy -- theme --preset midnight --tiles glass
+npm run posy -- publish
 ```
 
-## Deploying elsewhere
+See [docs/ai-agents.md](docs/ai-agents.md).
 
-```bash
-npm run build      # static site in out/
-```
+## Deploying
 
-Upload `out/` anywhere. On Vercel or Netlify, import the repo and keep the defaults.
-
-For share previews (the image shown when your link is posted), set `seo.url` in `page.json` to your
-page's address. The GitHub Pages workflow does this for you.
-
-To host a try-it-yourself editor (it saves to the visitor's browser), build with `POSY_PLAYGROUND=1`.
+- **Docker** anywhere (see above). Mount `/data`.
+- **Vercel**: import the repo, set `DATABASE_URL` + `DATABASE_AUTH_TOKEN` (Turso), `BLOB_READ_WRITE_TOKEN`,
+  `BETTER_AUTH_SECRET` and `NEXT_PUBLIC_SITE_URL`. Migrations run on start.
 
 ## Built with
 
-Next.js 16 (static export) · React 19 · TypeScript · Tailwind CSS 4 · Motion · dnd-kit · shadcn/ui ·
-Zustand · Zod · Simple Icons
+Next.js 16 · React 19 · TypeScript · Tailwind CSS 4 · Motion · dnd-kit · shadcn/ui · Better Auth ·
+Drizzle + libSQL · Zod · MCP
 
 ## Contributing
 
