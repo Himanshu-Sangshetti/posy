@@ -174,3 +174,25 @@ test('the desk template turns tiles into objects, and a note can become a stamp'
   await expect(visitor.locator('.posy-social-row a')).toHaveCount(4);
   await visitor.close();
 });
+
+test('export page.json, then import it back into the draft', async ({ page }) => {
+  await newUser(page, 'creator');
+  const before = (await draft(page)).page;
+  await page.goto('/settings');
+  const dl = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download page.json' }).click();
+  const file = await (await dl).path();
+
+  // change the draft, then bring the exported one back
+  await page.request.put('/api/v1/page', { data: { page: { ...before, profile: { ...before.profile, bio: 'Changed after export' } }, baseVersion: (await draft(page)).version } });
+  await page.locator('input[type=file]').setInputFiles(file!);
+  await page.getByRole('button', { name: 'Replace draft' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Imported into your draft' })).toBeVisible();
+  expect((await draft(page)).page).toEqual(before);
+
+  // a bad file explains itself and changes nothing
+  await page.locator('input[type=file]').setInputFiles({ name: 'bad.json', mimeType: 'application/json', buffer: Buffer.from('{"theme":{"preset":"nope"}}') });
+  await page.getByRole('button', { name: 'Replace draft' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'theme.preset' })).toBeVisible();
+  expect((await draft(page)).page).toEqual(before);
+});

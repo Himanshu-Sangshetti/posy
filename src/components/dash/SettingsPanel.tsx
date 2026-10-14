@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, Download, Loader2, X } from 'lucide-react';
+import { Check, Download, Loader2, Upload, X } from 'lucide-react';
+import { exportFile, readImport } from '@/lib/portable';
 import { authClient } from '@/lib/auth-client';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -19,6 +20,10 @@ export function SettingsPanel({ username, email, host }: { username: string; ema
   const [password, setPassword] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [delError, setDelError] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [incoming, setIncoming] = useState<{ file: string; page: Record<string, unknown> } | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importMsg, setImportMsg] = useState<{ ok: boolean; text: string[] } | null>(null);
 
   useEffect(() => {
     if (name === username || !name) { setCheck(null); return; }
@@ -37,8 +42,28 @@ export function SettingsPanel({ username, email, host }: { username: string; ema
   async function exportJson() {
     const d = await (await fetch('/api/v1/page')).json();
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([JSON.stringify({ $schema: 'https://posy.page/schema/page.schema.json', ...d.page }, null, 2)], { type: 'application/json' }));
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(exportFile(d.page, window.location.origin), null, 2)], { type: 'application/json' }));
     a.download = `${username}-posy.json`; a.click();
+  }
+
+  async function pickFile(f: File | undefined) {
+    if (!f) return;
+    setImportMsg(null);
+    try { setIncoming({ file: f.name, page: readImport(await f.text()) }); }
+    catch (e) { setImportMsg({ ok: false, text: [(e as Error).message] }); }
+    if (fileRef.current) fileRef.current.value = '';
+  }
+
+  async function importJson() {
+    if (!incoming) return;
+    setImporting(true);
+    const cur = await fetch('/api/v1/page');
+    const base = cur.ok ? (await cur.json()).version : undefined;
+    const r = await fetch('/api/v1/page', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ page: incoming.page, baseVersion: base }) });
+    const d = await r.json().catch(() => ({}));
+    setImporting(false); setIncoming(null);
+    if (r.ok) { setImportMsg({ ok: true, text: ['Imported into your draft. Open the editor to review it, then press Publish to make it live.'] }); router.refresh(); return; }
+    setImportMsg({ ok: false, text: d.issues ?? [d.error ?? 'Could not import that file.'] });
   }
 
   async function remove() {
@@ -67,8 +92,24 @@ export function SettingsPanel({ username, email, host }: { username: string; ema
 
       <section className={card}>
         <h2 className="app-h2">Own your page</h2>
-        <p className="mt-1 max-w-[58ch] text-[14.5px] text-[#8d8379]">Download your page as one JSON file. Posy is open source, so you can host it yourself any time.</p>
-        <button type="button" onClick={exportJson} className={`${btn} mt-4 border border-[rgb(45_39_35/.16)] hover:bg-[rgb(45_39_35/.05)]`}><Download className="size-4" />Download page.json</button>
+        <p className="mt-1 max-w-[58ch] text-[14.5px] text-[#8d8379]">Your page is one JSON file. Download it, or import one from another Posy.</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button type="button" onClick={exportJson} className={`${btn} border border-[rgb(45_39_35/.16)] hover:bg-[rgb(45_39_35/.05)]`}><Download className="size-4" />Download page.json</button>
+          <button type="button" onClick={() => fileRef.current?.click()} className={`${btn} border border-[rgb(45_39_35/.16)] hover:bg-[rgb(45_39_35/.05)]`}><Upload className="size-4" />Import page.json</button>
+          <input ref={fileRef} type="file" accept="application/json,.json" aria-label="Page file" className="hidden" onChange={e => pickFile(e.target.files?.[0])} />
+        </div>
+        <p className="mt-3 max-w-[58ch] text-[13.5px] text-[#8d8379]">Works between any two Posy instances, self-hosted or posy.page. Photos you uploaded are saved as full links, so they keep loading from the original server.</p>
+        {importMsg && (
+          <div role="status" className={`mt-3 text-[14px] ${importMsg.ok ? '' : 'text-[#c2453c]'}`}>
+            {importMsg.text.slice(0, 6).map(t => <p key={t}>{t}</p>)}
+          </div>
+        )}
+        <Dialog open={!!incoming} onOpenChange={o => !o && setIncoming(null)}>
+          <DialogContent className="max-w-[420px] rounded-[22px]">
+            <DialogHeader><DialogTitle>Replace your draft?</DialogTitle><DialogDescription>{incoming?.file} has {Array.isArray(incoming?.page.tiles) ? incoming.page.tiles.length : 0} tiles. It replaces your current draft. Your live page stays as it is until you publish.</DialogDescription></DialogHeader>
+            <button type="button" onClick={importJson} disabled={importing} className={`${btn} justify-center bg-[#2d2723] text-white`}>{importing && <Loader2 className="size-4 animate-spin" />}Replace draft</button>
+          </DialogContent>
+        </Dialog>
       </section>
 
       <section className={card}>
