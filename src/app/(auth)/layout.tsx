@@ -1,22 +1,41 @@
 import Link from 'next/link';
 import { Logo } from '@/components/brand';
 import { Thumbnail } from '@/components/page/Thumbnail';
+import { AppFrame } from '@/components/dash/ui';
+import { BlurFade } from '@/components/ui/blur-fade';
 import { template } from '@/lib/templates';
+import { SITE_HOST } from '@/lib/site';
+
+const POINTS = [
+  ['rose', 'Five styles', 'Soft, editorial, terminal, neon, cozy.'],
+  ['mint', 'Edited by your AI', 'Claude, Cursor and Codex over MCP.'],
+  ['sky', 'Yours to keep', 'One JSON file, free and open source.'],
+] as const;
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   const preview = template('desk', 'Your Name');
   return (
-    <div className="posy-page posy-app posy-style-cozy posy-bg-solid posy-grain posy-motion min-h-dvh">
-      <div aria-hidden className="posy-backdrop"><span className="posy-noise" /></div>
-      <header className="relative z-10 px-6 py-5 sm:px-10"><Link href="/" aria-label="Posy home"><Logo /></Link></header>
-      <main className="relative z-10 mx-auto grid min-h-[calc(100dvh-80px)] max-w-[1080px] items-center gap-16 px-5 pb-16 lg:grid-cols-[400px_1fr]">
+    <AppFrame>
+      <header className="mx-auto flex max-w-[1180px] items-center px-6 py-5 sm:px-10"><Link href="/" aria-label="Posy home" className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"><Logo /></Link></header>
+      <main className="mx-auto grid min-h-[calc(100dvh-84px)] max-w-[1180px] items-center gap-10 px-5 pb-14 sm:px-10 lg:grid-cols-[420px_1fr] lg:gap-16">
         {children}
-        <figure aria-hidden className="relative hidden rotate-[2.5deg] bg-[var(--dk-white)] p-3.5 pb-14 shadow-[var(--dk-shadow)] lg:block">
-          <span className="app-tape" />
-          <Thumbnail page={preview} width={1100} height={860} scale={0.52} />
-          <figcaption className="app-hand absolute inset-x-0 bottom-3 text-center text-[26px] text-[#5b5049]">your page, a minute from now ✿</figcaption>
-        </figure>
+        <BlurFade delay={0.12} className="hidden lg:block">
+          <figure aria-hidden className="relative overflow-hidden rounded-[32px] border border-[var(--line)] bg-[linear-gradient(150deg,#f1ebfc_0%,#fdeaf0_55%,#e8f2fb_100%)] p-8">
+            <div className="mx-auto w-fit overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface)] shadow-[0_30px_60px_-30px_rgb(80_50_130/.45)]">
+              <div className="flex h-9 items-center gap-1.5 border-b border-[var(--line)] px-3.5">
+                <i className="size-2.5 rounded-full bg-[var(--ac-rose)]" /><i className="size-2.5 rounded-full bg-[var(--ac-butter)]" /><i className="size-2.5 rounded-full bg-[var(--ac-mint)]" />
+                <span className="ac-mono mx-auto rounded-full bg-[var(--bg)] px-3 py-0.5 text-[11.5px] text-[var(--muted)]">{SITE_HOST()}/yourname</span><span className="w-10" />
+              </div>
+              <Thumbnail page={preview} width={1100} height={860} scale={0.5} />
+            </div>
+            <figcaption className="mt-7 grid grid-cols-3 gap-4">
+              {POINTS.map(([tone, t, d]) => (
+                <div key={t}><span className={`ac-pill ac-tone-${tone}`}>{t}</span><p className="mt-2 text-[13.5px] leading-snug text-[var(--muted)]">{d}</p></div>
+              ))}
+            </figcaption>
+          </figure>
+        </BlurFade>
       </main>
-    </div>
+    </AppFrame>
   );
 }
