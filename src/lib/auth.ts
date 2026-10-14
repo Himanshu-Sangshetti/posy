@@ -19,6 +19,8 @@ export const auth = betterAuth({
   // On by default in production; the e2e suite signs up many users from one IP, so it switches this off.
   ...(env.POSY_RATE_LIMIT === 'off' ? { rateLimit: { enabled: false } } : {}),
   emailAndPassword: { enabled: true, minPasswordLength: 8, autoSignIn: true },
+  // Brute-force protection stays on in production; only the e2e test server turns it off.
+  rateLimit: process.env.POSY_E2E ? { enabled: false } : undefined,
   user: { deleteUser: { enabled: true } }, // pages and events cascade-delete with the user
   databaseHooks: {
     user: {
