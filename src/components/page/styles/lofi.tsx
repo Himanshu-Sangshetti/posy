@@ -26,16 +26,12 @@ export function fileName(tile: Tile, n: number) {
   }
 }
 
-/** A photo as a halftone print: real dots that grow in the shadows, tinted with the page colours. */
+/** A photo, night-graded: real colour, a soft tint of the page's light and a fine print texture over it. */
 export function Halftone({ src, className }: { src: string; className?: string }) {
   return (
     <span className={cn('lf-ht', className)}>
-      <span className="lf-ht-dots">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={asset(src)} alt="" loading="lazy" draggable={false} />
-      </span>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="lf-ht-real" src={asset(src)} alt="" loading="lazy" draggable={false} />
+      <img src={asset(src)} alt="" loading="lazy" draggable={false} />
     </span>
   );
 }
