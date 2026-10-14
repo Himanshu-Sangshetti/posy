@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { PLATFORM_IDS } from './platforms';
 import { THEME_IDS, TINTS } from './themes';
 import { EDITION_FONT_PAIRS } from '@/edition/fonts';
+import { CANVAS_WIDTH } from './canvas-layout';
 
 /** Tile footprint on the grid: small square, wide, tall, large square. */
 export const SIZES = ['s', 'w', 't', 'l'] as const;
@@ -12,7 +13,7 @@ export const RADII = ['sharp', 'soft', 'round', 'pill'] as const;
 export const STYLES = ['cozy', 'minimal', 'washi', 'lofi'] as const;
 /** Styles that were retired, and the look each one moves to. */
 const RETIRED_STYLES: Record<string, (typeof STYLES)[number]> = { soft: 'minimal', editorial: 'minimal', terminal: 'minimal', neon: 'lofi' };
-export const LAYOUTS = ['bento', 'list'] as const;
+export const LAYOUTS = ['bento', 'list', 'canvas'] as const;
 export const TEXT_LOOKS = ['note', 'stamp'] as const;
 export const ALIGNS = ['side', 'center'] as const;
 export const BACKGROUNDS = ['solid', 'dots', 'grid', 'image'] as const;
@@ -23,10 +24,21 @@ export const COLORS = ['auto', 'surface', 'accent', ...TINTS] as const;
 
 const id = z.string().min(1).describe('Stable unique id, e.g. "t-abc123"');
 const url = z.string().min(1).describe('Absolute URL (https://...) or a path inside /public');
+/** Free placement on the canvas layout. Units are a 1200-wide design space; the page scales it to fit. */
+export const TilePos = z.object({
+  x: z.number().min(0).max(CANVAS_WIDTH).describe('Left edge, 0–1200'),
+  y: z.number().min(0).describe('Top edge, 0 and up'),
+  w: z.number().min(24).max(CANVAS_WIDTH).describe('Width, up to 1200'),
+  h: z.number().min(24).describe('Height'),
+  r: z.number().min(-15).max(15).default(0).describe('Rotation in degrees, -15 to 15'),
+  z: z.number().int().default(0).describe('Layer: higher sits on top'),
+}).describe('Canvas layout only: where the tile sits. Tiles without it are placed automatically, flowing like the grid');
+
 const base = {
   id,
   size: z.enum(SIZES).default('s').describe('s = 1x1, w = 2x1, t = 1x2, l = 2x2'),
   color: z.enum(COLORS).default('auto').describe('Tile background. "auto" is the plain card colour; pick a tint to colour one tile'),
+  pos: TilePos.optional(),
 };
 
 export const LinkTile = z.object({
@@ -110,7 +122,7 @@ export const Theme = z.object({
   font: z.enum(FONTS).default('editorial'),
   radius: z.enum(RADII).default('round'),
   style: z.enum(STYLES).default('cozy').describe('cozy = Desk: tiles as objects on a desk (polaroids, sticky notes, records); minimal = quiet type and plain cards; washi = a Japanese print (paper, ink, kanji numerals, red seal); lofi = a night-time anime still (tiles as little app windows, halftone photos)'),
-  layout: z.enum(LAYOUTS).default('bento').describe('bento = grid of tiles; list = Linktree-style stacked links'),
+  layout: z.enum(LAYOUTS).default('bento').describe('bento = grid of tiles; list = Linktree-style stacked links; canvas = free placement, each tile at its own `pos` (x, y, w, h in a 1200-wide space, rotation r, layer z)'),
   align: z.enum(ALIGNS).default('side').describe('minimal style + bento only: profile beside the grid (side) or above it (center)'),
   background: Background.default(Background.parse({})),
   tileStyle: z.enum(TILE_STYLES).default('soft'),
@@ -161,6 +173,8 @@ export type Tile = z.infer<typeof Tile>;
 export type TileType = Tile['type'];
 export type Size = (typeof SIZES)[number];
 export type Color = (typeof COLORS)[number];
+export type TilePos = z.infer<typeof TilePos>;
+export type Layout = (typeof LAYOUTS)[number];
 
 export function parsePage(data: unknown): Page {
   return Page.parse(data);

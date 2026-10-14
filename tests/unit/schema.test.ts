@@ -83,3 +83,23 @@ describe('desk layout', () => {
     expect(Math.abs(deskTilt(t))).toBeLessThanOrEqual(2.8);
   });
 });
+
+describe('canvas layout', () => {
+  it('accepts the canvas layout and free tile positions', () => {
+    const p = parsePage({ profile: { name: 'A' }, theme: { layout: 'canvas' }, tiles: [{ id: 'a', type: 'text', text: 'hi', pos: { x: 10, y: 20, w: 300, h: 200 } }] });
+    expect(p.theme.layout).toBe('canvas');
+    expect(p.tiles[0].pos).toEqual({ x: 10, y: 20, w: 300, h: 200, r: 0, z: 0 });
+  });
+  it('keeps old pages valid without positions', () => {
+    const p = parsePage({ profile: { name: 'A' }, tiles: [{ id: 'a', type: 'text', text: 'hi' }] });
+    expect(p.tiles[0].pos).toBeUndefined();
+  });
+  it('rejects rotations beyond ±15 and positions off the canvas', () => {
+    const bad = (pos: object) => Page.safeParse({ profile: { name: 'A' }, tiles: [{ id: 'a', type: 'text', text: 'hi', pos: { x: 0, y: 0, w: 100, h: 100, ...pos } }] }).success;
+    expect(bad({ r: 20 })).toBe(false);
+    expect(bad({ x: 1300 })).toBe(false);
+    expect(bad({ w: 2000 })).toBe(false);
+    expect(bad({ z: 1.5 })).toBe(false);
+    expect(bad({ r: -15, z: -3 })).toBe(true);
+  });
+});

@@ -134,11 +134,12 @@
         },
         "layout": {
           "default": "bento",
-          "description": "bento = grid of tiles; list = Linktree-style stacked links",
+          "description": "bento = grid of tiles; list = Linktree-style stacked links; canvas = free placement, each tile at its own `pos` (x, y, w, h in a 1200-wide space, rotation r, layer z)",
           "type": "string",
           "enum": [
             "bento",
-            "list"
+            "list",
+            "canvas"
           ]
         },
         "align": {
@@ -287,6 +288,54 @@
                   "rose"
                 ]
               },
+              "pos": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1200,
+                    "description": "Left edge, 0–1200"
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Top edge, 0 and up"
+                  },
+                  "w": {
+                    "type": "number",
+                    "minimum": 24,
+                    "maximum": 1200,
+                    "description": "Width, up to 1200"
+                  },
+                  "h": {
+                    "type": "number",
+                    "minimum": 24,
+                    "description": "Height"
+                  },
+                  "r": {
+                    "default": 0,
+                    "description": "Rotation in degrees, -15 to 15",
+                    "type": "number",
+                    "minimum": -15,
+                    "maximum": 15
+                  },
+                  "z": {
+                    "default": 0,
+                    "description": "Layer: higher sits on top",
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "x",
+                  "y",
+                  "w",
+                  "h"
+                ],
+                "description": "Canvas layout only: where the tile sits. Tiles without it are placed automatically, flowing like the grid"
+              },
               "type": {
                 "type": "string",
                 "const": "link"
@@ -348,6 +397,54 @@
                   "lilac",
                   "rose"
                 ]
+              },
+              "pos": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1200,
+                    "description": "Left edge, 0–1200"
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Top edge, 0 and up"
+                  },
+                  "w": {
+                    "type": "number",
+                    "minimum": 24,
+                    "maximum": 1200,
+                    "description": "Width, up to 1200"
+                  },
+                  "h": {
+                    "type": "number",
+                    "minimum": 24,
+                    "description": "Height"
+                  },
+                  "r": {
+                    "default": 0,
+                    "description": "Rotation in degrees, -15 to 15",
+                    "type": "number",
+                    "minimum": -15,
+                    "maximum": 15
+                  },
+                  "z": {
+                    "default": 0,
+                    "description": "Layer: higher sits on top",
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "x",
+                  "y",
+                  "w",
+                  "h"
+                ],
+                "description": "Canvas layout only: where the tile sits. Tiles without it are placed automatically, flowing like the grid"
               },
               "type": {
                 "type": "string",
@@ -441,6 +538,54 @@
                   "rose"
                 ]
               },
+              "pos": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1200,
+                    "description": "Left edge, 0–1200"
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Top edge, 0 and up"
+                  },
+                  "w": {
+                    "type": "number",
+                    "minimum": 24,
+                    "maximum": 1200,
+                    "description": "Width, up to 1200"
+                  },
+                  "h": {
+                    "type": "number",
+                    "minimum": 24,
+                    "description": "Height"
+                  },
+                  "r": {
+                    "default": 0,
+                    "description": "Rotation in degrees, -15 to 15",
+                    "type": "number",
+                    "minimum": -15,
+                    "maximum": 15
+                  },
+                  "z": {
+                    "default": 0,
+                    "description": "Layer: higher sits on top",
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "x",
+                  "y",
+                  "w",
+                  "h"
+                ],
+                "description": "Canvas layout only: where the tile sits. Tiles without it are placed automatically, flowing like the grid"
+              },
               "type": {
                 "type": "string",
                 "const": "text"
@@ -500,6 +645,54 @@
                   "rose"
                 ]
               },
+              "pos": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1200,
+                    "description": "Left edge, 0–1200"
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Top edge, 0 and up"
+                  },
+                  "w": {
+                    "type": "number",
+                    "minimum": 24,
+                    "maximum": 1200,
+                    "description": "Width, up to 1200"
+                  },
+                  "h": {
+                    "type": "number",
+                    "minimum": 24,
+                    "description": "Height"
+                  },
+                  "r": {
+                    "default": 0,
+                    "description": "Rotation in degrees, -15 to 15",
+                    "type": "number",
+                    "minimum": -15,
+                    "maximum": 15
+                  },
+                  "z": {
+                    "default": 0,
+                    "description": "Layer: higher sits on top",
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "x",
+                  "y",
+                  "w",
+                  "h"
+                ],
+                "description": "Canvas layout only: where the tile sits. Tiles without it are placed automatically, flowing like the grid"
+              },
               "type": {
                 "type": "string",
                 "const": "heading"
@@ -550,6 +743,54 @@
                   "lilac",
                   "rose"
                 ]
+              },
+              "pos": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1200,
+                    "description": "Left edge, 0–1200"
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Top edge, 0 and up"
+                  },
+                  "w": {
+                    "type": "number",
+                    "minimum": 24,
+                    "maximum": 1200,
+                    "description": "Width, up to 1200"
+                  },
+                  "h": {
+                    "type": "number",
+                    "minimum": 24,
+                    "description": "Height"
+                  },
+                  "r": {
+                    "default": 0,
+                    "description": "Rotation in degrees, -15 to 15",
+                    "type": "number",
+                    "minimum": -15,
+                    "maximum": 15
+                  },
+                  "z": {
+                    "default": 0,
+                    "description": "Layer: higher sits on top",
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "x",
+                  "y",
+                  "w",
+                  "h"
+                ],
+                "description": "Canvas layout only: where the tile sits. Tiles without it are placed automatically, flowing like the grid"
               },
               "type": {
                 "type": "string",
@@ -613,6 +854,54 @@
                   "rose"
                 ]
               },
+              "pos": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1200,
+                    "description": "Left edge, 0–1200"
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Top edge, 0 and up"
+                  },
+                  "w": {
+                    "type": "number",
+                    "minimum": 24,
+                    "maximum": 1200,
+                    "description": "Width, up to 1200"
+                  },
+                  "h": {
+                    "type": "number",
+                    "minimum": 24,
+                    "description": "Height"
+                  },
+                  "r": {
+                    "default": 0,
+                    "description": "Rotation in degrees, -15 to 15",
+                    "type": "number",
+                    "minimum": -15,
+                    "maximum": 15
+                  },
+                  "z": {
+                    "default": 0,
+                    "description": "Layer: higher sits on top",
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "x",
+                  "y",
+                  "w",
+                  "h"
+                ],
+                "description": "Canvas layout only: where the tile sits. Tiles without it are placed automatically, flowing like the grid"
+              },
               "type": {
                 "type": "string",
                 "const": "video"
@@ -670,6 +959,54 @@
                   "lilac",
                   "rose"
                 ]
+              },
+              "pos": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1200,
+                    "description": "Left edge, 0–1200"
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Top edge, 0 and up"
+                  },
+                  "w": {
+                    "type": "number",
+                    "minimum": 24,
+                    "maximum": 1200,
+                    "description": "Width, up to 1200"
+                  },
+                  "h": {
+                    "type": "number",
+                    "minimum": 24,
+                    "description": "Height"
+                  },
+                  "r": {
+                    "default": 0,
+                    "description": "Rotation in degrees, -15 to 15",
+                    "type": "number",
+                    "minimum": -15,
+                    "maximum": 15
+                  },
+                  "z": {
+                    "default": 0,
+                    "description": "Layer: higher sits on top",
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "x",
+                  "y",
+                  "w",
+                  "h"
+                ],
+                "description": "Canvas layout only: where the tile sits. Tiles without it are placed automatically, flowing like the grid"
               },
               "type": {
                 "type": "string",
@@ -732,6 +1069,54 @@
                   "lilac",
                   "rose"
                 ]
+              },
+              "pos": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1200,
+                    "description": "Left edge, 0–1200"
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Top edge, 0 and up"
+                  },
+                  "w": {
+                    "type": "number",
+                    "minimum": 24,
+                    "maximum": 1200,
+                    "description": "Width, up to 1200"
+                  },
+                  "h": {
+                    "type": "number",
+                    "minimum": 24,
+                    "description": "Height"
+                  },
+                  "r": {
+                    "default": 0,
+                    "description": "Rotation in degrees, -15 to 15",
+                    "type": "number",
+                    "minimum": -15,
+                    "maximum": 15
+                  },
+                  "z": {
+                    "default": 0,
+                    "description": "Layer: higher sits on top",
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "x",
+                  "y",
+                  "w",
+                  "h"
+                ],
+                "description": "Canvas layout only: where the tile sits. Tiles without it are placed automatically, flowing like the grid"
               },
               "type": {
                 "type": "string",

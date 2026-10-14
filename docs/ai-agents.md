@@ -25,7 +25,7 @@ Cursor, Codex and other MCP clients: add an HTTP server at `https://YOUR-POSY/ap
 | `get_page` | Draft (profile, theme, tiles with ids), public URL, version, unpublished-changes flag |
 | `add_tile` | Add from a link, email, `owner/repo` or note (auto-detected), or a full tile object |
 | `update_tile` / `remove_tile` / `move_tile` | Change fields, delete, reorder by id |
-| `set_theme` | Preset, accent, font, radius, layout (`desk`, `bento`, `list`), alignment, background, tile style, hover effect, avatar |
+| `set_theme` | Preset, accent, font, radius, layout (`bento`, `list`, `canvas`), alignment, background, tile style, hover effect, avatar |
 | `set_profile` | Name, bio, avatar, location |
 | `publish` | Make the draft live |
 | `list_options` | Allowed values for themes, fonts, backgrounds, sizes, colours and platforms |
@@ -48,6 +48,14 @@ Cursor, Codex and other MCP clients: add an HTTP server at `https://YOUR-POSY/ap
 3. Colours: `auto`, `surface`, `accent` or a pastel tint (`peach`, `butter`, `mint`, `sky`, `lilac`, `rose`).
 4. Keep pages calm: a few well-chosen tiles beat many. Ask before deleting things the user added.
 5. Edits are version-checked, so an agent and the person in the studio can work at the same time.
+6. Layouts: `bento` is the grid, `list` is one column of links, and `canvas` places every tile freely, like a design canvas.
+   On `canvas` a tile can carry `pos: { x, y, w, h, r, z }` in a design space **1200 units wide** (the page scales it to fit;
+   `y` grows downwards without limit). `r` is rotation in degrees (-15 to 15, default 0) and `z` is the layer (higher on top,
+   default 0). Tiles without `pos` are placed automatically, flowing like the grid below any placed tiles, so switching a page
+   to canvas needs no positions at all. The auto grid is 4 columns of 288 with 16 gaps: a small tile is 288×288, wide 592×288,
+   tall 288×592, large 592×592, and column `n` starts at `x = n × 304`. Keep values on multiples of 8, overlap tiles only on
+   purpose, and keep text tiles at least 160 wide. Example: `update_tile` with `{"pos":{"x":608,"y":0,"w":592,"h":288,"r":-3,"z":1}}`.
+   On phones (under 600px) a canvas page becomes one column, ordered top to bottom, then left to right.
 
 ## Tile types
 
