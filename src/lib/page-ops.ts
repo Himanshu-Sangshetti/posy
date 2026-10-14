@@ -4,6 +4,7 @@ import { pageForUser, saveDraft, publish, hasUnpublished } from './pages';
 import { parsePage, Tile, Theme, newId, type Page } from './schema';
 import { tileFromInput } from './detect';
 import { siteUrl } from './site';
+import { enrichTile } from './enrich';
 
 /** Operations shared by the REST API and the MCP server. Each one edits the draft. */
 async function edit(userId: string, fn: (p: Page) => Page) {
@@ -28,7 +29,7 @@ export async function getState(userId: string) {
 
 export async function addTile(userId: string, input: string | Record<string, unknown>, opts: { after?: string; size?: string; color?: string } = {}) {
   const base = typeof input === 'string' ? tileFromInput(input) : { id: newId(), ...input };
-  const tile = Tile.parse({ ...base, ...(opts.size && { size: opts.size }), ...(opts.color && { color: opts.color }) });
+  const tile = await enrichTile(Tile.parse({ ...base, ...(opts.size && { size: opts.size }), ...(opts.color && { color: opts.color }) }));
   await edit(userId, p => {
     const tiles = [...p.tiles];
     const at = opts.after ? tiles.findIndex(t => t.id === opts.after) : -1;

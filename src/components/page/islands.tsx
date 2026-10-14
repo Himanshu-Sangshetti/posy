@@ -69,3 +69,23 @@ export function TileEffects() {
   }, []);
   return null;
 }
+
+const counted = new Set<string>();
+
+/** Cookie-free analytics: one view per load, one click per tile tap. */
+export function PageAnalytics({ username }: { username: string }) {
+  useEffect(() => {
+    const send = (k: 'view' | 'click', t?: string) => {
+      const body = JSON.stringify({ u: username, k, t, r: k === 'view' ? document.referrer : undefined });
+      if (!navigator.sendBeacon?.('/api/track', new Blob([body], { type: 'text/plain' }))) fetch('/api/track', { method: 'POST', body, keepalive: true }).catch(() => {});
+    };
+    if (!counted.has(username)) { counted.add(username); send('view'); }
+    const click = (e: MouseEvent) => {
+      const el = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-tile-id], .posy-social-row a');
+      if (el) send('click', el.dataset.tileId ?? el.getAttribute('aria-label') ?? undefined);
+    };
+    document.addEventListener('click', click, { capture: true });
+    return () => document.removeEventListener('click', click, { capture: true });
+  }, [username]);
+  return null;
+}
