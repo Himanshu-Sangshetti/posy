@@ -8,7 +8,8 @@ export const SIZES = ['s', 'w', 't', 'l'] as const;
 export const BASE_FONTS = ['soft', 'editorial', 'classic', 'elegant', 'rounded', 'playful', 'modern', 'tech', 'mono', 'hand'] as const;
 export const FONTS = [...BASE_FONTS, ...Object.keys(EDITION_FONT_PAIRS)] as [string, ...string[]];
 export const RADII = ['sharp', 'soft', 'round', 'pill'] as const;
-export const LAYOUTS = ['bento', 'list'] as const;
+export const LAYOUTS = ['desk', 'bento', 'list'] as const;
+export const TEXT_LOOKS = ['note', 'stamp'] as const;
 export const ALIGNS = ['side', 'center'] as const;
 export const BACKGROUNDS = ['solid', 'gradient', 'mesh', 'aurora', 'dots', 'grid', 'image'] as const;
 export const TILE_STYLES = ['soft', 'glass', 'outline', 'solid'] as const;
@@ -45,6 +46,7 @@ export const TextTile = z.object({
   ...base,
   type: z.literal('text'),
   text: z.string().min(1).describe('Short note. **bold** and [links](https://...) are supported'),
+  look: z.enum(TEXT_LOOKS).optional().describe('Desk layout: note = sticky note, stamp = round badge with the text running around it (keep it short)'),
 });
 
 export const HeadingTile = z.object({
@@ -73,6 +75,9 @@ export const MusicTile = z.object({
   ...base,
   type: z.literal('music'),
   url: url.describe('Spotify track, album, playlist or artist URL'),
+  title: z.string().optional().describe('Filled automatically from Spotify'),
+  artist: z.string().optional(),
+  image: z.string().optional().describe('Cover art, filled automatically from Spotify'),
 });
 
 export const GithubTile = z.object({
@@ -97,9 +102,9 @@ export const Background = z.object({
 export const Theme = z.object({
   preset: z.enum(THEME_IDS).default('cream'),
   accent: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().describe('Override the theme accent, e.g. "#e8a87c"'),
-  font: z.enum(FONTS).default('soft'),
+  font: z.enum(FONTS).default('editorial'),
   radius: z.enum(RADII).default('round'),
-  layout: z.enum(LAYOUTS).default('bento').describe('bento = tile grid; list = Linktree-style stacked links'),
+  layout: z.enum(LAYOUTS).default('desk').describe('desk = tiles as objects on a desk (polaroids, notes, records); bento = tile grid; list = Linktree-style stacked links'),
   align: z.enum(ALIGNS).default('side').describe('bento only: profile beside the grid (side) or above it (center)'),
   background: Background.default(Background.parse({})),
   tileStyle: z.enum(TILE_STYLES).default('soft'),

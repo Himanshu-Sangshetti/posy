@@ -7,7 +7,7 @@ import { tileBackground } from '@/lib/style';
 describe('page format', () => {
   it('fills sensible defaults from a minimal page', () => {
     const p = parsePage({ profile: { name: 'Ada' } });
-    expect(p.theme).toMatchObject({ preset: 'cream', font: 'soft', radius: 'round', layout: 'bento', align: 'side', tileStyle: 'soft', effect: 'lift', motion: true });
+    expect(p.theme).toMatchObject({ preset: 'cream', font: 'editorial', radius: 'round', layout: 'desk', align: 'side', tileStyle: 'soft', effect: 'lift', motion: true });
     expect(p.theme.background).toMatchObject({ style: 'solid', grain: true });
     expect(p.version).toBe(2);
     expect(p.tiles).toEqual([]);
@@ -48,5 +48,22 @@ describe('themes', () => {
     const x = { id: 'a', type: 'social', platform: 'x', handle: 'a', size: 's', color: 'auto' } as const;
     expect(tileBackground(x, 0, '000000')).toBe('var(--tint-peach)');
     expect(tileBackground({ ...x, platform: 'instagram' }, 0, 'FF0069')).toContain('#FF0069');
+  });
+});
+
+describe('desk layout', () => {
+  it('keeps the note look and music cover art', () => {
+    const p = parsePage({ profile: { name: 'Ada' }, tiles: [
+      { id: 'a', type: 'text', text: 'Open for work', look: 'stamp' },
+      { id: 'b', type: 'music', url: 'https://open.spotify.com/track/x', title: 'Song', image: 'https://i.scdn.co/image/x' },
+    ] });
+    expect(p.tiles[0]).toMatchObject({ look: 'stamp' });
+    expect(p.tiles[1]).toMatchObject({ title: 'Song', image: 'https://i.scdn.co/image/x' });
+  });
+  it('tilts each tile the same way every time, within a small range', async () => {
+    const { deskTilt } = await import('../../src/components/page/desk');
+    const t = { id: 't-abc1234', type: 'text', text: 'hi', size: 's', color: 'auto' } as const;
+    expect(deskTilt(t)).toBe(deskTilt(t));
+    expect(Math.abs(deskTilt(t))).toBeLessThanOrEqual(2.8);
   });
 });

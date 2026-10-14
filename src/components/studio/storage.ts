@@ -59,6 +59,12 @@ export async function enrich(tile: Tile): Promise<Partial<Tile> | null> {
       if (r.full_name) return { description: r.description ?? undefined, stars: r.stargazers_count, language: r.language ?? undefined };
     } catch { /* offline */ }
   }
+  if (tile.type === 'music' && !tile.image) {
+    try {
+      const r = await (await fetch(`/api/unfurl?url=${encodeURIComponent(tile.url)}`)).json();
+      if (r.image) return { image: r.image, ...(r.title && !tile.title && { title: r.title }) };
+    } catch { /* ignore */ }
+  }
   if (tile.type === 'link') {
     try {
       const r = await (await fetch(`/api/unfurl?url=${encodeURIComponent(tile.url)}`)).json();

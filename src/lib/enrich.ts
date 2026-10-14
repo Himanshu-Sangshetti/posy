@@ -42,5 +42,20 @@ export async function enrichTile<T extends Tile>(tile: T): Promise<T> {
     const r = await unfurl(tile.url);
     return { ...tile, title: tile.title ?? r.title, description: tile.description ?? r.description, image: tile.image ?? r.image };
   }
+  if (tile.type === 'music' && !tile.image) {
+    const r = await spotify(tile.url);
+    return r ? { ...tile, title: tile.title ?? r.title, image: r.image } : tile;
+  }
   return tile;
+}
+
+/** Title and cover art from Spotify's public oEmbed endpoint. */
+export async function spotify(url: string): Promise<{ title?: string; image?: string } | null> {
+  if (!/^https:\/\/open\.spotify\.com\//.test(url)) return null;
+  try {
+    const res = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(url)}`, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return null;
+    const r = await res.json();
+    return { title: (r.title as string | undefined)?.slice(0, 80), image: r.thumbnail_url as string | undefined };
+  } catch { return null; }
 }

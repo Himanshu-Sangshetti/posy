@@ -69,7 +69,7 @@
           "pattern": "^#[0-9a-fA-F]{6}$"
         },
         "font": {
-          "default": "soft",
+          "default": "editorial",
           "type": "string",
           "enum": [
             "soft",
@@ -95,10 +95,11 @@
           ]
         },
         "layout": {
-          "default": "bento",
-          "description": "bento = tile grid; list = Linktree-style stacked links",
+          "default": "desk",
+          "description": "desk = tiles as objects on a desk (polaroids, notes, records); bento = tile grid; list = Linktree-style stacked links",
           "type": "string",
           "enum": [
+            "desk",
             "bento",
             "list"
           ]
@@ -414,6 +415,14 @@
                 "type": "string",
                 "minLength": 1,
                 "description": "Short note. **bold** and [links](https://...) are supported"
+              },
+              "look": {
+                "description": "Desk layout: note = sticky note, stamp = round badge with the text running around it (keep it short)",
+                "type": "string",
+                "enum": [
+                  "note",
+                  "stamp"
+                ]
               }
             },
             "required": [
@@ -632,6 +641,17 @@
                 "type": "string",
                 "minLength": 1,
                 "description": "Spotify track, album, playlist or artist URL"
+              },
+              "title": {
+                "description": "Filled automatically from Spotify",
+                "type": "string"
+              },
+              "artist": {
+                "type": "string"
+              },
+              "image": {
+                "description": "Cover art, filled automatically from Spotify",
+                "type": "string"
               }
             },
             "required": [
