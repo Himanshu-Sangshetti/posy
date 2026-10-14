@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Pencil, Stamp, StickyNote, Trash2, Upload } from 'lucide-react';
+import { BringToFront, Pencil, SendToBack, Stamp, StickyNote, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Tile, Size, Color } from '@/lib/schema';
 import { COLORS } from '@/lib/schema';
@@ -17,6 +17,7 @@ import { CHROME } from './chrome';
 import { cn } from '@/lib/utils';
 import { useStudio } from './store';
 import { storeImage } from './storage';
+import { layerTile, sizeTile } from './canvas-ops';
 
 const SIZE_LABEL: Record<Size, string> = { s: 'Small', w: 'Wide', t: 'Tall', l: 'Large' };
 
@@ -57,6 +58,7 @@ export function TileToolbar({ tile }: { tile: Tile }) {
   const layout = useStudio(s => s.page?.theme.layout);
   const desk = style === 'cozy';
   const stamp = tile.type === 'text' && tile.look === 'stamp';
+  const canvas = layout === 'canvas';
   const sticker = tile.type === 'social' && (style !== 'minimal' || layout === 'list');
   const inlineText = tile.type === 'text' && !stamp && (style === 'minimal' || style === 'cozy');
   const sized = tile.type !== 'heading' && !sticker;
@@ -68,7 +70,7 @@ export function TileToolbar({ tile }: { tile: Tile }) {
       className={cn(CHROME, 'sc-float absolute left-1/2 top-0 z-30 flex -translate-x-1/2 -translate-y-[calc(100%+10px)] items-center gap-0.5 rounded-[13px] p-1')}
     >
       {sized && sizes.map(s => (
-        <ToolButton key={s} label={SIZE_LABEL[s]} active={tile.size === s} onClick={() => updateTile(tile.id, { size: s })}><SizeGlyph size={s} /></ToolButton>
+        <ToolButton key={s} label={SIZE_LABEL[s]} active={tile.size === s} onClick={() => (canvas ? sizeTile(tile.id, s) : updateTile(tile.id, { size: s }))}><SizeGlyph size={s} /></ToolButton>
       ))}
       {sized && <Divider />}
       {sized && (
@@ -112,6 +114,11 @@ export function TileToolbar({ tile }: { tile: Tile }) {
           <PopoverContent side="top" className={cn(popCls, 'w-80 p-4')}><TileFields tile={tile} /></PopoverContent>
         </Popover>
       )}
+      {canvas && !sticker && <>
+        <Divider />
+        <ToolButton label="Bring to front" onClick={() => layerTile(tile.id, 'front')}><BringToFront className="size-4" /></ToolButton>
+        <ToolButton label="Send to back" onClick={() => layerTile(tile.id, 'back')}><SendToBack className="size-4" /></ToolButton>
+      </>}
       <Divider />
       <ToolButton label="Delete" danger onClick={() => removeTile(tile.id)}><Trash2 className="size-4" /></ToolButton>
     </div>

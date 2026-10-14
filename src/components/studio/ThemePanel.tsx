@@ -247,16 +247,22 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
       <TabsContent value="layout" className="grid min-h-0 content-start gap-6 overflow-y-auto px-5 pb-8 pt-1">
         <div className="grid gap-2.5">
           <Label>Layout</Label>
-          <div className={cn('grid gap-2', t.style === 'minimal' ? 'grid-cols-3' : 'grid-cols-2')}>
+          <div className={cn('grid gap-2', t.style === 'minimal' ? 'grid-cols-2' : 'grid-cols-3')}>
             {(t.style === 'minimal'
-              ? [['bento', 'side', 'Grid, profile beside'], ['bento', 'center', 'Grid, profile on top'], ['list', 'center', 'List']] as const
-              : [['bento', 'side', 'Grid'], ['list', 'center', 'List']] as const).map(([layout, align, label]) => {
-              const on = t.layout === layout && (layout === 'list' || t.style !== 'minimal' || t.align === align);
+              ? [['bento', 'side', 'Grid, profile beside'], ['bento', 'center', 'Grid, profile on top'], ['list', 'center', 'List'], ['canvas', 'center', 'Canvas']] as const
+              : [['bento', 'side', 'Grid'], ['list', 'center', 'List'], ['canvas', 'center', 'Canvas']] as const).map(([layout, align, label]) => {
+              const on = t.layout === layout && (layout !== 'bento' || t.style !== 'minimal' || t.align === align);
               return (
                 <button key={label} type="button" aria-pressed={on} onClick={() => updateTheme({ layout, align })} className={cn('grid gap-1.5 p-2 text-center text-[12px]', choice(on))}>
                   <span className="grid h-12 place-items-center rounded-[8px] bg-[var(--bg)]">
                     {layout === 'list'
                       ? <span className="grid w-10 gap-1">{[0, 1, 2].map(i => <span key={i} className="h-1.5 rounded-full bg-[var(--muted)]/40" />)}</span>
+                      : layout === 'canvas'
+                        ? <span className="relative block h-9 w-12">
+                            <span className="absolute left-0 top-0.5 h-5 w-6 -rotate-6 rounded-[3px] bg-[var(--muted)]/40" />
+                            <span className="absolute right-0 top-0 size-4 rotate-6 rounded-[3px] bg-[var(--muted)]/40" />
+                            <span className="absolute bottom-0 left-4 h-3.5 w-7 rounded-[3px] bg-[var(--muted)]/55" />
+                          </span>
                       : align === 'side'
                         ? <span className="flex gap-1.5"><span className="h-8 w-3 rounded-sm bg-[var(--muted)]/40" /><span className="grid grid-cols-2 gap-0.5">{[0, 1, 2, 3].map(i => <span key={i} className="size-3.5 rounded-[3px] bg-[var(--muted)]/40" />)}</span></span>
                         : <span className="grid justify-items-center gap-1"><span className="h-1.5 w-6 rounded-full bg-[var(--muted)]/40" /><span className="grid grid-cols-3 gap-0.5">{[0, 1, 2].map(i => <span key={i} className="size-3.5 rounded-[3px] bg-[var(--muted)]/40" />)}</span></span>}

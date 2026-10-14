@@ -19,6 +19,8 @@ export type StudioState = {
   updateTile: (id: string, patch: Partial<Tile>) => void;
   removeTile: (id: string) => void;
   moveTile: (activeId: string, overId: string) => void;
+  /** Several tiles at once, as one undo step (canvas moves write every position together). */
+  patchTiles: (patches: Record<string, Partial<Tile>>) => void;
 };
 
 function throttle<A extends unknown[]>(fn: (...a: A) => void, ms: number) {
@@ -56,6 +58,7 @@ export const useStudio = create<StudioState>()(
         const from = page.tiles.findIndex(t => t.id === activeId), to = page.tiles.findIndex(t => t.id === overId);
         return from < 0 || to < 0 ? page : { ...page, tiles: arrayMove(page.tiles, from, to) };
       })),
+      patchTiles: patches => set(s => withPage(s, page => ({ ...page, tiles: page.tiles.map(t => (patches[t.id] ? ({ ...t, ...patches[t.id] } as Tile) : t)) }))),
     }),
     {
       limit: 100,

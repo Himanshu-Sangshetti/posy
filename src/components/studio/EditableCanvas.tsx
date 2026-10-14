@@ -17,6 +17,7 @@ import { useStudio } from './store';
 import { TileToolbar, ImagePicker } from './TileControls';
 import { PLATFORMS } from '@/lib/platforms';
 import { MotionShell } from '@/components/page/motion';
+import { CanvasEditor } from './CanvasEditor';
 
 const LABEL: Record<Tile['type'], string> = { link: 'Link', social: 'Social', text: 'Note', heading: 'Section title', image: 'Image', video: 'Video', music: 'Music', github: 'GitHub repo' };
 export function tileLabel(t: Tile) {
@@ -89,9 +90,9 @@ function EditableProfile({ page }: { page: Page }) {
         </PopoverContent>
       </Popover>
       <textarea aria-label="Name" rows={1} value={name} placeholder="Your name" onChange={e => update({ name: e.target.value })}
-        className={cn(blank, 'posy-head mt-3 text-[42px] leading-[1.02] sm:text-[50px]', (page.theme.layout === 'list' || page.theme.align === 'center') && 'text-center')} />
+        className={cn(blank, 'posy-head mt-3 text-[42px] leading-[1.02] sm:text-[50px]', (page.theme.layout !== 'bento' || page.theme.align === 'center') && 'text-center')} />
       <textarea aria-label="Bio" value={bio} placeholder="A line about you" onChange={e => update({ bio: e.target.value })}
-        className={cn(blank, 'max-w-[34ch] text-[17px] leading-relaxed text-[var(--muted)]', (page.theme.layout === 'list' || page.theme.align === 'center') && 'text-center')} />
+        className={cn(blank, 'max-w-[34ch] text-[17px] leading-relaxed text-[var(--muted)]', (page.theme.layout !== 'bento' || page.theme.align === 'center') && 'text-center')} />
       <label className="posy-meta">
         <MapPin className="size-4 shrink-0" />
         <input aria-label="Location" value={location ?? ''} placeholder="Add location" onChange={e => update({ location: e.target.value || undefined })} className={cn(blank, 'w-auto min-w-[8ch] [field-sizing:content]')} />
@@ -197,6 +198,15 @@ function SortableHeading({ tile, list }: { tile: Extract<Tile, { type: 'heading'
   );
 }
 
+function CanvasHeading({ tile, selected }: { tile: Extract<Tile, { type: 'heading' }>; selected: boolean }) {
+  const updateTile = useStudio(s => s.updateTile);
+  return (
+    <input aria-label="Section title" value={tile.text} onChange={e => updateTile(tile.id, { text: e.target.value })}
+      onPointerDown={e => selected && e.stopPropagation()} onKeyDown={e => e.stopPropagation()}
+      className={cn(blank, 'posy-head posy-section w-full cursor-[inherit] text-[26px] leading-tight', selected && 'cursor-text')} />
+  );
+}
+
 export function EditableCanvas({ page }: { page: Page }) {
   const { moveTile, select } = useStudio();
   const [active, setActive] = useState<Tile | null>(null);
@@ -208,6 +218,7 @@ export function EditableCanvas({ page }: { page: Page }) {
   const onEnd = (e: DragEndEvent) => { setActive(null); if (e.over && e.active.id !== e.over.id) moveTile(String(e.active.id), String(e.over.id)); };
 
   const list = page.theme.layout === 'list';
+  const canvas = page.theme.layout === 'canvas';
   const look = page.theme.style;
   const gridTiles = socialsInHeader(page) ? page.tiles.filter(t => t.type !== 'social') : page.tiles;
   return (
@@ -220,7 +231,16 @@ export function EditableCanvas({ page }: { page: Page }) {
                 {page.tiles.map((tile, index) => tile.type === 'social' ? null : tile.type === 'heading' ? <SortableHeading key={tile.id} tile={tile} list /> : <SortableRow key={tile.id} tile={tile} index={index} ord={ordinals(page.tiles).get(tile.id)} look={look} />)}
               </div>
             )}
-            {!list && sections(gridTiles).map((s, i) => (
+            {canvas && (
+              <CanvasEditor page={page} labelFor={tileLabel}
+                renderTile={(tile, index, selected) => (
+                  <TileShell tile={tile} index={index} editing look={look} lift={false}>
+                    {selected && tile.type === 'text' && tile.look !== 'stamp' && (look === 'minimal' || look === 'cozy') ? <InlineText tile={tile} desk={look === 'cozy'} /> : undefined}
+                  </TileShell>
+                )}
+                renderHeading={(tile, selected) => <CanvasHeading tile={tile} selected={selected} />} />
+            )}
+            {!list && !canvas && sections(gridTiles).map((s, i) => (
               <section key={s.heading?.id ?? `top-${i}`} className="posy-grid-wrap">
                 {s.heading && <SortableHeading tile={s.heading} />}
                 <div className="posy-grid">

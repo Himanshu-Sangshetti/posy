@@ -219,3 +219,29 @@ test('onboarding lets you choose style, layout and colours separately', async ({
   expect(d.theme.layout).toBe('list');
   expect(d.theme.preset).toBe('stone');
 });
+
+test('canvas layout: drag a tile anywhere and the position saves', async ({ page }) => {
+  await newUser(page);
+  await page.getByRole('button', { name: 'Design' }).click();
+  await page.getByRole('tab', { name: 'Layout' }).click();
+  await page.getByRole('button', { name: 'Canvas' }).click();
+  await page.keyboard.press('Escape');
+  await expect.poll(async () => (await draft(page)).page.theme.layout).toBe('canvas');
+  const tile = page.locator('[data-canvas-editor] > [data-tile]:not(.posy-cv-heading)').first();
+  await tile.scrollIntoViewIfNeeded();
+  const id = await tile.getAttribute('data-tile');
+  const auto = await tile.evaluate(el => ({ x: +getComputedStyle(el).getPropertyValue('--x'), y: +getComputedStyle(el).getPropertyValue('--y') }));
+  const box = (await tile.boundingBox())!;
+  await page.mouse.move(box.x + 30, box.y + 30);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 150, box.y + 110, { steps: 12 });
+  await page.mouse.up();
+  await saved(page);
+  await expect.poll(async () => {
+    const t = (await draft(page)).page.tiles.find((t: { id: string }) => t.id === id);
+    return t?.pos && t.pos.x > auto.x + 40 && t.pos.y > auto.y + 20;
+  }).toBe(true);
+  // every other tile was pinned where it was shown, so nothing reflowed
+  const tiles = (await draft(page)).page.tiles as { type: string; pos?: object }[];
+  expect(tiles.filter(t => t.type !== 'social').every(t => t.pos)).toBe(true);
+});

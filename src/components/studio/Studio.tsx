@@ -9,6 +9,7 @@ import { newId } from '@/lib/schema';
 import { tileFromInput } from '@/lib/detect';
 import { pageStyle, isDark } from '@/lib/style';
 import { cn } from '@/lib/utils';
+import { nudgeTile } from './canvas-ops';
 import { useStudio, undo, redo, useHistory } from './store';
 import { save, fetchRemote, enrich, storeImage, publish, Conflict } from './storage';
 import { EditableCanvas } from './EditableCanvas';
@@ -136,6 +137,13 @@ export function Studio({ init }: { init: StudioInit }) {
       if (typing()) return;
       if (!mod && !e.altKey && e.key.toLowerCase() === 'd') { e.preventDefault(); setDesignOpen(o => !o); return; }
       if ((e.key === 'Backspace' || e.key === 'Delete') && selected) { e.preventDefault(); removeTile(selected); }
+      // canvas: arrow keys nudge the selected tile (shift = 10 units)
+      const arrow = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+      if (arrow && selected && !mod && useStudio.getState().page?.theme.layout === 'canvas') {
+        e.preventDefault();
+        const step = e.shiftKey ? 10 : 1;
+        nudgeTile(selected, arrow[0] * step, arrow[1] * step);
+      }
     };
     window.addEventListener('paste', onPaste);
     window.addEventListener('drop', onDrop);

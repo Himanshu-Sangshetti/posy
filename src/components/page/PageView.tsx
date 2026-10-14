@@ -11,6 +11,9 @@ import { TileContent, tileHref, brandHex, RichText, ListItem, BrandIcon } from '
 import { deskTilt } from './desk';
 import { StyleHeader, StyleTile, StyleRow, headerClass, socialsInHeader, type StyleId } from './styles';
 import { Halftone } from './styles/lofi';
+import { placeTiles, canvasHeight, readingOrder, boxSize } from '@/lib/canvas-layout';
+import type { TilePos } from '@/lib/schema';
+import './canvas.css';
 
 /** Splits tiles into sections at each heading tile. */
 export function sections(tiles: Tile[]) {
@@ -216,11 +219,38 @@ function ListTiles({ page }: { page: Page }) {
   );
 }
 
+/** CSS variables that place one tile on the canvas. */
+export const canvasVars = (pos: TilePos) => ({ '--x': pos.x, '--y': pos.y, '--w': pos.w, '--h': pos.h, '--r': pos.r, '--z': pos.z }) as React.CSSProperties;
+
+/** On phones, tiles up to about a third of the design width sit two across. */
+export const halfOnPhone = (pos: TilePos) => pos.w < 480;
+
+/** Free placement: every tile at its own position, scaled from the 1200-unit design space. Plain CSS, so it works without JS. */
+function CanvasTiles({ page }: { page: Page }) {
+  const lift = page.theme.effect === 'lift';
+  const tiles = socialsInHeader(page) ? page.tiles.filter(t => t.type !== 'social') : page.tiles;
+  const placed = placeTiles(tiles);
+  const ord = ordinals(page.tiles);
+  return (
+    <div className="posy-canvas-wrap">
+      <div className="posy-canvas" style={{ '--ch': canvasHeight(placed) } as React.CSSProperties}>
+        {readingOrder(placed).map(({ tile, pos }, i) => tile.type === 'heading'
+          ? <div key={tile.id} className="posy-cv posy-cv-heading" style={canvasVars(pos)}><SectionHeading text={tile.text} /></div>
+          : (
+            <div key={tile.id} className={cn('posy-cv', halfOnPhone(pos) && 'posy-cv-half')} style={canvasVars(pos)}>
+              <TileShell tile={{ ...tile, size: boxSize(tile, pos) }} index={i} ord={ord.get(tile.id)} lift={lift} look={page.theme.style} />
+            </div>
+          ))}
+      </div>
+    </div>
+  );
+}
+
 /** The public, read-only page. `contained` renders it inside a box (previews, thumbnails, mockups). */
 export function PageView({ page, contained }: { page: Page; contained?: boolean }) {
   return (
     <PageFrame page={page} className={contained ? 'posy-contained' : undefined} interactive={!contained}>
-      {page.theme.layout === 'list' ? <ListTiles page={page} /> : <BentoTiles page={page} />}
+      {page.theme.layout === 'list' ? <ListTiles page={page} /> : page.theme.layout === 'canvas' ? <CanvasTiles page={page} /> : <BentoTiles page={page} />}
     </PageFrame>
   );
 }
