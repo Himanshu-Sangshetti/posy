@@ -115,7 +115,7 @@ function Ticket({ tile, editing }: Props<'video'>) {
   const id = youtubeId(tile.url);
   return (
     <div className={cn('dk-ticket', (tile.size === 's' || tile.size === 't') && 'dk-ticket-v')} style={{ '--paper': paper(tile, 'peach') } as React.CSSProperties}>
-      <div className="dk-ticket-main">{id ? <VideoPlayer id={id} title={tile.title} editing={editing} /> : <span className="dk-serif">{tile.title || hostOf(tile.url)}</span>}</div>
+      <div className="dk-ticket-main">{id ? <VideoPlayer id={id} title={tile.title} editing={editing} thumb={tile.image && asset(tile.image)} /> : <span className="dk-serif">{tile.title || hostOf(tile.url)}</span>}</div>
       <div className="dk-ticket-stub">
         <span className="dk-ticket-play" aria-hidden><Play className="size-4 fill-current" /></span>
         <small className="dk-mono">Watch</small>

@@ -590,6 +590,10 @@
               },
               "title": {
                 "type": "string"
+              },
+              "image": {
+                "description": "Custom thumbnail; defaults to the YouTube one",
+                "type": "string"
               }
             },
             "required": [

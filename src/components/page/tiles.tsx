@@ -126,7 +126,7 @@ export function ImageTileView({ tile }: Props<'image'>) {
 export function VideoTileView({ tile, editing }: Props<'video'>) {
   const id = youtubeId(tile.url);
   if (!id) return <LinkTileView tile={{ ...tile, type: 'link' }} />;
-  return <VideoPlayer id={id} title={tile.title} editing={editing} />;
+  return <VideoPlayer id={id} title={tile.title} editing={editing} thumb={tile.image && asset(tile.image)} />;
 }
 
 export function MusicTileView({ tile, editing }: Props<'music'>) {

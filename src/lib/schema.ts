@@ -69,6 +69,7 @@ export const VideoTile = z.object({
   type: z.literal('video'),
   url: url.describe('YouTube URL'),
   title: z.string().optional(),
+  image: z.string().optional().describe('Custom thumbnail; defaults to the YouTube one'),
 });
 
 export const MusicTile = z.object({

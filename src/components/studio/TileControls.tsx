@@ -150,7 +150,7 @@ export function TileFields({ tile }: { tile: Tile }) {
         {text('url', tile.url, 'Link (optional)')}
       </>}
       {tile.type === 'text' && <Field label="Text"><Textarea value={tile.text} rows={2} onChange={e => set({ text: e.target.value })} /></Field>}
-      {tile.type === 'video' && <>{text('url', tile.url, 'YouTube link')}{text('title', tile.title, 'Title')}</>}
+      {tile.type === 'video' && <>{text('url', tile.url, 'YouTube link')}{text('title', tile.title, 'Title')}<Field label="Thumbnail (optional)"><div className="flex gap-2"><Input value={tile.image ?? ''} placeholder="YouTube's own" onChange={e => set({ image: e.target.value || undefined })} /><ImagePicker label="Upload" onPick={src => set({ image: src })} /></div></Field></>}
       {tile.type === 'music' && text('url', tile.url, 'Spotify link')}
       {tile.type === 'github' && text('repo', tile.repo, 'Repository', 'owner/name')}
     </div>

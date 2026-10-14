@@ -56,7 +56,7 @@ Cursor, Codex and other MCP clients: add an HTTP server at `https://YOUR-POSY/ap
 | `text` | `text` | supports `**bold**`, `*italic*` and `[links](https://…)`. On the desk layout, `look: "stamp"` turns a short note into a round badge |
 | `heading` | `text` | section title, always full width |
 | `image` | `src` | uploaded or external image URL |
-| `video` | `url` | YouTube |
+| `video` | `url` | YouTube. Optional `image` replaces the thumbnail |
 | `music` | `url` | Spotify track, album, playlist, artist or show. `title` and cover `image` are filled in automatically |
 | `github` | `repo` (`owner/name`) | stars, description and language are filled in automatically |
 
