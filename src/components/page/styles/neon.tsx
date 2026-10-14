@@ -1,4 +1,5 @@
 // Neon: a cyberpunk night. Cut-corner panels with glowing edges, duotone photos, a glitching name, a synthwave floor.
+import { ArrowUpRight, Mail, ShoppingBag } from 'lucide-react';
 import type { Tile } from '@/lib/schema';
 import { asset, cn } from '@/lib/utils';
 import { youtubeId } from '@/lib/url';
@@ -37,6 +38,8 @@ export function NeonTile({ tile, index, editing }: { tile: Tile; index: number; 
   const m = tileMeta(tile);
   const big = tile.size !== 's';
   const vid = tile.type === 'video' ? youtubeId(tile.url) : null;
+  // Text-only panels get one big glowing mark up top instead of empty space.
+  const glyph = (tile.type === 'link' || tile.type === 'github') && !(big && m.image);
   return (
     <div className={cn('nn-panel', `nn-t-${tile.type}`)} style={{ '--n': neonColor(tile, index) } as React.CSSProperties}>
       <span className="nn-label">{`// ${m.kind}`}</span>
@@ -46,6 +49,7 @@ export function NeonTile({ tile, index, editing }: { tile: Tile; index: number; 
           {vid ? <VideoPlayer id={vid} title={tile.type === 'video' ? tile.title : undefined} editing={editing} thumb={tile.type === 'video' && tile.image ? asset(tile.image) : undefined} /> : m.image && <Img src={m.image} />}
         </div>
       )}
+      {glyph && <span className="nn-glyph" aria-hidden>{m.icon ? <BrandIcon path={m.icon} size={64} /> : (() => { const I = m.kind === 'shop' ? ShoppingBag : m.kind === 'newsletter' ? Mail : ArrowUpRight; return <I size={64} strokeWidth={1.25} />; })()}</span>}
       {tile.type === 'music' && m.image && <div className="nn-cover"><Img src={m.image} /></div>}
       {tile.type !== 'text' && tile.type !== 'image' && tile.type !== 'video' && (
         <div className="nn-text">
@@ -56,7 +60,7 @@ export function NeonTile({ tile, index, editing }: { tile: Tile; index: number; 
         </div>
       )}
       {tile.type === 'image' && tile.caption && <p className="nn-cap">{tile.caption}</p>}
-      {m.icon && tile.type !== 'video' && <span className="nn-icon" aria-hidden><BrandIcon path={m.icon} size={18} /></span>}
+      {m.icon && tile.type !== 'video' && !glyph && <span className="nn-icon" aria-hidden><BrandIcon path={m.icon} size={18} /></span>}
     </div>
   );
 }

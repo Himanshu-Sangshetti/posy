@@ -1,7 +1,7 @@
 // Terminal: the page as a shell session. Monospace, box-drawn tiles, ASCII avatar, inverted selection on hover.
 import type { Tile } from '@/lib/schema';
 import { asset, cn } from '@/lib/utils';
-import { youtubeId } from '@/lib/url';
+import { hostOf, youtubeId } from '@/lib/url';
 import { VideoPlayer } from '../islands';
 import { RichText } from '../tiles';
 import { tileMeta, compact } from './meta';
@@ -29,12 +29,21 @@ const Img = ({ src }: { src: string }) => (
   <img src={asset(src)} alt="" loading="lazy" draggable={false} />
 );
 
+/** The shell command a tile stands for, shown at the top of text-only tiles. */
+function command(tile: Tile): [string, string] | null {
+  if (tile.type === 'github') return [`gh repo clone ${tile.repo}`, `Cloning into '${tile.repo.split('/').pop()}'...`];
+  if (tile.type === 'link') return [`curl -I ${hostOf(tile.url)}`, 'HTTP/2 200'];
+  return null;
+}
+
 export function TerminalTile({ tile, editing }: { tile: Tile; editing?: boolean }) {
   const m = tileMeta(tile);
   const media = tile.size !== 's';
+  const cmd = command(tile);
   return (
     <div className={cn('tm-box', `tm-t-${tile.type}`)}>
       <span className="tm-label">{m.kind}</span>
+      {cmd && !(media && m.image) && <p className="tm-cmd"><span>$</span> {cmd[0]}<br /><i>{cmd[1]}</i></p>}
       {tile.type === 'text' && <p className="tm-note"><RichText text={tile.text} /></p>}
       {tile.type === 'image' && <><div className="tm-img"><Img src={tile.src} /></div>{tile.caption && <p className="tm-cap">&gt; {tile.caption}</p>}</>}
       {tile.type === 'video' && (

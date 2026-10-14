@@ -69,9 +69,12 @@ a.posy-tile:hover .tm-text b::before { color: var(--bg); }
 .tm-box:has(.tm-text) .tm-text:last-child { margin-top: auto; }
 .tm-note { font-size: 15px; line-height: 1.55; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 9; overflow: hidden; }
 .tm-note::before { content: "/* "; color: var(--muted); } .tm-note::after { content: " */"; color: var(--muted); }
+.tm-cmd { font-size: 13px; line-height: 1.6; color: var(--text); overflow: hidden; overflow-wrap: anywhere; }
+.tm-cmd span { color: var(--accent); } .tm-cmd i { font-style: normal; color: var(--muted); }
+a.posy-tile:hover .tm-cmd :is(span, i) { color: var(--bg); }
 .tm-cap { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tm-row { display: flex; align-items: center; gap: 14px; flex: 1; min-height: 0; }
-.tm-cover { flex: none; height: min(100%, 120px); aspect-ratio: 1; border: 1px solid var(--tm-line); overflow: hidden; }
+.tm-cover { flex: none; height: min(100%, 180px); aspect-ratio: 1; border: 1px solid var(--tm-line); overflow: hidden; }
 .tm-cover img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.1); }
 .posy-style-terminal .posy-list { gap: 0; border-top: 1px dashed var(--tm-line); }
 .tm-line { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: baseline; gap: 18px; padding: 13px 12px; border-bottom: 1px dashed var(--tm-line); font-size: 14.5px; }
@@ -138,7 +141,14 @@ a.posy-tile:hover .tm-text b::before { color: var(--bg); }
 .nn-text span { font-family: var(--font-geist-mono), monospace; font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .nn-note { font-family: var(--font-head); font-size: 22px; line-height: 1.2; color: var(--text); text-shadow: 0 0 14px color-mix(in oklab, var(--n) 55%, transparent); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 7; overflow: hidden; }
 .nn-cap { font-family: var(--font-geist-mono), monospace; font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.nn-cover { width: 72px; aspect-ratio: 1; box-shadow: 0 0 0 1px var(--n), 0 0 18px -4px var(--n); overflow: hidden; }
+.nn-glyph { display: grid; place-items: start; flex: 1; min-height: 0; font-family: var(--font-head); font-size: 76px; line-height: .9; text-transform: uppercase; color: transparent; -webkit-text-stroke: 1.5px var(--n); filter: drop-shadow(0 0 10px var(--n)); }
+.nn-glyph svg { color: var(--n); opacity: .9; }
+.posy-motion .posy-tile:hover .nn-glyph { animation: nn-flicker .5s steps(2) 1; }
+@keyframes nn-flicker { 30% { opacity: .35; } 60% { opacity: 1; } 80% { opacity: .6; } }
+.nn-t-music { display: grid; grid-template: auto minmax(0, 1fr) / auto minmax(0, 1fr); column-gap: 18px; }
+.nn-t-music .nn-label { grid-column: 1 / -1; }
+.nn-t-music .nn-text { align-self: end; }
+.nn-cover { height: 100%; max-height: 170px; align-self: end; aspect-ratio: 1; box-shadow: 0 0 0 1px var(--n), 0 0 18px -4px var(--n); overflow: hidden; }
 .nn-cover img { width: 100%; height: 100%; object-fit: cover; }
 .posy-style-neon .posy-list { gap: 12px; }
 .nn-bar { display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-radius: calc(var(--radius-tile) * .2); background: linear-gradient(90deg, color-mix(in oklab, var(--n) 16%, transparent), color-mix(in oklab, var(--surface) 70%, transparent)); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--n) 45%, transparent); transition: box-shadow .3s, background .3s; }
