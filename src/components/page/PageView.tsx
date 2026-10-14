@@ -21,6 +21,14 @@ export function sections(tiles: Tile[]) {
   return out.filter(s => s.heading || s.tiles.length);
 }
 
+/** The 0-based position of each tile among the numbered ones (not headings or socials), so "01, 02, 03" never skips. */
+export function ordinals(tiles: Tile[]) {
+  const out = new Map<string, number>();
+  let n = 0;
+  for (const t of tiles) if (t.type !== 'heading' && t.type !== 'social') out.set(t.id, n++);
+  return out;
+}
+
 /** Decorative background: gradients, mesh, aurora, patterns or a photo, plus optional grain. */
 export function Backdrop() {
   return <div aria-hidden className="posy-backdrop"><span className="posy-noise" /></div>;
@@ -113,7 +121,7 @@ export function Profile({ page, interactive = true }: { page: Page; interactive?
       <h1 className="posy-head posy-name">{name}</h1>
       {bio && <p className="posy-bio"><RichText text={bio} /></p>}
       <div className="posy-meta">
-        {location && <span className="inline-flex items-center gap-1.5"><MapPin className="size-4" />{location}</span>}
+        {location && <span className="sf-pill"><MapPin className="size-3.5" />{location}</span>}
         {interactive && <ShareButton url={page.seo.url} />}
       </div>
       {list && <SocialRow tiles={socialTiles(page)} />}
@@ -121,7 +129,7 @@ export function Profile({ page, interactive = true }: { page: Page; interactive?
   );
 }
 
-export function TileShell({ tile, index, children, editing, className, style, lift = true, look = 'soft' }: { tile: Tile; index: number; children?: ReactNode; editing?: boolean; className?: string; style?: React.CSSProperties; lift?: boolean; look?: StyleId }) {
+export function TileShell({ tile, index, ord, children, editing, className, style, lift = true, look = 'soft' }: { tile: Tile; index: number; ord?: number; children?: ReactNode; editing?: boolean; className?: string; style?: React.CSSProperties; lift?: boolean; look?: StyleId }) {
   if (look !== 'soft') {
     return (
       <MotionShell
@@ -133,7 +141,7 @@ export function TileShell({ tile, index, children, editing, className, style, li
         className={cn('posy-tile posy-obj group block', `posy-size-${tile.size}`, `posy-type-${tile.type}`, className)}
         style={{ '--rot': look === 'cozy' ? `${deskTilt(tile)}deg` : '0deg', ...style } as React.CSSProperties}
       >
-        {children ?? <StyleTile style={look} tile={tile} index={index} editing={editing} />}
+        {children ?? <StyleTile style={look} tile={tile} index={ord ?? index} editing={editing} />}
       </MotionShell>
     );
   }
@@ -166,6 +174,7 @@ export function SectionHeading({ text }: { text: string }) {
 function BentoTiles({ page }: { page: Page }) {
   const lift = page.theme.effect === 'lift';
   const tiles = socialsInHeader(page) ? page.tiles.filter(t => t.type !== 'social') : page.tiles;
+  const ord = ordinals(page.tiles);
   return (
     <>
       {sections(tiles).map((s, i) => (
@@ -173,7 +182,7 @@ function BentoTiles({ page }: { page: Page }) {
           {s.heading && <SectionHeading text={s.heading.text} />}
           {s.tiles.length > 0 && (
             <div className="posy-grid">
-              {s.tiles.map(({ tile, index }) => <TileShell key={tile.id} tile={tile} index={index} lift={lift} look={page.theme.style} />)}
+              {s.tiles.map(({ tile, index }) => <TileShell key={tile.id} tile={tile} index={index} ord={ord.get(tile.id)} lift={lift} look={page.theme.style} />)}
             </div>
           )}
         </section>
@@ -184,6 +193,7 @@ function BentoTiles({ page }: { page: Page }) {
 
 function ListTiles({ page }: { page: Page }) {
   const lift = page.theme.effect === 'lift';
+  const ord = ordinals(page.tiles);
   return (
     <div className="posy-list">
       {page.tiles.map((tile, index) => {
@@ -192,7 +202,7 @@ function ListTiles({ page }: { page: Page }) {
         if (page.theme.style !== 'soft') return (
           <MotionShell key={tile.id} tileId={tile.id} href={tileHref(tile, true)} index={index} lift={lift} label={ariaLabel(tile)}
             className={cn('posy-row-st group block', `posy-type-${tile.type}`, `posy-size-${tile.size}`)}>
-            <StyleRow style={page.theme.style} tile={tile} index={index} />
+            <StyleRow style={page.theme.style} tile={tile} index={ord.get(tile.id) ?? index} />
           </MotionShell>
         );
         return (

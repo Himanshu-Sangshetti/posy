@@ -1,0 +1,278 @@
+/* ================= Soft: frosted pastel cards with real material ================= */
+.posy-style-soft {
+  --r: var(--radius-tile);
+  --sf-ease: cubic-bezier(.2, .8, .2, 1);
+  --sf-pad: 18px;
+  --sf-deep: #6a4f86;     /* the shadow colour every tint is mixed toward */
+  --sf-up: 74%;           /* how much of the tile colour survives at its lit edge */
+  --sf-edge: rgb(255 255 255 / .9);
+  --sf-ink-soft: color-mix(in oklab, var(--text) 66%, var(--bg));
+  --sf-noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .25 0 0 0 0 .2 0 0 0 0 .35 0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.dark.posy-style-soft { --sf-deep: #000; --sf-up: 90%; --sf-edge: rgb(255 255 255 / .1); }
+@container grid (max-width: 600px) { .posy-style-soft .posy-grid { --sf-pad: 14px; } }
+
+/* An ambient wash behind everything: three soft pools of colour, so the page is never a flat sheet. */
+.posy-style-soft.posy-bg-solid .posy-backdrop::before {
+  background:
+    radial-gradient(52rem 34rem at 4% -6%, color-mix(in oklab, var(--tint-peach) 75%, transparent), transparent 70%),
+    radial-gradient(46rem 34rem at 104% 8%, color-mix(in oklab, var(--tint-lilac) 80%, transparent), transparent 70%),
+    radial-gradient(54rem 36rem at 48% 112%, color-mix(in oklab, var(--tint-mint) 70%, transparent), transparent 70%);
+}
+.dark.posy-style-soft.posy-bg-solid .posy-backdrop::before {
+  background:
+    radial-gradient(50rem 32rem at 4% -6%, color-mix(in oklab, var(--tint-peach) 70%, transparent), transparent 70%),
+    radial-gradient(44rem 32rem at 104% 8%, color-mix(in oklab, var(--tint-lilac) 80%, transparent), transparent 70%),
+    radial-gradient(50rem 34rem at 48% 112%, color-mix(in oklab, var(--tint-sky) 70%, transparent), transparent 70%);
+}
+
+/* ---------- header ---------- */
+.posy-style-soft .posy-profile { position: relative; gap: 12px; min-width: 0; max-width: 100%; }
+.posy-style-soft .posy-profile::before, .posy-style-soft .posy-profile::after {
+  content: ""; position: absolute; z-index: -1; pointer-events: none; border-radius: 46% 54% 58% 42% / 52% 44% 56% 48%;
+}
+.posy-style-soft .posy-profile::before { width: 124px; height: 124px; left: -20px; top: -14px; background: var(--tint-sky); rotate: -14deg; }
+.posy-style-soft .posy-profile::after { width: 84px; height: 84px; left: 70px; top: -26px; background: var(--tint-rose); rotate: 20deg; }
+.posy-style-soft.posy-center .posy-profile::before { left: calc(50% - 82px); }
+.posy-style-soft.posy-center .posy-profile::after { left: calc(50% + 14px); }
+.posy-style-soft.posy-layout-list .posy-profile::before { width: 108px; height: 108px; top: -10px; left: calc(50% - 74px); }
+.posy-style-soft.posy-layout-list .posy-profile::after { width: 70px; height: 70px; left: calc(50% + 10px); top: -20px; }
+.posy-style-soft .posy-avatar {
+  border-radius: 34%;
+  box-shadow: 0 0 0 5px var(--surface), 0 0 0 6px color-mix(in oklab, var(--text) 8%, transparent), 0 22px 36px -18px color-mix(in oklab, var(--sf-deep) 55%, transparent);
+}
+.posy-style-soft.posy-avatar-circle .posy-avatar { border-radius: 50%; }
+.posy-style-soft.posy-avatar-square .posy-avatar { border-radius: 20%; }
+.posy-style-soft .posy-name {
+  margin-top: 14px; font-size: 46px; line-height: 1; text-wrap: balance; overflow-wrap: anywhere;
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144;
+}
+@container page (min-width: 700px) { .posy-style-soft .posy-name { font-size: 62px; } }
+.posy-style-soft.posy-layout-list .posy-name { font-size: 40px; }
+.posy-style-soft .posy-bio { font-family: var(--font-body); font-size: 17px; line-height: 1.55; max-width: 32ch; color: var(--sf-ink-soft); text-wrap: pretty; }
+.posy-style-soft .posy-meta { flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.posy-center .posy-meta { justify-content: center; }
+.sf-pill {
+  display: inline-flex; align-items: flex-start; gap: 6px; max-width: 100%; min-width: 0; overflow-wrap: anywhere; padding: 6px 12px 6px 10px; border-radius: 999px; font-size: 13px; line-height: 1.2; color: var(--sf-ink-soft);
+  background: color-mix(in oklab, var(--surface) 70%, transparent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .6), 0 0 0 1px color-mix(in oklab, var(--text) 7%, transparent), 0 8px 14px -10px color-mix(in oklab, var(--sf-deep) 50%, transparent);
+}
+.dark .sf-pill { box-shadow: inset 0 1px 0 rgb(255 255 255 / .08), 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent); }
+.sf-pill > svg { flex: none; margin-top: 2px; }
+.sf-pill-btn { align-items: center; cursor: pointer; transition: translate .3s var(--sf-ease), color .3s, background-color .3s; }
+.sf-pill-btn:hover { translate: 0 -2px; color: var(--text); background: var(--surface); }
+
+.posy-style-soft .posy-section {
+  display: flex; align-items: center; gap: 14px; margin: 0 0 18px; padding: 0 2px; font-size: 25px; line-height: 1.15;
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 72;
+}
+.posy-style-soft .posy-section::before { content: ""; flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 22%, transparent); }
+.posy-style-soft .posy-section::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, color-mix(in oklab, var(--text) 18%, transparent), transparent); }
+.posy-style-soft.posy-layout-list .posy-section { justify-content: center; margin: 18px 0 4px; font-size: 22px; }
+.posy-style-soft.posy-layout-list .posy-section::before { width: 36px; height: 1px; border-radius: 0; box-shadow: none; background: linear-gradient(270deg, color-mix(in oklab, var(--text) 18%, transparent), transparent); }
+.posy-style-soft.posy-layout-list .posy-section::after { flex: none; width: 36px; }
+.posy-style-soft .posy-social-row a {
+  background: color-mix(in oklab, var(--surface) 72%, transparent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .6), 0 8px 14px -10px color-mix(in oklab, var(--sf-deep) 50%, transparent);
+}
+
+/* ---------- the tile shape: a radii rhythm ---------- */
+.posy-style-soft .posy-tile {
+  --tl: var(--r); --tr: var(--r); --br: var(--r); --bl: var(--r);
+  border-radius: var(--tl) var(--tr) var(--br) var(--bl);
+}
+.posy-style-soft .posy-size-l { --tl: calc(var(--r) * 1.2); --tr: calc(var(--r) * 1.2); --br: calc(var(--r) * 1.2); --bl: calc(var(--r) * 1.2); }
+.posy-style-soft .posy-size-t { --tl: calc(var(--r) * 2.4); --tr: calc(var(--r) * 2.4); }   /* an arched window */
+.posy-style-soft .posy-grid > .posy-size-s:nth-child(odd) { --tr: calc(var(--r) * .34); --bl: calc(var(--r) * .34); }  /* petals, alternating */
+.posy-style-soft .posy-grid > .posy-size-s:nth-child(even) { --tl: calc(var(--r) * .34); --br: calc(var(--r) * .34); }
+.posy-style-soft .posy-list > .posy-tile { --r: min(var(--radius-tile), 28px); --tl: var(--r); --tr: var(--r); --br: var(--r); --bl: var(--r); }
+
+/* ---------- the material ---------- */
+.posy-tiles-soft.posy-style-soft .posy-tile {
+  --tb: var(--tile-bg, var(--surface));
+  background:
+    radial-gradient(130% 80% at 8% 0%, color-mix(in oklab, var(--tb) 30%, #fff) 0%, transparent 62%),
+    linear-gradient(172deg, color-mix(in oklab, var(--tb) var(--sf-up), #fff) 0%, var(--tb) 55%, color-mix(in oklab, var(--tb) 95%, var(--sf-deep)) 100%);
+  border: 1px solid color-mix(in oklab, var(--tb) 45%, #fff);
+  box-shadow:
+    inset 0 1px 0 var(--sf-edge),
+    inset 0 -12px 20px -16px color-mix(in oklab, var(--tb) 78%, var(--sf-deep)),
+    0 1px 1px color-mix(in oklab, var(--tb) 70%, color-mix(in oklab, var(--sf-deep) 60%, transparent)),
+    0 12px 20px -14px color-mix(in oklab, var(--tb) 50%, var(--sf-deep)),
+    0 30px 44px -30px color-mix(in oklab, var(--tb) 40%, var(--sf-deep));
+}
+.dark.posy-tiles-soft.posy-style-soft .posy-tile {
+  border-color: rgb(255 255 255 / .08);
+  background:
+    radial-gradient(130% 80% at 8% 0%, color-mix(in oklab, var(--tb) 80%, #fff) 0%, transparent 62%),
+    linear-gradient(172deg, color-mix(in oklab, var(--tb) var(--sf-up), #fff) 0%, var(--tb) 52%, color-mix(in oklab, var(--tb) 80%, #000) 100%);
+  box-shadow: inset 0 1px 0 var(--sf-edge), inset 0 -14px 22px -16px rgb(0 0 0 / .5), 0 1px 1px rgb(0 0 0 / .4), 0 14px 24px -14px rgb(0 0 0 / .6), 0 30px 44px -30px rgb(0 0 0 / .7);
+}
+.posy-style-soft.posy-tiles-soft .posy-tile.posy-type-image, .posy-style-soft.posy-tiles-soft .posy-tile.posy-type-video { --tb: var(--surface); }
+/* grain, so large flat colour never looks like a plastic sticker */
+.posy-style-soft .posy-tile::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit;
+  background: var(--sf-noise); opacity: .16; mix-blend-mode: multiply;
+}
+.dark.posy-style-soft .posy-tile::before { opacity: .3; mix-blend-mode: soft-light; }
+.posy-style-soft .posy-tile.posy-type-image::before, .posy-style-soft .posy-tile.posy-type-video::before { display: none; }
+/* a slow glint that crosses the card on hover */
+.posy-style-soft:not(.posy-fx-glow) .posy-tile::after {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; border-radius: inherit; translate: -130% 0;
+  background: linear-gradient(112deg, transparent 38%, rgb(255 255 255 / .38) 50%, transparent 62%);
+  transition: translate 0s;
+}
+.dark.posy-style-soft:not(.posy-fx-glow) .posy-tile::after { background: linear-gradient(112deg, transparent 38%, rgb(255 255 255 / .09) 50%, transparent 62%); }
+@media (hover: hover) {
+  .posy-style-soft:not(.posy-fx-glow) a.posy-tile:hover::after { translate: 130% 0; transition: translate 1.1s var(--sf-ease); }
+}
+.posy-style-soft a.posy-tile:hover { box-shadow: inset 0 1px 0 var(--sf-edge), inset 0 -14px 22px -16px color-mix(in oklab, var(--tb, var(--surface)) 55%, var(--sf-deep)), 0 2px 2px rgb(40 24 70 / .06), 0 18px 28px -14px color-mix(in oklab, var(--tb, var(--surface)) 40%, var(--sf-deep)), 0 44px 60px -30px color-mix(in oklab, var(--tb, var(--surface)) 35%, var(--sf-deep)); }
+.dark.posy-style-soft a.posy-tile:hover { box-shadow: inset 0 1px 0 var(--sf-edge), 0 2px 2px rgb(0 0 0 / .4), 0 22px 32px -14px rgb(0 0 0 / .7), 0 44px 60px -30px rgb(0 0 0 / .8); }
+:where(.posy-style-soft .posy-tile) > * { position: relative; z-index: 1; }
+.posy-style-soft .posy-tile { transition: box-shadow .5s var(--sf-ease), background-color .45s; }
+
+/* ---------- shared pieces ---------- */
+.sf-copy { min-width: 0; }
+.sf-title { font-size: 15.5px; font-weight: 620; line-height: 1.25; letter-spacing: -.012em; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.sf-desc { margin-top: 4px; font-size: 13px; line-height: 1.4; color: var(--sf-ink-soft); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.sf-sub { margin-top: 2px; font-size: 12.5px; line-height: 1.3; color: var(--sf-ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sf-owner { color: var(--sf-ink-soft); font-weight: 450; }
+.posy-style-soft :is(.posy-size-w, .posy-size-l, .posy-size-t) .sf-link .sf-title {
+  font-family: var(--font-head); font-weight: var(--head-weight, 560); font-size: 20px; line-height: 1.12; letter-spacing: var(--head-track, -.02em);
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 48;
+}
+.sf-badge {
+  --bgc: var(--sf-badge-bg, color-mix(in oklab, var(--surface) 88%, transparent));
+  display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 13px; color: var(--text);
+  background: linear-gradient(150deg, rgb(255 255 255 / .34), transparent 58%), var(--bgc);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .55), inset 0 -2px 4px rgb(0 0 0 / .06), 0 1px 1px rgb(40 24 70 / .1), 0 8px 14px -8px color-mix(in oklab, var(--bgc) 70%, var(--sf-deep));
+  transition: rotate .5s var(--sf-ease), scale .5s var(--sf-ease);
+}
+.sf-badge-round { border-radius: 50%; width: 44px; height: 44px; }
+.posy-style-soft a.posy-tile:hover .sf-badge { rotate: -7deg; scale: 1.07; }
+.sf-go {
+  position: absolute; right: 12px; top: 12px; z-index: 3; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; color: var(--text);
+  background: color-mix(in oklab, var(--surface) 82%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--text) 8%, transparent), 0 6px 12px -6px rgb(40 24 70 / .3);
+  opacity: 0; scale: .7; rotate: -25deg; transition: opacity .3s, scale .45s var(--sf-ease), rotate .45s var(--sf-ease);
+}
+a.posy-tile:is(:hover, :focus-visible) .sf-go { opacity: 1; scale: 1; rotate: 0deg; }
+
+/* link */
+.sf-link { display: flex; flex-direction: column; justify-content: space-between; gap: 12px; height: 100%; padding: var(--sf-pad); }
+.sf-link-text { display: flex; flex-direction: column; justify-content: space-between; gap: 10px; min-width: 0; flex: 1; }
+.sf-link .sf-copy { margin-top: auto; }
+.sf-split { flex-direction: row; gap: 16px; }
+.sf-media { flex: 1; min-height: 0; overflow: hidden; border-radius: max(0px, calc(var(--r) - 10px)); box-shadow: 0 0 0 1px rgb(255 255 255 / .6), 0 10px 18px -12px rgb(40 24 70 / .45); }
+.sf-media img { display: block; width: 100%; height: 100%; object-fit: cover; transition: scale .9s var(--sf-ease); }
+.posy-style-soft a.posy-tile:hover .sf-media img { scale: 1.06; }
+.posy-size-t .sf-media { border-radius: max(0px, calc(var(--r) * 1.5)) max(0px, calc(var(--r) * 1.5)) max(0px, calc(var(--r) - 10px)) max(0px, calc(var(--r) - 10px)); }
+
+/* social */
+.sf-social { display: flex; flex-direction: column; justify-content: space-between; height: 100%; padding: var(--sf-pad); }
+.posy-size-w .sf-social { flex-direction: row; align-items: center; justify-content: flex-start; gap: 14px; }
+.posy-size-w .sf-social .sf-sub { margin-top: 3px; }
+
+/* text */
+.sf-text { display: flex; align-items: center; height: 100%; padding: calc(var(--sf-pad) + 2px); }
+.sf-text p {
+  font-family: var(--font-head); font-weight: var(--head-weight, 520); letter-spacing: var(--head-track, -.015em); font-size: 19px; line-height: 1.28; text-wrap: pretty;
+  font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 36;
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+.sf-text-s p { font-family: var(--font-body); font-weight: 560; font-size: 14.5px; line-height: 1.35; letter-spacing: -.01em; -webkit-line-clamp: 5; }
+.sf-text-big { align-items: flex-end; padding-top: calc(var(--sf-pad) + 34px); }
+.sf-text-big p { font-size: 27px; line-height: 1.16; -webkit-line-clamp: 8; }
+.sf-text-big::before {
+  content: "\201C"; position: absolute; left: calc(var(--sf-pad) + 2px); top: 6px; font-family: var(--font-head); font-size: 96px; line-height: 1; color: color-mix(in oklab, var(--accent) 55%, transparent);
+}
+.sf-text-row { justify-content: center; text-align: center; padding: 20px 26px; }
+.sf-text-row p { font-size: 18px; -webkit-line-clamp: unset; }
+
+/* photo and video sit in a mat, like a print in a frame */
+.sf-photo {
+  position: absolute; inset: 7px; overflow: hidden;
+  border-radius: max(0px, calc(var(--tl) - 7px)) max(0px, calc(var(--tr) - 7px)) max(0px, calc(var(--br) - 7px)) max(0px, calc(var(--bl) - 7px));
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / .05);
+}
+.sf-photo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: scale 1s var(--sf-ease); }
+.posy-style-soft a.posy-tile:hover .sf-photo > img { scale: 1.05; }
+.sf-cap {
+  position: absolute; left: 10px; bottom: 10px; max-width: calc(100% - 20px); padding: 6px 13px; font-size: 12.5px; font-weight: 560; line-height: 1.25; color: #2a2230;
+  background: rgb(255 255 255 / .74); -webkit-backdrop-filter: blur(12px) saturate(1.5); backdrop-filter: blur(12px) saturate(1.5);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .8), 0 8px 16px -8px rgb(0 0 0 / .35); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; border-radius: 16px;
+}
+
+/* github */
+.sf-github { display: flex; flex-direction: column; justify-content: space-between; gap: 10px; height: 100%; padding: var(--sf-pad); }
+.sf-github .sf-title { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 640; }
+.sf-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.sf-chip {
+  display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; font-size: 12px; line-height: 1.3; color: var(--sf-ink-soft);
+  background: color-mix(in oklab, var(--surface) 62%, transparent); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--text) 8%, transparent);
+}
+.sf-chip i { width: 7px; height: 7px; border-radius: 50%; }
+
+/* music: our own card, not an embed */
+.sf-music { position: relative; display: flex; align-items: center; gap: 16px; height: 100%; padding: 12px; overflow: hidden; isolation: isolate; }
+.sf-music::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(100deg, color-mix(in oklab, var(--surface) 86%, transparent), color-mix(in oklab, var(--surface) 52%, transparent)); }
+.dark .sf-music::before { background: linear-gradient(100deg, color-mix(in oklab, var(--surface) 80%, transparent), color-mix(in oklab, var(--surface) 40%, transparent)); }
+.sf-music-glow { position: absolute; inset: -30%; z-index: -2; width: 160%; height: 160%; max-width: none; object-fit: cover; filter: blur(34px) saturate(1.5); opacity: .55; }
+.sf-cover {
+  position: relative; flex: none; display: grid; place-items: center; height: 100%; aspect-ratio: 1; overflow: hidden; color: var(--sf-ink-soft);
+  border-radius: max(0px, calc(var(--r) - 10px));
+  background: linear-gradient(135deg, var(--tint-lilac), var(--tint-peach));
+  box-shadow: 0 0 0 1px rgb(255 255 255 / .55), 0 14px 22px -10px rgb(30 18 60 / .5), 0 2px 3px rgb(30 18 60 / .18);
+}
+.sf-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.sf-cover::after { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgb(255 255 255 / .42), transparent 42%); pointer-events: none; }
+.sf-music-body { display: flex; flex-direction: column; min-width: 0; flex: 1; padding-right: 54px; }
+.sf-music-kind { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 6px; font-size: 10.5px; font-weight: 640; letter-spacing: .09em; text-transform: uppercase; color: var(--sf-ink-soft); }
+.sf-music .sf-title { font-family: var(--font-head); font-weight: var(--head-weight, 560); font-size: 20px; line-height: 1.1; letter-spacing: var(--head-track, -.02em); font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 48; -webkit-line-clamp: 2; }
+.sf-play {
+  position: absolute; right: 14px; top: 50%; margin-top: -22px; z-index: 2; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; color: var(--surface);
+  background: linear-gradient(150deg, color-mix(in oklab, var(--text) 82%, #fff), var(--text));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .28), 0 12px 20px -8px color-mix(in oklab, var(--text) 70%, transparent);
+  transition: scale .45s var(--sf-ease);
+}
+.sf-play svg { margin-left: 2px; }
+.posy-style-soft a.posy-tile:hover .sf-play { scale: 1.1; }
+.sf-eq { display: flex; align-items: flex-end; gap: 3px; height: 16px; margin-top: 10px; }
+.sf-eq i { width: 3px; border-radius: 2px; background: var(--accent); height: 40%; opacity: .85; }
+.sf-eq i:nth-child(2) { height: 85%; } .sf-eq i:nth-child(3) { height: 55%; } .sf-eq i:nth-child(4) { height: 100%; } .sf-eq i:nth-child(5) { height: 30%; }
+@keyframes sf-eq { from { transform: scaleY(.35); } to { transform: scaleY(1); } }
+.posy-motion a.posy-tile:hover .sf-eq i { transform-origin: bottom; animation: sf-eq .7s ease-in-out infinite alternate; }
+.posy-motion a.posy-tile:hover .sf-eq i:nth-child(2) { animation-delay: -.2s; } .posy-motion a.posy-tile:hover .sf-eq i:nth-child(3) { animation-delay: -.4s; }
+.posy-motion a.posy-tile:hover .sf-eq i:nth-child(4) { animation-delay: -.1s; } .posy-motion a.posy-tile:hover .sf-eq i:nth-child(5) { animation-delay: -.5s; }
+.posy-size-l .sf-music, .posy-size-t .sf-music { flex-direction: column; align-items: stretch; gap: 14px; padding: 12px 12px 16px; }
+.posy-size-l .sf-cover, .posy-size-t .sf-cover { flex: 1; min-height: 0; width: 100%; height: auto; aspect-ratio: auto; }
+.posy-size-l .sf-music-body, .posy-size-t .sf-music-body { flex: none; padding: 0 60px 0 6px; }
+.posy-size-l .sf-play, .posy-size-t .sf-play { top: auto; bottom: 18px; margin-top: 0; }
+.sf-music-s { padding: 8px; }
+.sf-music-s .sf-cover { width: 100%; height: 100%; aspect-ratio: auto; }
+.sf-music-s .sf-play { right: 14px; bottom: 14px; top: auto; margin-top: 0; width: 34px; height: 34px; }
+.sf-music-s .sf-go { display: none; }
+
+/* ---------- list rows ---------- */
+.posy-style-soft .posy-row-inner { gap: 14px; min-height: 68px; padding: 11px 20px 11px 11px; }
+.sf-row-text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.sf-row-text .sf-title { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 15.5px; }
+.sf-row-thumb { flex: none; width: 46px; height: 46px; border-radius: 15px; object-fit: cover; box-shadow: 0 0 0 1px rgb(255 255 255 / .6), 0 8px 14px -8px rgb(40 24 70 / .45); }
+.sf-row-go { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; color: var(--sf-ink-soft); background: color-mix(in oklab, var(--surface) 70%, transparent); transition: translate .4s var(--sf-ease), background-color .3s, color .3s; }
+a.posy-row:hover .sf-row-go { translate: 2px -2px; background: var(--text); color: var(--surface); }
+.sf-music-row .sf-cover { width: 46px; height: 46px; border-radius: 15px; }
+.sf-music-row .sf-play { position: static; margin: 0; width: 36px; height: 36px; }
+.posy-style-soft .posy-list > .posy-type-image, .posy-style-soft .posy-list > .posy-type-video { --r: 26px; }
+
+/* ---------- scroll-in: tiles drift up and un-blur as they enter the viewport ---------- */
+@keyframes sf-in { from { translate: 0 34px; scale: .94; filter: blur(8px); } to { translate: 0 0; scale: 1; filter: blur(0); } }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .posy-style-soft.posy-motion .posy-rise:not(header) {
+      animation: posy-rise .6s ease-out backwards, sf-in linear backwards;
+      animation-delay: calc(min(var(--i, 0), 10) * 45ms), 0s;
+      animation-timeline: auto, view();
+      animation-range: normal, entry 0% entry 70%;
+    }
+  }
+}

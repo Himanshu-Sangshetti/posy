@@ -22,36 +22,36 @@ const light = (t: Omit<Theme, 'dark'>): Theme => ({ ...t, dark: false });
 
 const BASE = {
   cream: light({
-    id: 'cream', name: 'Cream', bg: '#f6f1e9', surface: '#fffcf7', text: '#2b2621', muted: '#8c8277', line: '#e9e1d5', accent: '#e39b6f',
-    tints: { peach: '#fbe2d2', butter: '#f9eec5', mint: '#dcefe2', sky: '#d9e9f6', lilac: '#e7e0f4', rose: '#f8dbe3' },
+    id: 'cream', name: 'Cream', bg: '#f6f1e9', surface: '#fffcf7', text: '#2b2621', muted: '#6a6056', line: '#e9e1d5', accent: '#bc774c',
+    tints: { peach: '#fee1d0', butter: '#f9eec0', mint: '#d6f1e0', sky: '#d2ebfd', lilac: '#e6dffa', rose: '#fadae3' },
   }),
   lavender: light({
-    id: 'lavender', name: 'Lavender', bg: '#f1eef9', surface: '#fcfbff', text: '#27233a', muted: '#857f9c', line: '#e3def2', accent: '#9a86d8',
-    tints: { peach: '#f7e1dc', butter: '#f4eed2', mint: '#dcefe9', sky: '#dbe6f8', lilac: '#e4dcf7', rose: '#f3dbec' },
+    id: 'lavender', name: 'Lavender', bg: '#f1eef9', surface: '#fcfbff', text: '#27233a', muted: '#635d79', line: '#e3def2', accent: '#8f7bcc',
+    tints: { peach: '#fddfd5', butter: '#f5eecf', mint: '#d4f2e5', sky: '#d4e8fd', lilac: '#e3dcfa', rose: '#f7d9e9' },
   }),
   mint: light({
-    id: 'mint', name: 'Mint', bg: '#ecf5ef', surface: '#fbfefc', text: '#1f2b25', muted: '#77897f', line: '#d9e9df', accent: '#5fb08a',
-    tints: { peach: '#f6e3d6', butter: '#f1efcc', mint: '#d3eedd', sky: '#d5ebf0', lilac: '#e2e1f2', rose: '#f3dde1' },
+    id: 'mint', name: 'Mint', bg: '#ecf5ef', surface: '#fbfefc', text: '#1f2b25', muted: '#54655b', line: '#d9e9df', accent: '#479873',
+    tints: { peach: '#fbe1d1', butter: '#f3efc7', mint: '#d0efdc', sky: '#ceecf8', lilac: '#e2e0fa', rose: '#f9dae2' },
   }),
   sky: light({
-    id: 'sky', name: 'Sky', bg: '#edf3fa', surface: '#fbfdff', text: '#1e2733', muted: '#7a8798', line: '#dbe5f1', accent: '#5e9bd6',
-    tints: { peach: '#f7e3da', butter: '#f3efd2', mint: '#d9efe6', sky: '#d4e6f7', lilac: '#e1e0f6', rose: '#f4dde6' },
+    id: 'sky', name: 'Sky', bg: '#edf3fa', surface: '#fbfdff', text: '#1e2733', muted: '#576373', line: '#dbe5f1', accent: '#518dc7',
+    tints: { peach: '#fde1d4', butter: '#f4efce', mint: '#d4f1e3', sky: '#cfe7fa', lilac: '#e2dffa', rose: '#f9dbe6' },
   }),
   peach: light({
-    id: 'peach', name: 'Peach', bg: '#fbefe8', surface: '#fffbf8', text: '#2e2420', muted: '#94817a', line: '#f1ded4', accent: '#e8886a',
-    tints: { peach: '#fbd9c9', butter: '#f9ebc6', mint: '#ddeedf', sky: '#dce8f3', lilac: '#ebdff2', rose: '#f9d6df' },
+    id: 'peach', name: 'Peach', bg: '#fbefe8', surface: '#fffbf8', text: '#2e2420', muted: '#6e5c55', line: '#f1ded4', accent: '#cd6f52',
+    tints: { peach: '#fed8c5', butter: '#f8ecc1', mint: '#d7f0de', sky: '#d2eafd', lilac: '#e9dff8', rose: '#fbd5e0' },
   }),
   paper: light({
-    id: 'paper', name: 'Paper', bg: '#f4f4f2', surface: '#ffffff', text: '#161616', muted: '#7b7b78', line: '#e4e4e1', accent: '#161616',
-    tints: { peach: '#f3ece7', butter: '#f2f0e6', mint: '#e8efea', sky: '#e7ecf1', lilac: '#ecebf1', rose: '#f2e9ec' },
+    id: 'paper', name: 'Paper', bg: '#f4f4f2', surface: '#ffffff', text: '#161616', muted: '#676764', line: '#e4e4e1', accent: '#161616',
+    tints: { peach: '#fce9de', butter: '#f4f0dd', mint: '#e0f3e6', sky: '#ddeefc', lilac: '#ece9fc', rose: '#fbe5ec' },
   }),
   blush: light({
-    id: 'blush', name: 'Blush', bg: '#fbeef1', surface: '#fffafb', text: '#2f2226', muted: '#977f86', line: '#f2dde3', accent: '#df7f9c',
-    tints: { peach: '#fbe0d6', butter: '#f8edcf', mint: '#e0efe4', sky: '#dde8f5', lilac: '#ebdff4', rose: '#f9d3de' },
+    id: 'blush', name: 'Blush', bg: '#fbeef1', surface: '#fffafb', text: '#2f2226', muted: '#6e585f', line: '#f2dde3', accent: '#c96c89',
+    tints: { peach: '#fde0d3', butter: '#f8eecb', mint: '#d8f2e1', sky: '#d4eafe', lilac: '#e9dff9', rose: '#fcd2de' },
   }),
   sage: light({
-    id: 'sage', name: 'Sage', bg: '#eef1ea', surface: '#fbfcf8', text: '#232820', muted: '#7d8576', line: '#dfe5d8', accent: '#7c9a6d',
-    tints: { peach: '#f2e4d8', butter: '#efecd0', mint: '#d9e8d3', sky: '#d9e6e8', lilac: '#e3e1ec', rose: '#f0e0e0' },
+    id: 'sage', name: 'Sage', bg: '#eef1ea', surface: '#fbfcf8', text: '#232820', muted: '#5d6456', line: '#dfe5d8', accent: '#739064',
+    tints: { peach: '#fae1d0', butter: '#f0eccd', mint: '#d4ead5', sky: '#cae9f4', lilac: '#e3dff9', rose: '#fbdbe0' },
   }),
   midnight: {
     id: 'midnight', name: 'Midnight', dark: true, bg: '#11131b', surface: '#1a1d28', text: '#eceef5', muted: '#8d93a8', line: '#262a38', accent: '#a9b8ff',
@@ -66,16 +66,16 @@ const BASE = {
     tints: { peach: '#33232a', butter: '#2f2a25', mint: '#1f2a28', sky: '#1f2537', lilac: '#2c2240', rose: '#352135' },
   },
   linen: light({
-    id: 'linen', name: 'Linen', bg: '#ebe3d3', surface: '#faf6ec', text: '#2e2a22', muted: '#5f5748', line: '#d9cfba', accent: '#a9794a',
-    tints: { peach: '#f4d9bf', butter: '#f3e6b4', mint: '#d6e4c8', sky: '#cfe0e6', lilac: '#ddd5e6', rose: '#f0d3d0' },
+    id: 'linen', name: 'Linen', bg: '#ebe3d3', surface: '#faf6ec', text: '#2e2a22', muted: '#5f5748', line: '#d9cfba', accent: '#a57546',
+    tints: { peach: '#f9d7bd', butter: '#f4e6ae', mint: '#cee7cb', sky: '#bfe3f4', lilac: '#ddd3f3', rose: '#f7cfd3' },
   }),
   matcha: light({
     id: 'matcha', name: 'Matcha', bg: '#dfe6d6', surface: '#f5f8ef', text: '#232b21', muted: '#4f5d4b', line: '#c9d4bd', accent: '#5a7d4a',
-    tints: { peach: '#f2dccb', butter: '#eeeab9', mint: '#c9e4c8', sky: '#cde3e3', lilac: '#dcd8ea', rose: '#efd4d6' },
+    tints: { peach: '#f9dac5', butter: '#f1e9b2', mint: '#c3e6ca', sky: '#bde6f0', lilac: '#dcd6f6', rose: '#f7d0d7' },
   }),
   rosewater: light({
     id: 'rosewater', name: 'Rosewater', bg: '#f2dcdd', surface: '#fdf4f3', text: '#35222a', muted: '#6b4d56', line: '#e6c8cb', accent: '#b8456a',
-    tints: { peach: '#f9d9c8', butter: '#f6e8c0', mint: '#d9ebdc', sky: '#d6e3f1', lilac: '#e4d8f0', rose: '#f6c9d4' },
+    tints: { peach: '#fcd8c5', butter: '#f6e9bb', mint: '#cfefd8', sky: '#c9e6fe', lilac: '#e2d7f7', rose: '#f9c7d5' },
   }),
   'night-garden': {
     id: 'night-garden', name: 'Night Garden', dark: true, bg: '#0f1a15', surface: '#18261f', text: '#e8f0e9', muted: '#aabdb0', line: '#27382f', accent: '#8fd3a4',

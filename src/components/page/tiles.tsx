@@ -1,18 +1,19 @@
 // Shared by the server-rendered page and the client studio. Interactive bits live in ./islands.
-import { ArrowUpRight, Star, Mail } from 'lucide-react';
+// These views draw the Soft style: frosted pastel cards. The other styles draw their own tiles in ./styles.
+import { ArrowUpRight, Star, Mail, Play, Music2 } from 'lucide-react';
 import { Favicon, VideoPlayer } from './islands';
 import type { Tile } from '@/lib/schema';
 import { PLATFORMS, profileUrl } from '@/lib/platforms';
-import { hostOf, youtubeId, spotifyEmbed } from '@/lib/url';
+import { hostOf, youtubeId } from '@/lib/url';
 import { asset, cn } from '@/lib/utils';
 import { isColourful } from '@/lib/style';
 
 type Props<T extends Tile['type']> = { tile: Extract<Tile, { type: T }>; editing?: boolean };
 
-/** The square icon in the corner of link-ish tiles. */
-function Badge({ children, bg, fg }: { children: React.ReactNode; bg: string; fg?: string }) {
+/** The frosted disc in the corner of link-ish tiles. */
+function Badge({ children, bg, fg, round }: { children: React.ReactNode; bg?: string; fg?: string; round?: boolean }) {
   return (
-    <span className="grid size-10 shrink-0 place-items-center rounded-[12px] shadow-[0_1px_2px_rgb(0_0_0/.06)]" style={{ background: bg, color: fg }}>
+    <span className={cn('sf-badge', round && 'sf-badge-round')} style={{ ...(bg ? { '--sf-badge-bg': bg } : {}), color: fg } as React.CSSProperties}>
       {children}
     </span>
   );
@@ -26,13 +27,9 @@ export function BrandIcon({ path, size = 20, color }: { path: string; size?: num
   );
 }
 
+/** A small round chip that appears on hover to say "this opens". */
 function Corner() {
-  return (
-    <ArrowUpRight
-      aria-hidden
-      className="absolute right-4 top-4 size-4 text-[var(--muted)] opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
-    />
-  );
+  return <span aria-hidden className="sf-go"><ArrowUpRight className="size-[15px]" /></span>;
 }
 
 /** Very small markdown: **bold**, *italic*, [text](url). */
@@ -55,19 +52,19 @@ export function LinkTileView({ tile }: Props<'link'>) {
   const wide = tile.size === 'w' || tile.size === 'l';
   const showImage = tile.image && tile.size !== 's';
   return (
-    <div className={cn('flex h-full gap-4 p-5', wide && showImage ? 'flex-row' : 'flex-col justify-between')}>
-      <div className={cn('flex min-w-0 flex-col justify-between', wide && showImage && 'flex-1')}>
-        <Badge bg="var(--surface)"><Favicon url={tile.url} /></Badge>
-        <div className="mt-3 min-w-0">
-          <p className="line-clamp-2 text-[15px] font-semibold leading-snug tracking-[-0.01em]">{tile.title || hostOf(tile.url)}</p>
-          {tile.description && tile.size !== 's' && <p className="mt-1 line-clamp-2 text-[13px] leading-snug text-[var(--muted)]">{tile.description}</p>}
-          <p className="mt-1 truncate text-[13px] text-[var(--muted)]">{hostOf(tile.url)}</p>
+    <div className={cn('sf-link', wide && showImage && 'sf-split')}>
+      <div className="sf-link-text">
+        <Badge><Favicon url={tile.url} /></Badge>
+        <div className="sf-copy">
+          <p className="sf-title">{tile.title || hostOf(tile.url)}</p>
+          {tile.description && tile.size !== 's' && <p className="sf-desc">{tile.description}</p>}
+          <p className="sf-sub">{hostOf(tile.url)}</p>
         </div>
       </div>
       {showImage && (
-        <div className={cn('overflow-hidden rounded-[calc(var(--radius-tile)-12px)]', wide ? 'flex-1' : 'min-h-0 flex-1')}>
+        <div className="sf-media">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={asset(tile.image)} alt="" className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" loading="lazy" />
+          <img src={asset(tile.image)} alt="" loading="lazy" />
         </div>
       )}
       <Corner />
@@ -85,13 +82,13 @@ export function SocialTileView({ tile }: Props<'social'>) {
   const fg = isEmail || isColourful(hex) ? '#fff' : 'var(--surface)';
   const handle = isEmail ? tile.handle : `@${tile.handle.replace(/^@/, '')}`;
   return (
-    <div className="flex h-full flex-col justify-between p-5">
-      <Badge bg={bg} fg={fg}>
+    <div className="sf-social">
+      <Badge bg={bg} fg={fg} round>
         {isEmail ? <Mail className="size-5" /> : icon && icon.path ? <BrandIcon path={icon.path} /> : <span className="text-[15px] font-bold tracking-tight">in</span>}
       </Badge>
-      <div className="min-w-0">
-        <p className="text-[15px] font-semibold tracking-[-0.01em]">{p.label}</p>
-        <p className="truncate text-[13px] text-[var(--muted)]">{handle}</p>
+      <div className="sf-copy">
+        <p className="sf-title">{p.label}</p>
+        <p className="sf-sub">{handle}</p>
       </div>
       <Corner />
     </div>
@@ -101,24 +98,18 @@ export function SocialTileView({ tile }: Props<'social'>) {
 export function TextTileView({ tile }: Props<'text'>) {
   const big = tile.size === 'l' || tile.size === 't';
   return (
-    <div className={cn('flex h-full p-5', big ? 'items-end' : 'items-center')}>
-      <p className={cn('font-medium leading-snug tracking-[-0.015em]', tile.size === 's' ? 'line-clamp-5 text-[15px]' : big ? 'text-[21px] leading-[1.3]' : 'line-clamp-4 text-[17px] leading-[1.45]')}>
-        <RichText text={tile.text} />
-      </p>
+    <div className={cn('sf-text', big && 'sf-text-big', tile.size === 's' && 'sf-text-s')}>
+      <p><RichText text={tile.text} /></p>
     </div>
   );
 }
 
 export function ImageTileView({ tile }: Props<'image'>) {
   return (
-    <div className="relative h-full">
+    <div className="sf-photo">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={asset(tile.src)} alt={tile.alt} className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" loading="lazy" />
-      {tile.caption && (
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/25 via-black/5 to-transparent p-4 pt-12">
-          <p className="text-[14px] font-medium text-white [text-shadow:0_1px_8px_rgb(0_0_0/.35)]">{tile.caption}</p>
-        </div>
-      )}
+      <img src={asset(tile.src)} alt={tile.alt} loading="lazy" />
+      {tile.caption && <span className="sf-cap">{tile.caption}</span>}
     </div>
   );
 }
@@ -126,29 +117,39 @@ export function ImageTileView({ tile }: Props<'image'>) {
 export function VideoTileView({ tile, editing }: Props<'video'>) {
   const id = youtubeId(tile.url);
   if (!id) return <LinkTileView tile={{ ...tile, type: 'link' }} />;
-  return <VideoPlayer id={id} title={tile.title} editing={editing} thumb={tile.image && asset(tile.image)} />;
+  return <div className="sf-photo"><VideoPlayer id={id} title={tile.title} editing={editing} thumb={tile.image && asset(tile.image)} /></div>;
 }
 
-export function MusicTileView({ tile, editing }: Props<'music'>) {
-  const src = spotifyEmbed(tile.url);
-  if (!src || tile.size === 's') {
+/** A native-looking music card: cover art, title, artist and a play button that opens the track. */
+export function MusicTileView({ tile }: Props<'music'>) {
+  const sp = PLATFORMS.spotify.icon as { path: string };
+  const cover = tile.image ? asset(tile.image) : undefined;
+  const title = tile.title || 'Listen on Spotify';
+  const artist = tile.artist || 'Spotify';
+  if (tile.size === 's') {
     return (
-      <div className="flex h-full flex-col justify-between p-5">
-        <Badge bg="#1DB954" fg="#fff"><BrandIcon path={(PLATFORMS.spotify.icon as { path: string }).path} color="#fff" /></Badge>
-        <div><p className="text-[15px] font-semibold">Spotify</p><p className="text-[13px] text-[var(--muted)]">Listen</p></div>
+      <div className="sf-music sf-music-s">
+        <span className="sf-cover">{cover ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={cover} alt="" loading="lazy" /> : <Music2 className="size-7" />}</span>
+        <span className="sf-play"><Play className="size-3.5 fill-current" /></span>
         <Corner />
       </div>
     );
   }
   return (
-    <iframe
-      className={cn('size-full', editing && 'pointer-events-none')}
-      style={{ colorScheme: 'normal' }}
-      src={`${src}?utm_source=generator&theme=0`}
-      title="Spotify"
-      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-      loading="lazy"
-    />
+    <div className="sf-music">
+      {cover && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={cover} alt="" aria-hidden className="sf-music-glow" loading="lazy" />
+      )}
+      <span className="sf-cover">{cover ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={cover} alt="" loading="lazy" /> : <Music2 className="size-8" />}</span>
+      <div className="sf-music-body">
+        <span className="sf-music-kind"><BrandIcon path={sp.path} size={13} />Now playing</span>
+        <p className="sf-title">{title}</p>
+        <p className="sf-sub">{artist}</p>
+        <span className="sf-eq" aria-hidden><i /><i /><i /><i /><i /></span>
+      </div>
+      <span className="sf-play" aria-hidden><Play className="size-[17px] fill-current" /></span>
+    </div>
   );
 }
 
@@ -161,15 +162,15 @@ export function GithubTileView({ tile }: Props<'github'>) {
   const [owner, name] = tile.repo.split('/');
   const gh = PLATFORMS.github.icon as { path: string };
   return (
-    <div className="flex h-full flex-col justify-between p-5">
-      <Badge bg="var(--text)" fg="var(--surface)"><BrandIcon path={gh.path} /></Badge>
-      <div className="min-w-0">
-        <p className="truncate text-[15px] tracking-[-0.01em]"><span className="text-[var(--muted)]">{owner}/</span><span className="font-semibold">{name}</span></p>
-        {tile.description && tile.size !== 's' && <p className="mt-1 line-clamp-2 text-[13px] leading-snug text-[var(--muted)]">{tile.description}</p>}
+    <div className="sf-github">
+      <Badge bg="var(--text)" fg="var(--surface)" round><BrandIcon path={gh.path} /></Badge>
+      <div className="sf-copy">
+        <p className="sf-title"><span className="sf-owner">{owner}/</span>{name}</p>
+        {tile.description && tile.size !== 's' && <p className="sf-desc">{tile.description}</p>}
         {(tile.stars !== undefined || tile.language) && (
-          <p className="mt-2 flex items-center gap-3 text-[12.5px] text-[var(--muted)]">
-            {tile.stars !== undefined && <span className="inline-flex items-center gap-1"><Star className="size-3.5" />{Intl.NumberFormat('en', { notation: 'compact' }).format(tile.stars)}</span>}
-            {tile.language && <span className="inline-flex items-center gap-1.5"><span className="size-2 rounded-full" style={{ background: LANG_COLORS[tile.language] ?? 'var(--muted)' }} />{tile.language}</span>}
+          <p className="sf-chips">
+            {tile.stars !== undefined && <span className="sf-chip"><Star className="size-3" />{Intl.NumberFormat('en', { notation: 'compact' }).format(tile.stars)}</span>}
+            {tile.language && <span className="sf-chip"><i style={{ background: LANG_COLORS[tile.language] ?? 'var(--muted)' }} />{tile.language}</span>}
           </p>
         )}
       </div>
@@ -179,13 +180,13 @@ export function GithubTileView({ tile }: Props<'github'>) {
 }
 
 /** Where a tile links to (null = not a link). */
-export function tileHref(tile: Tile, desk = false): string | null {
+export function tileHref(tile: Tile, _desk = false): string | null {
   switch (tile.type) {
     case 'link': return tile.url;
     case 'social': return profileUrl(tile.platform, tile.handle, tile.url);
     case 'github': return `https://github.com/${tile.repo}`;
     case 'image': return tile.url ?? null;
-    case 'music': return desk || tile.size === 's' ? tile.url : null;
+    case 'music': return tile.url;
     default: return null;
   }
 }
@@ -210,13 +211,13 @@ export function brandHex(tile: Tile): string | undefined {
 /* ---------- List layout (Linktree-style rows) ---------- */
 function RowText({ title, sub }: { title: string; sub?: string }) {
   return (
-    <span className="min-w-0 flex-1">
-      <span className="block truncate text-[15.5px] font-semibold tracking-[-0.01em]">{title}</span>
-      {sub && <span className="block truncate text-[13px] text-[var(--muted)]">{sub}</span>}
+    <span className="sf-row-text">
+      <span className="sf-title">{title}</span>
+      {sub && <span className="sf-sub">{sub}</span>}
     </span>
   );
 }
-const RowArrow = () => <ArrowUpRight aria-hidden className="size-4 shrink-0 text-[var(--muted)] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />;
+const RowArrow = () => <span aria-hidden className="sf-row-go"><ArrowUpRight className="size-4" /></span>;
 
 export function ListItem({ tile }: { tile: Tile }) {
   switch (tile.type) {
@@ -225,8 +226,8 @@ export function ListItem({ tile }: { tile: Tile }) {
         <div className="posy-row-inner">
           {tile.image && tile.size !== 's'
             // eslint-disable-next-line @next/next/no-img-element
-            ? <img src={asset(tile.image)} alt="" className="size-11 shrink-0 rounded-[12px] object-cover" loading="lazy" />
-            : <Badge bg="var(--surface)"><Favicon url={tile.url} /></Badge>}
+            ? <img src={asset(tile.image)} alt="" className="sf-row-thumb" loading="lazy" />
+            : <Badge><Favicon url={tile.url} /></Badge>}
           <RowText title={tile.title || hostOf(tile.url)} sub={tile.description || hostOf(tile.url)} />
           <RowArrow />
         </div>
@@ -241,8 +242,18 @@ export function ListItem({ tile }: { tile: Tile }) {
         </div>
       );
     }
+    case 'music': {
+      const cover = tile.image ? asset(tile.image) : undefined;
+      return (
+        <div className="posy-row-inner sf-music-row">
+          <span className="sf-cover">{cover ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={cover} alt="" loading="lazy" /> : <Music2 className="size-5" />}</span>
+          <RowText title={tile.title || 'Listen on Spotify'} sub={tile.artist || 'Spotify'} />
+          <span className="sf-play" aria-hidden><Play className="size-3.5 fill-current" /></span>
+        </div>
+      );
+    }
     case 'text':
-      return <p className="px-6 py-5 text-center text-[16px] font-medium leading-relaxed"><RichText text={tile.text} /></p>;
+      return <div className="sf-text sf-text-row"><p><RichText text={tile.text} /></p></div>;
     case 'image':
       return (
         <div className="relative" style={{ aspectRatio: tile.size === 't' ? '4 / 5' : tile.size === 's' ? '1' : '16 / 10' }}>
@@ -251,11 +262,7 @@ export function ListItem({ tile }: { tile: Tile }) {
       );
     case 'video': {
       const id = youtubeId(tile.url);
-      return id ? <div className="relative aspect-video"><VideoPlayer id={id} title={tile.title} /></div> : null;
-    }
-    case 'music': {
-      const src = spotifyEmbed(tile.url);
-      return src ? <iframe className="block h-[152px] w-full" src={`${src}?utm_source=generator&theme=0`} title="Spotify" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" /> : null;
+      return id ? <div className="relative aspect-video"><div className="sf-photo"><VideoPlayer id={id} title={tile.title} /></div></div> : null;
     }
     default:
       return null;

@@ -22,7 +22,7 @@ export function VideoPlayer({ id, title, editing, thumb }: { id: string; title?:
   return (
     <button type="button" onClick={e => { if (editing) return; e.preventDefault(); setPlaying(true); }} className="relative block size-full text-left" aria-label={`Play ${title || 'video'}`} tabIndex={editing ? -1 : 0}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={thumb || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" loading="lazy" />
+      <img src={thumb || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" style={thumb ? undefined : { transform: 'scale(1.34)' }} loading="lazy" />
       <span className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
       <span className="absolute left-1/2 top-1/2 grid size-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white/90 shadow-lg backdrop-blur transition-transform duration-300 group-hover:scale-110">
         <Play className="ml-0.5 size-5 fill-[#1b1b1b] text-[#1b1b1b]" />
@@ -41,8 +41,8 @@ export function ShareButton({ url }: { url?: string }) {
     setDone(true); setTimeout(() => setDone(false), 1600);
   }
   return (
-    <button type="button" onClick={share} className="inline-flex items-center gap-1.5 transition-colors hover:text-[var(--text)]">
-      {done ? <Check className="size-4" /> : <Share2 className="size-4" />}{done ? 'Copied' : 'Share'}
+    <button type="button" onClick={share} className="sf-pill sf-pill-btn">
+      {done ? <Check className="size-3.5" /> : <Share2 className="size-3.5" />}{done ? 'Copied' : 'Share'}
     </button>
   );
 }

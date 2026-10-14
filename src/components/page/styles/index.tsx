@@ -7,6 +7,7 @@ import { NeonHeader, NeonTile, NeonRow } from './neon';
 import { EditorialHeader, EditorialTile, EditorialRow } from './editorial';
 import type { HeaderSlots } from './types';
 import './styles.css';
+import './soft.css';
 
 export type StyleId = Page['theme']['style'];
 
@@ -14,6 +15,11 @@ export type StyleId = Page['theme']['style'];
 export const socialsInHeader = (page: Page) => page.theme.style !== 'soft' || page.theme.layout === 'list';
 
 export function StyleHeader({ page, slots }: { page: Page; slots: HeaderSlots }) {
+  // display: contents keeps the header's own layout; the variable lets long names scale down in CSS.
+  return <div style={{ display: 'contents', '--nlen': page.profile.name.length } as React.CSSProperties}>{styledHeader(page, slots)}</div>;
+}
+
+function styledHeader(page: Page, slots: HeaderSlots) {
   switch (page.theme.style) {
     case 'cozy': return <CozyHeader slots={slots} />;
     case 'terminal': return <TerminalHeader name={page.profile.name} slots={slots} />;
