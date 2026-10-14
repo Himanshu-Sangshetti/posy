@@ -47,9 +47,12 @@ function ToolButton({ label, active, onClick, children }: { label: string; activ
 export function TileToolbar({ tile }: { tile: Tile }) {
   const { updateTile, removeTile } = useStudio();
   const sizes: Size[] = tile.type === 'music' ? ['s', 'w', 'l'] : ['s', 'w', 't', 'l'];
-  const desk = useStudio(s => s.page?.theme.layout === 'desk');
+  const style = useStudio(s => s.page?.theme.style ?? 'soft');
+  const layout = useStudio(s => s.page?.theme.layout);
+  const desk = style === 'cozy';
   const stamp = tile.type === 'text' && tile.look === 'stamp';
-  const sticker = desk && tile.type === 'social';
+  const sticker = tile.type === 'social' && (style !== 'soft' || layout === 'list');
+  const inlineText = tile.type === 'text' && !stamp && (style === 'soft' || style === 'cozy');
   return (
     <div
       data-toolbar
@@ -83,7 +86,7 @@ export function TileToolbar({ tile }: { tile: Tile }) {
         <ToolButton label="Sticky note" active={!stamp} onClick={() => updateTile(tile.id, { look: undefined } as Partial<Tile>)}><StickyNote className="size-4" /></ToolButton>
         <ToolButton label="Round stamp" active={stamp} onClick={() => updateTile(tile.id, { look: 'stamp' } as Partial<Tile>)}><Stamp className="size-4" /></ToolButton>
       </>}
-      {(stamp || tile.type !== 'text') && tile.type !== 'heading' && (
+      {!inlineText && tile.type !== 'heading' && (
         <Popover>
           <PopoverTrigger asChild>
             <button type="button" aria-label="Edit" className="grid size-8 place-items-center rounded-[10px] text-[var(--muted)] hover:bg-[var(--secondary)] hover:text-[var(--text)]"><Pencil className="size-4" /></button>

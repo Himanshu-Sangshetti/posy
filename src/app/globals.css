@@ -223,21 +223,22 @@ a.posy-tile:hover { box-shadow: 0 2px 4px rgb(20 16 12 / .05), 0 22px 44px -22px
 .posy-thumb > div { position: absolute; top: 0; left: 0; transform-origin: top left; }
 
 /* ================= Desk layout: tiles as objects on a paper desk ================= */
-.posy-layout-desk {
+.posy-style-cozy, .posy-app {
   --dk-ease: cubic-bezier(.2, .9, .25, 1.15);
   --dk-ink: color-mix(in oklab, var(--text) 82%, var(--accent));
   --dk-shadow: 0 1px 1px rgb(60 40 20 / .06), 0 2px 4px rgb(60 40 20 / .05), 0 16px 32px -14px rgb(60 40 20 / .28);
   --dk-shadow-hi: 0 2px 2px rgb(60 40 20 / .06), 0 6px 10px rgb(60 40 20 / .05), 0 30px 50px -18px rgb(60 40 20 / .34);
   --dk-white: #fffefb;
 }
-.dark.posy-layout-desk { --dk-shadow: 0 1px 2px rgb(0 0 0 / .35), 0 18px 34px -14px rgb(0 0 0 / .7); --dk-shadow-hi: 0 2px 4px rgb(0 0 0 / .4), 0 30px 50px -16px rgb(0 0 0 / .8); --dk-white: #f4f1ec; }
-.posy-layout-desk { overflow-x: clip; }
-.posy-layout-desk .posy-layout { max-width: 1040px; gap: 52px; }
-@container page (min-width: 700px) { .posy-layout-desk .posy-layout { padding-top: 88px; gap: 72px; } }
+.dark.posy-style-cozy { --dk-shadow: 0 1px 2px rgb(0 0 0 / .35), 0 18px 34px -14px rgb(0 0 0 / .7); --dk-shadow-hi: 0 2px 4px rgb(0 0 0 / .4), 0 30px 50px -16px rgb(0 0 0 / .8); --dk-white: #f4f1ec; }
+.posy-top { overflow-x: clip; }
+.posy-top .posy-layout { max-width: 1040px; gap: 52px; }
+@container page (min-width: 700px) { .posy-top .posy-layout { padding-top: 88px; gap: 72px; } }
+.posy-top.posy-layout-list .posy-layout { max-width: 640px; }
 .dk-hand { font-family: var(--font-caveat), cursive; font-weight: 600; }
 .dk-serif { font-family: var(--font-head); font-weight: var(--head-weight, 400); letter-spacing: var(--head-track, -0.01em); }
 .dk-mono { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
-.posy-layout-desk.posy-bg-solid .posy-backdrop::before { background:
+.posy-style-cozy.posy-bg-solid .posy-backdrop::before { background:
   radial-gradient(50vw 40vw at 6% 0%, color-mix(in oklab, var(--tint-peach) 70%, transparent), transparent 70%),
   radial-gradient(45vw 40vw at 100% 45%, color-mix(in oklab, var(--tint-lilac) 60%, transparent), transparent 70%),
   radial-gradient(40vw 30vw at 15% 100%, color-mix(in oklab, var(--tint-mint) 60%, transparent), transparent 70%); }
@@ -248,40 +249,40 @@ a.posy-tile:hover { box-shadow: 0 2px 4px rgb(20 16 12 / .05), 0 22px 44px -22px
 .dk-me { position: relative; width: 150px; padding: 10px 10px 40px; background: var(--dk-white); box-shadow: var(--dk-shadow); rotate: -4deg; transition: rotate .6s var(--dk-ease); }
 .dk-me:hover { rotate: -1deg; }
 @container page (min-width: 700px) { .dk-me { width: 176px; } }
-.posy-layout-desk .posy-avatar { width: 100%; height: auto; aspect-ratio: 1; border-radius: 0; box-shadow: none; }
+.posy-style-cozy .posy-avatar { width: 100%; height: auto; aspect-ratio: 1; border-radius: 0; box-shadow: none; }
 .posy-avatar-hidden .dk-me { display: none; }
 .posy-avatar-hidden .dk-profile { grid-template-columns: 1fr; }
 .dk-me-cap { position: absolute; inset: auto 0 6px; padding: 0 8px; text-align: center; font-size: 18px; color: #5b5049; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 @container page (min-width: 700px) { .dk-me-cap { font-size: 21px; } }
-.posy-layout-desk .posy-name { margin: 0; font-size: 68px; line-height: .9; }
-@container page (min-width: 700px) { .posy-layout-desk .posy-name { font-size: 104px; line-height: .86; } }
-.posy-layout-desk .posy-name i { font-style: italic; color: color-mix(in oklab, var(--accent) 70%, var(--text)); }
-.posy-layout-desk .posy-bio { margin-top: 18px; max-width: 46ch; font-size: 17.5px; }
-.posy-layout-desk .posy-social-row { justify-content: flex-start; gap: 10px; margin-top: 22px; }
-.posy-layout-desk .posy-social-row > * { transition: rotate .45s var(--dk-ease), scale .45s var(--dk-ease), translate .45s var(--dk-ease); }
-.posy-layout-desk .posy-social-row a, .posy-layout-desk .posy-social-row .dk-stk {
+.posy-style-cozy .posy-name { margin: 0; font-size: 68px; line-height: .9; }
+@container page (min-width: 700px) { .posy-style-cozy .posy-name { font-size: 104px; line-height: .86; } }
+.posy-style-cozy .posy-name i { font-style: italic; color: color-mix(in oklab, var(--accent) 70%, var(--text)); }
+.posy-style-cozy .posy-bio { margin-top: 18px; max-width: 46ch; font-size: 17.5px; }
+.posy-style-cozy .posy-social-row { justify-content: flex-start; gap: 10px; margin-top: 22px; }
+.posy-style-cozy .posy-social-row > * { transition: rotate .45s var(--dk-ease), scale .45s var(--dk-ease), translate .45s var(--dk-ease); }
+.posy-style-cozy .posy-social-row a, .posy-style-cozy .posy-social-row .dk-stk {
   display: grid; place-items: center; width: 46px; height: 46px; border-radius: 999px; border: 3px solid var(--dk-white); color: #2d2723; background: var(--stk, var(--tint-lilac));
   box-shadow: 0 1px 1px rgb(60 40 20 / .1), 0 6px 12px -6px rgb(60 40 20 / .4);
   transition: rotate .45s var(--dk-ease), scale .45s var(--dk-ease), translate .45s var(--dk-ease);
 }
-.posy-layout-desk .posy-social-row > :nth-child(6n+1) { --stk: var(--tint-rose); rotate: -8deg; }
-.posy-layout-desk .posy-social-row > :nth-child(6n+2) { --stk: var(--tint-lilac); rotate: 7deg; }
-.posy-layout-desk .posy-social-row > :nth-child(6n+3) { --stk: var(--tint-mint); rotate: -5deg; }
-.posy-layout-desk .posy-social-row > :nth-child(6n+4) { --stk: var(--tint-peach); rotate: 9deg; }
-.posy-layout-desk .posy-social-row > :nth-child(6n+5) { --stk: var(--tint-butter); rotate: -7deg; }
-.posy-layout-desk .posy-social-row > :nth-child(6n+6) { --stk: var(--tint-sky); rotate: 6deg; }
-.posy-layout-desk .posy-social-row a:hover { background: var(--stk, var(--tint-lilac)); color: #2d2723; transform: none; }
-.posy-layout-desk .posy-social-row > :hover { rotate: 0deg; scale: 1.14; translate: 0 -3px; }
-.dark.posy-layout-desk .posy-social-row a { color: var(--text); }
+.posy-style-cozy .posy-social-row > :nth-child(6n+1) { --stk: var(--tint-rose); rotate: -8deg; }
+.posy-style-cozy .posy-social-row > :nth-child(6n+2) { --stk: var(--tint-lilac); rotate: 7deg; }
+.posy-style-cozy .posy-social-row > :nth-child(6n+3) { --stk: var(--tint-mint); rotate: -5deg; }
+.posy-style-cozy .posy-social-row > :nth-child(6n+4) { --stk: var(--tint-peach); rotate: 9deg; }
+.posy-style-cozy .posy-social-row > :nth-child(6n+5) { --stk: var(--tint-butter); rotate: -7deg; }
+.posy-style-cozy .posy-social-row > :nth-child(6n+6) { --stk: var(--tint-sky); rotate: 6deg; }
+.posy-style-cozy .posy-social-row a:hover { background: var(--stk, var(--tint-lilac)); color: #2d2723; transform: none; }
+.posy-style-cozy .posy-social-row > :hover { rotate: 0deg; scale: 1.14; translate: 0 -3px; }
+.dark.posy-style-cozy .posy-social-row a { color: var(--text); }
 
 /* grid of objects */
-.posy-layout-desk .posy-grid { --gap: 28px; }
-@container grid (max-width: 600px) { .posy-layout-desk .posy-grid { --gap: 20px; } }
-.posy-layout-desk .posy-grid-wrap + .posy-grid-wrap { margin-top: 64px; }
-.posy-layout-desk .posy-section { font-family: var(--font-head); font-style: italic; font-weight: 400; font-size: 32px; color: var(--muted); margin-bottom: 26px; }
+.posy-style-cozy .posy-grid { --gap: 28px; }
+@container grid (max-width: 600px) { .posy-style-cozy .posy-grid { --gap: 20px; } }
+.posy-style-cozy .posy-grid-wrap + .posy-grid-wrap { margin-top: 64px; }
+.posy-style-cozy .posy-section { font-family: var(--font-head); font-style: italic; font-weight: 400; font-size: 32px; color: var(--muted); margin-bottom: 26px; }
 .posy-obj.posy-tile { overflow: visible; border: 0; border-radius: 0; background: none; box-shadow: none; rotate: var(--rot, 0deg); transition: rotate .55s var(--dk-ease); }
 a.posy-obj.posy-tile:hover, .posy-obj.posy-tile:hover { box-shadow: none; rotate: 0deg; z-index: 5; }
-.posy-layout-desk.posy-motion .posy-rise { animation-name: dk-drop; animation-duration: .9s; animation-timing-function: var(--dk-ease); animation-delay: calc(min(var(--i, 0), 14) * 60ms); }
+.posy-style-cozy.posy-motion .posy-rise { animation-name: dk-drop; animation-duration: .9s; animation-timing-function: var(--dk-ease); animation-delay: calc(min(var(--i, 0), 14) * 60ms); }
 @keyframes dk-drop { from { opacity: 0; transform: translateY(-24px) scale(1.04); } }
 .posy-obj img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
@@ -409,7 +410,7 @@ a.posy-obj.posy-tile:hover, .posy-obj.posy-tile:hover { box-shadow: none; rotate
 .dk-sticker { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; border: 3px solid var(--dk-white); background: var(--tint-lilac); box-shadow: var(--dk-shadow); color: #2d2723; }
 .dk-sticker-tile .dk-hand { font-size: 22px; color: var(--muted); }
 
-.posy-layout-desk .posy-footer a { font-family: var(--font-caveat), cursive; font-size: 21px; font-weight: 600; }
+.posy-style-cozy .posy-footer a { font-family: var(--font-caveat), cursive; font-size: 21px; font-weight: 600; }
 .dark .dk-env-front { background: color-mix(in oklab, var(--paper) 88%, white 7%); }
 .dark .dk-env-flap { background: color-mix(in oklab, var(--paper) 80%, white 12%); }
 .dark .dk-env-back { background: color-mix(in oklab, var(--paper) 90%, black 20%); }

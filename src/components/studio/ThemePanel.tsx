@@ -8,6 +8,7 @@ import { FONTS, RADII, BACKGROUNDS, TILE_STYLES, EFFECTS, AVATARS } from '@/lib/
 import { THEMES, THEME_IDS, PREMIUM_THEMES, type ThemeId } from '@/lib/themes';
 import { ALL_FONT_PAIRS as FONT_PAIRS, FONT_VARS, PREMIUM_FONTS } from '@/lib/style';
 import { useEntitlements } from './entitlements';
+import { STYLE_IDS, STYLE_INFO, PREMIUM_STYLES, type StyleId } from '@/lib/styles';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
@@ -57,6 +58,43 @@ function TileSwatch({ style }: { style: (typeof TILE_STYLES)[number] }) {
   );
 }
 
+/** A tiny drawing of each style, so people can tell them apart at a glance. */
+function StyleSwatch({ id }: { id: StyleId }) {
+  const box = 'relative block h-[74px] w-full overflow-hidden rounded-[9px]';
+  switch (id) {
+    case 'cozy': return (
+      <span className={box} style={{ background: '#f5efe6' }}>
+        <span className="absolute left-3 top-3 h-11 w-10 -rotate-6 bg-white p-1 pb-3 shadow-md"><span className="block size-full" style={{ background: 'linear-gradient(160deg,#bcd6ee,#f3b8b8)' }} /></span>
+        <span className="absolute left-[60px] top-4 size-9 rotate-3 shadow-md" style={{ background: '#fbe9a6' }} />
+        <span className="absolute right-3 top-5 size-9 rounded-full shadow-md" style={{ background: '#e4dcfb' }} />
+      </span>);
+    case 'soft': return (
+      <span className={box} style={{ background: '#f1eef9' }}>
+        <span className="absolute left-3 top-3 h-12 w-14 rounded-[10px]" style={{ background: '#fbe0d6' }} />
+        <span className="absolute left-[72px] top-3 h-5 w-14 rounded-[8px]" style={{ background: '#dcefe2' }} />
+        <span className="absolute left-[72px] top-[38px] h-5 w-14 rounded-[8px]" style={{ background: '#d9e6f8' }} />
+      </span>);
+    case 'editorial': return (
+      <span className={box} style={{ background: '#f7f6f2', fontFamily: 'var(--font-dm-serif)' }}>
+        <span className="absolute left-3 top-2 text-[26px] leading-none text-[#161616]">Aa</span>
+        <span className="absolute inset-x-3 top-[38px] h-px bg-[#161616]" />
+        <span className="absolute left-3 top-[46px] h-1.5 w-16 rounded-full bg-[#16161633]" /><span className="absolute left-3 top-[56px] h-1.5 w-10 rounded-full bg-[#16161622]" />
+      </span>);
+    case 'terminal': return (
+      <span className={box} style={{ background: '#070b08', fontFamily: 'var(--font-geist-mono), monospace' }}>
+        <span className="absolute left-3 top-2.5 text-[11px] text-[#6f9a76]">~ $ whoami</span>
+        <span className="absolute left-3 top-6 text-[18px] font-semibold text-[#c9f7cf]">you<span className="ml-0.5 inline-block h-4 w-2 translate-y-0.5 bg-[#3dff8b]" /></span>
+        <span className="absolute inset-x-3 bottom-2.5 h-4 border border-dashed border-[#3dff8b80]" />
+      </span>);
+    case 'neon': return (
+      <span className={box} style={{ background: 'linear-gradient(#08061a 55%, #1a0b30)' }}>
+        <span className="absolute inset-x-0 bottom-0 h-7" style={{ background: 'linear-gradient(transparent 0 92%, #ff3ea5aa 92%) 0 0 / 100% 7px, linear-gradient(90deg, transparent 0 94%, #ff3ea5aa 94%) 0 0 / 12px 100%', maskImage: 'linear-gradient(transparent, #000)' }} />
+        <span className="absolute left-3 top-3 h-8 w-14 border border-[#2be4ff] shadow-[0_0_10px_#2be4ff]" style={{ clipPath: 'polygon(0 0,85% 0,100% 30%,100% 100%,15% 100%,0 70%)' }} />
+        <span className="absolute right-3 top-3 text-[15px] font-bold tracking-wider text-[#ff3ea5] [text-shadow:0_0_8px_#ff3ea5]" style={{ fontFamily: 'var(--font-chakra)' }}>NEON</span>
+      </span>);
+  }
+}
+
 const proNote = () => toast('Part of Posy Pro', { description: 'Upgrade from Settings to use premium themes, fonts and more.' });
 
 export function ThemePanel({ page }: { page: Page }) {
@@ -72,14 +110,64 @@ export function ThemePanel({ page }: { page: Page }) {
   return (
     <Tabs defaultValue="style" className="gap-4">
       <TabsList className="grid h-10 w-full grid-cols-5 rounded-[12px] bg-[var(--secondary)] p-1">
-        {['style', 'background', 'tiles', 'type', 'layout'].map(k => (
+        {['style', 'colour', 'type', 'layout', 'background'].map(k => (
           <TabsTrigger key={k} value={k} className="rounded-[9px] text-[12.5px] capitalize data-[state=active]:bg-[var(--surface)] data-[state=active]:shadow-sm">{k === 'background' ? 'Backdrop' : k}</TabsTrigger>
         ))}
       </TabsList>
 
       <TabsContent value="style" className="grid max-h-[58vh] gap-5 overflow-y-auto pr-1">
+        <div className="grid grid-cols-2 gap-2.5">
+          {STYLE_IDS.map(id => {
+            const info = STYLE_INFO[id];
+            const lock = locked(PREMIUM_STYLES.has(id));
+            return (
+              <button key={id} type="button" aria-pressed={t.style === id} aria-label={`${info.label} style`}
+                onClick={() => (lock ? proNote() : t.style !== id && updateTheme({ style: id, preset: info.preset, font: info.font, accent: undefined }))}
+                className={cn('relative grid gap-2 p-2 text-left', choice(t.style === id))}>
+                {lock && <Lock className="absolute right-3 top-3 z-10 size-3.5 text-white mix-blend-difference" />}
+                <StyleSwatch id={id} />
+                <span className="px-1 pb-0.5"><span className="block text-[13.5px] font-medium">{info.label}</span><span className="block text-[12px] text-[var(--muted)]">{info.note}</span></span>
+              </button>
+            );
+          })}
+        </div>
+        {t.style === 'soft' && (
+          <div className="grid gap-2.5">
+            <Label>Card finish</Label>
+            <div className="grid grid-cols-4 gap-2">
+              {TILE_STYLES.map(s => (
+                <button key={s} type="button" aria-pressed={t.tileStyle === s} onClick={() => updateTheme({ tileStyle: s })} className={cn('grid gap-1.5 p-1.5 text-center text-[12px]', choice(t.tileStyle === s))}>
+                  <TileSwatch style={s} />{TILE_LABEL[s]}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {(t.style === 'soft' || t.style === 'neon' || t.style === 'terminal') && (
+          <div className="grid gap-2.5">
+            <Label>Corners</Label>
+            <div className="grid grid-cols-4 gap-2">
+              {RADII.map(r => (
+                <button key={r} type="button" aria-label={`${r} corners`} aria-pressed={t.radius === r} onClick={() => updateTheme({ radius: r })} className={cn('grid h-11 place-items-center', choice(t.radius === r))}>
+                  <span className="size-5 border-l-2 border-t-2 border-current" style={{ borderTopLeftRadius: RADIUS_GLYPH[r] }} />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="grid gap-2.5">
-          <Label>Theme</Label>
+          <Label>On hover</Label>
+          <div className="grid grid-cols-4 gap-2">
+            {EFFECTS.map(f => (
+              <button key={f} type="button" aria-pressed={t.effect === f} onClick={() => updateTheme({ effect: f })} className={cn('h-10 text-[13px]', choice(t.effect === f))}>{FX_LABEL[f]}</button>
+            ))}
+          </div>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="colour" className="grid max-h-[58vh] gap-5 overflow-y-auto pr-1">
+        <div className="grid gap-2.5">
+          <Label>Colours</Label>
           <div className="grid grid-cols-4 gap-2">
             {THEME_IDS.map(id => {
               const th = THEMES[id];
@@ -137,37 +225,6 @@ export function ThemePanel({ page }: { page: Page }) {
         <label className="flex items-center justify-between text-[14px]">Film grain <Switch checked={bg.grain} onCheckedChange={v => setBg({ grain: v })} /></label>
       </TabsContent>
 
-      <TabsContent value="tiles" className="grid max-h-[58vh] gap-5 overflow-y-auto pr-1">
-        <div className="grid gap-2.5">
-          <Label>Tile style</Label>
-          <div className="grid grid-cols-4 gap-2">
-            {TILE_STYLES.map(s => (
-              <button key={s} type="button" aria-pressed={t.tileStyle === s} onClick={() => updateTheme({ tileStyle: s })} className={cn('grid gap-1.5 p-1.5 text-center text-[12px]', choice(t.tileStyle === s))}>
-                <TileSwatch style={s} />{TILE_LABEL[s]}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="grid gap-2.5">
-          <Label>Corners</Label>
-          <div className="grid grid-cols-4 gap-2">
-            {RADII.map(r => (
-              <button key={r} type="button" aria-label={`${r} corners`} aria-pressed={t.radius === r} onClick={() => updateTheme({ radius: r })} className={cn('grid h-11 place-items-center', choice(t.radius === r))}>
-                <span className="size-5 border-l-2 border-t-2 border-current" style={{ borderTopLeftRadius: RADIUS_GLYPH[r] }} />
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="grid gap-2.5">
-          <Label>On hover</Label>
-          <div className="grid grid-cols-4 gap-2">
-            {EFFECTS.map(f => (
-              <button key={f} type="button" aria-pressed={t.effect === f} onClick={() => updateTheme({ effect: f })} className={cn('h-10 text-[13px]', choice(t.effect === f))}>{FX_LABEL[f]}</button>
-            ))}
-          </div>
-        </div>
-      </TabsContent>
-
       <TabsContent value="type" className="grid max-h-[58vh] grid-cols-2 gap-2 overflow-y-auto pr-1">
         {FONTS.map(f => (
           <button key={f} type="button" aria-pressed={t.font === f} aria-label={`${FONT_PAIRS[f].label} font`} onClick={() => (locked(PREMIUM_FONTS.has(f)) ? proNote() : updateTheme({ font: f }))}
@@ -182,15 +239,15 @@ export function ThemePanel({ page }: { page: Page }) {
       <TabsContent value="layout" className="grid max-h-[58vh] gap-5 overflow-y-auto pr-1">
         <div className="grid gap-2.5">
           <Label>Layout</Label>
-          <div className="grid grid-cols-2 gap-2">
-            {([['desk', 'side', 'Desk'], ['bento', 'side', 'Bento'], ['bento', 'center', 'Bento centred'], ['list', 'center', 'List']] as const).map(([layout, align, label]) => {
-              const on = t.layout === layout && (layout !== 'bento' || t.align === align);
+          <div className={cn('grid gap-2', t.style === 'soft' ? 'grid-cols-3' : 'grid-cols-2')}>
+            {(t.style === 'soft'
+              ? [['bento', 'side', 'Grid, profile beside'], ['bento', 'center', 'Grid, profile on top'], ['list', 'center', 'List']] as const
+              : [['bento', 'side', 'Grid'], ['list', 'center', 'List']] as const).map(([layout, align, label]) => {
+              const on = t.layout === layout && (layout === 'list' || t.style !== 'soft' || t.align === align);
               return (
                 <button key={label} type="button" aria-pressed={on} onClick={() => updateTheme({ layout, align })} className={cn('grid gap-1.5 p-2 text-center text-[12px]', choice(on))}>
                   <span className="grid h-12 place-items-center rounded-[8px] bg-[var(--bg)]">
-                    {layout === 'desk'
-                      ? <span className="flex items-end gap-1"><span className="size-5 -rotate-6 bg-white p-0.5 pb-1.5 shadow-sm"><span className="block size-full bg-[var(--tint-sky)]" /></span><span className="size-4 rotate-3 bg-[var(--tint-butter)] shadow-sm" /><span className="size-4 rounded-full bg-[var(--tint-lilac)] shadow-sm" /></span>
-                      : layout === 'list'
+                    {layout === 'list'
                       ? <span className="grid w-10 gap-1">{[0, 1, 2].map(i => <span key={i} className="h-1.5 rounded-full bg-[var(--muted)]/40" />)}</span>
                       : align === 'side'
                         ? <span className="flex gap-1.5"><span className="h-8 w-3 rounded-sm bg-[var(--muted)]/40" /><span className="grid grid-cols-2 gap-0.5">{[0, 1, 2, 3].map(i => <span key={i} className="size-3.5 rounded-[3px] bg-[var(--muted)]/40" />)}</span></span>

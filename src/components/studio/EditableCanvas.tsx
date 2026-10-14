@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { MapPin, ImagePlus, X } from 'lucide-react';
 import type { Page, Tile } from '@/lib/schema';
 import { PageFrame, TileShell, Avatar, sections } from '@/components/page/PageView';
-import { DeskTile } from '@/components/page/desk';
+import { StyleHeader, StyleTile, StyleRow, headerClass, socialsInHeader, type StyleId } from '@/components/page/styles';
 import { TileContent, ListItem, BrandIcon } from '@/components/page/tiles';
 import { tileBackground } from '@/lib/style';
 import { brandHex } from '@/components/page/tiles';
@@ -47,23 +47,23 @@ function AvatarPicker({ page, className }: { page: Page; className?: string }) {
   );
 }
 
-function EditableDeskProfile({ page }: { page: Page }) {
+function EditableStyledProfile({ page }: { page: Page }) {
   const update = useStudio(s => s.updateProfile);
   const { name, bio, location } = page.profile;
+  const style = page.theme.style;
   return (
-    <header className="posy-profile dk-profile" onClick={() => useStudio.getState().select(null)}>
-      <div className="dk-me">
-        <AvatarPicker page={page} />
-        <input aria-label="Location" value={location ?? ''} placeholder="a caption" onChange={e => update({ location: e.target.value || undefined })}
-          className={cn(blank, 'dk-hand dk-me-cap bg-transparent')} />
-      </div>
-      <div className="dk-intro">
-        <textarea aria-label="Name" rows={1} value={name} placeholder="Your name" onChange={e => update({ name: e.target.value })} className={cn(blank, 'posy-head posy-name')} />
-        <textarea aria-label="Bio" value={bio} placeholder="A line about you" onChange={e => update({ bio: e.target.value })} className={cn(blank, 'posy-bio')} />
-        <div className="posy-social-row" onClick={e => e.stopPropagation()}>
-          {page.tiles.filter((t): t is Extract<Tile, { type: 'social' }> => t.type === 'social').map(t => <SortableSocialIcon key={t.id} tile={t} desk />)}
-        </div>
-      </div>
+    <header className={headerClass(style)} onClick={() => useStudio.getState().select(null)}>
+      <StyleHeader page={page} slots={{
+        avatar: page.theme.avatar === 'hidden' ? null : <AvatarPicker page={page} />,
+        name: <textarea aria-label="Name" rows={1} value={name} placeholder="Your name" onChange={e => update({ name: e.target.value })} className={cn(blank, 'st-edit-name')} />,
+        bio: <textarea aria-label="Bio" value={bio} placeholder="A line about you" onChange={e => update({ bio: e.target.value })} className={cn(blank, 'st-edit-bio')} />,
+        caption: <input aria-label="Location" value={location ?? ''} placeholder={style === 'cozy' ? 'a caption' : 'Add location'} onChange={e => update({ location: e.target.value || undefined })} className={cn(blank, 'st-edit-caption')} />,
+        socials: (
+          <div className="posy-social-row" onClick={e => e.stopPropagation()}>
+            {page.tiles.filter((t): t is Extract<Tile, { type: 'social' }> => t.type === 'social').map(t => <SortableSocialIcon key={t.id} tile={t} desk={style === 'cozy'} />)}
+          </div>
+        ),
+      }} />
     </header>
   );
 }
@@ -71,7 +71,7 @@ function EditableDeskProfile({ page }: { page: Page }) {
 function EditableProfile({ page }: { page: Page }) {
   const update = useStudio(s => s.updateProfile);
   const { name, bio, location, avatar } = page.profile;
-  if (page.theme.layout === 'desk') return <EditableDeskProfile page={page} />;
+  if (page.theme.style !== 'soft') return <EditableStyledProfile page={page} />;
   return (
     <header className="posy-profile" onClick={() => useStudio.getState().select(null)}>
       <Popover>
@@ -126,7 +126,7 @@ function InlineText({ tile, desk }: { tile: Extract<Tile, { type: 'text' }>; des
   );
 }
 
-function SortableTile({ tile, index, desk }: { tile: Tile; index: number; desk?: boolean }) {
+function SortableTile({ tile, index, look }: { tile: Tile; index: number; look: StyleId }) {
   const selected = useStudio(s => s.selected === tile.id);
   const select = useStudio(s => s.select);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: tile.id });
@@ -141,15 +141,15 @@ function SortableTile({ tile, index, desk }: { tile: Tile; index: number; desk?:
       {...attributes}
       {...listeners}
     >
-      <TileShell tile={tile} index={index} editing desk={desk} className={cn('size-full cursor-grab active:cursor-grabbing', selected && 'outline outline-2 outline-offset-[3px] outline-[var(--accent)]')}>
-        {selected && tile.type === 'text' && tile.look !== 'stamp' ? <InlineText tile={tile} desk={desk} /> : undefined}
+      <TileShell tile={tile} index={index} editing look={look} className={cn('size-full cursor-grab active:cursor-grabbing', selected && 'outline outline-2 outline-offset-[3px] outline-[var(--accent)]')}>
+        {selected && tile.type === 'text' && tile.look !== 'stamp' && (look === 'soft' || look === 'cozy') ? <InlineText tile={tile} desk={look === 'cozy'} /> : undefined}
       </TileShell>
       {selected && <TileToolbar tile={tile} />}
     </div>
   );
 }
 
-function SortableRow({ tile, index }: { tile: Tile; index: number }) {
+function SortableRow({ tile, index, look }: { tile: Tile; index: number; look: StyleId }) {
   const selected = useStudio(s => s.selected === tile.id);
   const select = useStudio(s => s.select);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: tile.id });
@@ -157,9 +157,9 @@ function SortableRow({ tile, index }: { tile: Tile; index: number }) {
     <div ref={setNodeRef} data-tile={tile.id} aria-label={tileLabel(tile)} className={cn('relative', isDragging && 'opacity-30')}
       style={{ transform: CSS.Translate.toString(transform), transition, zIndex: selected ? 20 : undefined }}
       onClick={e => { e.stopPropagation(); select(tile.id); }} {...attributes} {...listeners}>
-      <MotionShell index={index} lift={false} className={cn('posy-tile posy-row group cursor-grab active:cursor-grabbing', `posy-type-${tile.type}`, `posy-size-${tile.size}`, selected && 'outline outline-2 outline-offset-[3px] outline-[var(--accent)]')}
+      <MotionShell index={index} lift={false} className={cn(look === 'soft' ? 'posy-tile posy-row' : 'posy-row-st', 'group block cursor-grab active:cursor-grabbing', `posy-type-${tile.type}`, `posy-size-${tile.size}`, selected && 'outline outline-2 outline-offset-[3px] outline-[var(--accent)]')}
         style={{ '--tile-bg': tileBackground(tile, index, brandHex(tile)) } as React.CSSProperties}>
-        {selected && tile.type === 'text' ? <InlineText tile={tile} /> : <ListItem tile={tile} />}
+        {look !== 'soft' ? <StyleRow style={look} tile={tile} index={index} /> : selected && tile.type === 'text' ? <InlineText tile={tile} /> : <ListItem tile={tile} />}
       </MotionShell>
       {selected && <TileToolbar tile={tile} />}
     </div>
@@ -208,8 +208,8 @@ export function EditableCanvas({ page }: { page: Page }) {
   const onEnd = (e: DragEndEvent) => { setActive(null); if (e.over && e.active.id !== e.over.id) moveTile(String(e.active.id), String(e.over.id)); };
 
   const list = page.theme.layout === 'list';
-  const desk = page.theme.layout === 'desk';
-  const gridTiles = desk ? page.tiles.filter(t => t.type !== 'social') : page.tiles;
+  const look = page.theme.style;
+  const gridTiles = socialsInHeader(page) ? page.tiles.filter(t => t.type !== 'social') : page.tiles;
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={onStart} onDragEnd={onEnd} onDragCancel={() => setActive(null)}>
       <SortableContext items={page.tiles.map(t => t.id)} strategy={rectSortingStrategy}>
@@ -217,14 +217,14 @@ export function EditableCanvas({ page }: { page: Page }) {
           <div onClick={() => select(null)} className="min-h-[50vh] pb-40">
             {list && (
               <div className="posy-list">
-                {page.tiles.map((tile, index) => tile.type === 'social' ? null : tile.type === 'heading' ? <SortableHeading key={tile.id} tile={tile} list /> : <SortableRow key={tile.id} tile={tile} index={index} />)}
+                {page.tiles.map((tile, index) => tile.type === 'social' ? null : tile.type === 'heading' ? <SortableHeading key={tile.id} tile={tile} list /> : <SortableRow key={tile.id} tile={tile} index={index} look={look} />)}
               </div>
             )}
             {!list && sections(gridTiles).map((s, i) => (
               <section key={s.heading?.id ?? `top-${i}`} className="posy-grid-wrap">
                 {s.heading && <SortableHeading tile={s.heading} />}
                 <div className="posy-grid">
-                  {s.tiles.map(({ tile, index }) => <SortableTile key={tile.id} tile={tile} index={index} desk={desk} />)}
+                  {s.tiles.map(({ tile, index }) => <SortableTile key={tile.id} tile={tile} index={index} look={look} />)}
                 </div>
               </section>
             ))}
@@ -237,10 +237,10 @@ export function EditableCanvas({ page }: { page: Page }) {
     </PageFrame>
         </SortableContext>
         <DragOverlay dropAnimation={{ duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)' }}>
-          {active && desk && active.type !== 'heading' && active.type !== 'social' && (
-            <div className="posy-obj rotate-[2deg] scale-[1.03]" style={{ width: '100%', height: '100%' }}><DeskTile tile={active} editing /></div>
+          {active && look !== 'soft' && active.type !== 'heading' && active.type !== 'social' && (
+            <div className="posy-obj rotate-[2deg] scale-[1.03]" style={{ width: '100%', height: '100%' }}>{list ? <StyleRow style={look} tile={active} index={page.tiles.indexOf(active)} /> : <StyleTile style={look} tile={active} index={page.tiles.indexOf(active)} editing />}</div>
           )}
-          {active && !desk && active.type !== 'heading' && !(list && active.type === 'social') && (
+          {active && look === 'soft' && active.type !== 'heading' && !(list && active.type === 'social') && (
             <div className={cn('posy-tile shadow-2xl', 'rotate-[1.5deg] scale-[1.03]', list && 'posy-row')} style={{ '--tile-bg': tileBackground(active, page.tiles.indexOf(active), brandHex(active)), width: '100%', height: '100%' } as React.CSSProperties}>
               {list ? <ListItem tile={active} /> : <TileContent tile={active} editing />}
             </div>
