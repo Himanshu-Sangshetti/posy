@@ -113,7 +113,7 @@ export function Profile({ page, interactive = true }: { page: Page; interactive?
       <h1 className="posy-head posy-name">{name}</h1>
       {bio && <p className="posy-bio"><RichText text={bio} /></p>}
       <div className="posy-meta">
-        {location && <span className="inline-flex items-center gap-1.5"><MapPin className="size-4" />{location}</span>}
+        {location && <span className="sf-pill"><MapPin className="size-3.5" />{location}</span>}
         {interactive && <ShareButton url={page.seo.url} />}
       </div>
       {list && <SocialRow tiles={socialTiles(page)} />}

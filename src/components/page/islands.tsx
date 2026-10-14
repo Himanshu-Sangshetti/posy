@@ -41,8 +41,8 @@ export function ShareButton({ url }: { url?: string }) {
     setDone(true); setTimeout(() => setDone(false), 1600);
   }
   return (
-    <button type="button" onClick={share} className="inline-flex items-center gap-1.5 transition-colors hover:text-[var(--text)]">
-      {done ? <Check className="size-4" /> : <Share2 className="size-4" />}{done ? 'Copied' : 'Share'}
+    <button type="button" onClick={share} className="sf-pill sf-pill-btn">
+      {done ? <Check className="size-3.5" /> : <Share2 className="size-3.5" />}{done ? 'Copied' : 'Share'}
     </button>
   );
 }

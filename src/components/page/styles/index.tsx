@@ -7,6 +7,7 @@ import { NeonHeader, NeonTile, NeonRow } from './neon';
 import { EditorialHeader, EditorialTile, EditorialRow } from './editorial';
 import type { HeaderSlots } from './types';
 import './styles.css';
+import './soft.css';
 
 export type StyleId = Page['theme']['style'];
 

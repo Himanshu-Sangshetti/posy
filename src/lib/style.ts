@@ -7,7 +7,7 @@ const f = (body: string, head: string, weight: number | string, track: string, l
   ({ '--font-body': `var(${body})`, '--font-head': `var(${head})`, '--head-weight': String(weight), '--head-track': track, label });
 /** Ten curated pairs: heading + body. */
 export const FONT_PAIRS = {
-  soft: f('--font-geist', '--font-geist', 640, '-0.035em', 'Soft'),
+  soft: f('--font-dm-sans', '--font-fraunces', 520, '-0.025em', 'Soft'),
   editorial: f('--font-geist', '--font-serif', 400, '-0.01em', 'Editorial'),
   classic: f('--font-geist', '--font-fraunces', 560, '-0.03em', 'Classic'),
   elegant: f('--font-dm-sans', '--font-dm-serif', 400, '-0.015em', 'Elegant'),
@@ -71,8 +71,11 @@ export function tileBackground(tile: Tile, index: number, brandHex?: string): st
   if (c !== 'auto') return `var(--tint-${c})`;
   if (tile.type === 'social' && brandHex && isColourful(brandHex)) return `color-mix(in oklab, #${brandHex} 10%, var(--surface))`;
   if (tile.type === 'image' || tile.type === 'video' || tile.type === 'music') return 'var(--surface)';
-  return `var(--tint-${TINTS[index % TINTS.length]})`;
+  return `var(--tint-${AUTO_TINTS[index % AUTO_TINTS.length]})`;
 }
+
+/** The order "auto" tiles take their colours in: warm and cool alternate, so neighbours never clash. */
+const AUTO_TINTS = ['lilac', 'peach', 'mint', 'butter', 'sky', 'rose'] as const satisfies readonly (typeof TINTS)[number][];
 
 /** True when a brand colour is saturated enough to tint a tile (black/white brands are not). */
 export function isColourful(hex: string) {
