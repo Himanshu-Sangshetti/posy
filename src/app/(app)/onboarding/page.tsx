@@ -6,6 +6,7 @@ import { template, TEMPLATES, type TemplateId } from '@/lib/templates';
 import { Thumbnail } from '@/components/page/Thumbnail';
 import { Onboarding } from '@/components/auth/Onboarding';
 import { Logo } from '@/components/brand';
+import { SITE_HOST } from '@/lib/site';
 
 export const metadata: Metadata = { title: 'Claim your page · Posy' };
 
@@ -22,7 +23,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
     <div className="posy-page posy-bg-mesh posy-grain posy-motion min-h-dvh">
       <div aria-hidden className="posy-backdrop"><span className="posy-noise" /></div>
       <header className="relative z-10 px-6 py-5 sm:px-10"><Logo /></header>
-      <main className="relative z-10 mx-auto max-w-[880px] px-5 pb-20 pt-4"><Onboarding initialUsername={username ?? ''} previews={previews} /></main>
+      <main className="relative z-10 mx-auto max-w-[880px] px-5 pb-20 pt-4"><Onboarding initialUsername={username ?? ''} previews={previews} host={SITE_HOST()} /></main>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { publicPage } from '@/lib/pages';
 import { THEMES } from '@/lib/themes';
 import { siteUrl } from '@/lib/site';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 /** Share image for links on X, WhatsApp, iMessage… */
 export async function GET(_req: Request, { params }: { params: Promise<{ username: string }> }) {
@@ -31,6 +31,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ usernam
         </div>
       </div>
     ),
-    { width: 1200, height: 630 },
+    { width: 1200, height: 630, headers: { 'Cache-Control': 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400' } },
   );
 }

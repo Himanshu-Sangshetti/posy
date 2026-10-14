@@ -5,6 +5,9 @@ const config: NextConfig = {
   devIndicators: false,
   agentRules: false, // we keep our own (git-ignored) AGENTS.md
   serverExternalPackages: ['@libsql/client'],
+  // Docker / plain Node hosting: a self-contained server in .next/standalone
+  output: process.env.POSY_STANDALONE ? 'standalone' : undefined,
+  outputFileTracingIncludes: { '/*': ['./drizzle/**/*'] },
 };
 
 export default config;

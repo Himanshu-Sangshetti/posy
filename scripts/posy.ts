@@ -1,93 +1,117 @@
 #!/usr/bin/env tsx
 /**
- * Posy CLI: edit your page from the terminal (or let your AI agent do it).
- *   npm run posy -- add <link | email | owner/repo | "a note"> [--size s|w|t|l] [--color <tint>]
- *   npm run posy -- theme <preset> [--accent #hex] [--font soft|editorial|rounded|mono] [--radius sharp|soft|round] [--layout split|stack]
- *   npm run posy -- list | remove <id> | validate | schema
+ * Posy CLI: manage your page from the terminal (or let a script/agent do it).
+ *
+ *   export POSY_URL=https://your-posy.example   # default http://localhost:3000
+ *   export POSY_API_KEY=posy_…                  # create one on the Agents page
+ *
+ *   npm run posy -- get
+ *   npm run posy -- add <link | email | owner/repo | "a note"> [--size s|w|t|l] [--color mint] [--after <id>]
+ *   npm run posy -- theme [--preset lavender] [--font modern] [--background aurora] [--tiles glass] [--layout list]
+ *   npm run posy -- profile [--name "…"] [--bio "…"] [--location "…"]
+ *   npm run posy -- remove <id>
+ *   npm run posy -- publish
+ *   npm run posy -- export [file]   |   import <file>
+ *   npm run posy -- validate <file> |   schema
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
-import { Page, SIZES, COLORS, FONTS, RADII, LAYOUTS } from '../src/lib/schema';
-import { THEME_IDS } from '../src/lib/themes';
-import { tileFromInput } from '../src/lib/detect';
+import { Page } from '../src/lib/schema';
 
-const FILE = path.resolve(process.env.POSY_CONTENT || 'content/page.json');
-const SCHEMA = path.resolve('schema/page.schema.json');
 const [cmd, ...rest] = process.argv.slice(2);
 const flags: Record<string, string> = {};
 const args: string[] = [];
 for (let i = 0; i < rest.length; i++) rest[i].startsWith('--') ? (flags[rest[i].slice(2)] = rest[++i]) : args.push(rest[i]);
 
-const read = () => JSON.parse(fs.readFileSync(FILE, 'utf8'));
-const write = (data: unknown) => {
-  const page = Page.parse(data);
-  const { $schema, ...body } = page;
-  fs.writeFileSync(FILE, JSON.stringify({ $schema: $schema ?? '../schema/page.schema.json', ...body }, null, 2) + '\n');
-};
-const oneOf = <T extends readonly string[]>(name: string, v: string | undefined, list: T): T[number] | undefined => {
-  if (v === undefined) return undefined;
-  if (!list.includes(v)) { console.error(`--${name} must be one of: ${list.join(', ')}`); process.exit(1); }
-  return v as T[number];
-};
+const BASE = (process.env.POSY_URL || 'http://localhost:3000').replace(/\/$/, '');
+const KEY = process.env.POSY_API_KEY;
+
+async function api(method: string, p: string, body?: unknown) {
+  if (!KEY) die('Set POSY_API_KEY (create a key on the Agents page).');
+  const res = await fetch(BASE + p, { method, headers: { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) die(data.error ? `${data.error}${data.issues ? '\n  ' + data.issues.join('\n  ') : ''}` : `HTTP ${res.status}`);
+  return data;
+}
+function die(msg: string): never { console.error(`✗ ${msg}`); process.exit(1); }
+const ok = (msg: string) => console.log(`✓ ${msg}`);
+
+async function editTheme(patch: Record<string, unknown>) {
+  const s = await api('GET', '/api/v1/page');
+  const page = { ...s.page, theme: { ...s.page.theme, ...patch, background: { ...s.page.theme.background, ...(patch.background as object) } } };
+  await api('PUT', '/api/v1/page', { page, baseVersion: s.version });
+}
 
 switch (cmd) {
-  case 'validate': {
-    const r = Page.safeParse(read());
-    if (r.success) { console.log(`✓ ${path.relative(process.cwd(), FILE)} is valid (${r.data.tiles.length} tiles)`); break; }
-    for (const i of r.error.issues) console.error(`✗ ${i.path.join('.') || '(root)'}: ${i.message}`);
-    process.exit(1);
-  }
-  case 'schema': {
-    const schema = z.toJSONSchema(Page, { io: 'input', target: 'draft-2020-12' });
-    fs.mkdirSync(path.dirname(SCHEMA), { recursive: true });
-    fs.writeFileSync(SCHEMA, JSON.stringify({ title: 'Posy page', ...schema }, null, 2) + '\n');
-    console.log(`✓ wrote ${path.relative(process.cwd(), SCHEMA)}`);
-    break;
-  }
-  case 'list': {
-    for (const t of Page.parse(read()).tiles) {
-      const what = 'url' in t ? t.url : 'handle' in t ? `${t.platform} @${t.handle}` : 'repo' in t ? t.repo : 'text' in t ? t.text : 'src' in t ? t.src : '';
+  case 'get': {
+    const s = await api('GET', '/api/v1/page');
+    console.log(`${s.url}  (version ${s.version}${s.hasUnpublishedChanges ? ', unpublished changes' : ''})\n`);
+    for (const t of s.page.tiles) {
+      const what = t.url ?? (t.handle ? `${t.platform} @${t.handle}` : t.repo ?? t.text ?? t.src ?? '');
       console.log(`${t.id.padEnd(11)} ${t.type.padEnd(8)} ${t.type === 'heading' ? '' : t.size}  ${what}`);
     }
     break;
   }
   case 'add': {
-    if (!args[0]) { console.error('usage: add <link | email | owner/repo | "a note">'); process.exit(1); }
-    const page = read();
-    const tile = { ...tileFromInput(args.join(' ')), ...(flags.size && { size: oneOf('size', flags.size, SIZES) }), ...(flags.color && { color: oneOf('color', flags.color, COLORS) }) };
-    page.tiles.push(tile);
-    write(page);
-    console.log(`✓ added ${tile.type} tile ${tile.id}`);
+    if (!args[0]) die('usage: add <link | email | owner/repo | "a note">');
+    const r = await api('POST', '/api/v1/page/tiles', { input: args.join(' '), size: flags.size, color: flags.color, after: flags.after });
+    ok(`added ${r.tile.type} tile ${r.tile.id}`);
     break;
   }
   case 'remove': {
-    const page = read();
-    const before = page.tiles.length;
-    page.tiles = page.tiles.filter((t: { id: string }) => t.id !== args[0]);
-    if (page.tiles.length === before) { console.error(`no tile with id ${args[0]}`); process.exit(1); }
-    write(page);
-    console.log(`✓ removed ${args[0]}`);
+    await api('DELETE', `/api/v1/page/tiles/${encodeURIComponent(args[0] ?? '')}`);
+    ok(`removed ${args[0]}`);
     break;
   }
   case 'theme': {
-    const page = read();
-    page.theme = {
-      ...page.theme,
-      ...(args[0] && { preset: oneOf('preset', args[0], THEME_IDS) }),
-      ...(flags.accent && { accent: flags.accent }),
-      ...(flags.font && { font: oneOf('font', flags.font, FONTS) }),
-      ...(flags.radius && { radius: oneOf('radius', flags.radius, RADII) }),
-      ...(flags.layout && { layout: oneOf('layout', flags.layout, LAYOUTS) }),
-    };
-    write(page);
-    console.log(`✓ theme updated`);
+    await editTheme({
+      ...(flags.preset && { preset: flags.preset }), ...(flags.accent && { accent: flags.accent }), ...(flags.font && { font: flags.font }),
+      ...(flags.radius && { radius: flags.radius }), ...(flags.layout && { layout: flags.layout }), ...(flags.align && { align: flags.align }),
+      ...(flags.tiles && { tileStyle: flags.tiles }), ...(flags.effect && { effect: flags.effect }),
+      ...(flags.background && { background: { style: flags.background } }),
+    });
+    ok('theme updated (draft)');
+    break;
+  }
+  case 'profile': {
+    const s = await api('GET', '/api/v1/page');
+    const profile = { ...s.page.profile, ...(flags.name && { name: flags.name }), ...(flags.bio !== undefined && { bio: flags.bio }), ...(flags.location && { location: flags.location }) };
+    await api('PUT', '/api/v1/page', { page: { ...s.page, profile }, baseVersion: s.version });
+    ok('profile updated (draft)');
+    break;
+  }
+  case 'publish': {
+    ok(`live at ${(await api('POST', '/api/v1/page/publish')).url}`);
+    break;
+  }
+  case 'export': {
+    const s = await api('GET', '/api/v1/page');
+    const json = JSON.stringify({ $schema: `${BASE}/schema/page.schema.json`, ...s.page }, null, 2) + '\n';
+    if (args[0]) { fs.writeFileSync(args[0], json); ok(`wrote ${args[0]}`); } else process.stdout.write(json);
+    break;
+  }
+  case 'import': {
+    if (!args[0]) die('usage: import <file>');
+    const page = Page.parse(JSON.parse(fs.readFileSync(args[0], 'utf8')));
+    const s = await api('GET', '/api/v1/page');
+    await api('PUT', '/api/v1/page', { page, baseVersion: s.version });
+    ok(`imported ${args[0]} into your draft. Run "publish" to make it live.`);
+    break;
+  }
+  case 'validate': {
+    if (!args[0]) die('usage: validate <file>');
+    const r = Page.safeParse(JSON.parse(fs.readFileSync(args[0], 'utf8')));
+    if (r.success) { ok(`${args[0]} is valid (${r.data.tiles.length} tiles)`); break; }
+    for (const i of r.error.issues) console.error(`✗ ${i.path.join('.') || '(root)'}: ${i.message}`);
+    process.exit(1);
+  }
+  case 'schema': {
+    const schema = JSON.stringify({ title: 'Posy page', ...z.toJSONSchema(Page, { io: 'input', target: 'draft-2020-12' }) }, null, 2) + '\n';
+    for (const f of ['schema/page.schema.json', 'public/schema/page.schema.json']) { fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, schema); }
+    ok('wrote schema/page.schema.json and public/schema/page.schema.json');
     break;
   }
   default:
-    console.log(`posy: edit content/page.json
-
-  add <link | email | owner/repo | "note">  [--size s|w|t|l] [--color ${COLORS.join('|')}]
-  theme <${THEME_IDS.join('|')}>  [--accent #hex] [--font ${FONTS.join('|')}] [--radius ${RADII.join('|')}] [--layout ${LAYOUTS.join('|')}]
-  list | remove <id> | validate | schema`);
+    console.log(fs.readFileSync(new URL(import.meta.url), 'utf8').match(/\/\*\*([\s\S]*?)\*\//)?.[1].replace(/^ \* ?/gm, '').trim());
 }

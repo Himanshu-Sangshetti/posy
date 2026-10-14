@@ -23,11 +23,11 @@ describe('page format', () => {
     expect(r.error!.issues[0].path).toEqual(['tiles', 0, 'repo']);
   });
   it('ships valid content and examples', () => {
-    for (const f of ['content/page.json', ...fs.readdirSync('examples').map(f => `examples/${f}`)])
+    for (const f of fs.readdirSync('examples').map(f => `examples/${f}`))
       expect(Page.safeParse(JSON.parse(fs.readFileSync(f, 'utf8'))).success, f).toBe(true);
   });
   it('tile ids are unique in shipped pages', () => {
-    for (const f of ['content/page.json', ...fs.readdirSync('examples').map(f => `examples/${f}`)]) {
+    for (const f of fs.readdirSync('examples').map(f => `examples/${f}`)) {
       const ids = JSON.parse(fs.readFileSync(f, 'utf8')).tiles.map((t: { id: string }) => t.id);
       expect(new Set(ids).size, f).toBe(ids.length);
     }

@@ -1,0 +1,10 @@
+node_modules
+.next
+.git
+.scratch
+.data
+test-results
+playwright-report
+PLAN.md
+AGENTS.md
+CLAUDE.md

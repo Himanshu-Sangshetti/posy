@@ -1,6 +1,8 @@
 import { publicPage } from '@/lib/pages';
 import { siteUrl } from '@/lib/site';
 
+export const dynamic = 'force-dynamic';
+
 /** Anyone (including AI agents) can read a published page as JSON. */
 export async function GET(_req: Request, { params }: { params: Promise<{ username: string }> }) {
   const r = await publicPage((await params).username);

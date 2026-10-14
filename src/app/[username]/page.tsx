@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical: url, types: { 'application/json': `/api/v1/public/${r.row.username}` } },
-    icons: { icon: `/${r.row.username}/icon.png` },
+    icons: { icon: `/${r.row.username}/favicon.png` },
     openGraph: { title, description, url, type: 'profile', images: [{ url: `/${r.row.username}/og.png`, width: 1200, height: 630 }] },
     twitter: { card: 'summary_large_image', title, description, images: [`/${r.row.username}/og.png`] },
   };

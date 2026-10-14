@@ -6,9 +6,7 @@ import { Check, Loader2, X } from 'lucide-react';
 import { TEMPLATES, type TemplateId } from '@/lib/templates';
 import { cn } from '@/lib/utils';
 
-const HOST = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/^https?:\/\//, '').replace(/\/$/, '');
-
-export function Onboarding({ initialUsername, previews }: { initialUsername: string; previews: Record<string, ReactNode> }) {
+export function Onboarding({ initialUsername, previews, host }: { initialUsername: string; previews: Record<string, ReactNode>; host: string }) {
   const router = useRouter();
   const [name, setName] = useState(initialUsername.toLowerCase());
   const [check, setCheck] = useState<{ ok: boolean; reason?: string } | null>(null);
@@ -35,7 +33,7 @@ export function Onboarding({ initialUsername, previews }: { initialUsername: str
       <section className="grid gap-4">
         <h1 className="text-[34px] font-semibold leading-tight tracking-[-0.035em] sm:text-[42px]">Claim your name</h1>
         <label className="flex h-16 items-center rounded-[20px] border border-[color-mix(in_oklab,#fff_60%,transparent)] bg-[color-mix(in_oklab,var(--surface)_80%,transparent)] pl-5 pr-3 text-[18px] shadow-[0_20px_50px_-30px_rgb(0_0_0/.3)] backdrop-blur-xl focus-within:ring-2 focus-within:ring-[var(--ring)]">
-          <span className="text-[var(--muted)]">{HOST}/</span>
+          <span className="text-[var(--muted)]">{host}/</span>
           <input autoFocus aria-label="Username" value={name} onChange={e => setName(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))} maxLength={30} placeholder="yourname"
             className="min-w-0 flex-1 bg-transparent font-medium outline-none placeholder:text-[var(--muted)]/50" />
           <span className="ml-2 flex items-center gap-1.5 text-[14px]" role="status" aria-live="polite">

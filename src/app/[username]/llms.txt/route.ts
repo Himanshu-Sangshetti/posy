@@ -3,6 +3,8 @@ import { siteUrl } from '@/lib/site';
 import { profileUrl } from '@/lib/platforms';
 import { PLATFORMS } from '@/lib/platforms';
 
+export const dynamic = 'force-dynamic';
+
 /** A plain-text version of the page for AI assistants and crawlers. */
 export async function GET(_req: Request, { params }: { params: Promise<{ username: string }> }) {
   const r = await publicPage((await params).username);

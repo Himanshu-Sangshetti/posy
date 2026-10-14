@@ -8,9 +8,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "npx serve out",
+    "start": "next start",
     "posy": "tsx scripts/posy.ts",
-    "check": "tsx scripts/posy.ts validate && tsc --noEmit",
+    "check": "tsc --noEmit && tsx scripts/posy.ts validate examples/creator.json && tsx scripts/posy.ts validate examples/developer.json && tsx scripts/posy.ts validate examples/minimal.json",
     "schema": "tsx scripts/posy.ts schema",
     "test": "vitest run",
     "e2e": "playwright test",

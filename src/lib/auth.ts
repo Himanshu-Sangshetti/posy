@@ -16,6 +16,8 @@ export const auth = betterAuth({
   trustedOrigins: env.NODE_ENV === 'production' ? [] : ['http://localhost:*', 'http://127.0.0.1:*'],
   secret: env.BETTER_AUTH_SECRET || 'dev-only-secret-change-me-in-production-0123456789',
   database: drizzleAdapter(db, { provider: 'sqlite', schema }),
+  // On by default in production; the e2e suite signs up many users from one IP, so it switches this off.
+  ...(env.POSY_RATE_LIMIT === 'off' ? { rateLimit: { enabled: false } } : {}),
   emailAndPassword: { enabled: true, minPasswordLength: 8, autoSignIn: true },
   user: { deleteUser: { enabled: true } }, // pages and events cascade-delete with the user
   databaseHooks: {

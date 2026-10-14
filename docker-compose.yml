@@ -1,0 +1,12 @@
+services:
+  posy:
+    build: .
+    ports: ["3000:3000"]
+    volumes: ["posy-data:/data"]
+    environment:
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      BETTER_AUTH_URL: http://localhost:3000
+      BETTER_AUTH_SECRET: change-me-to-a-long-random-string
+    restart: unless-stopped
+volumes:
+  posy-data:
