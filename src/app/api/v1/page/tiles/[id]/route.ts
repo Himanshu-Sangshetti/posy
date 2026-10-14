@@ -6,6 +6,7 @@ type Ctx = { params: Promise<{ id: string }> };
 export const PATCH = authed<Ctx>(async (userId, req, { params }) => {
   const { id } = await params;
   const { position, ...patch } = await req.json();
+  if (typeof position !== 'number' && !Object.keys(patch).length) return json({ error: 'Send fields to change, or a position' }, 400);
   if (typeof position === 'number') await moveTile(userId, id, position);
   return json({ tile: Object.keys(patch).length ? await updateTile(userId, id, patch) : undefined, ok: true });
 });

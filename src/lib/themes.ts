@@ -1,3 +1,5 @@
+import { EDITION_THEMES } from '@/edition/themes';
+
 /** Pastel tints available to every tile. Each theme maps them to its own shades. */
 export const TINTS = ['peach', 'butter', 'mint', 'sky', 'lilac', 'rose'] as const;
 export type Tint = (typeof TINTS)[number];
@@ -17,7 +19,7 @@ export type Theme = {
 
 const light = (t: Omit<Theme, 'dark'>): Theme => ({ ...t, dark: false });
 
-export const THEMES = {
+const BASE = {
   cream: light({
     id: 'cream', name: 'Cream', bg: '#f6f1e9', surface: '#fffcf7', text: '#2b2621', muted: '#8c8277', line: '#e9e1d5', accent: '#e39b6f',
     tints: { peach: '#fbe2d2', butter: '#f9eec5', mint: '#dcefe2', sky: '#d9e9f6', lilac: '#e7e0f4', rose: '#f8dbe3' },
@@ -68,8 +70,12 @@ export const THEMES = {
   },
 } satisfies Record<string, Theme>;
 
-export type ThemeId = keyof typeof THEMES;
-export const THEME_IDS = Object.keys(THEMES) as [ThemeId, ...ThemeId[]];
+/** Built-in themes plus any the edition adds. */
+export const THEMES: Record<string, Theme> = { ...BASE, ...EDITION_THEMES };
+export type ThemeId = string;
+export const THEME_IDS = Object.keys(THEMES) as [string, ...string[]];
+/** Themes that need the premium entitlement (only exist in editions that add them). */
+export const PREMIUM_THEMES = new Set(Object.keys(EDITION_THEMES));
 
 /** CSS custom properties for a theme (+ optional accent override). */
 export function themeVars(id: ThemeId, accent?: string): Record<string, string> {

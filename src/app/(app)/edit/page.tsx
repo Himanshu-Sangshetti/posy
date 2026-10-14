@@ -6,6 +6,7 @@ import { pageForUser, hasUnpublished } from '@/lib/pages';
 import { parsePage } from '@/lib/schema';
 import { siteUrl } from '@/lib/site';
 import { Studio } from '@/components/studio/Studio';
+import { entitlementsFor } from '@/lib/entitlements';
 
 export const metadata: Metadata = { title: 'Editor · Posy', robots: { index: false } };
 
@@ -15,7 +16,7 @@ export default async function EditPage() {
   if (!row) redirect('/onboarding');
   return (
     <Suspense>
-      <Studio init={{ page: parsePage(row.draft), version: row.version, username: row.username, hasUnpublished: hasUnpublished(row), site: siteUrl() }} />
+      <Studio init={{ page: parsePage(row.draft), version: row.version, username: row.username, hasUnpublished: hasUnpublished(row), site: siteUrl(), entitlements: await entitlementsFor(user.id) }} />
     </Suspense>
   );
 }

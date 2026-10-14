@@ -5,6 +5,7 @@ import { pageStats } from '@/lib/analytics';
 import { parsePage, type Tile } from '@/lib/schema';
 import { PLATFORMS } from '@/lib/platforms';
 import { AreaChart } from '@/components/dash/charts';
+import { entitlementsFor } from '@/lib/entitlements';
 
 export const metadata: Metadata = { title: 'Analytics · Posy' };
 export const dynamic = 'force-dynamic';
@@ -43,7 +44,8 @@ function BarList({ rows, empty }: { rows: { label: string; n: number }[]; empty:
 export default async function AnalyticsPage() {
   const user = await requireUser();
   const row = (await pageForUser(user.id))!;
-  const s = await pageStats(row.id, 30);
+  const days = (await entitlementsFor(user.id)).analyticsDays;
+  const s = await pageStats(row.id, days);
   const page = parsePage(row.published ?? row.draft);
   const byId = new Map(page.tiles.map(t => [t.id, t]));
   const stat = (label: string, value: string) => (
@@ -51,7 +53,7 @@ export default async function AnalyticsPage() {
   );
   return (
     <div className="posy-rise grid gap-5">
-      <div className="mb-2 mt-6"><h1 className="text-[32px] font-semibold tracking-[-0.03em]">Analytics</h1><p className="text-[15px] text-[var(--muted)]">Last 30 days. No cookies, no tracking across sites.</p></div>
+      <div className="mb-2 mt-6"><h1 className="text-[32px] font-semibold tracking-[-0.03em]">Analytics</h1><p className="text-[15px] text-[var(--muted)]">Last {days} days. No cookies, no tracking across sites.</p></div>
       <div className="grid gap-4 sm:grid-cols-3">
         {stat('Views', s.views.toLocaleString())}
         {stat('Clicks', s.clicks.toLocaleString())}

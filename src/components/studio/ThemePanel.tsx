@@ -1,12 +1,13 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { ImagePlus, Loader2 } from 'lucide-react';
+import { ImagePlus, Loader2, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Page } from '@/lib/schema';
 import { FONTS, RADII, BACKGROUNDS, TILE_STYLES, EFFECTS, AVATARS } from '@/lib/schema';
-import { THEMES, THEME_IDS, type ThemeId } from '@/lib/themes';
-import { FONT_PAIRS, FONT_VARS } from '@/lib/style';
+import { THEMES, THEME_IDS, PREMIUM_THEMES, type ThemeId } from '@/lib/themes';
+import { ALL_FONT_PAIRS as FONT_PAIRS, FONT_VARS, PREMIUM_FONTS } from '@/lib/style';
+import { useEntitlements } from './entitlements';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
@@ -56,8 +57,12 @@ function TileSwatch({ style }: { style: (typeof TILE_STYLES)[number] }) {
   );
 }
 
+const proNote = () => toast('Part of Posy Pro', { description: 'Upgrade from Settings to use premium themes, fonts and more.' });
+
 export function ThemePanel({ page }: { page: Page }) {
   const { updateTheme, setBadge } = useStudio();
+  const ent = useEntitlements();
+  const locked = (premium: boolean) => premium && !ent.premium;
   const t = page.theme;
   const bg = t.background;
   const setBg = (patch: Partial<typeof bg>) => updateTheme({ background: { ...bg, ...patch } });
@@ -79,8 +84,9 @@ export function ThemePanel({ page }: { page: Page }) {
             {THEME_IDS.map(id => {
               const th = THEMES[id];
               return (
-                <button key={id} type="button" onClick={() => updateTheme({ preset: id, accent: undefined })} aria-pressed={t.preset === id} aria-label={th.name}
-                  className="group grid gap-1.5 text-center text-[12px] text-[var(--muted)]">
+                <button key={id} type="button" onClick={() => (locked(PREMIUM_THEMES.has(id)) ? proNote() : updateTheme({ preset: id, accent: undefined }))} aria-pressed={t.preset === id} aria-label={th.name}
+                  className="group relative grid gap-1.5 text-center text-[12px] text-[var(--muted)]">
+                  {locked(PREMIUM_THEMES.has(id)) && <Lock className="absolute right-1.5 top-1.5 z-10 size-3.5 text-[var(--muted)]" />}
                   <span className={cn('grid h-14 place-items-center overflow-hidden rounded-[13px] border transition-transform group-hover:scale-[1.04]', t.preset === id ? 'border-[var(--text)] ring-1 ring-[var(--text)]' : 'border-[var(--line)]')} style={{ background: th.bg }}>
                     <span className="flex gap-1">{(['peach', 'mint', 'lilac'] as const).map(k => <span key={k} className="size-3.5 rounded-full" style={{ background: th.tints[k], boxShadow: `inset 0 0 0 1px ${th.line}` }} />)}</span>
                   </span>
@@ -164,8 +170,9 @@ export function ThemePanel({ page }: { page: Page }) {
 
       <TabsContent value="type" className="grid max-h-[58vh] grid-cols-2 gap-2 overflow-y-auto pr-1">
         {FONTS.map(f => (
-          <button key={f} type="button" aria-pressed={t.font === f} aria-label={`${FONT_PAIRS[f].label} font`} onClick={() => updateTheme({ font: f })}
-            className={cn('grid gap-1 px-3 py-3 text-left', choice(t.font === f))} style={FONT_VARS[f] as React.CSSProperties}>
+          <button key={f} type="button" aria-pressed={t.font === f} aria-label={`${FONT_PAIRS[f].label} font`} onClick={() => (locked(PREMIUM_FONTS.has(f)) ? proNote() : updateTheme({ font: f }))}
+            className={cn('relative grid gap-1 px-3 py-3 text-left', choice(t.font === f))} style={FONT_VARS[f] as React.CSSProperties}>
+            {locked(PREMIUM_FONTS.has(f)) && <Lock className="absolute right-2.5 top-2.5 size-3.5 text-[var(--muted)]" />}
             <span className="posy-head text-[24px] leading-none">Aa Bb</span>
             <span className="text-[12px] text-[var(--muted)]">{FONT_PAIRS[f].label}</span>
           </button>
@@ -203,7 +210,10 @@ export function ThemePanel({ page }: { page: Page }) {
         </div>
         <div className="grid gap-3 border-t border-[var(--line)] pt-4">
           <label className="flex items-center justify-between text-[14px]">Animations <Switch checked={t.motion} onCheckedChange={v => updateTheme({ motion: v })} /></label>
-          <label className="flex items-center justify-between text-[14px]">“Made with Posy” link <Switch checked={page.badge} onCheckedChange={setBadge} /></label>
+          <label className="flex items-center justify-between text-[14px]">
+            <span>“Made with Posy” link{!ent.removeBranding && <span className="ml-2 text-[12.5px] text-[var(--muted)]">Pro can hide it</span>}</span>
+            <Switch checked={page.badge} disabled={!ent.removeBranding} onCheckedChange={setBadge} />
+          </label>
         </div>
       </TabsContent>
     </Tabs>

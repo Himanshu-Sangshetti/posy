@@ -1,10 +1,12 @@
 import { z } from 'zod';
 import { PLATFORM_IDS } from './platforms';
 import { THEME_IDS, TINTS } from './themes';
+import { EDITION_FONT_PAIRS } from '@/edition/fonts';
 
 /** Tile footprint on the grid: small square, wide, tall, large square. */
 export const SIZES = ['s', 'w', 't', 'l'] as const;
-export const FONTS = ['soft', 'editorial', 'classic', 'elegant', 'rounded', 'playful', 'modern', 'tech', 'mono', 'hand'] as const;
+export const BASE_FONTS = ['soft', 'editorial', 'classic', 'elegant', 'rounded', 'playful', 'modern', 'tech', 'mono', 'hand'] as const;
+export const FONTS = [...BASE_FONTS, ...Object.keys(EDITION_FONT_PAIRS)] as [string, ...string[]];
 export const RADII = ['sharp', 'soft', 'round', 'pill'] as const;
 export const LAYOUTS = ['bento', 'list'] as const;
 export const ALIGNS = ['side', 'center'] as const;

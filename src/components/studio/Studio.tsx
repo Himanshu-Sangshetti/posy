@@ -14,13 +14,15 @@ import { save, fetchRemote, enrich, storeImage, publish, Conflict } from './stor
 import { EditableCanvas } from './EditableCanvas';
 import { Dock, useAddTile, type Device, type SaveState } from './Dock';
 import { TopBar } from './TopBar';
+import { EntitlementsProvider } from './entitlements';
+import type { Entitlements } from '@/edition/types';
 
 const typing = () => {
   const el = document.activeElement as HTMLElement | null;
   return !!el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
 };
 
-export type StudioInit = { page: Page; version: number; username: string; hasUnpublished: boolean; site: string };
+export type StudioInit = { page: Page; version: number; username: string; hasUnpublished: boolean; site: string; entitlements: Entitlements };
 
 export function Studio({ init }: { init: StudioInit }) {
   const router = useRouter();
@@ -65,7 +67,7 @@ export function Studio({ init }: { init: StudioInit }) {
       try { version.current = await save(page, version.current); setSaveState('saved'); setUnpublished(true); }
       catch (e) {
         if (e instanceof Conflict) adopt(e.remote, 'Updated with changes made elsewhere');
-        else setSaveState('error');
+        else { setSaveState('error'); toast.error((e as Error).message); }
       }
     }, 450);
     return () => clearTimeout(t);
@@ -142,6 +144,7 @@ export function Studio({ init }: { init: StudioInit }) {
 
   const canvas = <EditableCanvas page={page} />;
   return (
+    <EntitlementsProvider value={init.entitlements}>
     <TooltipProvider delayDuration={300}>
       <div onClick={() => useStudio.getState().select(null)} className={cn('min-h-dvh', isDark(page) && 'dark')}
         style={{ ...pageStyle(page), background: device === 'mobile' ? 'color-mix(in oklab, var(--bg) 82%, var(--text))' : undefined }}>
@@ -157,5 +160,6 @@ export function Studio({ init }: { init: StudioInit }) {
         <Toaster position="top-center" offset={76} toastOptions={{ className: '!rounded-[14px] !border-[var(--line)] !bg-[var(--surface)] !text-[var(--text)] !shadow-lg' }} />
       </div>
     </TooltipProvider>
+    </EntitlementsProvider>
   );
 }

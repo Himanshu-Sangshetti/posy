@@ -6,6 +6,7 @@ import { db } from '@/db';
 import { pages } from '@/db/app-schema';
 import { parsePage, Page, type Page as PageData } from './schema';
 import { template, type TemplateId } from './templates';
+import { entitlementsFor, assertAllowed, applyEntitlements } from './entitlements';
 
 export const USERNAME_RE = /^[a-z0-9](?:[a-z0-9_-]{1,28}[a-z0-9])$/;
 const RESERVED = new Set(('about admin agents analytics api app apps assets auth blog dashboard demo docs edit editor explore faq ' +
@@ -47,6 +48,7 @@ export async function saveDraft(userId: string, data: unknown, baseVersion?: num
   const page = parsePage(data);
   const row = await pageForUser(userId);
   if (!row) throw new Error('No page yet');
+  assertAllowed(page, await entitlementsFor(userId));
   if (baseVersion !== undefined && baseVersion !== row.version) throw new VersionConflict(row);
   const version = row.version + 1;
   const res = await db.update(pages).set({ draft: page, version, updatedAt: new Date() })
@@ -79,7 +81,13 @@ export async function publicPage(username: string): Promise<{ row: PageRow; page
   const row = await db.select().from(pages).where(eq(pages.username, username.toLowerCase())).get();
   if (!row?.published) return null;
   const parsed = Page.safeParse(row.published);
-  return parsed.success ? { row, page: parsed.data } : null;
+  return parsed.success ? { row, page: applyEntitlements(parsed.data, await entitlementsFor(row.userId)) } : null;
+}
+
+/** The instance owner's page (self-hosted root): the oldest page. */
+export async function ownerUsername(): Promise<string | null> {
+  const row = await db.select({ username: pages.username }).from(pages).orderBy(pages.createdAt).limit(1).get();
+  return row?.username ?? null;
 }
 
 export function hasUnpublished(row: PageRow) {

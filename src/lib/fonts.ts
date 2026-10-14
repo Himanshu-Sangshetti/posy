@@ -13,4 +13,6 @@ export const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--fon
 export const sora = Sora({ subsets: ['latin'], variable: '--font-sora', display: 'swap', preload: false });
 export const caveat = Caveat({ subsets: ['latin'], variable: '--font-caveat', display: 'swap', preload: false });
 
-export const fontVariables = [geist, geistMono, serif, nunito, fraunces, dmSerif, dmSans, bricolage, spaceGrotesk, sora, caveat].map(f => f.variable).join(' ');
+import { EDITION_FONT_VARIABLES } from '@/edition/fonts';
+
+export const fontVariables = [geist, geistMono, serif, nunito, fraunces, dmSerif, dmSans, bricolage, spaceGrotesk, sora, caveat].map(f => f.variable).join(' ') + (EDITION_FONT_VARIABLES ? ' ' + EDITION_FONT_VARIABLES : '');
