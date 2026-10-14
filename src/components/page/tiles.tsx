@@ -179,13 +179,13 @@ export function GithubTileView({ tile }: Props<'github'>) {
 }
 
 /** Where a tile links to (null = not a link). */
-export function tileHref(tile: Tile): string | null {
+export function tileHref(tile: Tile, desk = false): string | null {
   switch (tile.type) {
     case 'link': return tile.url;
     case 'social': return profileUrl(tile.platform, tile.handle, tile.url);
     case 'github': return `https://github.com/${tile.repo}`;
     case 'image': return tile.url ?? null;
-    case 'music': return tile.size === 's' ? tile.url : null;
+    case 'music': return desk || tile.size === 's' ? tile.url : null;
     default: return null;
   }
 }

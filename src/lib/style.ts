@@ -44,7 +44,7 @@ export function pageClasses(page: Page): string {
   return [
     'posy-page',
     `posy-layout-${t.layout}`,
-    t.layout === 'bento' && t.align === 'center' ? 'posy-center' : t.layout === 'bento' ? 'posy-side' : 'posy-center',
+    t.layout === 'desk' ? 'posy-desk' : t.layout === 'bento' && t.align === 'center' ? 'posy-center' : t.layout === 'bento' ? 'posy-side' : 'posy-center',
     `posy-bg-${t.background.style}`,
     t.background.grain && 'posy-grain',
     `posy-tiles-${t.tileStyle}`,
