@@ -17,8 +17,10 @@ import { useStudio } from './store';
 import { storeImage } from './storage';
 
 const ACCENTS = ['#e39b6f', '#e8886a', '#d97a9a', '#9a86d8', '#5e9bd6', '#5fb08a', '#c9a227', '#161616'];
-const choice = (on: boolean) => cn('rounded-[12px] border transition-all', on ? 'border-[var(--text)] bg-[var(--secondary)] shadow-[0_0_0_1px_var(--text)]' : 'border-[var(--line)] hover:bg-[var(--secondary)]');
-const Label = ({ children }: { children: React.ReactNode }) => <p className="text-[12.5px] font-medium text-[var(--muted)]">{children}</p>;
+const choice = (on: boolean) => cn('sc-choice', on && 'is-on');
+const Label = ({ children, hint }: { children: React.ReactNode; hint?: string }) => (
+  <div className="flex items-baseline justify-between gap-3"><p className="sc-eyebrow">{children}</p>{hint && <p className="text-[11.5px] text-[var(--muted)]">{hint}</p>}</div>
+);
 
 const BG_LABEL: Record<(typeof BACKGROUNDS)[number], string> = { solid: 'Solid', gradient: 'Gradient', mesh: 'Mesh', aurora: 'Aurora', dots: 'Dots', grid: 'Grid', image: 'Photo' };
 const TILE_LABEL: Record<(typeof TILE_STYLES)[number], string> = { soft: 'Soft', glass: 'Glass', outline: 'Outline', solid: 'Solid' };
@@ -95,9 +97,21 @@ function StyleSwatch({ id }: { id: StyleId }) {
   }
 }
 
+function SwitchRow({ title, note, checked, onChange, disabled }: { title: string; note: string; checked: boolean; onChange: (v: boolean) => void; disabled?: boolean }) {
+  return (
+    <label className="flex items-center justify-between gap-4">
+      <span className="grid gap-0.5"><span className="text-[14px] font-medium">{title}</span><span className="text-[12.5px] text-[var(--muted)]">{note}</span></span>
+      <Switch checked={checked} disabled={disabled} onCheckedChange={onChange} />
+    </label>
+  );
+}
+
 const proNote = () => toast('Part of Posy Pro', { description: 'Upgrade from Settings to use premium themes, fonts and more.' });
 
-export function ThemePanel({ page }: { page: Page }) {
+export type DesignTab = 'style' | 'colour' | 'type' | 'layout' | 'background';
+const TAB_LABEL: Record<DesignTab, string> = { style: 'Style', colour: 'Colour', type: 'Type', layout: 'Layout', background: 'Backdrop' };
+
+export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: DesignTab; onTab?: (t: DesignTab) => void }) {
   const { updateTheme, setBadge } = useStudio();
   const ent = useEntitlements();
   const locked = (premium: boolean) => premium && !ent.premium;
@@ -108,14 +122,14 @@ export function ThemePanel({ page }: { page: Page }) {
   const [uploading, setUploading] = useState(false);
 
   return (
-    <Tabs defaultValue="style" className="gap-4">
-      <TabsList className="grid h-10 w-full grid-cols-5 rounded-[12px] bg-[var(--secondary)] p-1">
-        {['style', 'colour', 'type', 'layout', 'background'].map(k => (
-          <TabsTrigger key={k} value={k} className="rounded-[9px] text-[12.5px] capitalize data-[state=active]:bg-[var(--surface)] data-[state=active]:shadow-sm">{k === 'background' ? 'Backdrop' : k}</TabsTrigger>
+    <Tabs value={tab} onValueChange={v => onTab?.(v as DesignTab)} className="min-h-0 flex-1 gap-0">
+      <TabsList className="mx-5 mb-4 grid h-10 w-auto shrink-0 grid-cols-5 rounded-full bg-[var(--secondary)] p-1">
+        {(Object.keys(TAB_LABEL) as DesignTab[]).map(k => (
+          <TabsTrigger key={k} value={k} className="rounded-full px-1 text-[12.5px] text-[var(--muted)] data-[state=active]:bg-[var(--surface)] data-[state=active]:text-[var(--text)] data-[state=active]:shadow-[0_1px_3px_rgb(60_40_90/.18)]">{TAB_LABEL[k]}</TabsTrigger>
         ))}
       </TabsList>
 
-      <TabsContent value="style" className="grid max-h-[58vh] gap-5 overflow-y-auto pr-1">
+      <TabsContent value="style" className="grid min-h-0 content-start gap-6 overflow-y-auto px-5 pb-8 pt-1">
         <div className="grid grid-cols-2 gap-2.5">
           {STYLE_IDS.map(id => {
             const info = STYLE_INFO[id];
@@ -123,7 +137,7 @@ export function ThemePanel({ page }: { page: Page }) {
             return (
               <button key={id} type="button" aria-pressed={t.style === id} aria-label={`${info.label} style`}
                 onClick={() => (lock ? proNote() : t.style !== id && updateTheme({ style: id, preset: info.preset, font: info.font, accent: undefined }))}
-                className={cn('relative grid gap-2 p-2 text-left', choice(t.style === id))}>
+                className={cn('relative grid content-start gap-2 p-2 text-left', choice(t.style === id))}>
                 {lock && <Lock className="absolute right-3 top-3 z-10 size-3.5 text-white mix-blend-difference" />}
                 <StyleSwatch id={id} />
                 <span className="px-1 pb-0.5"><span className="block text-[13.5px] font-medium">{info.label}</span><span className="block text-[12px] text-[var(--muted)]">{info.note}</span></span>
@@ -165,7 +179,7 @@ export function ThemePanel({ page }: { page: Page }) {
         </div>
       </TabsContent>
 
-      <TabsContent value="colour" className="grid max-h-[58vh] gap-5 overflow-y-auto pr-1">
+      <TabsContent value="colour" className="grid min-h-0 content-start gap-6 overflow-y-auto px-5 pb-8 pt-1">
         <div className="grid gap-2.5">
           <Label>Colours</Label>
           <div className="grid grid-cols-4 gap-2">
@@ -175,7 +189,7 @@ export function ThemePanel({ page }: { page: Page }) {
                 <button key={id} type="button" onClick={() => (locked(PREMIUM_THEMES.has(id)) ? proNote() : updateTheme({ preset: id, accent: undefined }))} aria-pressed={t.preset === id} aria-label={th.name}
                   className="group relative grid gap-1.5 text-center text-[12px] text-[var(--muted)]">
                   {locked(PREMIUM_THEMES.has(id)) && <Lock className="absolute right-1.5 top-1.5 z-10 size-3.5 text-[var(--muted)]" />}
-                  <span className={cn('grid h-14 place-items-center overflow-hidden rounded-[13px] border transition-transform group-hover:scale-[1.04]', t.preset === id ? 'border-[var(--text)] ring-1 ring-[var(--text)]' : 'border-[var(--line)]')} style={{ background: th.bg }}>
+                  <span className={cn('grid h-14 place-items-center overflow-hidden rounded-[13px] border transition-transform group-hover:scale-[1.04]', t.preset === id ? 'border-[var(--sc-deep)] ring-1 ring-[var(--sc-deep)]' : 'border-[var(--line)]')} style={{ background: th.bg }}>
                     <span className="flex gap-1">{(['peach', 'mint', 'lilac'] as const).map(k => <span key={k} className="size-3.5 rounded-full" style={{ background: th.tints[k], boxShadow: `inset 0 0 0 1px ${th.line}` }} />)}</span>
                   </span>
                   {th.name}
@@ -189,7 +203,7 @@ export function ThemePanel({ page }: { page: Page }) {
           <div className="flex flex-wrap items-center gap-2">
             {ACCENTS.map(c => (
               <button key={c} type="button" aria-label={`Accent ${c}`} onClick={() => updateTheme({ accent: c })}
-                className={cn('size-7 rounded-full transition-transform hover:scale-110', (t.accent ?? THEMES[t.preset as ThemeId].accent) === c && 'ring-2 ring-[var(--text)] ring-offset-2 ring-offset-[var(--surface)]')} style={{ background: c }} />
+                className={cn('size-7 rounded-full transition-transform hover:scale-110', (t.accent ?? THEMES[t.preset as ThemeId].accent) === c && 'ring-2 ring-[var(--sc-deep)] ring-offset-2 ring-offset-[var(--surface)]')} style={{ background: c }} />
             ))}
             <label className="relative size-7 cursor-pointer overflow-hidden rounded-full border border-[var(--line)]" style={{ background: 'conic-gradient(#f87171, #fbbf24, #a3e635, #22d3ee, #818cf8, #e879f9, #f87171)' }} aria-label="Custom accent">
               <input type="color" value={t.accent ?? THEMES[t.preset as ThemeId].accent} onChange={e => updateTheme({ accent: e.target.value })} className="absolute inset-0 cursor-pointer opacity-0" />
@@ -198,7 +212,8 @@ export function ThemePanel({ page }: { page: Page }) {
         </div>
       </TabsContent>
 
-      <TabsContent value="background" className="grid max-h-[58vh] gap-5 overflow-y-auto pr-1">
+      <TabsContent value="background" className="grid min-h-0 content-start gap-6 overflow-y-auto px-5 pb-8 pt-1">
+        <div className="grid gap-2.5"><Label>Backdrop</Label>
         <div className="grid grid-cols-4 gap-2">
           {BACKGROUNDS.map(b => (
             <button key={b} type="button" aria-pressed={bg.style === b} onClick={() => (b === 'image' && !bg.image ? file.current?.click() : setBg({ style: b }))}
@@ -206,7 +221,7 @@ export function ThemePanel({ page }: { page: Page }) {
               <BgSwatch style={b} page={page} />{BG_LABEL[b]}
             </button>
           ))}
-        </div>
+        </div></div>
         <input ref={file} type="file" accept="image/*" className="hidden" onChange={async e => {
           const f = e.target.files?.[0]; if (!f) return;
           setUploading(true);
@@ -218,14 +233,15 @@ export function ThemePanel({ page }: { page: Page }) {
             <button type="button" onClick={() => file.current?.click()} className="inline-flex h-9 items-center justify-center gap-2 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] text-[13.5px] font-medium hover:opacity-90">
               {uploading ? <Loader2 className="size-4 animate-spin" /> : <ImagePlus className="size-4" />}{bg.image ? 'Change photo' : 'Upload photo'}
             </button>
-            <label className="grid gap-2 text-[13px]">Darken <Slider value={[bg.dim]} min={0} max={80} step={1} onValueChange={([v]) => setBg({ dim: v })} /></label>
-            <label className="grid gap-2 text-[13px]">Blur <Slider value={[bg.blur]} min={0} max={24} step={1} onValueChange={([v]) => setBg({ blur: v })} /></label>
+            <label className="grid gap-2.5 text-[13px] font-medium"><span className="flex justify-between">Darken<span className="sc-mono text-[11.5px] font-normal text-[var(--muted)]">{bg.dim}%</span></span> <Slider value={[bg.dim]} min={0} max={80} step={1} onValueChange={([v]) => setBg({ dim: v })} /></label>
+            <label className="grid gap-2.5 text-[13px] font-medium"><span className="flex justify-between">Blur<span className="sc-mono text-[11.5px] font-normal text-[var(--muted)]">{bg.blur}px</span></span> <Slider value={[bg.blur]} min={0} max={24} step={1} onValueChange={([v]) => setBg({ blur: v })} /></label>
           </div>
         )}
-        <label className="flex items-center justify-between text-[14px]">Film grain <Switch checked={bg.grain} onCheckedChange={v => setBg({ grain: v })} /></label>
+        <SwitchRow title="Film grain" note="A faint paper texture over the backdrop" checked={bg.grain} onChange={v => setBg({ grain: v })} />
       </TabsContent>
 
-      <TabsContent value="type" className="grid max-h-[58vh] grid-cols-2 gap-2 overflow-y-auto pr-1">
+      <TabsContent value="type" className="grid min-h-0 grid-cols-2 content-start gap-2 overflow-y-auto px-5 pb-8 pt-1">
+        <div className="col-span-2"><Label hint="Headings and body">Typeface pairs</Label></div>
         {FONTS.map(f => (
           <button key={f} type="button" aria-pressed={t.font === f} aria-label={`${FONT_PAIRS[f].label} font`} onClick={() => (locked(PREMIUM_FONTS.has(f)) ? proNote() : updateTheme({ font: f }))}
             className={cn('relative grid gap-1 px-3 py-3 text-left', choice(t.font === f))} style={FONT_VARS[f] as React.CSSProperties}>
@@ -236,7 +252,7 @@ export function ThemePanel({ page }: { page: Page }) {
         ))}
       </TabsContent>
 
-      <TabsContent value="layout" className="grid max-h-[58vh] gap-5 overflow-y-auto pr-1">
+      <TabsContent value="layout" className="grid min-h-0 content-start gap-6 overflow-y-auto px-5 pb-8 pt-1">
         <div className="grid gap-2.5">
           <Label>Layout</Label>
           <div className={cn('grid gap-2', t.style === 'soft' ? 'grid-cols-3' : 'grid-cols-2')}>
@@ -268,11 +284,8 @@ export function ThemePanel({ page }: { page: Page }) {
           </div>
         </div>
         <div className="grid gap-3 border-t border-[var(--line)] pt-4">
-          <label className="flex items-center justify-between text-[14px]">Animations <Switch checked={t.motion} onCheckedChange={v => updateTheme({ motion: v })} /></label>
-          <label className="flex items-center justify-between text-[14px]">
-            <span>“Made with Posy” link{!ent.removeBranding && <span className="ml-2 text-[12.5px] text-[var(--muted)]">Pro can hide it</span>}</span>
-            <Switch checked={page.badge} disabled={!ent.removeBranding} onCheckedChange={setBadge} />
-          </label>
+          <SwitchRow title="Animations" note="Tiles drop in and move on hover" checked={t.motion} onChange={v => updateTheme({ motion: v })} />
+          <SwitchRow title="“Made with Posy” link" note={ent.removeBranding ? 'A small credit at the bottom of your page' : 'Pro can hide it'} checked={page.badge} disabled={!ent.removeBranding} onChange={setBadge} />
         </div>
       </TabsContent>
     </Tabs>
