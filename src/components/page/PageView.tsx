@@ -37,7 +37,7 @@ export function PageFrame({ page, children, profile, className, interactive = tr
         </div>
         {page.badge && (
           <footer className="posy-footer">
-            <a href="https://github.com/Himanshu-Sangshetti/posy" target="_blank" rel="noopener">Made with Posy</a>
+            <a href="https://posy.page" target="_blank" rel="noopener">Made with Posy</a>
           </footer>
         )}
       </MotionProvider>
