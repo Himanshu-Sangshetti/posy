@@ -560,3 +560,46 @@ a.posy-obj.posy-tile:hover, .posy-obj.posy-tile:hover { box-shadow: none; rotate
 .posy-app .app-btn-ghost { background: transparent; color: var(--brand-ink); box-shadow: inset 0 0 0 1px rgb(36 31 46 / .18); }
 .posy-app .app-nav a[aria-current="page"]::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5 Q 25 1 50 4.5 T 98 3' fill='none' stroke='%23a98be0' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E"); }
 .posy-app .app-step { background: var(--tint-lilac); color: var(--brand-deep); }
+
+/* studio-chrome ====================================================================
+   Editor chrome (top bar, dock, panels, dialogs, toasts). Always brand-coloured, whatever the page theme is.
+   Use as `posy-app sc-chrome` on chrome containers and on portalled content. */
+.sc-chrome {
+  --bg: #faf6f1; --surface: #fffdfa; --text: #241f2e; --muted: #7b7389; --line: #e9e1ef; --accent: #a98be0;
+  --sc-paper-2: #f4eef7; --sc-hover: #f3eefa; --sc-on: #ece4fb; --sc-deep: #7048b8;
+  --background: #faf6f1; --foreground: #241f2e;
+  --card: #fffdfa; --card-foreground: #241f2e; --popover: #fffdfa; --popover-foreground: #241f2e;
+  --primary: #241f2e; --primary-foreground: #fffdfa;
+  --secondary: #f3eefa; --secondary-foreground: #241f2e; --muted-foreground: #7b7389;
+  --accent-foreground: #241f2e; --border: #e9e1ef; --input: #e2d9ec; --ring: #a98be0; --destructive: #c9485b;
+  --radius: 12px;
+  color: #241f2e; color-scheme: light; font-family: var(--font-sans);
+}
+.sc-chrome * { scrollbar-color: #d9cdee transparent; }
+.sc-title { font-family: var(--font-serif); font-weight: 400; font-variation-settings: "SOFT" 100, "WONK" 1; letter-spacing: -0.015em; }
+.sc-mono { font-family: var(--font-geist-mono), ui-monospace, monospace; letter-spacing: .02em; }
+.sc-eyebrow { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #7b7389; }
+.sc-kbd { display: inline-flex; align-items: center; gap: 2px; height: 20px; padding: 0 6px; border-radius: 6px; border: 1px solid #e2d9ec; background: #fffdfa; color: #7b7389;
+  font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; line-height: 1; }
+.sc-bar { background: color-mix(in oklab, #faf6f1 97%, transparent); backdrop-filter: blur(14px); border-bottom: 1px solid #e9e1ef; }
+.sc-float { background: color-mix(in oklab, #fffdfa 94%, transparent); backdrop-filter: blur(14px); border: 1px solid #e9e1ef;
+  box-shadow: 0 1px 1px rgb(60 40 90 / .05), 0 14px 34px -14px rgb(60 40 90 / .28); }
+.sc-pop { box-shadow: 0 1px 1px rgb(60 40 90 / .05), 0 22px 48px -18px rgb(60 40 90 / .34); border-color: #e9e1ef; }
+.sc-choice { border: 1px solid #e9e1ef; border-radius: 12px; background: #fffdfa; transition: border-color .15s, background .15s, box-shadow .15s, transform .15s; }
+.sc-choice:hover { border-color: #cdbdea; background: #fbf8ff; }
+.sc-choice[aria-pressed="true"] { border-color: #7048b8; background: #f6f1ff; box-shadow: 0 0 0 1px #7048b8; }
+.sc-dot { width: 8px; height: 8px; border-radius: 999px; flex: none; }
+.sc-dot-live { background: #5fbf95; box-shadow: 0 0 0 3px #b7e4cf88; }
+.sc-dot-draft { background: #e5b44d; box-shadow: 0 0 0 3px #f8e3a388; }
+.sc-dot-saving { background: #a98be0; box-shadow: 0 0 0 3px #c9b6f388; animation: sc-pulse 1s ease-in-out infinite; }
+.sc-dot-error { background: #d9566b; box-shadow: 0 0 0 3px #f4b3c688; }
+@keyframes sc-pulse { 50% { opacity: .45; } }
+.sc-toast { border-radius: 14px !important; border: 1px solid #e9e1ef !important; background: #fffdfa !important; color: #241f2e !important;
+  box-shadow: 0 1px 1px rgb(60 40 90 / .05), 0 18px 40px -16px rgb(60 40 90 / .35) !important; font-family: var(--font-sans) !important; }
+.sc-toast [data-description] { color: #7b7389 !important; }
+.sc-toast [data-button] { background: #241f2e !important; color: #fffdfa !important; border-radius: 9px !important; }
+@media (prefers-reduced-motion: reduce) { .sc-dot-saving { animation: none; } }
+.sc-choice.is-on { border-color: #7048b8; background: #f6f1ff; box-shadow: 0 0 0 1px #7048b8; }
+.sc-chrome [cmdk-group-heading] { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10.5px !important; letter-spacing: .1em; text-transform: uppercase; font-weight: 400 !important; color: #7b7389 !important; padding: 12px 10px 6px !important; }
+.sc-chrome [cmdk-input-wrapper] { height: 52px; border-color: #e9e1ef; padding: 0 16px; }
+.sc-chrome [cmdk-item][data-disabled="true"] { opacity: .4; }
