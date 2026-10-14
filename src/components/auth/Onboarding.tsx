@@ -10,7 +10,7 @@ export function Onboarding({ initialUsername, previews, host }: { initialUsernam
   const router = useRouter();
   const [name, setName] = useState(initialUsername.toLowerCase());
   const [check, setCheck] = useState<{ ok: boolean; reason?: string } | null>(null);
-  const [tpl, setTpl] = useState<TemplateId>('creator');
+  const [tpl, setTpl] = useState<TemplateId>('desk');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 

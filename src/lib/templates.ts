@@ -1,6 +1,7 @@
 import { parsePage, newId, type Page } from './schema';
 
 export const TEMPLATES = {
+  desk: { label: 'Desk', note: 'Polaroids, notes and records' },
   creator: { label: 'Creator', note: 'Bento grid, soft pastels' },
   developer: { label: 'Developer', note: 'Dark, repos up front' },
   links: { label: 'Links', note: 'A clean list, like Linktree' },
@@ -14,6 +15,26 @@ const ids = (tiles: Record<string, unknown>[]) => tiles.map(t => ({ ...t, id: ne
 export function template(id: TemplateId, name: string): Page {
   const profile = { name: name || 'Your name', bio: '' };
   switch (id) {
+    case 'desk':
+      return parsePage({
+        profile: { ...profile, bio: 'I make small, soft things on the internet. Say hi.', location: 'hello from home' },
+        theme: { preset: 'cream', font: 'editorial', layout: 'desk', avatar: 'square' },
+        tiles: ids([
+          { type: 'social', platform: 'instagram', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'x', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'youtube', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'email', handle: 'you@example.com', size: 's' },
+          { type: 'image', src: '/samples/flowers.jpg', caption: 'spring, again ✿', size: 'l' },
+          { type: 'text', text: 'Currently working on something new. Updates soon!', size: 's' },
+          { type: 'text', text: 'Open for work', look: 'stamp', color: 'lilac', size: 's' },
+          { type: 'music', url: 'https://open.spotify.com/', title: 'My song of the week', artist: 'Spotify', image: '/samples/petunia.jpg', size: 'w' },
+          { type: 'heading', text: 'things I make' },
+          { type: 'link', url: 'https://substack.com', title: 'My newsletter', description: 'Dear friend, this week I tried something new…', image: '/samples/tea.jpg', size: 'w' },
+          { type: 'link', url: 'https://example.com', title: 'My website', size: 'w' },
+          { type: 'link', url: 'https://gumroad.com', title: 'Shop', image: '/samples/berries.jpg', size: 's' },
+          { type: 'image', src: '/samples/lemon.jpg', caption: 'lately', size: 's' },
+        ]),
+      });
     case 'creator':
       return parsePage({
         profile: { ...profile, bio: 'Making things on the internet. Say hi.' },
@@ -53,6 +74,6 @@ export function template(id: TemplateId, name: string): Page {
         ]),
       });
     default:
-      return parsePage({ profile, theme: { preset: 'cream', layout: 'bento' }, tiles: [] });
+      return parsePage({ profile, theme: { preset: 'cream', font: 'editorial', layout: 'desk' }, tiles: [] });
   }
 }
