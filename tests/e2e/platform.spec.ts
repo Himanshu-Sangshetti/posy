@@ -75,6 +75,10 @@ test('visits show up in analytics', async ({ page, browser }) => {
   await ctx.close();
   await page.goto('/analytics');
   await expect(page.getByText('Views', { exact: true }).locator('xpath=..')).toContainText('1');
+  const csv = await page.request.get('/api/v1/analytics/export');
+  expect(csv.status()).toBe(200);
+  expect(csv.headers()['content-type']).toContain('text/csv');
+  expect(await csv.text()).toContain('date,views,clicks');
 });
 
 test('changing your username moves the page', async ({ page }) => {
