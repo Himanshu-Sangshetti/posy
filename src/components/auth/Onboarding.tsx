@@ -31,8 +31,8 @@ export function Onboarding({ initialUsername, previews, host }: { initialUsernam
   return (
     <div className="posy-rise grid gap-10">
       <section className="grid gap-4">
-        <h1 className="text-[34px] font-semibold leading-tight tracking-[-0.035em] sm:text-[42px]">Claim your name</h1>
-        <label className="flex h-16 items-center rounded-[20px] border border-[color-mix(in_oklab,#fff_60%,transparent)] bg-[color-mix(in_oklab,var(--surface)_80%,transparent)] pl-5 pr-3 text-[18px] shadow-[0_20px_50px_-30px_rgb(0_0_0/.3)] backdrop-blur-xl focus-within:ring-2 focus-within:ring-[var(--ring)]">
+        <h1 className="app-h1">Claim your <i>name</i></h1>
+        <label className="flex h-16 items-center rounded-[6px] bg-[var(--dk-white)] pl-5 pr-3 text-[18px] text-[#2d2723] shadow-[var(--dk-shadow)] focus-within:ring-2 focus-within:ring-[var(--ring)]">
           <span className="text-[var(--muted)]">{host}/</span>
           <input autoFocus aria-label="Username" value={name} onChange={e => setName(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))} maxLength={30} placeholder="yourname"
             className="min-w-0 flex-1 bg-transparent font-medium outline-none placeholder:text-[var(--muted)]/50" />
@@ -45,9 +45,9 @@ export function Onboarding({ initialUsername, previews, host }: { initialUsernam
       </section>
 
       <section className="grid gap-4">
-        <h2 className="text-[20px] font-semibold tracking-[-0.02em]">Pick a starting point</h2>
+        <h2 className="app-h2">Pick a starting <i>point</i></h2>
         <p className="-mt-2 text-[15px] text-[var(--muted)]">You can change everything later.</p>
-        <div role="radiogroup" aria-label="Starting point" className="grid grid-cols-2 gap-4 md:grid-cols-4"
+        <div role="radiogroup" aria-label="Starting point" className="grid grid-cols-2 gap-x-5 gap-y-8 pt-2 md:grid-cols-3"
           onKeyDown={e => {
             const ids = Object.keys(TEMPLATES) as TemplateId[];
             const i = ids.indexOf(tpl), d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
@@ -60,10 +60,11 @@ export function Onboarding({ initialUsername, previews, host }: { initialUsernam
           {(Object.keys(TEMPLATES) as TemplateId[]).map(id => (
             <div key={id} role="radio" data-tpl={id} aria-checked={tpl === id} tabIndex={tpl === id ? 0 : -1}
               onClick={() => setTpl(id)} onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setTpl(id); } }}
-              className={cn('group grid cursor-pointer gap-3 rounded-[22px] border outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] bg-[color-mix(in_oklab,var(--surface)_70%,transparent)] p-2.5 text-left backdrop-blur-xl transition-all',
-                tpl === id ? 'border-[var(--text)] shadow-[0_18px_40px_-24px_rgb(0_0_0/.45)]' : 'border-[color-mix(in_oklab,#fff_55%,transparent)] hover:-translate-y-0.5')}>
-              <div className="grid h-[156px] place-items-center overflow-hidden rounded-[16px] bg-[var(--bg)]">{previews[id]}</div>
-              <span className="px-1.5 pb-1"><span className="block text-[15px] font-semibold">{TEMPLATES[id].label}</span><span className="block text-[13px] text-[var(--muted)]">{TEMPLATES[id].note}</span></span>
+              className={cn('group relative grid cursor-pointer gap-2 bg-[var(--dk-white)] p-2.5 pb-3 text-left text-[#2d2723] shadow-[var(--dk-shadow)] outline-none transition-[rotate,translate,box-shadow] duration-500 [transition-timing-function:cubic-bezier(.2,.9,.25,1.15)] focus-visible:ring-2 focus-visible:ring-[var(--ring)]',
+                tpl === id ? 'rotate-0 -translate-y-1 shadow-[var(--dk-shadow-hi)] ring-2 ring-[color-mix(in_oklab,var(--accent)_70%,transparent)]' : 'odd:-rotate-[1.6deg] even:rotate-[1.4deg] hover:rotate-0')}>
+              {tpl === id && <span aria-hidden className="absolute -right-3 -top-3 z-10 grid size-9 rotate-12 place-items-center rounded-full border-[3px] border-[var(--dk-white)] bg-[var(--tint-mint)] shadow-md"><Check className="size-4" /></span>}
+              <div className="grid h-[156px] place-items-center overflow-hidden bg-[var(--bg)]">{previews[id]}</div>
+              <span className="px-1"><span className="app-hand block text-[24px] leading-none">{TEMPLATES[id].label}</span><span className="mt-1 block text-[13px] text-[#8d8379]">{TEMPLATES[id].note}</span></span>
             </div>
           ))}
         </div>
@@ -71,7 +72,7 @@ export function Onboarding({ initialUsername, previews, host }: { initialUsernam
 
       <div className="flex flex-wrap items-center gap-4">
         <button type="button" onClick={create} disabled={!check?.ok || busy}
-          className="inline-flex h-12 items-center gap-2 rounded-full bg-[var(--text)] px-7 text-[15.5px] font-medium text-[var(--surface)] transition-all hover:scale-[1.02] active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-40">
+          className="app-btn h-12 px-7 text-[15.5px] disabled:cursor-not-allowed">
           {busy && <Loader2 className="size-4 animate-spin" />}Create my page
         </button>
         {error && <p role="alert" className="text-[14px] text-[#c2453c]">{error}</p>}

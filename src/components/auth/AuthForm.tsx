@@ -14,7 +14,7 @@ type Mode = 'login' | 'signup';
 function Social({ provider, label, path, next }: { provider: 'github' | 'google'; label: string; path: string; next: string }) {
   return (
     <button type="button" onClick={() => signIn.social({ provider, callbackURL: next })}
-      className="inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-[14px] border border-[var(--line)] bg-[var(--surface)] text-[14.5px] font-medium transition-colors hover:bg-[var(--secondary)]">
+      className="inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-full border border-[rgb(45_39_35/.16)] bg-white text-[14.5px] font-medium transition-colors hover:bg-[rgb(45_39_35/.04)]">
       <svg viewBox="0 0 24 24" className="size-[18px]" fill="currentColor" aria-hidden><path d={path} /></svg>{label}
     </button>
   );
@@ -42,9 +42,9 @@ export function AuthForm({ mode, providers }: { mode: Mode; providers: { github:
   }
 
   return (
-    <div className="posy-rise w-full max-w-[400px] rounded-[28px] border border-[color-mix(in_oklab,#fff_60%,transparent)] bg-[color-mix(in_oklab,var(--surface)_72%,transparent)] p-7 shadow-[0_30px_80px_-40px_rgb(0_0_0/.35)] backdrop-blur-xl sm:p-9">
-      <h1 className="text-[28px] font-semibold tracking-[-0.03em]">{mode === 'signup' ? 'Make your page' : 'Welcome back'}</h1>
-      <p className="mt-1.5 text-[15px] text-[var(--muted)]">
+    <div className="posy-rise app-card mx-auto w-full max-w-[400px] -rotate-[0.6deg] !p-7 sm:!p-9">
+      <h1 className="app-h1 !text-[46px]">{mode === 'signup' ? <>Make your <i>page</i></> : <>Welcome <i>back</i></>}</h1>
+      <p className="mt-3 text-[15px] text-[#8d8379]">
         {mode === 'signup' ? (wanted ? <>Claim <b className="font-medium text-[var(--text)]">posy.page/{wanted}</b> in a minute.</> : 'Free, and it takes a minute.') : 'Log in to edit your page.'}
       </p>
       {(providers.github || providers.google) && (
@@ -62,13 +62,13 @@ export function AuthForm({ mode, providers }: { mode: Mode; providers: { github:
         <div className="grid gap-1.5"><Label htmlFor="password">Password</Label><Input id="password" name="password" type="password" required minLength={8} autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} placeholder={mode === 'signup' ? 'At least 8 characters' : ''} className="h-11" /></div>
         {error && <p role="alert" className="text-[14px] text-[#c2453c]">{error}</p>}
         <button type="submit" disabled={busy}
-          className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-[14px] bg-[var(--text)] text-[15px] font-medium text-[var(--surface)] transition-transform active:scale-[.98] disabled:opacity-70">
+          className="app-btn mt-1 h-12 text-[15px]">
           {busy && <Loader2 className="size-4 animate-spin" />}{mode === 'signup' ? 'Create account' : 'Log in'}
         </button>
       </form>
-      <p className="mt-6 text-center text-[14px] text-[var(--muted)]">
-        {mode === 'signup' ? <>Already have a page? <Link href="/login" className="font-medium text-[var(--text)] underline-offset-4 hover:underline">Log in</Link></>
-          : <>New here? <Link href={`/signup${wanted ? `?username=${wanted}` : ''}`} className="font-medium text-[var(--text)] underline-offset-4 hover:underline">Make your page</Link></>}
+      <p className="mt-6 text-center text-[14px] text-[#8d8379]">
+        {mode === 'signup' ? <>Already have a page? <Link href="/login" className="font-medium text-[#2d2723] underline-offset-4 hover:underline">Log in</Link></>
+          : <>New here? <Link href={`/signup${wanted ? `?username=${wanted}` : ''}`} className="font-medium text-[#2d2723] underline-offset-4 hover:underline">Make your page</Link></>}
       </p>
     </div>
   );

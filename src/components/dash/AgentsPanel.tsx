@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CodeBlock } from './CodeBlock';
 
 type Key = { id: string; name: string | null; start: string | null; createdAt: Date | string };
-const card = 'rounded-[24px] border border-[color-mix(in_oklab,#fff_55%,transparent)] bg-[color-mix(in_oklab,var(--surface)_78%,transparent)] p-5 shadow-[0_20px_50px_-34px_rgb(0_0_0/.35)] backdrop-blur-xl sm:p-7';
+const card = 'app-card';
 
 const PROMPTS = [
   'Add my GitHub repo owner/name as a wide tile under a "Projects" section.',
@@ -46,11 +46,11 @@ export function AgentsPanel({ site, username }: { site: string; username: string
   return (
     <div className="grid gap-5">
       <section className={card}>
-        <h2 className="flex items-center gap-2 text-[18px] font-semibold"><span className="grid size-7 place-items-center rounded-full bg-[var(--text)] text-[13px] text-[var(--surface)]">1</span>Create a key</h2>
-        <p className="mt-1.5 text-[14.5px] text-[var(--muted)]">A key lets an agent edit your page. You can revoke it any time.</p>
+        <h2 className="app-h2"><span className="app-step">1</span>Create a key</h2>
+        <p className="mt-1.5 text-[14.5px] text-[#8d8379]">A key lets an agent edit your page. You can revoke it any time.</p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Input aria-label="Key name" value={name} onChange={e => setName(e.target.value)} className="h-11 max-w-[260px]" />
-          <button type="button" onClick={create} disabled={busy} className="inline-flex h-11 items-center gap-2 rounded-[12px] bg-[var(--text)] px-4 text-[14.5px] font-medium text-[var(--surface)] disabled:opacity-60">
+          <button type="button" onClick={create} disabled={busy} className="app-btn">
             {busy ? <Loader2 className="size-4 animate-spin" /> : <KeyRound className="size-4" />}Create key
           </button>
         </div>
@@ -64,8 +64,8 @@ export function AgentsPanel({ site, username }: { site: string; username: string
           <ul className="mt-5 divide-y divide-[var(--line)] border-t border-[var(--line)]">
             {keys.map(k => (
               <li key={k.id} className="flex items-center justify-between py-3 text-[14px]">
-                <span><span className="font-medium">{k.name ?? 'Key'}</span> <span className="ml-2 font-mono text-[13px] text-[var(--muted)]">{k.start}…</span></span>
-                <button type="button" onClick={() => revoke(k.id)} aria-label={`Revoke ${k.name}`} className="inline-flex items-center gap-1.5 rounded-[10px] px-2.5 py-1.5 text-[13.5px] text-[var(--muted)] hover:bg-[var(--secondary)] hover:text-[#c2453c]">
+                <span><span className="font-medium">{k.name ?? 'Key'}</span> <span className="ml-2 font-mono text-[13px] text-[#8d8379]">{k.start}…</span></span>
+                <button type="button" onClick={() => revoke(k.id)} aria-label={`Revoke ${k.name}`} className="inline-flex items-center gap-1.5 rounded-[10px] px-2.5 py-1.5 text-[13.5px] text-[#8d8379] hover:bg-[var(--secondary)] hover:text-[#c2453c]">
                   <Trash2 className="size-4" />Revoke
                 </button>
               </li>
@@ -75,8 +75,8 @@ export function AgentsPanel({ site, username }: { site: string; username: string
       </section>
 
       <section className={card}>
-        <h2 className="flex items-center gap-2 text-[18px] font-semibold"><span className="grid size-7 place-items-center rounded-full bg-[var(--text)] text-[13px] text-[var(--surface)]">2</span>Connect your agent</h2>
-        <p className="mt-1.5 text-[14.5px] text-[var(--muted)]">Posy speaks MCP, so it works with Claude, Cursor, Codex and anything else that does.</p>
+        <h2 className="app-h2"><span className="app-step">2</span>Connect your agent</h2>
+        <p className="mt-1.5 text-[14.5px] text-[#8d8379]">Posy speaks MCP, so it works with Claude, Cursor, Codex and anything else that does.</p>
         <Tabs defaultValue="claude" className="mt-4">
           <TabsList className="h-10 flex-wrap rounded-[12px] bg-[var(--secondary)] p-1">
             {[['claude', 'Claude Code'], ['cursor', 'Cursor'], ['codex', 'Codex'], ['other', 'Other apps'], ['rest', 'REST']].map(([v, l]) => (
@@ -98,11 +98,11 @@ export function AgentsPanel({ site, username }: { site: string; username: string
       </section>
 
       <section className={card}>
-        <h2 className="flex items-center gap-2 text-[18px] font-semibold"><span className="grid size-7 place-items-center rounded-full bg-[var(--text)] text-[13px] text-[var(--surface)]">3</span>Ask for what you want</h2>
+        <h2 className="app-h2"><span className="app-step">3</span>Ask for what you want</h2>
         <ul className="mt-4 grid gap-2.5">
-          {PROMPTS.map(p => <li key={p} className="rounded-[14px] bg-[var(--secondary)] px-4 py-3 text-[14.5px]">&ldquo;{p}&rdquo;</li>)}
+          {PROMPTS.map(p => <li key={p} className="app-hand -rotate-[0.4deg] bg-[var(--tint-butter)] px-4 py-2.5 text-[21px] leading-snug text-[#5a4710] shadow-[0_8px_16px_-12px_rgb(90_70_0/.5)]">&ldquo;{p}&rdquo;</li>)}
         </ul>
-        <p className="mt-5 text-[14px] text-[var(--muted)]">
+        <p className="mt-5 text-[14px] text-[#8d8379]">
           Edits land in your draft and show up in the editor live. Your agent publishes only when you ask. Anyone&apos;s agent can read your published page at{' '}
           <a className="underline underline-offset-4" href={`${site}/${username}/llms.txt`} target="_blank" rel="noopener">/{username}/llms.txt</a> and{' '}
           <a className="underline underline-offset-4" href={`${site}/api/v1/public/${username}`} target="_blank" rel="noopener">JSON</a>.

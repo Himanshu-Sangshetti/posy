@@ -413,3 +413,30 @@ a.posy-obj.posy-tile:hover, .posy-obj.posy-tile:hover { box-shadow: none; rotate
 .dark .dk-env-front { background: color-mix(in oklab, var(--paper) 88%, white 7%); }
 .dark .dk-env-flap { background: color-mix(in oklab, var(--paper) 80%, white 12%); }
 .dark .dk-env-back { background: color-mix(in oklab, var(--paper) 90%, black 20%); }
+
+/* ================= App chrome (auth, onboarding, dashboard) in the desk style ================= */
+.posy-app { --font-head: var(--font-serif); --head-weight: 400; --head-track: -0.015em; }
+.posy-app .posy-backdrop { position: fixed; }
+.app-card { position: relative; border-radius: 6px; background: var(--dk-white); color: #2d2723; box-shadow: var(--dk-shadow); padding: 22px; }
+@media (min-width: 640px) { .app-card { padding: 28px; } }
+.app-h1 { font-family: var(--font-serif); font-weight: 400; font-size: 52px; line-height: .95; letter-spacing: -0.02em; }
+@media (min-width: 640px) { .app-h1 { font-size: 68px; } }
+.app-h1 i, .app-h2 i { font-style: italic; color: color-mix(in oklab, var(--accent) 70%, var(--text)); }
+.app-h2 { font-family: var(--font-serif); font-weight: 400; font-size: 28px; line-height: 1.05; letter-spacing: -0.01em; }
+.app-lede { margin-top: 12px; max-width: 54ch; font-size: 16px; line-height: 1.55; color: var(--muted); }
+.app-num { font-family: var(--font-serif); font-size: 56px; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.app-hand { font-family: var(--font-caveat), cursive; font-weight: 600; }
+.app-step { display: inline-grid; place-items: center; width: 34px; height: 34px; margin-right: 10px; border-radius: 50%; background: var(--tint-butter); color: #5a4710; font-family: var(--font-caveat), cursive; font-size: 22px; font-weight: 700; rotate: -6deg; vertical-align: 4px; }
+.app-tape { position: absolute; top: -12px; left: 50%; width: 104px; height: 26px; translate: -50% 0; rotate: -2deg; opacity: .9;
+  background: repeating-linear-gradient(45deg, color-mix(in oklab, var(--tint-rose) 80%, transparent) 0 8px, color-mix(in oklab, var(--tint-rose) 45%, white 30%) 8px 16px); }
+.app-nav { display: flex; align-items: center; gap: 4px; }
+.app-nav a { position: relative; padding: 8px 12px; font-size: 15px; color: var(--muted); transition: color .2s; }
+.app-nav a:hover { color: var(--text); }
+.app-nav a[aria-current="page"] { color: var(--text); }
+.app-nav a[aria-current="page"]::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: 0; height: 8px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5 Q 25 1 50 4.5 T 98 3' fill='none' stroke='%23e39b6f' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+.app-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 999px; background: #2d2723; color: #fff; font-size: 14.5px; font-weight: 500; transition: transform .2s, opacity .2s; }
+.app-btn:active { transform: scale(.98); } .app-btn:disabled { opacity: .45; }
+.app-btn-ghost { background: transparent; color: #2d2723; box-shadow: inset 0 0 0 1px rgb(45 39 35 / .16); }
+.app-btn-ghost:hover { background: rgb(45 39 35 / .05); }
+.posy-app .app-card input, .posy-app .app-card [data-slot="input"] { background: #fff; }

@@ -9,10 +9,10 @@ export default async function DashLayout({ children }: { children: React.ReactNo
   const row = await pageForUser(user.id);
   if (!row) redirect('/onboarding');
   return (
-    <div className="posy-page posy-bg-mesh posy-grain min-h-dvh">
+    <div className="posy-page posy-app posy-layout-desk posy-bg-solid posy-grain min-h-dvh">
       <div aria-hidden className="posy-backdrop"><span className="posy-noise" /></div>
       <DashHeader username={row.username} site={siteUrl()} />
-      <main className="relative z-10 mx-auto w-full max-w-[1000px] px-5 pb-24 pt-6 sm:px-8">{children}</main>
+      <main className="relative z-10 mx-auto w-full max-w-[1000px] px-5 pb-24 pt-8 sm:px-8">{children}</main>
     </div>
   );
 }

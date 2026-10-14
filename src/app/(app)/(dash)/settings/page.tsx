@@ -10,8 +10,8 @@ export default async function SettingsPage() {
   const user = await requireUser();
   const row = (await pageForUser(user.id))!;
   return (
-    <div className="posy-rise grid gap-5">
-      <h1 className="mb-2 mt-6 text-[32px] font-semibold tracking-[-0.03em]">Settings</h1>
+    <div className="posy-rise grid gap-7">
+      <h1 className="app-h1 mb-4 mt-6">Settings</h1>
       <SettingsPanel username={row.username} email={user.email} host={SITE_HOST()} />
     </div>
   );
