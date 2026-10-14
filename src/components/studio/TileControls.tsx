@@ -11,6 +11,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Toggle } from '@/components/ui/toggle';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CHROME } from './chrome';
 import { cn } from '@/lib/utils';
 import { useStudio } from './store';
 import { storeImage } from './storage';
@@ -29,19 +32,22 @@ export function swatch(c: Color): string {
   return `var(--tint-${c})`;
 }
 
-function ToolButton({ label, active, onClick, children }: { label: string; active?: boolean; onClick?: () => void; children: React.ReactNode }) {
+function ToolButton({ label, active, onClick, children, danger }: { label: string; active?: boolean; onClick?: () => void; children: React.ReactNode; danger?: boolean }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <button type="button" onClick={onClick} aria-label={label} aria-pressed={active}
-          className={cn('grid size-8 place-items-center rounded-[10px] text-[var(--muted)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--text)]', active && 'bg-[var(--text)] text-[var(--surface)] hover:bg-[var(--text)] hover:text-[var(--surface)]')}>
+        <Toggle pressed={!!active} onPressedChange={() => onClick?.()} aria-label={label} size="sm"
+          className={cn('size-8 min-w-8 rounded-[9px] px-0 text-[var(--muted)] hover:bg-[var(--secondary)] hover:text-[var(--text)] data-[state=on]:bg-[var(--sc-on)] data-[state=on]:text-[var(--sc-deep)]', danger && 'hover:bg-[#fbe3e8] hover:text-[#b83a52]')}>
           {children}
-        </button>
+        </Toggle>
       </TooltipTrigger>
-      <TooltipContent side="top">{label}</TooltipContent>
+      <TooltipContent side="top" className={CHROME}>{label}</TooltipContent>
     </Tooltip>
   );
 }
+
+const Divider = () => <span className="mx-1 h-5 w-px shrink-0 bg-[var(--line)]" />;
+const popCls = cn(CHROME, 'sc-pop rounded-[16px] p-3');
 
 /** Floating toolbar above the selected tile. */
 export function TileToolbar({ tile }: { tile: Tile }) {
@@ -53,29 +59,36 @@ export function TileToolbar({ tile }: { tile: Tile }) {
   const stamp = tile.type === 'text' && tile.look === 'stamp';
   const sticker = tile.type === 'social' && (style !== 'soft' || layout === 'list');
   const inlineText = tile.type === 'text' && !stamp && (style === 'soft' || style === 'cozy');
+  const sized = tile.type !== 'heading' && !sticker;
   return (
     <div
       data-toolbar
       onPointerDown={e => e.stopPropagation()}
       onClick={e => e.stopPropagation()}
-      className="absolute left-1/2 top-0 z-30 flex -translate-x-1/2 -translate-y-[calc(100%+10px)] items-center gap-0.5 rounded-[14px] border border-[var(--line)] bg-[color-mix(in_oklab,var(--surface)_92%,transparent)] p-1 shadow-[0_12px_32px_-12px_rgb(0_0_0/.28)] backdrop-blur-md"
+      className={cn(CHROME, 'sc-float absolute left-1/2 top-0 z-30 flex -translate-x-1/2 -translate-y-[calc(100%+10px)] items-center gap-0.5 rounded-[13px] p-1')}
     >
-      {tile.type !== 'heading' && !sticker && sizes.map(s => (
+      {sized && sizes.map(s => (
         <ToolButton key={s} label={SIZE_LABEL[s]} active={tile.size === s} onClick={() => updateTile(tile.id, { size: s })}><SizeGlyph size={s} /></ToolButton>
       ))}
-      {tile.type !== 'heading' && !sticker && <span className="mx-1 h-5 w-px bg-[var(--line)]" />}
-      {tile.type !== 'heading' && !sticker && (
+      {sized && <Divider />}
+      {sized && (
         <Popover>
-          <PopoverTrigger asChild>
-            <button type="button" aria-label="Colour" className="grid size-8 place-items-center rounded-[10px] hover:bg-[var(--secondary)]">
-              <span className="size-[18px] rounded-full border border-[var(--line)]" style={{ background: swatch(tile.color) }} />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent side="top" className="w-auto p-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <button type="button" aria-label="Colour" className="grid size-8 place-items-center rounded-[9px] transition-colors hover:bg-[var(--secondary)]">
+                  <span className="size-[18px] rounded-full border border-[var(--line)] shadow-[inset_0_0_0_1px_rgb(255_255_255/.5)]" style={{ background: swatch(tile.color) }} />
+                </button>
+              </PopoverTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="top" className={CHROME}>Colour</TooltipContent>
+          </Tooltip>
+          <PopoverContent side="top" className={cn(popCls, 'w-auto')}>
+            <p className="sc-eyebrow mb-2">Tile colour</p>
             <div className="grid grid-cols-5 gap-1.5">
               {COLORS.map(c => (
                 <button key={c} type="button" aria-label={c} onClick={() => updateTile(tile.id, { color: c })}
-                  className={cn('size-8 rounded-full border border-[var(--line)] transition-transform hover:scale-110', tile.color === c && 'ring-2 ring-[var(--text)] ring-offset-2 ring-offset-[var(--surface)]')}
+                  className={cn('size-8 rounded-full border border-[var(--line)] transition-transform hover:scale-110', tile.color === c && 'ring-2 ring-[var(--sc-deep)] ring-offset-2 ring-offset-[var(--surface)]')}
                   style={{ background: swatch(c) }} />
               ))}
             </div>
@@ -88,19 +101,25 @@ export function TileToolbar({ tile }: { tile: Tile }) {
       </>}
       {!inlineText && tile.type !== 'heading' && (
         <Popover>
-          <PopoverTrigger asChild>
-            <button type="button" aria-label="Edit" className="grid size-8 place-items-center rounded-[10px] text-[var(--muted)] hover:bg-[var(--secondary)] hover:text-[var(--text)]"><Pencil className="size-4" /></button>
-          </PopoverTrigger>
-          <PopoverContent side="top" className="w-80"><TileFields tile={tile} /></PopoverContent>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <button type="button" aria-label="Edit" className="grid size-8 place-items-center rounded-[9px] text-[var(--muted)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--text)]"><Pencil className="size-4" /></button>
+              </PopoverTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="top" className={CHROME}>Edit</TooltipContent>
+          </Tooltip>
+          <PopoverContent side="top" className={cn(popCls, 'w-80 p-4')}><TileFields tile={tile} /></PopoverContent>
         </Popover>
       )}
-      <ToolButton label="Delete" onClick={() => removeTile(tile.id)}><Trash2 className="size-4" /></ToolButton>
+      <Divider />
+      <ToolButton label="Delete" danger onClick={() => removeTile(tile.id)}><Trash2 className="size-4" /></ToolButton>
     </div>
   );
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div className="grid gap-1.5"><Label className="text-[12.5px] font-medium text-[var(--muted)]">{label}</Label>{children}</div>;
+  return <div className="grid gap-1.5"><Label className="sc-eyebrow">{label}</Label>{children}</div>;
 }
 
 export function ImagePicker({ onPick, label = 'Upload image' }: { onPick: (src: string) => void; label?: string }) {
@@ -114,7 +133,7 @@ export function ImagePicker({ onPick, label = 'Upload image' }: { onPick: (src: 
         try { onPick(await storeImage(f)); } catch (err) { toast.error((err as Error).message); } finally { setBusy(false); e.target.value = ''; }
       }} />
       <button type="button" onClick={() => ref.current?.click()} disabled={busy}
-        className="inline-flex h-9 items-center justify-center gap-2 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] px-3 text-[13.5px] font-medium transition-colors hover:bg-[var(--secondary)] disabled:opacity-60">
+        className="inline-flex h-9 items-center justify-center gap-2 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] px-3 text-[13px] font-medium transition-colors hover:bg-[var(--secondary)] disabled:opacity-60">
         <Upload className="size-4" />{busy ? 'Uploading…' : label}
       </button>
     </>
@@ -138,10 +157,10 @@ export function TileFields({ tile }: { tile: Tile }) {
       </>}
       {tile.type === 'social' && <>
         <Field label="Platform">
-          <select value={tile.platform} onChange={e => set({ platform: e.target.value })}
-            className="h-9 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] px-2.5 text-[14px] outline-none focus:ring-2 focus:ring-[var(--ring)]">
-            {PLATFORM_IDS.map(p => <option key={p} value={p}>{PLATFORMS[p].label}</option>)}
-          </select>
+          <Select value={tile.platform} onValueChange={v => set({ platform: v })}>
+            <SelectTrigger className="h-9 w-full rounded-[10px] border-[var(--line)] bg-[var(--bg)] shadow-none"><SelectValue /></SelectTrigger>
+            <SelectContent className={cn(CHROME, 'sc-pop')}>{PLATFORM_IDS.map(p => <SelectItem key={p} value={p}>{PLATFORMS[p].label}</SelectItem>)}</SelectContent>
+          </Select>
         </Field>
         {text('handle', tile.handle, tile.platform === 'email' ? 'Email' : 'Username')}
         {text('url', tile.url, 'Custom link (optional)')}

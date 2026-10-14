@@ -141,7 +141,7 @@ function SortableTile({ tile, index, look }: { tile: Tile; index: number; look: 
       {...attributes}
       {...listeners}
     >
-      <TileShell tile={tile} index={index} editing look={look} className={cn('size-full cursor-grab active:cursor-grabbing', selected && 'outline outline-2 outline-offset-[3px] outline-[var(--accent)]')}>
+      <TileShell tile={tile} index={index} editing look={look} className={cn('size-full cursor-grab active:cursor-grabbing', selected && 'outline outline-2 outline-offset-[3px] outline-[#8a63d2]')}>
         {selected && tile.type === 'text' && tile.look !== 'stamp' && (look === 'soft' || look === 'cozy') ? <InlineText tile={tile} desk={look === 'cozy'} /> : undefined}
       </TileShell>
       {selected && <TileToolbar tile={tile} />}
@@ -157,7 +157,7 @@ function SortableRow({ tile, index, look }: { tile: Tile; index: number; look: S
     <div ref={setNodeRef} data-tile={tile.id} aria-label={tileLabel(tile)} className={cn('relative', isDragging && 'opacity-30')}
       style={{ transform: CSS.Translate.toString(transform), transition, zIndex: selected ? 20 : undefined }}
       onClick={e => { e.stopPropagation(); select(tile.id); }} {...attributes} {...listeners}>
-      <MotionShell index={index} lift={false} className={cn(look === 'soft' ? 'posy-tile posy-row' : 'posy-row-st', 'group block cursor-grab active:cursor-grabbing', `posy-type-${tile.type}`, `posy-size-${tile.size}`, selected && 'outline outline-2 outline-offset-[3px] outline-[var(--accent)]')}
+      <MotionShell index={index} lift={false} className={cn(look === 'soft' ? 'posy-tile posy-row' : 'posy-row-st', 'group block cursor-grab active:cursor-grabbing', `posy-type-${tile.type}`, `posy-size-${tile.size}`, selected && 'outline outline-2 outline-offset-[3px] outline-[#8a63d2]')}
         style={{ '--tile-bg': tileBackground(tile, index, brandHex(tile)) } as React.CSSProperties}>
         {look !== 'soft' ? <StyleRow style={look} tile={tile} index={index} /> : selected && tile.type === 'text' ? <InlineText tile={tile} /> : <ListItem tile={tile} />}
       </MotionShell>
@@ -175,7 +175,7 @@ function SortableSocialIcon({ tile, desk }: { tile: Extract<Tile, { type: 'socia
     <div ref={setNodeRef} data-tile={tile.id} aria-label={tileLabel(tile)} className={cn('relative', isDragging && 'opacity-30')}
       style={{ transform: CSS.Translate.toString(transform), transition, zIndex: selected ? 20 : undefined }}
       onClick={e => { e.stopPropagation(); select(tile.id); }} {...attributes} {...listeners}>
-      <span className={cn(desk ? 'dk-stk cursor-grab' : 'grid size-11 cursor-grab place-items-center rounded-full border border-[color-mix(in_oklab,var(--text)_8%,transparent)] bg-[color-mix(in_oklab,var(--surface)_70%,transparent)]', selected && 'outline outline-2 outline-offset-2 outline-[var(--accent)]')}>
+      <span className={cn(desk ? 'dk-stk cursor-grab' : 'grid size-11 cursor-grab place-items-center rounded-full border border-[color-mix(in_oklab,var(--text)_8%,transparent)] bg-[color-mix(in_oklab,var(--surface)_70%,transparent)]', selected && 'outline outline-2 outline-offset-2 outline-[#8a63d2]')}>
         {p.icon?.path ? <BrandIcon path={p.icon.path} size={19} /> : tile.platform === 'email' ? <span className="text-[17px]">@</span> : <span className="text-[14px] font-bold">in</span>}
       </span>
       {selected && <TileToolbar tile={tile} />}
@@ -191,7 +191,7 @@ function SortableHeading({ tile, list }: { tile: Extract<Tile, { type: 'heading'
     <div ref={setNodeRef} data-tile={tile.id} aria-label={tileLabel(tile)} className={cn('relative w-fit min-w-[12ch] px-1', list ? 'mx-auto mt-3 text-center' : 'mb-4', isDragging && 'opacity-30')}
       style={{ transform: CSS.Translate.toString(transform), transition }} onClick={e => { e.stopPropagation(); select(tile.id); }} {...attributes} {...listeners}>
       <input aria-label="Section title" value={tile.text} onChange={e => updateTile(tile.id, { text: e.target.value })} onPointerDown={e => selected && e.stopPropagation()} onKeyDown={e => e.stopPropagation()}
-        className={cn(blank, 'posy-head rounded-md leading-tight [field-sizing:content]', list ? 'text-center text-[20px]' : 'text-[26px]', selected && 'outline outline-2 outline-offset-4 outline-[var(--accent)]')} />
+        className={cn(blank, 'posy-head rounded-md leading-tight [field-sizing:content]', list ? 'text-center text-[20px]' : 'text-[26px]', selected && 'outline outline-2 outline-offset-4 outline-[#8a63d2]')} />
       {selected && <TileToolbar tile={tile} />}
     </div>
   );
