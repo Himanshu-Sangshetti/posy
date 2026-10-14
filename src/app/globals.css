@@ -184,7 +184,7 @@
 .posy-meta button:hover { color: var(--text); }
 .posy-avatar {
   position: relative; width: 112px; height: 112px; flex-shrink: 0; overflow: hidden; color: var(--text);
-  border-radius: 36%; background: linear-gradient(135deg, var(--tint-peach), var(--tint-lilac));
+  border-radius: 36%; background: color-mix(in oklab, var(--text) 7%, var(--surface));
   box-shadow: 0 0 0 4px var(--surface), 0 14px 34px -16px rgb(0 0 0 / .4);
 }
 .posy-layout-list .posy-avatar { width: 96px; height: 96px; }
