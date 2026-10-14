@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { useStudio } from './store';
-import { storeImage, type Mode } from './storage';
+import { storeImage } from './storage';
 
 const SIZE_LABEL: Record<Size, string> = { s: 'Small', w: 'Wide', t: 'Tall', l: 'Large' };
 
@@ -44,7 +44,7 @@ function ToolButton({ label, active, onClick, children }: { label: string; activ
 }
 
 /** Floating toolbar above the selected tile. */
-export function TileToolbar({ tile, mode }: { tile: Tile; mode: Mode }) {
+export function TileToolbar({ tile }: { tile: Tile }) {
   const { updateTile, removeTile } = useStudio();
   const sizes: Size[] = tile.type === 'music' ? ['s', 'w', 'l'] : ['s', 'w', 't', 'l'];
   return (
@@ -81,7 +81,7 @@ export function TileToolbar({ tile, mode }: { tile: Tile; mode: Mode }) {
           <PopoverTrigger asChild>
             <button type="button" aria-label="Edit" className="grid size-8 place-items-center rounded-[10px] text-[var(--muted)] hover:bg-[var(--secondary)] hover:text-[var(--text)]"><Pencil className="size-4" /></button>
           </PopoverTrigger>
-          <PopoverContent side="top" className="w-80"><TileFields tile={tile} mode={mode} /></PopoverContent>
+          <PopoverContent side="top" className="w-80"><TileFields tile={tile} /></PopoverContent>
         </Popover>
       )}
       <ToolButton label="Delete" onClick={() => removeTile(tile.id)}><Trash2 className="size-4" /></ToolButton>
@@ -93,7 +93,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   return <div className="grid gap-1.5"><Label className="text-[12.5px] font-medium text-[var(--muted)]">{label}</Label>{children}</div>;
 }
 
-export function ImagePicker({ mode, onPick, label = 'Upload image' }: { mode: Mode; onPick: (src: string) => void; label?: string }) {
+export function ImagePicker({ onPick, label = 'Upload image' }: { onPick: (src: string) => void; label?: string }) {
   const ref = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   return (
@@ -101,7 +101,7 @@ export function ImagePicker({ mode, onPick, label = 'Upload image' }: { mode: Mo
       <input ref={ref} type="file" accept="image/*" className="hidden" onChange={async e => {
         const f = e.target.files?.[0]; if (!f) return;
         setBusy(true);
-        try { onPick(await storeImage(mode, f)); } catch (err) { toast.error((err as Error).message); } finally { setBusy(false); e.target.value = ''; }
+        try { onPick(await storeImage(f)); } catch (err) { toast.error((err as Error).message); } finally { setBusy(false); e.target.value = ''; }
       }} />
       <button type="button" onClick={() => ref.current?.click()} disabled={busy}
         className="inline-flex h-9 items-center justify-center gap-2 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] px-3 text-[13.5px] font-medium transition-colors hover:bg-[var(--secondary)] disabled:opacity-60">
@@ -112,7 +112,7 @@ export function ImagePicker({ mode, onPick, label = 'Upload image' }: { mode: Mo
 }
 
 /** The edit form for one tile. */
-export function TileFields({ tile, mode }: { tile: Tile; mode: Mode }) {
+export function TileFields({ tile }: { tile: Tile }) {
   const update = useStudio(s => s.updateTile);
   const set = (patch: Record<string, unknown>) => update(tile.id, patch as Partial<Tile>);
   const text = (key: string, value: string | undefined, label: string, placeholder?: string) => (
@@ -124,7 +124,7 @@ export function TileFields({ tile, mode }: { tile: Tile; mode: Mode }) {
         {text('url', tile.url, 'Link')}
         {text('title', tile.title, 'Title')}
         {text('description', tile.description, 'Description')}
-        <Field label="Preview image"><div className="flex gap-2"><Input value={tile.image ?? ''} placeholder="https://…" onChange={e => set({ image: e.target.value || undefined })} /><ImagePicker mode={mode} label="Upload" onPick={src => set({ image: src })} /></div></Field>
+        <Field label="Preview image"><div className="flex gap-2"><Input value={tile.image ?? ''} placeholder="https://…" onChange={e => set({ image: e.target.value || undefined })} /><ImagePicker label="Upload" onPick={src => set({ image: src })} /></div></Field>
       </>}
       {tile.type === 'social' && <>
         <Field label="Platform">
@@ -137,7 +137,7 @@ export function TileFields({ tile, mode }: { tile: Tile; mode: Mode }) {
         {text('url', tile.url, 'Custom link (optional)')}
       </>}
       {tile.type === 'image' && <>
-        <Field label="Image"><div className="flex gap-2"><Input value={tile.src.startsWith('data:') ? 'Uploaded image' : tile.src} onChange={e => set({ src: e.target.value })} /><ImagePicker mode={mode} label="Replace" onPick={src => set({ src })} /></div></Field>
+        <Field label="Image"><div className="flex gap-2"><Input value={tile.src.startsWith('data:') ? 'Uploaded image' : tile.src} onChange={e => set({ src: e.target.value })} /><ImagePicker label="Replace" onPick={src => set({ src })} /></div></Field>
         {text('caption', tile.caption, 'Caption')}
         {text('alt', tile.alt, 'Description for screen readers')}
         {text('url', tile.url, 'Link (optional)')}
