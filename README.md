@@ -12,7 +12,8 @@ When Linktree bought Bento and shut it down, a lot of people lost a page they lo
 page that can't be taken away: it's open source, you can run it yourself with one Docker command,
 and you can export your whole page as JSON at any time.
 
-- **Looks good by default.** Twelve pastel and dark themes, ten font pairs, soft spring animations.
+- **Looks good by default.** The Desk layout turns your links into things on a desk: polaroids, sticky notes, a record
+  that spins, an envelope that opens. Or use a classic bento grid or a simple list. Twelve themes, ten font pairs.
 - **A calm editor.** Paste any link and it becomes the right tile. Drag to reorder. Click to edit. That's it.
 - **Yours forever.** Self-host with Docker or Vercel, export your page as JSON whenever you like. No lock-in.
 - **Agent friendly.** API keys, a REST API, a hosted MCP server and a CLI. The studio updates live when your agent edits the page.

@@ -23,7 +23,7 @@ Cursor, Codex and other MCP clients: add an HTTP server at `https://YOUR-POSY/ap
 | `get_page` | Draft (profile, theme, tiles with ids), public URL, version, unpublished-changes flag |
 | `add_tile` | Add from a link, email, `owner/repo` or note (auto-detected), or a full tile object |
 | `update_tile` / `remove_tile` / `move_tile` | Change fields, delete, reorder by id |
-| `set_theme` | Preset, accent, font, radius, layout, alignment, background, tile style, hover effect, avatar |
+| `set_theme` | Preset, accent, font, radius, layout (`desk`, `bento`, `list`), alignment, background, tile style, hover effect, avatar |
 | `set_profile` | Name, bio, avatar, location |
 | `publish` | Make the draft live |
 | `list_options` | Allowed values for themes, fonts, backgrounds, sizes, colours and platforms |
@@ -40,6 +40,9 @@ Cursor, Codex and other MCP clients: add an HTTP server at `https://YOUR-POSY/ap
 
 1. Start with `get_page`. Tiles have stable ids.
 2. Sizes: `s` (1×1), `w` (2×1), `t` (1×2), `l` (2×2). `heading` tiles start a new section.
+   On the default **desk** layout every tile is an object: images are polaroids, notes are sticky notes, Spotify is a record,
+   YouTube is a ticket, GitHub repos are index cards, newsletter links (Substack, Buttondown, beehiiv…) are envelopes and
+   links with a preview image are postcards. Social tiles become stickers under the name.
 3. Colours: `auto`, `surface`, `accent` or a pastel tint (`peach`, `butter`, `mint`, `sky`, `lilac`, `rose`).
 4. Keep pages calm: a few well-chosen tiles beat many. Ask before deleting things the user added.
 5. Edits are version-checked, so an agent and the person in the studio can work at the same time.
@@ -50,11 +53,11 @@ Cursor, Codex and other MCP clients: add an HTTP server at `https://YOUR-POSY/ap
 |---|---|---|
 | `link` | `url` | optional `title`, `description`, `image` |
 | `social` | `platform`, `handle` | platforms are listed in the schema; `email` works too |
-| `text` | `text` | supports `**bold**`, `*italic*` and `[links](https://…)` |
+| `text` | `text` | supports `**bold**`, `*italic*` and `[links](https://…)`. On the desk layout, `look: "stamp"` turns a short note into a round badge |
 | `heading` | `text` | section title, always full width |
 | `image` | `src` | uploaded or external image URL |
 | `video` | `url` | YouTube |
-| `music` | `url` | Spotify track, album, playlist, artist or show |
+| `music` | `url` | Spotify track, album, playlist, artist or show. `title` and cover `image` are filled in automatically |
 | `github` | `repo` (`owner/name`) | stars, description and language are filled in automatically |
 
 The JSON Schema for a whole page is in `schema/page.schema.json` (`npm run schema` regenerates it).
