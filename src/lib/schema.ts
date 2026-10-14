@@ -5,10 +5,12 @@ import { EDITION_FONT_PAIRS } from '@/edition/fonts';
 
 /** Tile footprint on the grid: small square, wide, tall, large square. */
 export const SIZES = ['s', 'w', 't', 'l'] as const;
-export const BASE_FONTS = ['soft', 'editorial', 'classic', 'elegant', 'rounded', 'playful', 'modern', 'tech', 'mono', 'hand'] as const;
+export const BASE_FONTS = ['soft', 'editorial', 'classic', 'elegant', 'rounded', 'playful', 'modern', 'tech', 'mono', 'hand', 'terminal', 'cyber', 'storybook', 'journal', 'stationery'] as const;
 export const FONTS = [...BASE_FONTS, ...Object.keys(EDITION_FONT_PAIRS)] as [string, ...string[]];
 export const RADII = ['sharp', 'soft', 'round', 'pill'] as const;
-export const LAYOUTS = ['desk', 'bento', 'list'] as const;
+/** The look of the whole page. Independent of the layout. */
+export const STYLES = ['cozy', 'soft', 'editorial', 'terminal', 'neon'] as const;
+export const LAYOUTS = ['bento', 'list'] as const;
 export const TEXT_LOOKS = ['note', 'stamp'] as const;
 export const ALIGNS = ['side', 'center'] as const;
 export const BACKGROUNDS = ['solid', 'gradient', 'mesh', 'aurora', 'dots', 'grid', 'image'] as const;
@@ -105,8 +107,9 @@ export const Theme = z.object({
   accent: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().describe('Override the theme accent, e.g. "#e8a87c"'),
   font: z.enum(FONTS).default('editorial'),
   radius: z.enum(RADII).default('round'),
-  layout: z.enum(LAYOUTS).default('desk').describe('desk = tiles as objects on a desk (polaroids, notes, records); bento = tile grid; list = Linktree-style stacked links'),
-  align: z.enum(ALIGNS).default('side').describe('bento only: profile beside the grid (side) or above it (center)'),
+  style: z.enum(STYLES).default('cozy').describe('cozy = tiles as objects on a desk (polaroids, sticky notes, records); soft = pastel cards; editorial = a small magazine; terminal = ASCII shell; neon = cyberpunk night'),
+  layout: z.enum(LAYOUTS).default('bento').describe('bento = grid of tiles; list = Linktree-style stacked links'),
+  align: z.enum(ALIGNS).default('side').describe('soft style + bento only: profile beside the grid (side) or above it (center)'),
   background: Background.default(Background.parse({})),
   tileStyle: z.enum(TILE_STYLES).default('soft'),
   effect: z.enum(EFFECTS).default('lift').describe('Hover effect on tiles'),
@@ -120,6 +123,9 @@ function migrateTheme(input: unknown) {
   const t = { ...(input as Record<string, unknown>) };
   if (t.layout === 'split') { t.layout = 'bento'; t.align = t.align ?? 'side'; }
   if (t.layout === 'stack') { t.layout = 'bento'; t.align = t.align ?? 'center'; }
+  // Before styles existed, "desk" was a layout. Pages saved without a style keep the look they had.
+  if (t.layout === 'desk') { t.layout = 'bento'; t.style = t.style ?? 'cozy'; }
+  if (t.style === undefined && t.layout !== undefined) t.style = 'soft';
   return t;
 }
 

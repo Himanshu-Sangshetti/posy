@@ -1,5 +1,6 @@
 import { THEMES, themeVars, TINTS, type ThemeId } from './themes';
 import { EDITION_FONT_PAIRS } from '@/edition/fonts';
+import { PREMIUM } from '@/edition/premium';
 import type { Page, Tile } from './schema';
 
 const f = (body: string, head: string, weight: number | string, track: string, label: string) =>
@@ -16,6 +17,11 @@ export const FONT_PAIRS = {
   tech: f('--font-space', '--font-space', 600, '-0.035em', 'Tech'),
   mono: f('--font-geist', '--font-geist-mono', 500, '-0.04em', 'Mono'),
   hand: f('--font-geist', '--font-caveat', 700, '-0.01em', 'Handwritten'),
+  terminal: f('--font-plex-mono', '--font-vt323', 400, '0em', 'Terminal'),
+  cyber: f('--font-geist', '--font-chakra', 700, '0.01em', 'Cyber'),
+  storybook: f('--font-geist', '--font-young-serif', 400, '-0.01em', 'Storybook'),
+  journal: f('--font-geist', '--font-cormorant', 600, '-0.015em', 'Journal'),
+  stationery: f('--font-dm-sans', '--font-bodoni', 600, '-0.02em', 'Stationery'),
 } as const;
 type Pair = { '--font-body': string; '--font-head': string; '--head-weight': string; '--head-track': string; label: string };
 /** Built-in pairs plus any the edition adds (premium). */
@@ -23,7 +29,7 @@ export const ALL_FONT_PAIRS: Record<string, Pair> = {
   ...FONT_PAIRS,
   ...Object.fromEntries(Object.entries(EDITION_FONT_PAIRS).map(([k, v]) => [k, f(v.body, v.head, v.weight, v.track, v.label)])),
 };
-export const PREMIUM_FONTS = new Set(Object.keys(EDITION_FONT_PAIRS));
+export const PREMIUM_FONTS = new Set([...PREMIUM.fonts, ...Object.keys(EDITION_FONT_PAIRS)]);
 export const FONT_VARS = Object.fromEntries(Object.entries(ALL_FONT_PAIRS).map(([k, { label: _l, ...v }]) => [k, v])) as Record<string, Record<string, string>>;
 export const RADIUS_PX = { sharp: 12, soft: 20, round: 28, pill: 34 } as const;
 
@@ -44,7 +50,8 @@ export function pageClasses(page: Page): string {
   return [
     'posy-page',
     `posy-layout-${t.layout}`,
-    t.layout === 'desk' ? 'posy-desk' : t.layout === 'bento' && t.align === 'center' ? 'posy-center' : t.layout === 'bento' ? 'posy-side' : 'posy-center',
+    `posy-style-${t.style}`,
+    t.style !== 'soft' ? 'posy-top' : t.layout === 'bento' && t.align === 'center' ? 'posy-center' : t.layout === 'bento' ? 'posy-side' : 'posy-center',
     `posy-bg-${t.background.style}`,
     t.background.grain && 'posy-grain',
     `posy-tiles-${t.tileStyle}`,

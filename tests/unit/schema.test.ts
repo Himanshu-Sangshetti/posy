@@ -7,7 +7,7 @@ import { tileBackground } from '@/lib/style';
 describe('page format', () => {
   it('fills sensible defaults from a minimal page', () => {
     const p = parsePage({ profile: { name: 'Ada' } });
-    expect(p.theme).toMatchObject({ preset: 'cream', font: 'editorial', radius: 'round', layout: 'desk', align: 'side', tileStyle: 'soft', effect: 'lift', motion: true });
+    expect(p.theme).toMatchObject({ preset: 'cream', font: 'editorial', radius: 'round', style: 'cozy', layout: 'bento', align: 'side', tileStyle: 'soft', effect: 'lift', motion: true });
     expect(p.theme.background).toMatchObject({ style: 'solid', grain: true });
     expect(p.version).toBe(2);
     expect(p.tiles).toEqual([]);
@@ -48,6 +48,14 @@ describe('themes', () => {
     const x = { id: 'a', type: 'social', platform: 'x', handle: 'a', size: 's', color: 'auto' } as const;
     expect(tileBackground(x, 0, '000000')).toBe('var(--tint-peach)');
     expect(tileBackground({ ...x, platform: 'instagram' }, 0, 'FF0069')).toContain('#FF0069');
+  });
+});
+
+describe('styles', () => {
+  it('turns the old desk layout into the cozy style, and keeps older pages soft', () => {
+    expect(parsePage({ profile: { name: 'A' }, theme: { layout: 'desk' } }).theme).toMatchObject({ style: 'cozy', layout: 'bento' });
+    expect(parsePage({ profile: { name: 'A' }, theme: { layout: 'list' } }).theme).toMatchObject({ style: 'soft', layout: 'list' });
+    expect(parsePage({ profile: { name: 'A' }, theme: { style: 'neon', layout: 'list' } }).theme.style).toBe('neon');
   });
 });
 

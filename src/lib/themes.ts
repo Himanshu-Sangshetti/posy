@@ -1,4 +1,5 @@
 import { EDITION_THEMES } from '@/edition/themes';
+import { PREMIUM } from '@/edition/premium';
 
 /** Pastel tints available to every tile. Each theme maps them to its own shades. */
 export const TINTS = ['peach', 'butter', 'mint', 'sky', 'lilac', 'rose'] as const;
@@ -64,6 +65,34 @@ const BASE = {
     id: 'dusk', name: 'Dusk', dark: true, bg: '#17131f', surface: '#211b2c', text: '#efe9f7', muted: '#9a90ab', line: '#2e2639', accent: '#d7a6f2',
     tints: { peach: '#33232a', butter: '#2f2a25', mint: '#1f2a28', sky: '#1f2537', lilac: '#2c2240', rose: '#352135' },
   },
+  linen: light({
+    id: 'linen', name: 'Linen', bg: '#ebe3d3', surface: '#faf6ec', text: '#2e2a22', muted: '#5f5748', line: '#d9cfba', accent: '#a9794a',
+    tints: { peach: '#f4d9bf', butter: '#f3e6b4', mint: '#d6e4c8', sky: '#cfe0e6', lilac: '#ddd5e6', rose: '#f0d3d0' },
+  }),
+  matcha: light({
+    id: 'matcha', name: 'Matcha', bg: '#dfe6d6', surface: '#f5f8ef', text: '#232b21', muted: '#4f5d4b', line: '#c9d4bd', accent: '#5a7d4a',
+    tints: { peach: '#f2dccb', butter: '#eeeab9', mint: '#c9e4c8', sky: '#cde3e3', lilac: '#dcd8ea', rose: '#efd4d6' },
+  }),
+  rosewater: light({
+    id: 'rosewater', name: 'Rosewater', bg: '#f2dcdd', surface: '#fdf4f3', text: '#35222a', muted: '#6b4d56', line: '#e6c8cb', accent: '#b8456a',
+    tints: { peach: '#f9d9c8', butter: '#f6e8c0', mint: '#d9ebdc', sky: '#d6e3f1', lilac: '#e4d8f0', rose: '#f6c9d4' },
+  }),
+  'night-garden': {
+    id: 'night-garden', name: 'Night Garden', dark: true, bg: '#0f1a15', surface: '#18261f', text: '#e8f0e9', muted: '#aabdb0', line: '#27382f', accent: '#8fd3a4',
+    tints: { peach: '#4a3a31', butter: '#464030', mint: '#2f4b3c', sky: '#2f4553', lilac: '#403a56', rose: '#4c3640' },
+  },
+  phosphor: {
+    id: 'phosphor', name: 'Phosphor', dark: true, bg: '#070b08', surface: '#0d140f', text: '#c9f7cf', muted: '#6f9a76', line: '#1d2b20', accent: '#3dff8b',
+    tints: { peach: '#1d1a12', butter: '#1c1f10', mint: '#10241a', sky: '#0f1f22', lilac: '#17172a', rose: '#22131a' },
+  },
+  amber: {
+    id: 'amber', name: 'Amber', dark: true, bg: '#0d0904', surface: '#16100a', text: '#ffd79a', muted: '#a37f4f', line: '#2a1e10', accent: '#ffb000',
+    tints: { peach: '#2a170c', butter: '#2a2109', mint: '#13200f', sky: '#121b20', lilac: '#1c1524', rose: '#2a1216' },
+  },
+  synth: {
+    id: 'synth', name: 'Synth', dark: true, bg: '#08061a', surface: '#110d2a', text: '#f3eeff', muted: '#948bc4', line: '#241d4a', accent: '#ff3ea5',
+    tints: { peach: '#2a1426', butter: '#25221a', mint: '#0f2a2a', sky: '#0e1f38', lilac: '#20164a', rose: '#2e0f2c' },
+  },
   ocean: {
     id: 'ocean', name: 'Ocean', dark: true, bg: '#0d171d', surface: '#14212a', text: '#e6f1f5', muted: '#86a0ab', line: '#1e2f39', accent: '#7fd1c7',
     tints: { peach: '#2b2523', butter: '#26281f', mint: '#16302c', sky: '#172b3a', lilac: '#202538', rose: '#2b2129' },
@@ -75,7 +104,7 @@ export const THEMES: Record<string, Theme> = { ...BASE, ...EDITION_THEMES };
 export type ThemeId = string;
 export const THEME_IDS = Object.keys(THEMES) as [string, ...string[]];
 /** Themes that need the premium entitlement (only exist in editions that add them). */
-export const PREMIUM_THEMES = new Set(Object.keys(EDITION_THEMES));
+export const PREMIUM_THEMES = new Set([...PREMIUM.themes, ...Object.keys(EDITION_THEMES)]);
 
 /** CSS custom properties for a theme (+ optional accent override). */
 export function themeVars(id: ThemeId, accent?: string): Record<string, string> {
