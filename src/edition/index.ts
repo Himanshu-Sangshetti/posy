@@ -9,5 +9,5 @@ export const edition: Edition = {
   signup,
   root: 'owner-page',
   // Your server, your rules: everything the open-source edition has is unlocked.
-  entitlements: async () => ({ plan: 'self-hosted', removeBranding: true, analyticsDays: 365, analyticsExport: true, premium: false, customDomain: false }),
+  entitlements: async () => ({ plan: 'self-hosted', removeBranding: true, analyticsDays: 365, analyticsExport: true, premium: true, customDomain: true }),
 };

@@ -8,22 +8,49 @@
 
 ---
 
-When Linktree bought Bento and shut it down, a lot of people lost a page they loved. Posy is the
-page that can't be taken away: it's open source, you can run it yourself with one Docker command,
-and you can export your whole page as JSON at any time.
+Posy makes a link-in-bio page that looks like a desk: polaroids, sticky notes, a record that spins.
+It is open source, and there are two ways to use it.
 
-- **Looks good by default.** The Desk layout turns your links into things on a desk: polaroids, sticky notes, a record
-  that spins, an envelope that opens. Or use a classic bento grid or a simple list. Twelve themes, ten font pairs.
-- **A calm editor.** Paste any link and it becomes the right tile. Drag to reorder. Click to edit. That's it.
-- **Yours forever.** Self-host with Docker or Vercel, export your page as JSON whenever you like. No lock-in.
-- **Agent friendly.** API keys, a REST API, a hosted MCP server and a CLI. The studio updates live when your agent edits the page.
-- **Fast.** Server-rendered, works with JavaScript turned off, entrance animations in pure CSS.
+## Two ways to use Posy
+
+**Run it yourself.** Download Posy and host it on your own server or domain. Everything is
+unlocked: every layout, theme and font, analytics with CSV export, your own domain, no badge to remove.
+The first account you create owns the instance, and `/` is your page.
+
+**Use posy.page.** The same app, hosted by us. Sign up and your page is live in a minute. Nothing to
+install, update or back up. There is a free plan, and Pro ($5/month or $48/year) adds the extras below.
+
+| | Self-hosted | posy.page Free | posy.page Pro |
+|---|---|---|---|
+| Layouts, tiles, editor, API, MCP, CLI | All | All | All |
+| Premium themes and fonts | Yes | No | Yes |
+| Your own domain | Yes, point it at your server | No | Yes, HTTPS set up for you |
+| Analytics | 12 months + CSV | Basic | 12 months + CSV |
+| "Made with Posy" footer | Hide it | Shown | Hide it |
+| Setup and upkeep | You | None | None |
+| Support | GitHub issues | GitHub issues | Priority |
 
 <p align="center">
   <img src="docs/media/studio.webp" alt="The Posy studio with the Design panel open" width="900">
 </p>
 
+### Moving between them
+
+Your page is one JSON file, and it works the same on both. In **Settings**, press **Download page.json**
+on one and **Import page.json** on the other. The import lands in your draft, so nothing changes
+on your live page until you press Publish. Photos you uploaded are saved as full links, so they keep
+loading from the old server; keep it running until you have re-uploaded them.
+
+The REST API, the MCP server and the CLI are the same on both too. Point `POSY_URL` at whichever one you use:
+
+```bash
+POSY_URL=https://posy.page POSY_API_KEY=posy_... npm run posy -- export page.json
+POSY_URL=https://my.server POSY_API_KEY=posy_... npm run posy -- import page.json
+```
+
 ## Run it yourself
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FHimanshu-Sangshetti%2Fposy&env=BETTER_AUTH_SECRET,NEXT_PUBLIC_SITE_URL,BETTER_AUTH_URL,DATABASE_URL,DATABASE_AUTH_TOKEN,BLOB_READ_WRITE_TOKEN&envDescription=Secret%20(openssl%20rand%20-base64%2032)%2C%20your%20public%20URL%2C%20a%20Turso%20database%20and%20a%20Vercel%20Blob%20token&envLink=https%3A%2F%2Fgithub.com%2FHimanshu-Sangshetti%2Fposy%2Fblob%2Fv2%2Fdocs%2Fself-hosting.md)
 
 ### Docker
 
@@ -38,8 +65,10 @@ docker run -p 3000:3000 -v posy-data:/data \
 
 Or `docker compose up` (change `BETTER_AUTH_SECRET` in `docker-compose.yml` first). Open
 http://localhost:3000 and sign up. **The first account owns the instance, then sign-ups close.**
-Your page lives at `/` and at `/<username>`. Data (SQLite) is stored in the `/data` volume, and
-migrations run on start.
+Data (SQLite) lives in the `/data` volume, and migrations run on start.
+
+Docker Compose, Vercel with Turso and Blob, custom domains, backups and upgrades are in
+[docs/self-hosting.md](docs/self-hosting.md).
 
 ### From source
 
@@ -77,7 +106,7 @@ Sign in and open **Edit**.
 | **Share** | QR code and link for your page. |
 
 Dashboard pages: **Analytics** (views and clicks per tile), **Agents** (API keys and setup snippets),
-**Settings** (change username, export your page as JSON, delete your account).
+**Settings** (change username, download or import your page as JSON, delete your account).
 
 <p align="center">
   <img src="docs/media/add.webp" alt="Adding a tile by pasting a link" width="900">
@@ -129,9 +158,7 @@ See [docs/ai-agents.md](docs/ai-agents.md).
 
 ## Deploying
 
-- **Docker** anywhere (see above). Mount `/data`.
-- **Vercel**: import the repo, set `DATABASE_URL` + `DATABASE_AUTH_TOKEN` (Turso), `BLOB_READ_WRITE_TOKEN`,
-  `BETTER_AUTH_SECRET` and `NEXT_PUBLIC_SITE_URL`. Migrations run on start.
+Docker, Docker Compose, Vercel or any Node host. Step by step in [docs/self-hosting.md](docs/self-hosting.md).
 
 ## Built with
 
