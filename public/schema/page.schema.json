@@ -60,7 +60,27 @@
             "midnight",
             "mocha",
             "dusk",
-            "ocean"
+            "linen",
+            "matcha",
+            "rosewater",
+            "night-garden",
+            "phosphor",
+            "amber",
+            "synth",
+            "ocean",
+            "oak",
+            "slate",
+            "white",
+            "stone",
+            "ink",
+            "kinari",
+            "sakura",
+            "yomogi",
+            "sumi",
+            "night-blue",
+            "violet",
+            "rain",
+            "sunset"
           ]
         },
         "accent": {
@@ -74,6 +94,8 @@
           "enum": [
             "soft",
             "editorial",
+            "washi",
+            "lofi",
             "classic",
             "elegant",
             "rounded",
@@ -81,7 +103,12 @@
             "modern",
             "tech",
             "mono",
-            "hand"
+            "hand",
+            "terminal",
+            "cyber",
+            "storybook",
+            "journal",
+            "stationery"
           ]
         },
         "radius": {
@@ -94,19 +121,29 @@
             "pill"
           ]
         },
-        "layout": {
-          "default": "desk",
-          "description": "desk = tiles as objects on a desk (polaroids, notes, records); bento = tile grid; list = Linktree-style stacked links",
+        "style": {
+          "default": "cozy",
+          "description": "cozy = Desk: tiles as objects on a desk (polaroids, sticky notes, records); minimal = quiet type and plain cards; washi = a Japanese print (paper, ink, kanji numerals, red seal); lofi = a night-time anime still (tiles as little app windows, halftone photos)",
           "type": "string",
           "enum": [
-            "desk",
+            "cozy",
+            "minimal",
+            "washi",
+            "lofi"
+          ]
+        },
+        "layout": {
+          "default": "bento",
+          "description": "bento = grid of tiles; list = Linktree-style stacked links",
+          "type": "string",
+          "enum": [
             "bento",
             "list"
           ]
         },
         "align": {
           "default": "side",
-          "description": "bento only: profile beside the grid (side) or above it (center)",
+          "description": "minimal style + bento only: profile beside the grid (side) or above it (center)",
           "type": "string",
           "enum": [
             "side",
@@ -127,9 +164,6 @@
               "type": "string",
               "enum": [
                 "solid",
-                "gradient",
-                "mesh",
-                "aurora",
                 "dots",
                 "grid",
                 "image"
@@ -239,7 +273,7 @@
               },
               "color": {
                 "default": "auto",
-                "description": "Tile background. \"auto\" picks a pastel from the theme",
+                "description": "Tile background. \"auto\" is the plain card colour; pick a tint to colour one tile",
                 "type": "string",
                 "enum": [
                   "auto",
@@ -301,7 +335,7 @@
               },
               "color": {
                 "default": "auto",
-                "description": "Tile background. \"auto\" picks a pastel from the theme",
+                "description": "Tile background. \"auto\" is the plain card colour; pick a tint to colour one tile",
                 "type": "string",
                 "enum": [
                   "auto",
@@ -393,7 +427,7 @@
               },
               "color": {
                 "default": "auto",
-                "description": "Tile background. \"auto\" picks a pastel from the theme",
+                "description": "Tile background. \"auto\" is the plain card colour; pick a tint to colour one tile",
                 "type": "string",
                 "enum": [
                   "auto",
@@ -452,7 +486,7 @@
               },
               "color": {
                 "default": "auto",
-                "description": "Tile background. \"auto\" picks a pastel from the theme",
+                "description": "Tile background. \"auto\" is the plain card colour; pick a tint to colour one tile",
                 "type": "string",
                 "enum": [
                   "auto",
@@ -503,7 +537,7 @@
               },
               "color": {
                 "default": "auto",
-                "description": "Tile background. \"auto\" picks a pastel from the theme",
+                "description": "Tile background. \"auto\" is the plain card colour; pick a tint to colour one tile",
                 "type": "string",
                 "enum": [
                   "auto",
@@ -565,7 +599,7 @@
               },
               "color": {
                 "default": "auto",
-                "description": "Tile background. \"auto\" picks a pastel from the theme",
+                "description": "Tile background. \"auto\" is the plain card colour; pick a tint to colour one tile",
                 "type": "string",
                 "enum": [
                   "auto",
@@ -623,7 +657,7 @@
               },
               "color": {
                 "default": "auto",
-                "description": "Tile background. \"auto\" picks a pastel from the theme",
+                "description": "Tile background. \"auto\" is the plain card colour; pick a tint to colour one tile",
                 "type": "string",
                 "enum": [
                   "auto",
@@ -685,7 +719,7 @@
               },
               "color": {
                 "default": "auto",
-                "description": "Tile background. \"auto\" picks a pastel from the theme",
+                "description": "Tile background. \"auto\" is the plain card colour; pick a tint to colour one tile",
                 "type": "string",
                 "enum": [
                   "auto",

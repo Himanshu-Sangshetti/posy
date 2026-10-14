@@ -6,7 +6,7 @@ import './globals.css';
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: { default: 'Posy · A beautiful link in bio', template: '%s' },
-  description: 'One beautiful page for all your links. Pastel themes, soft motion, and an editor your AI agent can use. Free and open source.',
+  description: 'A link in bio that looks like you made it by hand. Four looks, an editor your AI agent can use, free and open source.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

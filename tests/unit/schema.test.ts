@@ -44,18 +44,26 @@ describe('themes', () => {
   it('accent override wins', () => {
     expect(themeVars('cream', '#123456')['--accent']).toBe('#123456');
   });
-  it('black brands get a pastel, colourful brands a tint of their own colour', () => {
+  it('keeps auto tiles plain, and uses a colour only when one was picked', () => {
     const x = { id: 'a', type: 'social', platform: 'x', handle: 'a', size: 's', color: 'auto' } as const;
-    expect(tileBackground(x, 0, '000000')).toBe('var(--tint-peach)');
-    expect(tileBackground({ ...x, platform: 'instagram' }, 0, 'FF0069')).toContain('#FF0069');
+    expect(tileBackground(x, 0, '000000')).toBe('var(--surface)');
+    expect(tileBackground({ ...x, platform: 'instagram' }, 3, 'FF0069')).toBe('var(--surface)');
+    expect(tileBackground({ ...x, color: 'mint' }, 0)).toBe('var(--tint-mint)');
   });
 });
 
 describe('styles', () => {
-  it('turns the old desk layout into the cozy style, and keeps older pages soft', () => {
+  it('turns the old desk layout into the cozy style, and moves retired styles to the closest new one', () => {
     expect(parsePage({ profile: { name: 'A' }, theme: { layout: 'desk' } }).theme).toMatchObject({ style: 'cozy', layout: 'bento' });
-    expect(parsePage({ profile: { name: 'A' }, theme: { layout: 'list' } }).theme).toMatchObject({ style: 'soft', layout: 'list' });
-    expect(parsePage({ profile: { name: 'A' }, theme: { style: 'neon', layout: 'list' } }).theme.style).toBe('neon');
+    expect(parsePage({ profile: { name: 'A' }, theme: { layout: 'list' } }).theme).toMatchObject({ style: 'minimal', layout: 'list' });
+    expect(parsePage({ profile: { name: 'A' }, theme: { style: 'neon', layout: 'list' } }).theme.style).toBe('lofi');
+    for (const s of ['soft', 'editorial', 'terminal']) expect(parsePage({ profile: { name: 'A' }, theme: { style: s } }).theme.style).toBe('minimal');
+    expect(parsePage({ profile: { name: 'A' }, theme: { style: 'washi' } }).theme.style).toBe('washi');
+  });
+
+  it('turns blended backgrounds into a solid colour', () => {
+    for (const b of ['gradient', 'mesh', 'aurora']) expect(parsePage({ profile: { name: 'A' }, theme: { background: { style: b } } }).theme.background.style).toBe('solid');
+    expect(parsePage({ profile: { name: 'A' }, theme: { background: { style: 'dots' } } }).theme.background.style).toBe('dots');
   });
 });
 

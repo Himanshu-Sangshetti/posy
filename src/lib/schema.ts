@@ -5,15 +5,17 @@ import { EDITION_FONT_PAIRS } from '@/edition/fonts';
 
 /** Tile footprint on the grid: small square, wide, tall, large square. */
 export const SIZES = ['s', 'w', 't', 'l'] as const;
-export const BASE_FONTS = ['soft', 'editorial', 'classic', 'elegant', 'rounded', 'playful', 'modern', 'tech', 'mono', 'hand', 'terminal', 'cyber', 'storybook', 'journal', 'stationery'] as const;
+export const BASE_FONTS = ['soft', 'editorial', 'washi', 'lofi', 'classic', 'elegant', 'rounded', 'playful', 'modern', 'tech', 'mono', 'hand', 'terminal', 'cyber', 'storybook', 'journal', 'stationery'] as const;
 export const FONTS = [...BASE_FONTS, ...Object.keys(EDITION_FONT_PAIRS)] as [string, ...string[]];
 export const RADII = ['sharp', 'soft', 'round', 'pill'] as const;
 /** The look of the whole page. Independent of the layout. */
-export const STYLES = ['cozy', 'soft', 'editorial', 'terminal', 'neon'] as const;
+export const STYLES = ['cozy', 'minimal', 'washi', 'lofi'] as const;
+/** Styles that were retired, and the look each one moves to. */
+const RETIRED_STYLES: Record<string, (typeof STYLES)[number]> = { soft: 'minimal', editorial: 'minimal', terminal: 'minimal', neon: 'lofi' };
 export const LAYOUTS = ['bento', 'list'] as const;
 export const TEXT_LOOKS = ['note', 'stamp'] as const;
 export const ALIGNS = ['side', 'center'] as const;
-export const BACKGROUNDS = ['solid', 'gradient', 'mesh', 'aurora', 'dots', 'grid', 'image'] as const;
+export const BACKGROUNDS = ['solid', 'dots', 'grid', 'image'] as const;
 export const TILE_STYLES = ['soft', 'glass', 'outline', 'solid'] as const;
 export const EFFECTS = ['lift', 'tilt', 'glow', 'none'] as const;
 export const AVATARS = ['squircle', 'circle', 'square', 'hidden'] as const;
@@ -24,7 +26,7 @@ const url = z.string().min(1).describe('Absolute URL (https://...) or a path ins
 const base = {
   id,
   size: z.enum(SIZES).default('s').describe('s = 1x1, w = 2x1, t = 1x2, l = 2x2'),
-  color: z.enum(COLORS).default('auto').describe('Tile background. "auto" picks a pastel from the theme'),
+  color: z.enum(COLORS).default('auto').describe('Tile background. "auto" is the plain card colour; pick a tint to colour one tile'),
 };
 
 export const LinkTile = z.object({
@@ -107,9 +109,9 @@ export const Theme = z.object({
   accent: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().describe('Override the theme accent, e.g. "#e8a87c"'),
   font: z.enum(FONTS).default('editorial'),
   radius: z.enum(RADII).default('round'),
-  style: z.enum(STYLES).default('cozy').describe('cozy = tiles as objects on a desk (polaroids, sticky notes, records); soft = pastel cards; editorial = a small magazine; terminal = ASCII shell; neon = cyberpunk night'),
+  style: z.enum(STYLES).default('cozy').describe('cozy = Desk: tiles as objects on a desk (polaroids, sticky notes, records); minimal = quiet type and plain cards; washi = a Japanese print (paper, ink, kanji numerals, red seal); lofi = a night-time anime still (tiles as little app windows, halftone photos)'),
   layout: z.enum(LAYOUTS).default('bento').describe('bento = grid of tiles; list = Linktree-style stacked links'),
-  align: z.enum(ALIGNS).default('side').describe('soft style + bento only: profile beside the grid (side) or above it (center)'),
+  align: z.enum(ALIGNS).default('side').describe('minimal style + bento only: profile beside the grid (side) or above it (center)'),
   background: Background.default(Background.parse({})),
   tileStyle: z.enum(TILE_STYLES).default('soft'),
   effect: z.enum(EFFECTS).default('lift').describe('Hover effect on tiles'),
@@ -125,7 +127,11 @@ function migrateTheme(input: unknown) {
   if (t.layout === 'stack') { t.layout = 'bento'; t.align = t.align ?? 'center'; }
   // Before styles existed, "desk" was a layout. Pages saved without a style keep the look they had.
   if (t.layout === 'desk') { t.layout = 'bento'; t.style = t.style ?? 'cozy'; }
-  if (t.style === undefined && t.layout !== undefined) t.style = 'soft';
+  if (t.style === undefined && t.layout !== undefined) t.style = 'minimal';
+  if (typeof t.style === 'string' && RETIRED_STYLES[t.style]) t.style = RETIRED_STYLES[t.style];
+  // Blended backgrounds were retired: pages keep their colour, as a single solid one.
+  const bg = t.background as Record<string, unknown> | undefined;
+  if (bg && ['gradient', 'mesh', 'aurora'].includes(String(bg.style))) t.background = { ...bg, style: 'solid' };
   return t;
 }
 

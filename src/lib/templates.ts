@@ -2,11 +2,11 @@ import { parsePage, newId, type Page } from './schema';
 import type { StyleId } from './styles';
 
 export const TEMPLATES = {
-  desk: { label: 'Cozy', note: 'Polaroids, notes and records' },
-  writer: { label: 'Editorial', note: 'A small magazine' },
-  developer: { label: 'Terminal', note: 'ASCII, repos up front' },
-  night: { label: 'Neon', note: 'A cyberpunk night' },
-  creator: { label: 'Soft', note: 'Pastel cards' },
+  desk: { label: 'Desk', note: 'Polaroids, notes and a record' },
+  writer: { label: 'Washi', note: 'Paper, ink and a red seal' },
+  developer: { label: 'Developer', note: 'Repos up front, in ink' },
+  night: { label: 'Lofi', note: 'A night-time anime still' },
+  creator: { label: 'Minimal', note: 'Quiet type, lots of room' },
   links: { label: 'Links', note: 'A clean list, like Linktree' },
   blank: { label: 'Blank', note: 'Start from nothing' },
 } as const;
@@ -41,7 +41,7 @@ export function template(id: TemplateId, name: string): Page {
     case 'writer':
       return parsePage({
         profile: { ...profile, bio: 'Writer and editor. Essays about small things, mostly.', location: 'Lisbon' },
-        theme: { style: 'editorial', preset: 'paper', font: 'elegant', layout: 'bento', avatar: 'circle' },
+        theme: { style: 'washi', preset: 'kinari', font: 'washi', layout: 'bento', avatar: 'square' },
         tiles: ids([
           { type: 'social', platform: 'substack', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'x', handle: 'yourname', size: 's' },
@@ -57,7 +57,7 @@ export function template(id: TemplateId, name: string): Page {
     case 'night':
       return parsePage({
         profile: { ...profile, bio: 'Building weird things after dark. Synths, shaders, side projects.', location: 'Night city' },
-        theme: { style: 'neon', preset: 'synth', font: 'cyber', layout: 'bento' },
+        theme: { style: 'lofi', preset: 'night-blue', font: 'lofi', layout: 'bento' },
         tiles: ids([
           { type: 'social', platform: 'github', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'x', handle: 'yourname', size: 's' },
@@ -72,7 +72,7 @@ export function template(id: TemplateId, name: string): Page {
     case 'creator':
       return parsePage({
         profile: { ...profile, bio: 'Making things on the internet. Say hi.' },
-        theme: { style: 'soft', preset: 'lavender', font: 'soft', layout: 'bento', align: 'side', background: { style: 'mesh' }, tileStyle: 'glass' },
+        theme: { style: 'minimal', preset: 'paper', font: 'editorial', layout: 'bento', align: 'side' },
         tiles: ids([
           { type: 'social', platform: 'instagram', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'youtube', handle: 'yourname', size: 's' },
@@ -85,7 +85,7 @@ export function template(id: TemplateId, name: string): Page {
     case 'developer':
       return parsePage({
         profile: { ...profile, bio: 'I build tools for developers.' },
-        theme: { style: 'terminal', preset: 'phosphor', font: 'terminal', layout: 'bento', radius: 'sharp', effect: 'none' },
+        theme: { style: 'minimal', preset: 'ink', font: 'mono', layout: 'bento', radius: 'sharp' },
         tiles: ids([
           { type: 'social', platform: 'github', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'x', handle: 'yourname', size: 's' },
@@ -98,7 +98,7 @@ export function template(id: TemplateId, name: string): Page {
     case 'links':
       return parsePage({
         profile: { ...profile, bio: 'All my links in one place.' },
-        theme: { style: 'soft', preset: 'peach', font: 'classic', layout: 'list', radius: 'pill', background: { style: 'gradient' }, tileStyle: 'solid', avatar: 'circle' },
+        theme: { style: 'minimal', preset: 'white', font: 'editorial', layout: 'list', radius: 'soft', avatar: 'circle' },
         tiles: ids([
           { type: 'social', platform: 'instagram', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'tiktok', handle: 'yourname', size: 's' },
@@ -113,7 +113,7 @@ export function template(id: TemplateId, name: string): Page {
 }
 
 /** The sample content shown for each style when you start from it. */
-export const STYLE_STARTERS: Record<StyleId, TemplateId> = { cozy: 'desk', editorial: 'writer', terminal: 'developer', neon: 'night', soft: 'creator' };
+export const STYLE_STARTERS: Record<StyleId, TemplateId> = { cozy: 'desk', minimal: 'creator', washi: 'writer', lofi: 'night' };
 
 /** A new page from independent choices: style, layout and colours (plus sample content or an empty page). */
 export function starterPage(o: { name: string; style: StyleId; layout?: 'bento' | 'list'; preset?: string; empty?: boolean }): Page {

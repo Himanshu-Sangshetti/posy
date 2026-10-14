@@ -9,6 +9,8 @@ const f = (body: string, head: string, weight: number | string, track: string, l
 export const FONT_PAIRS = {
   soft: f('--font-dm-sans', '--font-fraunces', 520, '-0.025em', 'Soft'),
   editorial: f('--font-geist', '--font-serif', 400, '-0.01em', 'Editorial'),
+  washi: f('--font-geist', '--font-cormorant', 600, '0.01em', 'Washi'),
+  lofi: f('--font-geist', '--font-geist', 500, '0em', 'Lofi'),
   classic: f('--font-geist', '--font-fraunces', 560, '-0.03em', 'Classic'),
   elegant: f('--font-dm-sans', '--font-dm-serif', 400, '-0.015em', 'Elegant'),
   rounded: f('--font-nunito', '--font-nunito', 800, '-0.02em', 'Rounded'),
@@ -51,7 +53,7 @@ export function pageClasses(page: Page): string {
     'posy-page',
     `posy-layout-${t.layout}`,
     `posy-style-${t.style}`,
-    t.style !== 'soft' ? 'posy-top' : t.layout === 'bento' && t.align === 'center' ? 'posy-center' : t.layout === 'bento' ? 'posy-side' : 'posy-center',
+    t.style !== 'minimal' ? 'posy-top' : t.layout === 'bento' && t.align === 'center' ? 'posy-center' : t.layout === 'bento' ? 'posy-side' : 'posy-center',
     `posy-bg-${t.background.style}`,
     t.background.grain && 'posy-grain',
     `posy-tiles-${t.tileStyle}`,
@@ -63,19 +65,17 @@ export function pageClasses(page: Page): string {
 }
 export const isDark = (page: Page) => THEMES[page.theme.preset as ThemeId]?.dark ?? false;
 
-/** Background for a tile. "auto" cycles pastel tints; social tiles get a whisper of their brand colour. */
+/** Background for a tile: the plain card colour, or the tint someone picked for it. */
 export function tileBackground(tile: Tile, index: number, brandHex?: string): string {
   const c = tile.color;
   if (c === 'surface') return 'var(--surface)';
   if (c === 'accent') return 'color-mix(in oklab, var(--accent) 22%, var(--surface))';
   if (c !== 'auto') return `var(--tint-${c})`;
-  if (tile.type === 'social' && brandHex && isColourful(brandHex)) return `color-mix(in oklab, #${brandHex} 10%, var(--surface))`;
-  if (tile.type === 'image' || tile.type === 'video' || tile.type === 'music') return 'var(--surface)';
-  return `var(--tint-${AUTO_TINTS[index % AUTO_TINTS.length]})`;
+  // Auto tiles stay plain: colour only where someone chose it, so a page never turns into a patchwork.
+  void index; void brandHex;
+  return 'var(--surface)';
 }
 
-/** The order "auto" tiles take their colours in: warm and cool alternate, so neighbours never clash. */
-const AUTO_TINTS = ['peach', 'lilac', 'mint', 'butter', 'sky', 'rose'] as const satisfies readonly (typeof TINTS)[number][];
 
 /** True when a brand colour is saturated enough to tint a tile (black/white brands are not). */
 export function isColourful(hex: string) {

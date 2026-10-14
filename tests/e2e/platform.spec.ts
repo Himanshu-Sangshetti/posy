@@ -31,13 +31,13 @@ test('design changes save to the draft', async ({ page }) => {
   await page.getByRole('button', { name: 'Design' }).click();
   await page.getByRole('button', { name: 'Glass' }).click();
   await page.getByRole('tab', { name: 'Colour' }).click();
-  await page.getByRole('button', { name: 'Midnight' }).click();
+  await page.getByRole('button', { name: 'Ink', exact: true }).click();
   await page.getByRole('tab', { name: 'Backdrop' }).click();
-  await page.getByRole('button', { name: 'Aurora' }).click();
+  await page.getByRole('button', { name: 'Dots' }).click();
   await page.getByRole('tab', { name: 'Type' }).click();
   await page.getByRole('button', { name: 'Modern font' }).click();
   await saved(page);
-  await expect.poll(async () => (await draft(page)).page.theme).toMatchObject({ preset: 'midnight', background: { style: 'aurora' }, tileStyle: 'glass', font: 'modern' });
+  await expect.poll(async () => (await draft(page)).page.theme).toMatchObject({ preset: 'ink', background: { style: 'dots' }, tileStyle: 'glass', font: 'modern' });
   await expect(page.locator('html')).toHaveClass(/dark/);
 });
 
@@ -208,14 +208,14 @@ test('onboarding lets you choose style, layout and colours separately', async ({
   await page.click('button[type=submit]');
   await page.waitForURL(/onboarding/);
   await expect(page.getByRole('status').filter({ hasText: 'Available' })).toBeVisible();
-  await page.click('[data-style="editorial"]');
+  await page.click('[data-style="washi"]');
   await page.click('[data-layout="list"]');
-  await page.click('[data-preset="mint"]');
-  await expect(page.frameLocator('iframe[title="Live preview of your page"]').getByText('Test Person').first()).toBeVisible({ timeout: 15_000 });
+  await page.click('[data-preset="sakura"]');
+  await expect(page.frameLocator('iframe[title="Live preview of your page"]').getByRole('heading', { name: 'Test Person' }).first()).toBeVisible({ timeout: 15_000 });
   await page.getByRole('button', { name: 'Create my page' }).click();
   await page.waitForURL(/\/edit/);
   const { page: d } = await page.request.get('/api/v1/page').then(r => r.json());
-  expect(d.theme.style).toBe('editorial');
+  expect(d.theme.style).toBe('washi');
   expect(d.theme.layout).toBe('list');
-  expect(d.theme.preset).toBe('mint');
+  expect(d.theme.preset).toBe('sakura');
 });

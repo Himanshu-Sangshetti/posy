@@ -274,24 +274,6 @@ a.posy-tile:hover { box-shadow: 0 2px 4px rgb(20 16 12 / .05), 0 22px 44px -22px
 .posy-grain .posy-noise { display: block; }
 .dark .posy-noise { opacity: .07; mix-blend-mode: screen; }
 
-.posy-bg-gradient .posy-backdrop { background:
-  linear-gradient(168deg, color-mix(in oklab, var(--tint-peach) 80%, var(--bg)) 0%, var(--bg) 46%, color-mix(in oklab, var(--tint-sky) 75%, var(--bg)) 100%); }
-
-.posy-bg-mesh .posy-backdrop::before, .posy-bg-aurora .posy-backdrop::before { background:
-  radial-gradient(at 12% 16%, var(--tint-peach) 0, transparent 46%),
-  radial-gradient(at 86% 10%, var(--tint-lilac) 0, transparent 44%),
-  radial-gradient(at 74% 86%, var(--tint-mint) 0, transparent 48%),
-  radial-gradient(at 14% 90%, var(--tint-sky) 0, transparent 42%),
-  radial-gradient(at 52% 46%, var(--tint-butter) 0, transparent 50%); }
-
-.posy-bg-aurora .posy-backdrop::before { inset: -25%; filter: blur(48px) saturate(1.15); }
-.posy-motion.posy-bg-aurora .posy-backdrop::before { animation: posy-aurora 26s ease-in-out infinite alternate; }
-@keyframes posy-aurora {
-  0% { transform: translate3d(-4%, -3%, 0) rotate(0deg) scale(1); }
-  50% { transform: translate3d(5%, 4%, 0) rotate(8deg) scale(1.12); }
-  100% { transform: translate3d(-3%, 6%, 0) rotate(-6deg) scale(1.04); }
-}
-
 .posy-bg-dots .posy-backdrop::before {
   background: radial-gradient(color-mix(in oklab, var(--text) 16%, transparent) 1.1px, transparent 1.6px) 0 0 / 22px 22px;
   -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 30%, transparent 100%); mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 30%, transparent 100%);
@@ -333,10 +315,9 @@ a.posy-tile:hover { box-shadow: 0 2px 4px rgb(20 16 12 / .05), 0 22px 44px -22px
 .dk-hand { font-family: var(--font-caveat), cursive; font-weight: 600; }
 .dk-serif { font-family: var(--font-head); font-weight: var(--head-weight, 400); letter-spacing: var(--head-track, -0.01em); }
 .dk-mono { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
-.posy-style-cozy.posy-bg-solid .posy-backdrop::before { background:
-  radial-gradient(50vw 40vw at 6% 0%, color-mix(in oklab, var(--tint-peach) 70%, transparent), transparent 70%),
-  radial-gradient(45vw 40vw at 100% 45%, color-mix(in oklab, var(--tint-lilac) 60%, transparent), transparent 70%),
-  radial-gradient(40vw 30vw at 15% 100%, color-mix(in oklab, var(--tint-mint) 60%, transparent), transparent 70%); }
+/* Desk: a plain tabletop, lit from one side; no colour washes */
+.posy-style-cozy.posy-bg-solid .posy-backdrop::before { background: radial-gradient(90vw 60vw at 20% 0%, color-mix(in oklab, #fff 28%, transparent), transparent 70%); }
+.dark.posy-style-cozy.posy-bg-solid .posy-backdrop::before { background: radial-gradient(90vw 60vw at 20% 0%, rgb(255 255 255 / .04), transparent 70%); }
 
 /* header: a polaroid of you, a big name, stickers */
 .dk-profile { display: grid; gap: 26px; align-items: end; }

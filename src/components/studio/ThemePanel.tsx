@@ -8,7 +8,7 @@ import { FONTS, RADII, BACKGROUNDS, TILE_STYLES, EFFECTS, AVATARS } from '@/lib/
 import { THEMES, THEME_IDS, PREMIUM_THEMES, type ThemeId } from '@/lib/themes';
 import { ALL_FONT_PAIRS as FONT_PAIRS, FONT_VARS, PREMIUM_FONTS } from '@/lib/style';
 import { useEntitlements } from './entitlements';
-import { STYLE_IDS, STYLE_INFO, PREMIUM_STYLES, type StyleId } from '@/lib/styles';
+import { STYLE_IDS, STYLE_INFO, STYLE_PALETTES, PREMIUM_STYLES, type StyleId } from '@/lib/styles';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
@@ -22,7 +22,7 @@ const Label = ({ children, hint }: { children: React.ReactNode; hint?: string })
   <div className="flex items-baseline justify-between gap-3"><p className="sc-eyebrow">{children}</p>{hint && <p className="text-[11.5px] text-[var(--muted)]">{hint}</p>}</div>
 );
 
-const BG_LABEL: Record<(typeof BACKGROUNDS)[number], string> = { solid: 'Solid', gradient: 'Gradient', mesh: 'Mesh', aurora: 'Aurora', dots: 'Dots', grid: 'Grid', image: 'Photo' };
+const BG_LABEL: Record<(typeof BACKGROUNDS)[number], string> = { solid: 'Solid', dots: 'Dots', grid: 'Grid', image: 'Photo' };
 const TILE_LABEL: Record<(typeof TILE_STYLES)[number], string> = { soft: 'Soft', glass: 'Glass', outline: 'Outline', solid: 'Solid' };
 const FX_LABEL: Record<(typeof EFFECTS)[number], string> = { lift: 'Lift', tilt: 'Tilt', glow: 'Glow', none: 'None' };
 const AVATAR_LABEL: Record<(typeof AVATARS)[number], string> = { squircle: 'Squircle', circle: 'Circle', square: 'Square', hidden: 'Hidden' };
@@ -31,17 +31,13 @@ const RADIUS_GLYPH: Record<(typeof RADII)[number], string> = { sharp: '3px', sof
 /** Mini swatch that previews a background style with the current theme. */
 function BgSwatch({ style, page }: { style: (typeof BACKGROUNDS)[number]; page: Page }) {
   const t = THEMES[page.theme.preset as ThemeId];
-  const tt = t.tints;
   const bg: Record<string, string> = {
     solid: t.bg,
-    gradient: `linear-gradient(160deg, ${tt.peach}, ${t.bg} 50%, ${tt.sky})`,
-    mesh: `radial-gradient(at 15% 20%, ${tt.peach}, transparent 55%), radial-gradient(at 85% 15%, ${tt.lilac}, transparent 55%), radial-gradient(at 70% 85%, ${tt.mint}, transparent 55%), ${t.bg}`,
-    aurora: `radial-gradient(at 30% 30%, ${tt.rose}, transparent 60%), radial-gradient(at 75% 60%, ${tt.sky}, transparent 60%), radial-gradient(at 40% 90%, ${tt.butter}, transparent 55%), ${t.bg}`,
     dots: `radial-gradient(${t.muted}55 1px, transparent 1.4px) 0 0 / 8px 8px, ${t.bg}`,
     grid: `linear-gradient(${t.muted}30 1px, transparent 1px) 0 0 / 12px 12px, linear-gradient(90deg, ${t.muted}30 1px, transparent 1px) 0 0 / 12px 12px, ${t.bg}`,
     image: page.theme.background.image ? `center / cover url("${page.theme.background.image}")` : `linear-gradient(135deg, ${t.muted}55, ${t.bg})`,
   };
-  return <span className="block h-12 w-full rounded-[9px]" style={{ background: bg[style], filter: style === 'aurora' ? 'blur(.3px) saturate(1.2)' : undefined }} />;
+  return <span className="block h-12 w-full rounded-[9px] border border-[var(--line)]" style={{ background: bg[style] }} />;
 }
 
 function TileSwatch({ style }: { style: (typeof TILE_STYLES)[number] }) {
@@ -68,31 +64,27 @@ function StyleSwatch({ id }: { id: StyleId }) {
       <span className={box} style={{ background: '#f5efe6' }}>
         <span className="absolute left-3 top-3 h-11 w-10 -rotate-6 bg-white p-1 pb-3 shadow-md"><span className="block size-full" style={{ background: 'linear-gradient(160deg,#bcd6ee,#f3b8b8)' }} /></span>
         <span className="absolute left-[60px] top-4 size-9 rotate-3 shadow-md" style={{ background: '#fbe9a6' }} />
-        <span className="absolute right-3 top-5 size-9 rounded-full shadow-md" style={{ background: '#e4dcfb' }} />
+        <span className="absolute right-3 top-5 size-9 rounded-full shadow-md" style={{ background: '#2b2621' }}><span className="absolute inset-[38%] rounded-full bg-[#e4572e]" /></span>
       </span>);
-    case 'soft': return (
-      <span className={box} style={{ background: '#f1eef9' }}>
-        <span className="absolute left-3 top-3 h-12 w-14 rounded-[10px]" style={{ background: '#fbe0d6' }} />
-        <span className="absolute left-[72px] top-3 h-5 w-14 rounded-[8px]" style={{ background: '#dcefe2' }} />
-        <span className="absolute left-[72px] top-[38px] h-5 w-14 rounded-[8px]" style={{ background: '#d9e6f8' }} />
+    case 'minimal': return (
+      <span className={box} style={{ background: '#f4f4f2' }}>
+        <span className="absolute left-3 top-2.5 font-[family-name:var(--font-serif)] text-[24px] leading-none text-[#161616]">Aa</span>
+        <span className="absolute left-3 top-[40px] h-6 w-[42%] rounded-[6px] border border-[#e4e4e1] bg-white" />
+        <span className="absolute right-3 top-[40px] h-6 w-[38%] rounded-[6px] border border-[#e4e4e1] bg-white" />
       </span>);
-    case 'editorial': return (
-      <span className={box} style={{ background: '#f7f6f2', fontFamily: 'var(--font-dm-serif)' }}>
-        <span className="absolute left-3 top-2 text-[26px] leading-none text-[#161616]">Aa</span>
-        <span className="absolute inset-x-3 top-[38px] h-px bg-[#161616]" />
-        <span className="absolute left-3 top-[46px] h-1.5 w-16 rounded-full bg-[#16161633]" /><span className="absolute left-3 top-[56px] h-1.5 w-10 rounded-full bg-[#16161622]" />
+    case 'washi': return (
+      <span className={box} style={{ background: '#f1ebdf', fontFamily: 'var(--font-cormorant), "Hiragino Mincho ProN", "Yu Mincho", serif' }}>
+        <span className="absolute left-3 top-2 text-[15px] leading-[1.05] text-[#1e1b17] [writing-mode:vertical-rl]">夜明け</span>
+        <span className="absolute left-10 top-3 h-[52px] w-[46%] shadow-[inset_0_0_0_1px_#1e1b1733,inset_0_0_0_4px_#f8f4ec,inset_0_0_0_5px_#1e1b171a] bg-[#f8f4ec]"><span className="absolute left-2 top-1.5 text-[11px] font-semibold text-[#c8402b]">一</span></span>
+        <span className="absolute right-3 top-3 grid size-7 rotate-[-4deg] place-items-center rounded-[4px] bg-[#c8402b] text-[11px] font-semibold text-[#f1ebdf]">MS</span>
       </span>);
-    case 'terminal': return (
-      <span className={box} style={{ background: '#070b08', fontFamily: 'var(--font-geist-mono), monospace' }}>
-        <span className="absolute left-3 top-2.5 text-[11px] text-[#6f9a76]">~ $ whoami</span>
-        <span className="absolute left-3 top-6 text-[18px] font-semibold text-[#c9f7cf]">you<span className="ml-0.5 inline-block h-4 w-2 translate-y-0.5 bg-[#3dff8b]" /></span>
-        <span className="absolute inset-x-3 bottom-2.5 h-4 border border-dashed border-[#3dff8b80]" />
-      </span>);
-    case 'neon': return (
-      <span className={box} style={{ background: 'linear-gradient(#08061a 55%, #1a0b30)' }}>
-        <span className="absolute inset-x-0 bottom-0 h-7" style={{ background: 'linear-gradient(transparent 0 92%, #ff3ea5aa 92%) 0 0 / 100% 7px, linear-gradient(90deg, transparent 0 94%, #ff3ea5aa 94%) 0 0 / 12px 100%', maskImage: 'linear-gradient(transparent, #000)' }} />
-        <span className="absolute left-3 top-3 h-8 w-14 border border-[#2be4ff] shadow-[0_0_10px_#2be4ff]" style={{ clipPath: 'polygon(0 0,85% 0,100% 30%,100% 100%,15% 100%,0 70%)' }} />
-        <span className="absolute right-3 top-3 text-[15px] font-bold tracking-wider text-[#ff3ea5] [text-shadow:0_0_8px_#ff3ea5]" style={{ fontFamily: 'var(--font-chakra)' }}>NEON</span>
+    case 'lofi': return (
+      <span className={box} style={{ background: 'radial-gradient(circle, #8f7cff66 1px, transparent 1.5px) 0 0 / 6px 6px, linear-gradient(#121a33, #1b1f4a)' }}>
+        <span className="absolute left-3 top-3 h-12 w-[52%] overflow-hidden rounded-[5px] border border-[#ffffff26] bg-[#18213f]">
+          <span className="block h-3 border-b border-[#ffffff1f] px-1.5 text-[7px] leading-3 text-[#8d95c2]" style={{ fontFamily: 'var(--font-geist-mono)' }}>me.webp</span>
+          <span className="m-1 block h-[26px] rounded-[2px]" style={{ background: 'radial-gradient(circle, #000 0 40%, transparent 46%) 0 0 / 4px 4px, linear-gradient(150deg, #8f7cff, #3b5bdb)' }} />
+        </span>
+        <span className="absolute right-3 top-5 text-[11px] font-medium tracking-[.35em] text-[#e8ebff] [text-shadow:0_0_10px_#8f7cff]">YOU</span>
       </span>);
   }
 }
@@ -145,7 +137,7 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
             );
           })}
         </div>
-        {t.style === 'soft' && (
+        {t.style === 'minimal' && (
           <div className="grid gap-2.5">
             <Label>Card finish</Label>
             <div className="grid grid-cols-4 gap-2">
@@ -157,7 +149,7 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
             </div>
           </div>
         )}
-        {(t.style === 'soft' || t.style === 'neon' || t.style === 'terminal') && (
+        {t.style === 'minimal' && (
           <div className="grid gap-2.5">
             <Label>Corners</Label>
             <div className="grid grid-cols-4 gap-2">
@@ -183,14 +175,14 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
         <div className="grid gap-2.5">
           <Label>Colours</Label>
           <div className="grid grid-cols-4 gap-2">
-            {THEME_IDS.map(id => {
+            {(STYLE_PALETTES[t.style] ?? THEME_IDS).map(id => {
               const th = THEMES[id];
               return (
                 <button key={id} type="button" onClick={() => (locked(PREMIUM_THEMES.has(id)) ? proNote() : updateTheme({ preset: id, accent: undefined }))} aria-pressed={t.preset === id} aria-label={th.name}
                   className="group relative grid gap-1.5 text-center text-[12px] text-[var(--muted)]">
                   {locked(PREMIUM_THEMES.has(id)) && <Lock className="absolute right-1.5 top-1.5 z-10 size-3.5 text-[var(--muted)]" />}
                   <span className={cn('grid h-14 place-items-center overflow-hidden rounded-[13px] border transition-transform group-hover:scale-[1.04]', t.preset === id ? 'border-[var(--sc-deep)] ring-1 ring-[var(--sc-deep)]' : 'border-[var(--line)]')} style={{ background: th.bg }}>
-                    <span className="flex gap-1">{(['peach', 'mint', 'lilac'] as const).map(k => <span key={k} className="size-3.5 rounded-full" style={{ background: th.tints[k], boxShadow: `inset 0 0 0 1px ${th.line}` }} />)}</span>
+                    <span className="flex items-center gap-1.5"><span className="font-[family-name:var(--font-serif)] text-[19px] leading-none" style={{ color: th.text }}>Aa</span><span className="size-2.5 rounded-full" style={{ background: th.accent }} /></span>
                   </span>
                   {th.name}
                 </button>
@@ -255,11 +247,11 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
       <TabsContent value="layout" className="grid min-h-0 content-start gap-6 overflow-y-auto px-5 pb-8 pt-1">
         <div className="grid gap-2.5">
           <Label>Layout</Label>
-          <div className={cn('grid gap-2', t.style === 'soft' ? 'grid-cols-3' : 'grid-cols-2')}>
-            {(t.style === 'soft'
+          <div className={cn('grid gap-2', t.style === 'minimal' ? 'grid-cols-3' : 'grid-cols-2')}>
+            {(t.style === 'minimal'
               ? [['bento', 'side', 'Grid, profile beside'], ['bento', 'center', 'Grid, profile on top'], ['list', 'center', 'List']] as const
               : [['bento', 'side', 'Grid'], ['list', 'center', 'List']] as const).map(([layout, align, label]) => {
-              const on = t.layout === layout && (layout === 'list' || t.style !== 'soft' || t.align === align);
+              const on = t.layout === layout && (layout === 'list' || t.style !== 'minimal' || t.align === align);
               return (
                 <button key={label} type="button" aria-pressed={on} onClick={() => updateTheme({ layout, align })} className={cn('grid gap-1.5 p-2 text-center text-[12px]', choice(on))}>
                   <span className="grid h-12 place-items-center rounded-[8px] bg-[var(--bg)]">

@@ -53,12 +53,12 @@ const popCls = cn(CHROME, 'sc-pop rounded-[16px] p-3');
 export function TileToolbar({ tile }: { tile: Tile }) {
   const { updateTile, removeTile } = useStudio();
   const sizes: Size[] = tile.type === 'music' ? ['s', 'w', 'l'] : ['s', 'w', 't', 'l'];
-  const style = useStudio(s => s.page?.theme.style ?? 'soft');
+  const style = useStudio(s => s.page?.theme.style ?? 'minimal');
   const layout = useStudio(s => s.page?.theme.layout);
   const desk = style === 'cozy';
   const stamp = tile.type === 'text' && tile.look === 'stamp';
-  const sticker = tile.type === 'social' && (style !== 'soft' || layout === 'list');
-  const inlineText = tile.type === 'text' && !stamp && (style === 'soft' || style === 'cozy');
+  const sticker = tile.type === 'social' && (style !== 'minimal' || layout === 'list');
+  const inlineText = tile.type === 'text' && !stamp && (style === 'minimal' || style === 'cozy');
   const sized = tile.type !== 'heading' && !sticker;
   return (
     <div

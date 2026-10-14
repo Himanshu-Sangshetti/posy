@@ -9,11 +9,12 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
+import { STYLE_PALETTES, type StyleId } from '@/lib/styles';
 
 type StyleOpt = { id: string; label: string; note: string; preset: string; locked: boolean; preview: ReactNode };
 type ThemeOpt = { id: string; name: string; bg: string; accent: string; text: string; dark: boolean; locked: boolean };
 // Starter ids kept as data attributes so the choice is easy to script (the style's sample content).
-const STARTER: Record<string, string> = { cozy: 'desk', editorial: 'writer', terminal: 'developer', neon: 'night', soft: 'creator' };
+const STARTER: Record<string, string> = { cozy: 'desk', minimal: 'creator', washi: 'writer', lofi: 'night' };
 
 export function Onboarding({ initialUsername, styles, themes, host }: { initialUsername: string; styles: StyleOpt[]; themes: ThemeOpt[]; host: string }) {
   const router = useRouter();
@@ -118,7 +119,7 @@ export function Onboarding({ initialUsername, styles, themes, host }: { initialU
             <div><p className="ac-eyebrow">03 · Colours</p><h2 className="ac-display ac-h2 mt-2">Pick a <i>palette</i></h2></div>
             <TooltipProvider delayDuration={150}>
               <div role="radiogroup" aria-label="Colours" className="flex flex-wrap gap-3">
-                {themes.map(t => (
+                {(STYLE_PALETTES[style as StyleId] ?? []).map(id => themes.find(t => t.id === id)).filter(t => !!t).map(t => (
                   <Tooltip key={t.id}>
                     <TooltipTrigger asChild>
                       <button type="button" role="radio" data-preset={t.id} aria-checked={preset === t.id} aria-label={t.locked ? `${t.name} (Pro)` : t.name} onClick={() => setPreset(t.id)}

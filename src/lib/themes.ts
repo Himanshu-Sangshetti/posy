@@ -1,7 +1,7 @@
 import { EDITION_THEMES } from '@/edition/themes';
 import { PREMIUM } from '@/edition/premium';
 
-/** Pastel tints available to every tile. Each theme maps them to its own shades. */
+/** Tints a tile can be given. Each theme maps them to its own shades. */
 export const TINTS = ['peach', 'butter', 'mint', 'sky', 'lilac', 'rose'] as const;
 export type Tint = (typeof TINTS)[number];
 
@@ -19,6 +19,33 @@ export type Theme = {
 };
 
 const light = (t: Omit<Theme, 'dark'>): Theme => ({ ...t, dark: false });
+
+/** Quiet tints for palettes that don't need their own: tiles only use them when someone picks a colour. */
+const LIGHT_TINTS = { peach: '#f4ddcc', butter: '#f2e6c0', mint: '#dbe9da', sky: '#d9e5ef', lilac: '#e3def0', rose: '#f2dadb' };
+const DARK_TINTS = { peach: '#33261f', butter: '#2f2b1e', mint: '#1f2b24', sky: '#1d2633', lilac: '#262337', rose: '#33222a' };
+const dark = (t: Omit<Theme, 'dark' | 'tints'>): Theme => ({ ...t, dark: true, tints: DARK_TINTS });
+const plain = (t: Omit<Theme, 'dark' | 'tints'>): Theme => ({ ...t, dark: false, tints: LIGHT_TINTS });
+
+/** Palettes made for the four looks: one solid colour each, an ink and one accent. */
+const LOOKS = {
+  // Desk
+  oak: plain({ id: 'oak', name: 'Oak', bg: '#e8dccb', surface: '#f7f1e6', text: '#2b241d', muted: '#6b5d4f', line: '#d8cab5', accent: '#a5683f' }),
+  slate: dark({ id: 'slate', name: 'Slate', bg: '#1f2124', surface: '#2a2d31', text: '#ece8e1', muted: '#9c978e', line: '#35383d', accent: '#e0a96d' }),
+  // Minimal
+  white: plain({ id: 'white', name: 'White', bg: '#ffffff', surface: '#ffffff', text: '#111111', muted: '#6b6b6b', line: '#e9e9e9', accent: '#e4572e' }),
+  stone: plain({ id: 'stone', name: 'Stone', bg: '#e7e5e0', surface: '#f3f2ee', text: '#1c1b19', muted: '#66625a', line: '#d6d3cc', accent: '#1c1b19' }),
+  ink: dark({ id: 'ink', name: 'Ink', bg: '#111111', surface: '#1a1a1a', text: '#f2f0eb', muted: '#8f8c85', line: '#272727', accent: '#f2f0eb' }),
+  // Washi
+  kinari: plain({ id: 'kinari', name: 'Kinari', bg: '#f1ebdf', surface: '#f8f4ec', text: '#1e1b17', muted: '#6e6558', line: '#ded4c3', accent: '#c8402b' }),
+  sakura: plain({ id: 'sakura', name: 'Sakura', bg: '#f4e7e4', surface: '#faf3f1', text: '#2a1d1c', muted: '#77605d', line: '#e8d3cf', accent: '#c23a4b' }),
+  yomogi: plain({ id: 'yomogi', name: 'Yomogi', bg: '#e3e6d8', surface: '#f1f2ea', text: '#1f241c', muted: '#5d6556', line: '#cdd3c0', accent: '#b5432e' }),
+  sumi: dark({ id: 'sumi', name: 'Sumi', bg: '#1a1917', surface: '#22211e', text: '#ece6da', muted: '#9a9384', line: '#33312c', accent: '#d4533b' }),
+  // Lofi
+  'night-blue': dark({ id: 'night-blue', name: 'Night', bg: '#121a33', surface: '#18213f', text: '#e8ebff', muted: '#8d95c2', line: '#26305a', accent: '#8f7cff' }),
+  violet: dark({ id: 'violet', name: 'Violet hour', bg: '#170f2b', surface: '#1f1638', text: '#f1eaff', muted: '#9d8fc4', line: '#2e2350', accent: '#c77dff' }),
+  rain: dark({ id: 'rain', name: 'Rain', bg: '#0f1a1f', surface: '#15232a', text: '#e3f1f3', muted: '#85a3a8', line: '#213740', accent: '#5fd4d0' }),
+  sunset: dark({ id: 'sunset', name: 'Last train', bg: '#1f1426', surface: '#281b31', text: '#ffe9e4', muted: '#b391a0', line: '#3a2840', accent: '#ff8a7a' }),
+} satisfies Record<string, Theme>;
 
 const BASE = {
   cream: light({
@@ -100,7 +127,7 @@ const BASE = {
 } satisfies Record<string, Theme>;
 
 /** Built-in themes plus any the edition adds. */
-export const THEMES: Record<string, Theme> = { ...BASE, ...EDITION_THEMES };
+export const THEMES: Record<string, Theme> = { ...BASE, ...LOOKS, ...EDITION_THEMES };
 export type ThemeId = string;
 export const THEME_IDS = Object.keys(THEMES) as [string, ...string[]];
 /** Themes that need the premium entitlement (only exist in editions that add them). */

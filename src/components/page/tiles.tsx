@@ -1,5 +1,5 @@
 // Shared by the server-rendered page and the client studio. Interactive bits live in ./islands.
-// These views draw the Soft style: frosted pastel cards. The other styles draw their own tiles in ./styles.
+// These views draw the Minimal style: plain cards on paper. The other styles draw their own tiles in ./styles.
 import { ArrowUpRight, Star, Mail, Play, Music2 } from 'lucide-react';
 import { Favicon, VideoPlayer } from './islands';
 import type { Tile } from '@/lib/schema';

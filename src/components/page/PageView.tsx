@@ -6,10 +6,11 @@ import { PLATFORMS, profileUrl } from '@/lib/platforms';
 import { pageStyle, pageClasses, tileBackground, isDark } from '@/lib/style';
 import { asset, cn } from '@/lib/utils';
 import { MotionProvider, MotionShell, MotionHeader } from './motion';
-import { ShareButton, TileEffects, AsciiAvatar } from './islands';
+import { ShareButton, TileEffects } from './islands';
 import { TileContent, tileHref, brandHex, RichText, ListItem, BrandIcon } from './tiles';
 import { deskTilt } from './desk';
 import { StyleHeader, StyleTile, StyleRow, headerClass, socialsInHeader, type StyleId } from './styles';
+import { Halftone } from './styles/lofi';
 
 /** Splits tiles into sections at each heading tile. */
 export function sections(tiles: Tile[]) {
@@ -98,15 +99,13 @@ export const socialTiles = (page: Page) => page.tiles.filter((t): t is Extract<T
 export function Profile({ page, interactive = true }: { page: Page; interactive?: boolean }) {
   const { name, bio, location, avatar } = page.profile;
   const { style, layout } = page.theme;
-  if (style !== 'soft') {
-    const av = page.theme.avatar === 'hidden' ? null
-      : style === 'terminal' && avatar ? <AsciiAvatar src={asset(avatar) ?? avatar} alt={name} dark={isDark(page)} />
-      : <Avatar page={page} />;
+  if (style !== 'minimal') {
+    const av = page.theme.avatar === 'hidden' ? null : style === 'lofi' && avatar ? <Halftone src={avatar} className="posy-avatar" /> : <Avatar page={page} />;
     return (
       <MotionHeader className={headerClass(style)}>
         <StyleHeader page={page} slots={{
           avatar: av,
-          name: style === 'cozy' || style === 'editorial' ? <DeskName name={name} /> : name,
+          name: style === 'cozy' ? <DeskName name={name} /> : name,
           bio: bio ? <RichText text={bio} /> : null,
           caption: location || null,
           socials: <SocialRow tiles={socialTiles(page)} />,
@@ -129,8 +128,8 @@ export function Profile({ page, interactive = true }: { page: Page; interactive?
   );
 }
 
-export function TileShell({ tile, index, ord, children, editing, className, style, lift = true, look = 'soft' }: { tile: Tile; index: number; ord?: number; children?: ReactNode; editing?: boolean; className?: string; style?: React.CSSProperties; lift?: boolean; look?: StyleId }) {
-  if (look !== 'soft') {
+export function TileShell({ tile, index, ord, children, editing, className, style, lift = true, look = 'minimal' }: { tile: Tile; index: number; ord?: number; children?: ReactNode; editing?: boolean; className?: string; style?: React.CSSProperties; lift?: boolean; look?: StyleId }) {
+  if (look !== 'minimal') {
     return (
       <MotionShell
         href={editing ? null : tileHref(tile, true)}
@@ -199,7 +198,7 @@ function ListTiles({ page }: { page: Page }) {
       {page.tiles.map((tile, index) => {
         if (tile.type === 'social') return null;
         if (tile.type === 'heading') return <SectionHeading key={tile.id} text={tile.text} />;
-        if (page.theme.style !== 'soft') return (
+        if (page.theme.style !== 'minimal') return (
           <MotionShell key={tile.id} tileId={tile.id} href={tileHref(tile, true)} index={index} lift={lift} label={ariaLabel(tile)}
             className={cn('posy-row-st group block', `posy-type-${tile.type}`, `posy-size-${tile.size}`)}>
             <StyleRow style={page.theme.style} tile={tile} index={ord.get(tile.id) ?? index} />

@@ -5,7 +5,6 @@ import { THEMES, type Theme } from '@/lib/themes';
 import { cozy } from './cozy';
 import { neon } from './neon';
 import { soft } from './soft';
-import { terminal } from './terminal';
 import { editorial } from './editorial';
 import { fontPair, loadFonts } from './fonts';
 import { loadImage, loadRoundable } from './images';
@@ -29,7 +28,7 @@ export type OgStyle = (input: OgInput) => Promise<{ element: React.ReactElement;
  * Share-image styles, keyed by `page.theme.style`. Add a style by writing an OgStyle and listing it here;
  * unknown or missing styles use "cozy".
  */
-const STYLES: Record<string, OgStyle> = { cozy, soft, editorial, terminal, neon };
+const STYLES: Record<string, OgStyle> = { cozy, minimal: soft, washi: editorial, lofi: neon };
 
 export function themeOf(page: Page): Theme {
   const t = THEMES[page.theme.preset] ?? THEMES.cream;
@@ -47,8 +46,7 @@ export async function ogFor(page: Page, opts: { link: string }): Promise<ImageRe
 
 /**
  * Favicon, in the page style's character. Cozy: the avatar cropped round, or the initial on the accent.
- * Soft: a rounded square. Editorial: a serif initial in ink (greyscale portrait). Terminal: a block cursor
- * on dark. Neon: a glowing ring.
+ * Minimal: a rounded square. Washi: a serif initial in ink (greyscale portrait). Lofi: a glowing ring.
  */
 export async function faviconFor(page: Page | null): Promise<ImageResponse> {
   const size = 96;
@@ -79,24 +77,6 @@ export async function faviconFor(page: Page | null): Promise<ImageResponse> {
     fonts = avatar ? [] : [{ ...serif, italic: true }];
     el = avatar ? wrap(photo(avatar, { borderRadius: size }))
       : wrap(glyph(serif.family, serif.weight, 70, t.bg, { fontStyle: 'italic', marginTop: serif.family === 'Instrument Serif' ? 6 : 0 }), { borderRadius: size, background: t.text });
-  } else if (kind === 'terminal') {
-    const avatar = await loadImage(src, size, size, { gray: true });
-    fonts = [{ family: 'VT323', weight: 400 }];
-    el = wrap(
-      avatar ? (
-        <div style={{ display: 'flex', position: 'relative', width: 84, height: 84, borderRadius: 8, overflow: 'hidden' }}>
-          {photo(avatar, { width: 84, height: 84 })}
-          <div style={{ position: 'absolute', left: 0, top: 0, width: 84, height: 84, display: 'flex', background: t.accent, opacity: 0.35 }} />
-          <div style={{ position: 'absolute', right: 8, bottom: 8, width: 20, height: 36, display: 'flex', background: t.accent }} />
-        </div>
-      ) : (
-        <div style={{ display: 'flex', alignItems: 'flex-end', height: 60 }}>
-          <div style={{ display: 'flex', width: 44, height: 60, alignItems: 'flex-end', justifyContent: 'center', fontFamily: '"VT323"', fontSize: 78, lineHeight: 0.78, color: t.text }}>{letter}</div>
-          <div style={{ display: 'flex', width: 22, height: 44, marginLeft: 4, background: t.accent }} />
-        </div>
-      ),
-      { background: t.bg, border: `4px solid ${t.accent}`, borderRadius: 14 },
-    );
   } else if (kind === 'neon') {
     const avatar = await loadRoundable(src, 64);
     fonts = [{ family: 'Chakra Petch', weight: 700 }];

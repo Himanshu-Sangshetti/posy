@@ -55,9 +55,10 @@ export function pickTiles<T extends { type: string; size?: string }>(tiles: T[],
 }
 
 /** The favicon's character for each style. */
-export const FAVICON_STYLES = ['cozy', 'soft', 'editorial', 'terminal', 'neon'] as const;
-export const faviconKind = (style: unknown): (typeof FAVICON_STYLES)[number] =>
-  (FAVICON_STYLES as readonly string[]).includes(String(style)) ? (style as (typeof FAVICON_STYLES)[number]) : 'cozy';
+export const FAVICON_STYLES = ['cozy', 'soft', 'editorial', 'neon'] as const;
+/** Which favicon drawing each page style uses. */
+const FAVICON_OF: Record<string, (typeof FAVICON_STYLES)[number]> = { cozy: 'cozy', minimal: 'soft', washi: 'editorial', lofi: 'neon' };
+export const faviconKind = (style: unknown): (typeof FAVICON_STYLES)[number] => FAVICON_OF[String(style)] ?? 'cozy';
 
 /** Drop symbols and emoji the share-image fonts have no glyph for (they would draw as empty boxes). */
 export const safe = (s: string) =>

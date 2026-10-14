@@ -7,7 +7,7 @@ import { template } from '@/lib/templates';
 import { SITE_HOST } from '@/lib/site';
 
 const POINTS = [
-  ['rose', 'Five styles', 'Soft, editorial, terminal, neon, cozy.'],
+  ['rose', 'Four looks', 'Desk, Minimal, Washi and Lofi.'],
   ['mint', 'Edited by your AI', 'Claude, Cursor and Codex over MCP.'],
   ['sky', 'Yours to keep', 'One JSON file, free and open source.'],
 ] as const;
