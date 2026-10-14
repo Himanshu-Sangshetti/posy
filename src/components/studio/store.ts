@@ -2,7 +2,7 @@
 
 import { create, useStore } from 'zustand';
 import { temporal } from 'zundo';
-import { arrayMove } from '@dnd-kit/sortable';
+import { arrayMove } from '@/lib/array';
 import type { Page, Tile } from '@/lib/schema';
 
 type Patch<T> = Partial<T>;

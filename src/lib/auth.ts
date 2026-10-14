@@ -8,7 +8,9 @@ const env = process.env;
 
 export const auth = betterAuth({
   appName: 'Posy',
-  baseURL: env.BETTER_AUTH_URL || env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+  // Unset in development: Better Auth infers the URL from each request (any localhost port works).
+  baseURL: env.BETTER_AUTH_URL || (env.NODE_ENV === 'production' ? env.NEXT_PUBLIC_SITE_URL : undefined),
+  trustedOrigins: env.NODE_ENV === 'production' ? [] : ['http://localhost:*', 'http://127.0.0.1:*'],
   secret: env.BETTER_AUTH_SECRET || 'dev-only-secret-change-me-in-production-0123456789',
   database: drizzleAdapter(db, { provider: 'sqlite', schema }),
   emailAndPassword: { enabled: true, minPasswordLength: 8, autoSignIn: true },

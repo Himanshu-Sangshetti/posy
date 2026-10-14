@@ -1,5 +1,5 @@
 import 'server-only';
-import { arrayMove } from '@dnd-kit/sortable';
+import { arrayMove } from './array';
 import { pageForUser, saveDraft, publish, hasUnpublished } from './pages';
 import { parsePage, Tile, Theme, newId, type Page } from './schema';
 import { tileFromInput } from './detect';
