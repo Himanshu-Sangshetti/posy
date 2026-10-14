@@ -149,3 +149,23 @@ test('export your page and delete your account', async ({ page }) => {
   await page.waitForURL(url => url.pathname === '/' || url.pathname === '/signup' || url.pathname === '/login');
   expect((await page.request.get(`/${u}`)).status()).toBe(404);
 });
+
+test('the desk template turns tiles into objects, and a note can become a stamp', async ({ page, browser }) => {
+  const u = await newUser(page, 'desk');
+  expect((await draft(page)).page.theme.layout).toBe('desk');
+  const note = page.locator('[data-tile]').filter({ hasText: 'Currently working on something new' });
+  await note.click();
+  await page.getByRole('button', { name: 'Round stamp' }).click();
+  await saved(page);
+  await expect.poll(async () => (await draft(page)).page.tiles.filter((t: { look?: string }) => t.look === 'stamp').length).toBe(2);
+  await page.getByRole('button', { name: 'Publish' }).click();
+  await expect(page.getByText('Your page is live')).toBeVisible();
+  const visitor = await browser.newPage();
+  await visitor.goto(`/${u}`);
+  await expect(visitor.locator('.dk-pol').first()).toBeVisible();
+  await expect(visitor.locator('.dk-ring')).toHaveCount(2);
+  await expect(visitor.locator('.dk-vinyl')).toBeVisible();
+  await expect(visitor.locator('.dk-env')).toBeVisible();
+  await expect(visitor.locator('.posy-social-row a')).toHaveCount(4);
+  await visitor.close();
+});

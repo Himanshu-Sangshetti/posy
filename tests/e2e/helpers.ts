@@ -1,7 +1,7 @@
 import { expect, type Page } from '@playwright/test';
 
 /** Sign up a fresh user, claim a username from a template, land in the editor. */
-export async function newUser(page: Page, template: 'creator' | 'developer' | 'links' | 'blank' = 'creator') {
+export async function newUser(page: Page, template: 'desk' | 'creator' | 'developer' | 'links' | 'blank' = 'creator') {
   const username = `t${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
   await page.goto(`/signup?username=${username}`);
   await page.fill('#name', 'Test Person');

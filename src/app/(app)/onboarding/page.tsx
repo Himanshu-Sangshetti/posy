@@ -17,7 +17,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   const previews = Object.fromEntries((Object.keys(TEMPLATES) as TemplateId[]).map(id => {
     const page = template(id, user.name);
     const list = page.theme.layout === 'list';
-    return [id, <Thumbnail key={id} page={page} width={list ? 640 : 1100} height={list ? 560 : 960} scale={list ? 0.275 : 0.16} />];
+    return [id, <Thumbnail key={id} page={page} width={list ? 640 : 1100} height={list ? 780 : 960} scale={list ? 0.2 : 0.16} />];
   }));
   return (
     <div className="posy-page posy-app posy-layout-desk posy-bg-solid posy-grain posy-motion min-h-dvh">

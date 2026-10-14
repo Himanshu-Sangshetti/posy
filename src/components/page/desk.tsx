@@ -54,7 +54,8 @@ function Note({ tile }: Props<'text'>) {
 
 function Stamp({ tile }: Props<'text'>) {
   const text = tile.text.replace(/[*[\]]|\(https?:[^)]+\)/g, '').toUpperCase();
-  const label = `${text} · ${text} · `;
+  let label = `${text} · `;
+  while (label.length < 36) label += `${text} · `;
   const id = `ring-${tile.id}`;
   return (
     <div className="dk-stamp" style={{ '--paper': paper(tile, 'lilac') } as React.CSSProperties}>
