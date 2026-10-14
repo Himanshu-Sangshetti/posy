@@ -2,8 +2,9 @@ import 'server-only';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { DATA_DIR } from './data-dir';
 
-export const UPLOAD_DIR = path.resolve('.data/uploads');
+export const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
 const TYPES: Record<string, string> = { 'image/webp': 'webp', 'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'image/avif': 'avif' };
 export const MIME = Object.fromEntries(Object.entries(TYPES).map(([m, e]) => [e, m]));
 
