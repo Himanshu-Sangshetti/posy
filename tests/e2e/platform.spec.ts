@@ -198,3 +198,24 @@ test('export page.json, then import it back into the draft', async ({ page }) =>
   await expect(page.getByRole('status').filter({ hasText: 'theme.preset' })).toBeVisible();
   expect((await draft(page)).page).toEqual(before);
 });
+
+test('onboarding lets you choose style, layout and colours separately', async ({ page }) => {
+  const username = `t${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
+  await page.goto(`/signup?username=${username}`);
+  await page.fill('#name', 'Test Person');
+  await page.fill('#email', `${username}@example.com`);
+  await page.fill('#password', 'pastel-garden-42');
+  await page.click('button[type=submit]');
+  await page.waitForURL(/onboarding/);
+  await expect(page.getByRole('status').filter({ hasText: 'Available' })).toBeVisible();
+  await page.click('[data-style="editorial"]');
+  await page.click('[data-layout="list"]');
+  await page.click('[data-preset="mint"]');
+  await expect(page.frameLocator('iframe[title="Live preview of your page"]').getByText('Test Person').first()).toBeVisible({ timeout: 15_000 });
+  await page.getByRole('button', { name: 'Create my page' }).click();
+  await page.waitForURL(/\/edit/);
+  const { page: d } = await page.request.get('/api/v1/page').then(r => r.json());
+  expect(d.theme.style).toBe('editorial');
+  expect(d.theme.layout).toBe('list');
+  expect(d.theme.preset).toBe('mint');
+});

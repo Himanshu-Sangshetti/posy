@@ -10,7 +10,9 @@ export async function newUser(page: Page, template: 'desk' | 'writer' | 'night' 
   await page.click('button[type=submit]');
   await page.waitForURL(/onboarding/);
   await expect(page.getByRole('status').filter({ hasText: 'Available' })).toBeVisible();
-  await page.click(`[data-tpl="${template}"]`);
+  await page.click(`[data-tpl="${template === 'links' || template === 'blank' ? 'creator' : template}"]`);
+  if (template === 'links') await page.click('[data-layout="list"]');
+  if (template === 'blank') await page.check('[data-empty]');
   await page.getByRole('button', { name: 'Create my page' }).click();
   await page.waitForURL(/\/edit/);
   await expect(page.getByLabel('Name', { exact: true })).toHaveValue('Test Person');
