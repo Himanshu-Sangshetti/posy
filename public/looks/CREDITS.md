@@ -15,3 +15,11 @@ Everything here is public domain or CC0, so it can be used and redistributed fre
 | desk/paper.jpg | Paper 001 | ambientCG | CC0 |
 | desk/oak.jpg | Wood 094 | ambientCG | CC0 |
 | desk/walnut.jpg | Wood 051 | ambientCG | CC0 |
+
+## Generated art
+
+Made for Posy with Krea 2 Turbo (open weights, Krea 2 Community License; Krea claims no rights over generated images).
+
+| File | What |
+|---|---|
+| lofi/room-night.jpg | A 90s anime bedroom at night, rain on the window (Lofi, Night palette) |

@@ -99,3 +99,12 @@
 .lf-meta { display: flex; align-items: center; gap: 14px; margin-top: 4px; color: var(--text); }
 .lf-clock { font-family: var(--font-geist-mono), monospace; font-size: 12px; letter-spacing: .08em; }
 .lf-barcode { height: 22px; width: auto; fill: currentColor; }
+
+/* ================= Lofi at night: a painted room behind the windows ================= */
+.posy-style-lofi.dark:is(.posy-preset-night-blue, .posy-preset-violet, .posy-preset-sunset) .posy-backdrop { background: var(--bg) var(--lf-art) center / cover no-repeat; }
+.posy-style-lofi.posy-preset-night-blue { --lf-art: url(/looks/lofi/room-night.jpg); }
+.posy-style-lofi.dark:is(.posy-preset-night-blue, .posy-preset-violet, .posy-preset-sunset) .posy-backdrop::before { opacity: .18; }
+.posy-style-lofi.dark:is(.posy-preset-night-blue, .posy-preset-violet, .posy-preset-sunset) .posy-backdrop::after {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--bg) 55%, transparent), color-mix(in oklab, var(--bg) 30%, transparent) 40%, color-mix(in oklab, var(--bg) 78%, transparent)); }
+.posy-style-lofi.dark .lf-name, .posy-style-lofi.dark .posy-bio, .posy-style-lofi.dark .lf-status { text-shadow: 0 2px 18px rgb(0 0 0 / .6); }
+.posy-style-lofi.dark .lf-win { background: color-mix(in oklab, var(--surface) 72%, transparent); }

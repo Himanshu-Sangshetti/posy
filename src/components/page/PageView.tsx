@@ -44,7 +44,7 @@ export function PageFrame({ page, children, profile, className, interactive = tr
   return (
     <div className={cn(pageClasses(page), className)} style={{ ...pageStyle(page), colorScheme: isDark(page) ? 'dark' : 'light' }}>
       <Backdrop />
-      {page.theme.style === 'lofi' && <Clouds3D dark={isDark(page)} />}
+      {page.theme.style === 'lofi' && !isDark(page) && <Clouds3D />}
       <MotionProvider enabled={page.theme.motion}>
         <div className="posy-layout">
           {profile ?? <Profile page={page} interactive={interactive} />}
