@@ -11,7 +11,8 @@ export function tileFromInput(input: string): Tile {
   const raw = input.trim();
   const id = newId();
   if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) return { id, type: 'social', platform: 'email', handle: raw, size: 's', color: 'auto' };
-  if (/^[\w.-]+\/[\w.-]+$/.test(raw) && !raw.includes('.')) return { id, type: 'github', repo: raw, size: 'w', color: 'auto' };
+  // owner/repo (owners never contain dots; repo names can, e.g. vercel/next.js)
+  if (/^[\w-]+\/[\w.-]+$/.test(raw) && !/^[\w-]+\.[a-z]{2,}\//i.test(raw)) return { id, type: 'github', repo: raw.replace(/\.git$/, ''), size: 'w', color: 'auto' };
 
   let u: URL;
   try { u = new URL(/^https?:\/\//i.test(raw) ? raw : `https://${raw}`); } catch { return { id, type: 'text', text: raw, size: 'w', color: 'auto' }; }

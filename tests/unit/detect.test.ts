@@ -16,6 +16,9 @@ describe('pasting a link picks the right tile', () => {
   });
   it('rich tiles', () => {
     expect(t('https://github.com/vercel/next.js')).toMatchObject({ type: 'github', repo: 'vercel/next.js', size: 'w' });
+    expect(t('vercel/next.js')).toMatchObject({ type: 'github', repo: 'vercel/next.js' });
+    expect(t('pmndrs/zustand')).toMatchObject({ type: 'github', repo: 'pmndrs/zustand' });
+    expect(t('example.com/about')).toMatchObject({ type: 'link' });
     expect(t('https://youtu.be/dQw4w9WgXcQ')).toMatchObject({ type: 'video' });
     expect(t('https://www.youtube.com/watch?v=dQw4w9WgXcQ')).toMatchObject({ type: 'video' });
     expect(t('https://open.spotify.com/track/abc123')).toMatchObject({ type: 'music' });
