@@ -74,7 +74,7 @@ test('visits show up in analytics', async ({ page, browser }) => {
   await v.waitForTimeout(800);
   await ctx.close();
   await page.goto('/analytics');
-  await expect(page.getByText('Views', { exact: true }).locator('xpath=..')).toContainText('1');
+  await expect(page.getByText('Visits', { exact: true }).locator('xpath=..')).toContainText('1');
   const csv = await page.request.get('/api/v1/analytics/export');
   if (csv.status() === 402) { expect((await csv.json()).error).toContain('Pro'); return; } // hosted Free plan
   expect(csv.status()).toBe(200);

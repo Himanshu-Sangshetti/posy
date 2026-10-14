@@ -5,6 +5,11 @@ import { events } from '@/db/app-schema';
 
 const DAY = 86_400_000;
 
+/** Whether a page has ever had a visit or a tap (to tell a brand-new page from a quiet week). */
+export async function hasEvents(pageId: string) {
+  return !!(await db.select({ id: events.id }).from(events).where(eq(events.pageId, pageId)).limit(1).get());
+}
+
 export async function pageStats(pageId: string, days = 30) {
   const since = new Date(Date.now() - days * DAY);
   const where = and(eq(events.pageId, pageId), gte(events.createdAt, since));
@@ -33,6 +38,7 @@ export async function pageStats(pageId: string, days = 30) {
     series, views, clicks, ctr: views ? clicks / views : 0,
     tiles: tiles.map(t => ({ tileId: t.tileId, n: Number(t.n) })),
     referrers: referrers.map(r => ({ label: r.referrer || 'Direct or unknown', n: Number(r.n) })),
-    countries: countries.map(c => ({ label: c.country || 'Unknown', n: Number(c.n) })),
+    // Countries only exist when the host adds a geo header (Vercel, Cloudflare); otherwise all null.
+    countries: countries.filter(c => c.country).map(c => ({ code: c.country!, n: Number(c.n) })),
   };
 }
