@@ -14,6 +14,7 @@ export const auth = betterAuth({
   secret: env.BETTER_AUTH_SECRET || 'dev-only-secret-change-me-in-production-0123456789',
   database: drizzleAdapter(db, { provider: 'sqlite', schema }),
   emailAndPassword: { enabled: true, minPasswordLength: 8, autoSignIn: true },
+  user: { deleteUser: { enabled: true } }, // pages and events cascade-delete with the user
   socialProviders: {
     ...(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET ? { github: { clientId: env.GITHUB_CLIENT_ID, clientSecret: env.GITHUB_CLIENT_SECRET } } : {}),
     ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET ? { google: { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET } } : {}),
