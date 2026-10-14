@@ -581,7 +581,7 @@ a.posy-obj.posy-tile:hover, .posy-obj.posy-tile:hover { box-shadow: none; rotate
 .sc-eyebrow { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #7b7389; }
 .sc-kbd { display: inline-flex; align-items: center; gap: 2px; height: 20px; padding: 0 6px; border-radius: 6px; border: 1px solid #e2d9ec; background: #fffdfa; color: #7b7389;
   font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; line-height: 1; }
-.sc-bar { background: color-mix(in oklab, #faf6f1 92%, transparent); backdrop-filter: blur(14px); border-bottom: 1px solid #e9e1ef; }
+.sc-bar { background: color-mix(in oklab, #faf6f1 97%, transparent); backdrop-filter: blur(14px); border-bottom: 1px solid #e9e1ef; }
 .sc-float { background: color-mix(in oklab, #fffdfa 94%, transparent); backdrop-filter: blur(14px); border: 1px solid #e9e1ef;
   box-shadow: 0 1px 1px rgb(60 40 90 / .05), 0 14px 34px -14px rgb(60 40 90 / .28); }
 .sc-pop { box-shadow: 0 1px 1px rgb(60 40 90 / .05), 0 22px 48px -18px rgb(60 40 90 / .34); border-color: #e9e1ef; }
