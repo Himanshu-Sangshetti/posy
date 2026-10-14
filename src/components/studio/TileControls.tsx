@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Pencil, Trash2, Upload } from 'lucide-react';
+import { Pencil, Stamp, StickyNote, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Tile, Size, Color } from '@/lib/schema';
 import { COLORS } from '@/lib/schema';
@@ -47,6 +47,9 @@ function ToolButton({ label, active, onClick, children }: { label: string; activ
 export function TileToolbar({ tile }: { tile: Tile }) {
   const { updateTile, removeTile } = useStudio();
   const sizes: Size[] = tile.type === 'music' ? ['s', 'w', 'l'] : ['s', 'w', 't', 'l'];
+  const desk = useStudio(s => s.page?.theme.layout === 'desk');
+  const stamp = tile.type === 'text' && tile.look === 'stamp';
+  const sticker = desk && tile.type === 'social';
   return (
     <div
       data-toolbar
@@ -54,11 +57,11 @@ export function TileToolbar({ tile }: { tile: Tile }) {
       onClick={e => e.stopPropagation()}
       className="absolute left-1/2 top-0 z-30 flex -translate-x-1/2 -translate-y-[calc(100%+10px)] items-center gap-0.5 rounded-[14px] border border-[var(--line)] bg-[color-mix(in_oklab,var(--surface)_92%,transparent)] p-1 shadow-[0_12px_32px_-12px_rgb(0_0_0/.28)] backdrop-blur-md"
     >
-      {tile.type !== 'heading' && sizes.map(s => (
+      {tile.type !== 'heading' && !sticker && sizes.map(s => (
         <ToolButton key={s} label={SIZE_LABEL[s]} active={tile.size === s} onClick={() => updateTile(tile.id, { size: s })}><SizeGlyph size={s} /></ToolButton>
       ))}
-      {tile.type !== 'heading' && <span className="mx-1 h-5 w-px bg-[var(--line)]" />}
-      {tile.type !== 'heading' && (
+      {tile.type !== 'heading' && !sticker && <span className="mx-1 h-5 w-px bg-[var(--line)]" />}
+      {tile.type !== 'heading' && !sticker && (
         <Popover>
           <PopoverTrigger asChild>
             <button type="button" aria-label="Colour" className="grid size-8 place-items-center rounded-[10px] hover:bg-[var(--secondary)]">
@@ -76,7 +79,11 @@ export function TileToolbar({ tile }: { tile: Tile }) {
           </PopoverContent>
         </Popover>
       )}
-      {tile.type !== 'text' && tile.type !== 'heading' && (
+      {desk && tile.type === 'text' && <>
+        <ToolButton label="Sticky note" active={!stamp} onClick={() => updateTile(tile.id, { look: undefined } as Partial<Tile>)}><StickyNote className="size-4" /></ToolButton>
+        <ToolButton label="Round stamp" active={stamp} onClick={() => updateTile(tile.id, { look: 'stamp' } as Partial<Tile>)}><Stamp className="size-4" /></ToolButton>
+      </>}
+      {(stamp || tile.type !== 'text') && tile.type !== 'heading' && (
         <Popover>
           <PopoverTrigger asChild>
             <button type="button" aria-label="Edit" className="grid size-8 place-items-center rounded-[10px] text-[var(--muted)] hover:bg-[var(--secondary)] hover:text-[var(--text)]"><Pencil className="size-4" /></button>
@@ -142,6 +149,7 @@ export function TileFields({ tile }: { tile: Tile }) {
         {text('alt', tile.alt, 'Description for screen readers')}
         {text('url', tile.url, 'Link (optional)')}
       </>}
+      {tile.type === 'text' && <Field label="Text"><Textarea value={tile.text} rows={2} onChange={e => set({ text: e.target.value })} /></Field>}
       {tile.type === 'video' && <>{text('url', tile.url, 'YouTube link')}{text('title', tile.title, 'Title')}</>}
       {tile.type === 'music' && text('url', tile.url, 'Spotify link')}
       {tile.type === 'github' && text('repo', tile.repo, 'Repository', 'owner/name')}

@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { MapPin, ImagePlus, X } from 'lucide-react';
 import type { Page, Tile } from '@/lib/schema';
 import { PageFrame, TileShell, Avatar, sections } from '@/components/page/PageView';
+import { DeskTile } from '@/components/page/desk';
 import { TileContent, ListItem, BrandIcon } from '@/components/page/tiles';
 import { tileBackground } from '@/lib/style';
 import { brandHex } from '@/components/page/tiles';
@@ -26,9 +27,51 @@ export function tileLabel(t: Tile) {
 
 const blank = 'w-full resize-none bg-transparent outline-none [field-sizing:content] placeholder:text-[var(--muted)]/60';
 
+function AvatarPicker({ page, className }: { page: Page; className?: string }) {
+  const update = useStudio(s => s.updateProfile);
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button type="button" aria-label="Change photo" className={cn('group relative block w-full', className)}>
+          <Avatar page={page} />
+          <span className="absolute inset-0 grid place-items-center bg-black/0 text-white opacity-0 transition-all group-hover:bg-black/25 group-hover:opacity-100"><ImagePlus className="size-6" /></span>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto" align="start">
+        <div className="flex gap-2">
+          <ImagePicker label="Upload photo" onPick={src => update({ avatar: src })} />
+          {page.profile.avatar && <button type="button" onClick={() => update({ avatar: undefined })} className="inline-flex h-9 items-center gap-1.5 rounded-[10px] px-3 text-[13.5px] text-[var(--muted)] hover:bg-[var(--secondary)]"><X className="size-4" />Remove</button>}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function EditableDeskProfile({ page }: { page: Page }) {
+  const update = useStudio(s => s.updateProfile);
+  const { name, bio, location } = page.profile;
+  return (
+    <header className="posy-profile dk-profile" onClick={() => useStudio.getState().select(null)}>
+      <div className="dk-me">
+        <AvatarPicker page={page} />
+        <input aria-label="Location" value={location ?? ''} placeholder="a caption" onChange={e => update({ location: e.target.value || undefined })}
+          className={cn(blank, 'dk-hand dk-me-cap bg-transparent')} />
+      </div>
+      <div className="dk-intro">
+        <textarea aria-label="Name" rows={1} value={name} placeholder="Your name" onChange={e => update({ name: e.target.value })} className={cn(blank, 'posy-head posy-name')} />
+        <textarea aria-label="Bio" value={bio} placeholder="A line about you" onChange={e => update({ bio: e.target.value })} className={cn(blank, 'posy-bio')} />
+        <div className="posy-social-row" onClick={e => e.stopPropagation()}>
+          {page.tiles.filter((t): t is Extract<Tile, { type: 'social' }> => t.type === 'social').map(t => <SortableSocialIcon key={t.id} tile={t} desk />)}
+        </div>
+      </div>
+    </header>
+  );
+}
+
 function EditableProfile({ page }: { page: Page }) {
   const update = useStudio(s => s.updateProfile);
   const { name, bio, location, avatar } = page.profile;
+  if (page.theme.layout === 'desk') return <EditableDeskProfile page={page} />;
   return (
     <header className="posy-profile" onClick={() => useStudio.getState().select(null)}>
       <Popover>
@@ -62,9 +105,18 @@ function EditableProfile({ page }: { page: Page }) {
   );
 }
 
-function InlineText({ tile }: { tile: Extract<Tile, { type: 'text' }> }) {
+function InlineText({ tile, desk }: { tile: Extract<Tile, { type: 'text' }>; desk?: boolean }) {
   const update = useStudio(s => s.updateTile);
   const big = tile.size === 'l' || tile.size === 't';
+  if (desk) {
+    return (
+      <div className={cn('dk-note', `dk-note-${tile.size}`)} style={{ '--paper': tile.color === 'auto' ? 'var(--tint-butter)' : tile.color === 'surface' ? 'var(--surface)' : tile.color === 'accent' ? 'color-mix(in oklab, var(--accent) 30%, var(--surface))' : `var(--tint-${tile.color})` } as React.CSSProperties}>
+        <textarea autoFocus aria-label="Note" value={tile.text} onChange={e => update(tile.id, { text: e.target.value })}
+          onPointerDown={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()}
+          className={cn(blank, 'dk-hand h-full text-[25px] leading-[1.12]')} />
+      </div>
+    );
+  }
   return (
     <div className={cn('flex h-full p-5', big ? 'items-end' : 'items-center')}>
       <textarea autoFocus aria-label="Note" value={tile.text} onChange={e => update(tile.id, { text: e.target.value })}
@@ -74,7 +126,7 @@ function InlineText({ tile }: { tile: Extract<Tile, { type: 'text' }> }) {
   );
 }
 
-function SortableTile({ tile, index }: { tile: Tile; index: number }) {
+function SortableTile({ tile, index, desk }: { tile: Tile; index: number; desk?: boolean }) {
   const selected = useStudio(s => s.selected === tile.id);
   const select = useStudio(s => s.select);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: tile.id });
@@ -89,8 +141,8 @@ function SortableTile({ tile, index }: { tile: Tile; index: number }) {
       {...attributes}
       {...listeners}
     >
-      <TileShell tile={tile} index={index} editing className={cn('size-full cursor-grab active:cursor-grabbing', selected && 'outline outline-2 outline-offset-[3px] outline-[var(--accent)]')}>
-        {selected && tile.type === 'text' ? <InlineText tile={tile} /> : undefined}
+      <TileShell tile={tile} index={index} editing desk={desk} className={cn('size-full cursor-grab active:cursor-grabbing', selected && 'outline outline-2 outline-offset-[3px] outline-[var(--accent)]')}>
+        {selected && tile.type === 'text' && tile.look !== 'stamp' ? <InlineText tile={tile} desk={desk} /> : undefined}
       </TileShell>
       {selected && <TileToolbar tile={tile} />}
     </div>
@@ -114,7 +166,7 @@ function SortableRow({ tile, index }: { tile: Tile; index: number }) {
   );
 }
 
-function SortableSocialIcon({ tile }: { tile: Extract<Tile, { type: 'social' }> }) {
+function SortableSocialIcon({ tile, desk }: { tile: Extract<Tile, { type: 'social' }>; desk?: boolean }) {
   const selected = useStudio(s => s.selected === tile.id);
   const select = useStudio(s => s.select);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: tile.id });
@@ -123,7 +175,7 @@ function SortableSocialIcon({ tile }: { tile: Extract<Tile, { type: 'social' }> 
     <div ref={setNodeRef} data-tile={tile.id} aria-label={tileLabel(tile)} className={cn('relative', isDragging && 'opacity-30')}
       style={{ transform: CSS.Translate.toString(transform), transition, zIndex: selected ? 20 : undefined }}
       onClick={e => { e.stopPropagation(); select(tile.id); }} {...attributes} {...listeners}>
-      <span className={cn('grid size-11 cursor-grab place-items-center rounded-full border border-[color-mix(in_oklab,var(--text)_8%,transparent)] bg-[color-mix(in_oklab,var(--surface)_70%,transparent)]', selected && 'outline outline-2 outline-offset-2 outline-[var(--accent)]')}>
+      <span className={cn(desk ? 'dk-stk cursor-grab' : 'grid size-11 cursor-grab place-items-center rounded-full border border-[color-mix(in_oklab,var(--text)_8%,transparent)] bg-[color-mix(in_oklab,var(--surface)_70%,transparent)]', selected && 'outline outline-2 outline-offset-2 outline-[var(--accent)]')}>
         {p.icon?.path ? <BrandIcon path={p.icon.path} size={19} /> : tile.platform === 'email' ? <span className="text-[17px]">@</span> : <span className="text-[14px] font-bold">in</span>}
       </span>
       {selected && <TileToolbar tile={tile} />}
@@ -156,6 +208,8 @@ export function EditableCanvas({ page }: { page: Page }) {
   const onEnd = (e: DragEndEvent) => { setActive(null); if (e.over && e.active.id !== e.over.id) moveTile(String(e.active.id), String(e.over.id)); };
 
   const list = page.theme.layout === 'list';
+  const desk = page.theme.layout === 'desk';
+  const gridTiles = desk ? page.tiles.filter(t => t.type !== 'social') : page.tiles;
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={onStart} onDragEnd={onEnd} onDragCancel={() => setActive(null)}>
       <SortableContext items={page.tiles.map(t => t.id)} strategy={rectSortingStrategy}>
@@ -166,11 +220,11 @@ export function EditableCanvas({ page }: { page: Page }) {
                 {page.tiles.map((tile, index) => tile.type === 'social' ? null : tile.type === 'heading' ? <SortableHeading key={tile.id} tile={tile} list /> : <SortableRow key={tile.id} tile={tile} index={index} />)}
               </div>
             )}
-            {!list && sections(page.tiles).map((s, i) => (
+            {!list && sections(gridTiles).map((s, i) => (
               <section key={s.heading?.id ?? `top-${i}`} className="posy-grid-wrap">
                 {s.heading && <SortableHeading tile={s.heading} />}
                 <div className="posy-grid">
-                  {s.tiles.map(({ tile, index }) => <SortableTile key={tile.id} tile={tile} index={index} />)}
+                  {s.tiles.map(({ tile, index }) => <SortableTile key={tile.id} tile={tile} index={index} desk={desk} />)}
                 </div>
               </section>
             ))}
@@ -183,7 +237,10 @@ export function EditableCanvas({ page }: { page: Page }) {
     </PageFrame>
         </SortableContext>
         <DragOverlay dropAnimation={{ duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)' }}>
-          {active && active.type !== 'heading' && !(list && active.type === 'social') && (
+          {active && desk && active.type !== 'heading' && active.type !== 'social' && (
+            <div className="posy-obj rotate-[2deg] scale-[1.03]" style={{ width: '100%', height: '100%' }}><DeskTile tile={active} editing /></div>
+          )}
+          {active && !desk && active.type !== 'heading' && !(list && active.type === 'social') && (
             <div className={cn('posy-tile shadow-2xl', 'rotate-[1.5deg] scale-[1.03]', list && 'posy-row')} style={{ '--tile-bg': tileBackground(active, page.tiles.indexOf(active), brandHex(active)), width: '100%', height: '100%' } as React.CSSProperties}>
               {list ? <ListItem tile={active} /> : <TileContent tile={active} editing />}
             </div>

@@ -182,13 +182,15 @@ export function ThemePanel({ page }: { page: Page }) {
       <TabsContent value="layout" className="grid max-h-[58vh] gap-5 overflow-y-auto pr-1">
         <div className="grid gap-2.5">
           <Label>Layout</Label>
-          <div className="grid grid-cols-3 gap-2">
-            {([['bento', 'side', 'Bento'], ['bento', 'center', 'Bento centred'], ['list', 'center', 'List']] as const).map(([layout, align, label]) => {
-              const on = t.layout === layout && (layout === 'list' || t.align === align);
+          <div className="grid grid-cols-2 gap-2">
+            {([['desk', 'side', 'Desk'], ['bento', 'side', 'Bento'], ['bento', 'center', 'Bento centred'], ['list', 'center', 'List']] as const).map(([layout, align, label]) => {
+              const on = t.layout === layout && (layout !== 'bento' || t.align === align);
               return (
                 <button key={label} type="button" aria-pressed={on} onClick={() => updateTheme({ layout, align })} className={cn('grid gap-1.5 p-2 text-center text-[12px]', choice(on))}>
                   <span className="grid h-12 place-items-center rounded-[8px] bg-[var(--bg)]">
-                    {layout === 'list'
+                    {layout === 'desk'
+                      ? <span className="flex items-end gap-1"><span className="size-5 -rotate-6 bg-white p-0.5 pb-1.5 shadow-sm"><span className="block size-full bg-[var(--tint-sky)]" /></span><span className="size-4 rotate-3 bg-[var(--tint-butter)] shadow-sm" /><span className="size-4 rounded-full bg-[var(--tint-lilac)] shadow-sm" /></span>
+                      : layout === 'list'
                       ? <span className="grid w-10 gap-1">{[0, 1, 2].map(i => <span key={i} className="h-1.5 rounded-full bg-[var(--muted)]/40" />)}</span>
                       : align === 'side'
                         ? <span className="flex gap-1.5"><span className="h-8 w-3 rounded-sm bg-[var(--muted)]/40" /><span className="grid grid-cols-2 gap-0.5">{[0, 1, 2, 3].map(i => <span key={i} className="size-3.5 rounded-[3px] bg-[var(--muted)]/40" />)}</span></span>
