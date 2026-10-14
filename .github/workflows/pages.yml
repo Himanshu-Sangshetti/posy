@@ -32,7 +32,7 @@ jobs:
           POSY_BASE_PATH: ${{ steps.pages.outputs.base_path }}
           POSY_SITE_URL: ${{ steps.pages.outputs.base_url }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with: { path: out }
 
   deploy:
