@@ -15,4 +15,6 @@ export type Edition = {
   /** What "/" shows: the owner's page (self-hosted) or a marketing site (platform). */
   root: 'owner-page' | 'marketing';
   entitlements: (userId: string) => Promise<Entitlements>;
+  /** Extra dashboard sections, e.g. the hosted platform's billing page. */
+  nav?: { href: string; label: string }[];
 };
