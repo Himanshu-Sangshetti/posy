@@ -9,6 +9,7 @@ import { entitlementsFor } from '@/lib/entitlements';
 import { Thumbnail } from '@/components/page/Thumbnail';
 import { Onboarding } from '@/components/auth/Onboarding';
 import { Logo } from '@/components/brand';
+import { AppFrame } from '@/components/dash/ui';
 import { SITE_HOST } from '@/lib/site';
 
 export const metadata: Metadata = { title: 'Claim your page · Posy' };
@@ -24,10 +25,9 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   });
   const themes = Object.values(THEMES).map(t => ({ id: t.id, name: t.name, bg: t.bg, accent: t.accent, text: t.text, dark: t.dark, locked: !premium && PREMIUM_THEMES.has(t.id) }));
   return (
-    <div className="posy-page posy-app posy-style-cozy posy-bg-solid posy-grain posy-motion min-h-dvh">
-      <div aria-hidden className="posy-backdrop"><span className="posy-noise" /></div>
-      <header className="relative z-10 px-6 py-5 sm:px-10"><Logo /></header>
-      <main className="relative z-10 mx-auto max-w-[1080px] px-5 pb-20 pt-4"><Onboarding initialUsername={username ?? ''} styles={styles} themes={themes} host={SITE_HOST()} /></main>
-    </div>
+    <AppFrame>
+      <header className="mx-auto flex max-w-[1120px] items-center px-6 py-5 sm:px-10"><Logo /></header>
+      <main className="mx-auto max-w-[1120px] px-5 pb-16 pt-6 sm:px-10"><Onboarding initialUsername={username ?? ''} styles={styles} themes={themes} host={SITE_HOST()} /></main>
+    </AppFrame>
   );
 }
