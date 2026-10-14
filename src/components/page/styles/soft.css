@@ -68,9 +68,8 @@
 .posy-style-soft .posy-section::before { content: ""; flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 22%, transparent); }
 .posy-style-soft .posy-section::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, color-mix(in oklab, var(--text) 18%, transparent), transparent); }
 .posy-style-soft.posy-layout-list .posy-section { justify-content: center; margin: 18px 0 4px; font-size: 22px; }
-.posy-style-soft.posy-layout-list .posy-section::before { order: 1; }
-.posy-style-soft.posy-layout-list .posy-section::before, .posy-style-soft.posy-layout-list .posy-section::after { flex: none; }
-.posy-style-soft.posy-layout-list .posy-section::after { width: 36px; }
+.posy-style-soft.posy-layout-list .posy-section::before { width: 36px; height: 1px; border-radius: 0; box-shadow: none; background: linear-gradient(270deg, color-mix(in oklab, var(--text) 18%, transparent), transparent); }
+.posy-style-soft.posy-layout-list .posy-section::after { flex: none; width: 36px; }
 .posy-style-soft .posy-social-row a {
   background: color-mix(in oklab, var(--surface) 72%, transparent);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / .6), 0 8px 14px -10px color-mix(in oklab, var(--sf-deep) 50%, transparent);
