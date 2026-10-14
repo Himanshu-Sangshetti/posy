@@ -27,8 +27,8 @@ function smooth(pts: [number, number][]): string {
 }
 
 /**
- * One series over time: a soft area with a hand-drawn feel, a crosshair tooltip (pointer or
- * arrow keys), the best day noted in handwriting, and a table for screen readers.
+ * One series over time: a soft area, a crosshair tooltip (pointer or
+ * arrow keys), the best day marked, and a table for screen readers.
  */
 export function AreaChart({ data, unit }: { data: { day: string; value: number }[]; unit: string }) {
   const box = useRef<HTMLDivElement>(null);
@@ -68,7 +68,7 @@ export function AreaChart({ data, unit }: { data: { day: string; value: number }
   return (
     <div ref={box} className="relative w-full min-w-0">
       <div tabIndex={0} onKeyDown={onKey} onBlur={() => setHover(null)} aria-label={`${unit} per day, ${total} in total. Use the arrow keys to read each day.`}
-        className="rounded-[8px] outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_oklab,var(--accent)_50%,transparent)]">
+        className="rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]">
         <svg width={w} height={h} aria-hidden onPointerMove={e => pick(e.clientX, e.currentTarget)} onPointerDown={e => pick(e.clientX, e.currentTarget)} onPointerLeave={() => setHover(null)} className="block max-w-full touch-pan-y select-none">
           <defs>
             <linearGradient id="area-fill" x1="0" y1="0" x2="0" y2="1">
@@ -79,35 +79,35 @@ export function AreaChart({ data, unit }: { data: { day: string; value: number }
           </defs>
           {[max / 2, max].map(t => (
             <g key={t}>
-              <line x1={pl} x2={w - pr} y1={y(t)} y2={y(t)} stroke="rgb(45 39 35 / .09)" strokeDasharray="2 6" strokeLinecap="round" />
-              <text x={pl - 8} y={y(t) + 4} textAnchor="end" fontSize="12" fill="#a39a90" className="tabular-nums">{t}</text>
+              <line x1={pl} x2={w - pr} y1={y(t)} y2={y(t)} stroke="var(--line)" strokeDasharray="3 5" strokeLinecap="round" />
+              <text x={pl - 8} y={y(t) + 4} textAnchor="end" fontSize="11" fill="var(--muted)" className="ac-mono">{t}</text>
             </g>
           ))}
-          <line x1={pl} x2={w - pr} y1={y(0)} y2={y(0)} stroke="rgb(45 39 35 / .14)" />
+          <line x1={pl} x2={w - pr} y1={y(0)} y2={y(0)} stroke="var(--input)" />
           <path d={area} fill="url(#area-fill)" />
           <path d={line} fill="none" stroke="var(--accent)" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
           {ticks.map(i => (
-            <text key={i} x={x(i)} y={h - 8} textAnchor={i === 0 ? 'start' : i === data.length - 1 ? 'end' : 'middle'} fontSize="12.5" fill="#a39a90">{label(data[i].day)}</text>
+            <text key={i} x={x(i)} y={h - 8} textAnchor={i === 0 ? 'start' : i === data.length - 1 ? 'end' : 'middle'} fontSize="11" fill="var(--muted)" className="ac-mono">{label(data[i].day)}</text>
           ))}
           {best >= 0 && hover === null && (
             <g>
-              <circle cx={x(best)} cy={y(top)} r={4.5} fill="var(--accent)" stroke="#fffefb" strokeWidth={2} />
-              <text x={Math.min(Math.max(x(best), pl + 40), w - pr - 40)} y={y(top) - 12} textAnchor="middle" fontSize="20" fill="#8d8379" style={{ fontFamily: 'var(--font-caveat), cursive', fontWeight: 600 }}>best day</text>
+              <circle cx={x(best)} cy={y(top)} r={4.5} fill="var(--accent)" stroke="var(--surface)" strokeWidth={2} />
+              <text x={Math.min(Math.max(x(best), pl + 40), w - pr - 40)} y={y(top) - 12} textAnchor="middle" fontSize="10.5" fill="var(--ac-deep)" className="ac-mono" style={{ letterSpacing: '.08em', textTransform: 'uppercase' }}>best day</text>
             </g>
           )}
           {hv && hover !== null && (
             <g>
-              <line x1={x(hover)} x2={x(hover)} y1={pt - 10} y2={y(0)} stroke="#8d8379" strokeOpacity=".45" strokeDasharray="2 4" />
-              <circle cx={x(hover)} cy={y(hv.value)} r={6} fill="var(--accent)" stroke="#fffefb" strokeWidth={2.5} />
+              <line x1={x(hover)} x2={x(hover)} y1={pt - 10} y2={y(0)} stroke="var(--ac-deep)" strokeOpacity=".35" strokeDasharray="3 4" />
+              <circle cx={x(hover)} cy={y(hv.value)} r={6} fill="var(--accent)" stroke="var(--surface)" strokeWidth={2.5} />
             </g>
           )}
         </svg>
       </div>
       {hv && hover !== null && (
-        <div role="status" className="pointer-events-none absolute -top-2 rounded-[4px] bg-[#fffefb] px-3.5 py-2 shadow-[var(--dk-shadow)]"
-          style={{ left: Math.min(Math.max(x(hover) - 70, 0), w - 140), rotate: '-1.5deg' }}>
-          <div className="text-[13px] text-[#8d8379]">{fmtDay(hv.day, { weekday: 'short', month: 'short', day: 'numeric' })}</div>
-          <div className="font-[family-name:var(--font-serif)] text-[24px] leading-tight">{hv.value} <span className="app-hand text-[20px] text-[#8d8379]">{hv.value === 1 ? unit.replace(/s$/, '') : unit}</span></div>
+        <div role="status" className="pointer-events-none absolute -top-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3.5 py-2 shadow-[0_12px_28px_-14px_rgb(80_50_130/.4)]"
+          style={{ left: Math.min(Math.max(x(hover) - 70, 0), w - 140) }}>
+          <div className="ac-mono text-[11px] uppercase tracking-[.06em] text-[var(--muted)]">{fmtDay(hv.day, { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+          <div className="ac-display text-[22px] leading-tight">{hv.value} <span className="font-sans text-[13px] text-[var(--muted)]">{hv.value === 1 ? unit.replace(/s$/, '') : unit}</span></div>
         </div>
       )}
       <table className="sr-only">

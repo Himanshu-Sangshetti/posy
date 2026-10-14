@@ -51,11 +51,11 @@ export function Onboarding({ initialUsername, styles, themes, host }: { initialU
   const styleLabel = styles.find(x => x.id === style)?.label ?? '';
   const themeName = themes.find(t => t.id === preset)?.name ?? '';
   return (
-    <div className="ac-rise grid gap-8">
+    <div className="ac-rise grid grid-cols-[minmax(0,1fr)] gap-8">
       <div>
         <p className="ac-eyebrow">Step 2 of 2 · Your page</p>
         <h1 className="ac-display ac-h1 mt-3">Claim your <i>name</i></h1>
-        <p className="ac-lede mt-3">This is your address on the web. Pick the look below and watch it come together on the right.</p>
+        <p className="ac-lede mt-3">This is your address on the web. Pick the look below and watch it come together in the preview.</p>
       </div>
       <label className="ac-card flex h-16 items-center pl-5 pr-4 text-[18px] transition-shadow focus-within:border-[var(--ac-deep)] focus-within:shadow-[0_0_0_4px_rgb(169_139_224/.22)]">
         <span className="ac-mono text-[15px] text-[var(--muted)]">{host}/</span>
@@ -154,7 +154,7 @@ export function Onboarding({ initialUsername, styles, themes, host }: { initialU
       </div>
 
       <div className="ac-card sticky bottom-4 z-20 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 bg-[rgb(255_253_250/.92)] p-3 pl-5 backdrop-blur-md">
-        <p className="ac-mono min-w-0 truncate text-[12.5px] text-[var(--muted)]">
+        <p className="ac-mono min-w-0 max-w-full flex-1 basis-60 truncate text-[12.5px] text-[var(--muted)]">
           <span className="text-[var(--text)]">{host}/{name || 'yourname'}</span> · {styleLabel} · {layout === 'bento' ? 'Bento' : 'List'} · {themeName}
         </p>
         <div className="flex items-center gap-3">

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Compass, Lock, StickyNote, Trash2 } from 'lucide-react';
+import { Compass, Download, Lock, StickyNote, Trash2 } from 'lucide-react';
 import { requireUser } from '@/lib/session';
 import { pageForUser } from '@/lib/pages';
 import { hasEvents, pageStats } from '@/lib/analytics';
@@ -13,6 +13,9 @@ import { asset } from '@/lib/utils';
 import { siteUrl } from '@/lib/site';
 import { AreaChart, GhostChart } from '@/components/dash/charts';
 import { CopyLink } from '@/components/dash/CopyLink';
+import { PageHead, Panel } from '@/components/dash/ui';
+import { NumberTicker } from '@/components/ui/number-ticker';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Favicon } from '@/components/page/islands';
 import { BrandIcon } from '@/components/page/tiles';
 import { entitlementsFor } from '@/lib/entitlements';
@@ -31,48 +34,49 @@ const fmtDay = (d: string) => new Date(d + 'T00:00:00Z').toLocaleDateString('en'
 
 /** A tiny rendering of the tile, so you recognise it before reading its label. */
 function TileMark({ tile, tint }: { tile?: Tile; tint: string }) {
-  const frame = 'grid size-11 shrink-0 place-items-center overflow-hidden';
+  const frame = 'grid size-10 shrink-0 place-items-center overflow-hidden';
   // eslint-disable-next-line @next/next/no-img-element
   const img = (src: string) => <img src={asset(src)} alt="" className="size-full object-cover" loading="lazy" />;
-  if (!tile) return <span className={`${frame} rounded-[10px] border border-dashed border-[#d9cfc3] text-[#b3a89c]`}><Trash2 className="size-4" /></span>;
+  if (!tile) return <span className={`${frame} rounded-[10px] border border-dashed border-[var(--input)] text-[var(--muted)]`}><Trash2 className="size-4" /></span>;
   switch (tile.type) {
     case 'image':
-      return <span className={`${frame} -rotate-3 bg-[#fffefb] p-[3px] pb-[7px] shadow-[var(--dk-shadow)]`}>{img(tile.src)}</span>;
+      return <span className={`${frame} rounded-[8px] border border-[var(--line)] bg-[var(--surface)]`}>{img(tile.src)}</span>;
     case 'video': {
       const id = youtubeId(tile.url);
       const src = tile.image || (id ? `https://i.ytimg.com/vi/${id}/default.jpg` : '');
-      return <span className={`${frame} rounded-[6px] shadow-[var(--dk-shadow)]`} style={{ background: tint }}>{src ? img(src) : null}</span>;
+      return <span className={`${frame} rounded-[8px] border border-[var(--line)]`} style={{ background: tint }}>{src ? img(src) : null}</span>;
     }
     case 'music':
-      return <span className={`${frame} shadow-[var(--dk-shadow)]`} style={{ background: tint }}>{tile.image ? img(tile.image) : <BrandIcon path={PLATFORMS.spotify.icon!.path} size={20} />}</span>;
+      return <span className={`${frame} rounded-[8px] border border-[var(--line)]`} style={{ background: tint }}>{tile.image ? img(tile.image) : <BrandIcon path={PLATFORMS.spotify.icon!.path} size={20} />}</span>;
     case 'social': {
       const p = PLATFORMS[tile.platform];
-      return <span className={`${frame} rounded-full border-[3px] border-[#fffefb] shadow-[var(--dk-shadow)]`} style={{ background: tint }}>{p.icon?.path ? <BrandIcon path={p.icon.path} size={18} /> : <b className="text-[15px]">{tile.platform === 'email' ? '@' : 'in'}</b>}</span>;
+      return <span className={`${frame} rounded-full border border-[var(--line)]`} style={{ background: tint }}>{p.icon?.path ? <BrandIcon path={p.icon.path} size={18} /> : <b className="text-[15px]">{tile.platform === 'email' ? '@' : 'in'}</b>}</span>;
     }
     case 'link':
-      return <span className={`${frame} rounded-[10px_16px_16px_10px] shadow-[var(--dk-shadow)]`} style={{ background: tint }}><Favicon url={tile.url} /></span>;
+      return <span className={`${frame} rounded-[8px] border border-[var(--line)]`} style={{ background: tint }}><Favicon url={tile.url} /></span>;
     case 'github':
-      return <span className={`${frame} rounded-[4px] bg-[#fffefb] shadow-[var(--dk-shadow)]`}><BrandIcon path={PLATFORMS.github.icon!.path} size={18} /></span>;
+      return <span className={`${frame} rounded-[8px] border border-[var(--line)] bg-[var(--surface)]`}><BrandIcon path={PLATFORMS.github.icon!.path} size={18} /></span>;
     default:
-      return <span className={`${frame} rotate-2 shadow-[var(--dk-shadow)]`} style={{ background: tint }}><StickyNote className="size-[18px] text-[#8d8379]" /></span>;
+      return <span className={`${frame} rounded-[8px] border border-[var(--line)]`} style={{ background: tint }}><StickyNote className="size-[18px] text-[var(--muted)]" /></span>;
   }
 }
 
-/** One row: a mark, a label, a gentle bar and the count. */
-function Row({ mark, label, n, max, colour }: { mark: React.ReactNode; label: string; n: number; max: number; colour: string }) {
+/** A ranked table: a mark, a label, a share bar, the count and its share of the total. */
+function Rank({ rows, head, max, total }: { rows: { key: string; mark: React.ReactNode; label: string; n: number; colour: string }[]; head: string; max: number; total: number }) {
   return (
-    <li className="flex items-center gap-4" title={`${label}: ${n}`}>
-      {mark}
-      <div className="min-w-0 flex-1">
-        <div className="flex items-baseline justify-between gap-3">
-          <span className="min-w-0 truncate text-[15px]">{label}</span>
-          <span className="font-[family-name:var(--font-serif)] text-[24px] leading-none tabular-nums">{n.toLocaleString()}</span>
-        </div>
-        <div className="mt-2 h-[7px] rounded-full bg-[rgb(45_39_35/.05)]">
-          <div className="h-full rounded-full" style={{ width: `${Math.max(3, (n / max) * 100)}%`, background: colour }} />
-        </div>
-      </div>
-    </li>
+    <Table className="ac-table">
+      <TableHeader><TableRow className="hover:bg-transparent"><TableHead className="px-0">{head}</TableHead><TableHead className="hidden w-[30%] sm:table-cell"><span className="sr-only">Share</span></TableHead><TableHead className="w-14 text-right">Count</TableHead><TableHead className="hidden w-14 pr-0 text-right sm:table-cell">Share</TableHead></TableRow></TableHeader>
+      <TableBody>
+        {rows.map(r => (
+          <TableRow key={r.key} title={`${r.label}: ${r.n}`}>
+            <TableCell className="px-0"><span className="flex min-w-0 items-center gap-3">{r.mark}<span className="min-w-0 truncate text-[14.5px] font-medium">{r.label}</span></span></TableCell>
+            <TableCell className="hidden sm:table-cell"><span className="block h-2 rounded-full bg-[var(--secondary)]"><span className="block h-full rounded-full" style={{ width: `${Math.max(4, (r.n / max) * 100)}%`, background: r.colour }} /></span></TableCell>
+            <TableCell className="ac-mono text-right text-[14px] font-medium">{r.n.toLocaleString()}</TableCell>
+            <TableCell className="ac-mono hidden pr-0 text-right text-[12.5px] text-[var(--muted)] sm:table-cell">{total ? Math.round((r.n / total) * 100) : 0}%</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }
 
@@ -95,12 +99,12 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const pro = ent.plan !== 'self-hosted';
 
   const switcher = (
-    <nav aria-label="Period" className="app-nav -ml-3 flex-wrap">
+    <nav aria-label="Period" className="ac-seg max-w-full overflow-x-auto">
       {PERIODS.map(p => p.days <= ent.analyticsDays
         ? <Link key={p.days} href={`/analytics?days=${p.days}`} aria-current={p.days === period.days ? 'page' : undefined} scroll={false}>{p.label}</Link>
         : (
-          <span key={p.days} aria-disabled title={pro ? 'Part of Posy Pro' : undefined} className="inline-flex cursor-default items-center gap-1.5 px-3 py-2 text-[15px] text-[#b3a89c]">
-            {p.label} <Lock className="size-3.5" aria-hidden />{pro && <span className="app-hand text-[19px]">Pro</span>}
+          <span key={p.days} aria-disabled title={pro ? 'Part of Posy Pro' : undefined} className="inline-flex h-[34px] cursor-default items-center gap-1.5 px-3.5 text-[14px] text-[var(--muted)]/60">
+            {p.label} <Lock className="size-3.5" aria-hidden />{pro && <span className="ac-pill ac-tone-butter !h-[18px]">Pro</span>}
           </span>
         ))}
     </nav>
@@ -108,38 +112,29 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
 
   // A brand-new page: show what will appear here and help them share it.
   if (!ever) return (
-    <div className="posy-rise grid min-w-0 gap-7 [&>*]:min-w-0">
-      <header className="mt-6">
-        <h1 className="app-h1 max-w-[14ch] !text-[46px] !leading-[1.02] sm:!text-[60px]">Nobody has <i>stopped by</i> yet.</h1>
-        <p className="app-lede">Your page is live. Share it, and this page fills in by itself: visits each day, which tiles people tap, and where they found you. No cookies, nothing that follows anyone around.</p>
-      </header>
-      <section className="app-card">
-        <span aria-hidden className="app-tape" />
-        <p className="app-hand mb-3 text-[24px] text-[#8d8379]">your link</p>
+    <div className="grid min-w-0 gap-6 [&>*]:min-w-0">
+      <PageHead eyebrow="Analytics" title={<>Nobody has <i>stopped by</i> yet.</>} lede="Your page is live. Share it, and this page fills in by itself: visits each day, which tiles people tap, and where they found you. No cookies, nothing that follows anyone around." />
+      <Panel eyebrow="Your link" tone="lilac" title={<>Share it <i>first</i></>} desc="Pop it in your Instagram or X bio, your email signature, or send it to a friend.">
         <CopyLink url={pageUrl} />
-        <p className="mt-4 text-[15px] text-[#8d8379]">Pop it in your Instagram or X bio, your email signature, or send it to a friend.</p>
-      </section>
-      <section className="app-card">
-        <h2 className="app-h2">Visits <i>per day</i></h2>
-        <div className="relative mt-4">
+      </Panel>
+      <Panel eyebrow="Preview" tone="sky" title={<>Visits <i>per day</i></>}>
+        <div className="relative">
           <GhostChart />
-          <p className="app-hand absolute inset-x-0 top-[38%] text-center text-[26px] text-[#8d8379]">your first visits will draw a line here</p>
+          <p className="ac-mono absolute inset-x-0 top-[40%] text-center text-[12.5px] text-[var(--muted)]"><span className="rounded-full border border-[var(--line)] bg-[var(--surface)] px-3.5 py-1.5">your first visits will draw a line here</span></p>
         </div>
-      </section>
-      <div className="grid gap-7 md:grid-cols-2 [&>*]:min-w-0">
-        {[['What people', 'tapped', 'Each tile, with how often it was tapped.'], ['Where they', 'came from', 'Instagram, X, a newsletter, or straight to your link.']].map(([a, b, note]) => (
-          <section key={b} className="app-card">
-            <h2 className="app-h2">{a} <i>{b}</i></h2>
-            <ul aria-hidden className="mt-5 grid gap-4 opacity-50">
+      </Panel>
+      <div className="grid gap-6 md:grid-cols-2 [&>*]:min-w-0">
+        {[['What people', 'tapped', 'Each tile, with how often it was tapped.', 'peach'], ['Where they', 'came from', 'Instagram, X, a newsletter, or straight to your link.', 'mint']].map(([a, b, note, tone]) => (
+          <Panel key={b} eyebrow={b === 'tapped' ? 'Tiles' : 'Sources'} tone={tone as 'peach' | 'mint'} title={<>{a} <i>{b}</i></>} desc={note}>
+            <ul aria-hidden className="grid gap-4 opacity-60">
               {[78, 52, 30].map((w, i) => (
-                <li key={w} className="flex items-center gap-4">
-                  <span className="size-11 shrink-0 rounded-[10px]" style={{ background: `var(--tint-${TINTS[i + (b === 'tapped' ? 0 : 3)]})` }} />
-                  <span className="h-[7px] rounded-full bg-[rgb(45_39_35/.08)]" style={{ width: `${w}%` }} />
+                <li key={w} className="flex items-center gap-3">
+                  <span className="size-10 shrink-0 rounded-[8px]" style={{ background: `var(--tint-${TINTS[i + (b === 'tapped' ? 0 : 3)]})` }} />
+                  <span className="h-2 rounded-full bg-[var(--line)]" style={{ width: `${w}%` }} />
                 </li>
               ))}
             </ul>
-            <p className="mt-5 text-[15px] text-[#8d8379]">{note}</p>
-          </section>
+          </Panel>
         ))}
       </div>
     </div>
@@ -148,73 +143,64 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const best = s.series.reduce((a, d) => (d.views > a.views ? d : a), s.series[0]);
   const topRef = s.referrers.find(r => r.label !== 'Direct or unknown');
   const quiet = s.views === 0;
-  const tileRows = s.tiles.map(t => ({ tile: byId.get(t.tileId ?? ''), label: tileLabel(byId.get(t.tileId ?? ''), t.tileId) ?? 'Unknown', n: t.n, tint: tintOf(t.tileId) }));
+  const tileRows = s.tiles.map((t, i) => ({ key: `${t.tileId}-${i}`, mark: <TileMark tile={byId.get(t.tileId ?? '')} tint={tintOf(t.tileId)} />, label: tileLabel(byId.get(t.tileId ?? ''), t.tileId) ?? 'Unknown', n: t.n, colour: tintOf(t.tileId) }));
   const tileMax = Math.max(1, ...tileRows.map(r => r.n));
   const refMax = Math.max(1, ...s.referrers.map(r => r.n));
   const countryMax = Math.max(1, ...s.countries.map(c => c.n));
+  const kpis = [
+    { k: 'Visits', v: s.views, tone: 'lilac', suffix: '' },
+    { k: 'Taps', v: s.clicks, tone: 'rose', suffix: '' },
+    { k: 'Tap rate', v: Math.round(s.ctr * 100), tone: 'mint', suffix: '%' },
+  ] as const;
 
   return (
-    <div className="posy-rise grid min-w-0 gap-7 [&>*]:min-w-0">
-      <header className="mt-6">
-        <h1 className="app-h1 max-w-[17ch] !text-[44px] !leading-[1.04] sm:!text-[58px]">
-          {quiet
-            ? <>A quiet stretch, <i>no visits</i> {period.span}.</>
-            : <>{plural(s.views, 'visit')} <i>{period.span}</i>, {s.clicks ? `${plural(s.clicks, 'tap')} on your tiles.` : 'no taps yet.'}</>}
-        </h1>
-        <p className="app-lede">
+    <div className="grid min-w-0 gap-6 [&>*]:min-w-0">
+      <PageHead eyebrow={`Analytics · ${period.label}`}
+        title={quiet
+          ? <>A quiet stretch, <i>no visits</i> {period.span}.</>
+          : <>{plural(s.views, 'visit')} <i>{period.span}</i>, {s.clicks ? `${plural(s.clicks, 'tap')} on your tiles.` : 'no taps yet.'}</>}
+        lede={<>
           {!quiet && best.views > 0 && <>Your best day was {fmtDay(best.day)}, with {plural(best.views, 'visit')}. </>}
           {!quiet && topRef && <>Most people found you through {topRef.label}. </>}
           Counted without cookies.
-        </p>
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-          {switcher}
-          {ent.analyticsExport && <a href={`/api/v1/analytics/export`} className="app-btn app-btn-ghost">Download CSV</a>}
-        </div>
-      </header>
+        </>} />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {switcher}
+        {ent.analyticsExport && <a href={`/api/v1/analytics/export`} className="ac-btn ac-btn-soft inline-flex items-center gap-2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[var(--ring)]"><Download className="size-4" />Download CSV</a>}
+      </div>
 
-      <section className="app-card">
-        <div className="mb-5 flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
-          <h2 className="app-h2">Visits <i>per day</i></h2>
-          <dl className="flex gap-8 sm:gap-10">
-            {[['Visits', s.views.toLocaleString()], ['Taps', s.clicks.toLocaleString()], ['Tap rate', `${Math.round(s.ctr * 100)}%`]].map(([k, v]) => (
-              <div key={k}><dt className="app-hand text-[21px] leading-none text-[#8d8379]">{k}</dt><dd className="mt-1 font-[family-name:var(--font-serif)] text-[38px] leading-none tabular-nums">{v}</dd></div>
-            ))}
-          </dl>
-        </div>
+      <dl className="grid grid-cols-3 gap-3 sm:gap-4">
+        {kpis.map(({ k, v, tone, suffix }) => (
+          <div key={k} className="ac-card ac-rise p-4 sm:p-5" style={{ background: `var(--ac-${tone}-bg)`, borderColor: `color-mix(in oklab, var(--ac-${tone}) 40%, var(--line))` }}>
+            <dt className="ac-eyebrow !text-[var(--text)]/60">{k}</dt>
+            <dd className="ac-display mt-2 text-[34px] leading-none tabular-nums sm:text-[48px]"><NumberTicker value={v} />{suffix}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <Panel eyebrow="Trend" tone="sky" title={<>Visits <i>per day</i></>}>
         <AreaChart data={s.series.map(d => ({ day: d.day, value: d.views }))} unit="visits" />
-      </section>
+      </Panel>
 
-      <div className="grid gap-7 md:grid-cols-2 [&>*]:min-w-0">
-        <section className="app-card">
-          <h2 className="app-h2">What people <i>tapped</i></h2>
+      <div className="grid gap-6 md:grid-cols-2 [&>*]:min-w-0">
+        <Panel eyebrow="Tiles" tone="peach" title={<>What people <i>tapped</i></>}>
           {tileRows.length
-            ? <ul className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-4">{tileRows.map((r, i) => <Row key={i} mark={<TileMark tile={r.tile} tint={r.tint} />} label={r.label} n={r.n} max={tileMax} colour={r.tint} />)}</ul>
-            : <p className="app-hand mt-4 text-[24px] text-[#8d8379]">No taps {period.span} yet.</p>}
-        </section>
-        <section className="app-card">
-          <h2 className="app-h2">Where they <i>came from</i></h2>
+            ? <Rank head="Tile" rows={tileRows} max={tileMax} total={s.clicks} />
+            : <p className="rounded-2xl border border-dashed border-[var(--input)] px-4 py-8 text-center text-[14px] text-[var(--muted)]">No taps {period.span} yet.</p>}
+        </Panel>
+        <Panel eyebrow="Sources" tone="mint" title={<>Where they <i>came from</i></>}>
           {s.referrers.length
-            ? (
-              <ul className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-4">
-                {s.referrers.map(r => {
-                  const direct = r.label === 'Direct or unknown';
-                  return <Row key={r.label} label={r.label} n={r.n} max={refMax} colour="color-mix(in oklab, var(--accent) 38%, var(--tint-peach))"
-                    mark={<span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#fffefb] shadow-[var(--dk-shadow)]">{direct ? <Compass className="size-[18px] text-[#8d8379]" /> : <Favicon url={`https://${r.label}`} />}</span>} />;
-                })}
-              </ul>
-            )
-            : <p className="app-hand mt-4 text-[24px] text-[#8d8379]">Nobody {period.span} yet.</p>}
-        </section>
+            ? <Rank head="Source" max={refMax} total={s.views} rows={s.referrers.map(r => ({ key: r.label, label: r.label, n: r.n, colour: 'var(--ac-lilac)',
+                mark: <span className="grid size-10 shrink-0 place-items-center rounded-[8px] border border-[var(--line)] bg-[var(--surface)]">{r.label === 'Direct or unknown' ? <Compass className="size-[18px] text-[var(--muted)]" /> : <Favicon url={`https://${r.label}`} />}</span> }))} />
+            : <p className="rounded-2xl border border-dashed border-[var(--input)] px-4 py-8 text-center text-[14px] text-[var(--muted)]">Nobody {period.span} yet.</p>}
+        </Panel>
       </div>
 
       {s.countries.length > 0 && (
-        <section className="app-card">
-          <h2 className="app-h2">Where in the <i>world</i></h2>
-          <ul className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2 md:gap-x-10">
-            {s.countries.map(c => <Row key={c.code} label={countryName(c.code)} n={c.n} max={countryMax} colour="var(--tint-sky)"
-              mark={<span aria-hidden className="grid size-11 shrink-0 place-items-center text-[26px]">{flag(c.code)}</span>} />)}
-          </ul>
-        </section>
+        <Panel eyebrow="Places" tone="sky" title={<>Where in the <i>world</i></>}>
+          <Rank head="Country" max={countryMax} total={s.views} rows={s.countries.map(c => ({ key: c.code, label: countryName(c.code), n: c.n, colour: 'var(--ac-sky)',
+            mark: <span aria-hidden className="grid size-10 shrink-0 place-items-center text-[24px]">{flag(c.code)}</span> }))} />
+        </Panel>
       )}
     </div>
   );
