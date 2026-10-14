@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 /* Page tokens come from the active Posy theme (set inline on <body> / the page root). */
 :root {
   --bg: #f6f1e9; --surface: #fffcf7; --text: #2b2621; --muted: #8c8277; --line: #e9e1d5; --accent: #e39b6f;
@@ -50,6 +52,99 @@
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-head), var(--font-body), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+  --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
+  --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
+  --animate-ripple: ripple var(--duration,2s) ease calc(var(--i, 0)*.2s) infinite;
+  --animate-blink-cursor: blink-cursor 1.2s step-end infinite;
+  --animate-shiny-text: shiny-text 8s infinite;
+  --animate-pulse: pulse var(--duration) ease-out infinite;
+  --animate-pulse-ripple: pulse-ripple var(--duration) cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  --animate-line-shadow: line-shadow 15s linear infinite;
+  @keyframes marquee {
+  from {
+    transform: translateX(0);
+    }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+  @keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+    }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
+  @keyframes shimmer-slide {
+  to {
+    transform: translate(calc(100cqw - 100%), 0);
+    }
+  }
+  @keyframes spin-around {
+  0% {
+    transform: translateZ(0) rotate(0);
+    }
+  15%, 35% {
+    transform: translateZ(0) rotate(90deg);
+    }
+  65%, 85% {
+    transform: translateZ(0) rotate(270deg);
+    }
+  100% {
+    transform: translateZ(0) rotate(360deg);
+    }
+  }
+  @keyframes ripple {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    }
+  50% {
+    transform: translate(-50%, -50%) scale(0.9);
+    }
+  }
+  @keyframes blink-cursor {
+  0%, 49% {
+    opacity: 1;
+    }
+  50%, 100% {
+    opacity: 0;
+    }
+  }
+  @keyframes shiny-text {
+  0%, 90%, 100% {
+    background-position: calc(-100% - var(--shiny-width)) 0;
+    }
+  30%, 60% {
+    background-position: calc(100% + var(--shiny-width)) 0;
+    }
+  }
+  @keyframes pulse {
+  0%, 100% {
+    boxShadow: 0 0 0 0 var(--pulse-color, oklch(from var(--bg) l c h / 0.5));
+    }
+  50% {
+    boxShadow: 0 0 0 var(--distance) var(--pulse-color, oklch(from var(--bg) l c h / 0.5));
+    }
+  }
+  @keyframes pulse-ripple {
+  0% {
+    boxShadow: 0 0 0 0 oklch(from var(--pulse-color, var(--bg)) l c h / 1);
+    }
+  100% {
+    boxShadow: 0 0 0 var(--distance) oklch(from var(--pulse-color, var(--bg)) l c h / 0);
+    }
+  }
+  @keyframes line-shadow {
+  0% {
+    background-position: 0 0;
+    }
+  100% {
+    background-position: 100% -100%;
+    }
+  }
 }
 
 @layer base {
@@ -441,3 +536,27 @@ a.posy-obj.posy-tile:hover, .posy-obj.posy-tile:hover { box-shadow: none; rotate
 .app-btn-ghost { background: transparent; color: #2d2723; box-shadow: inset 0 0 0 1px rgb(45 39 35 / .16); }
 .app-btn-ghost:hover { background: rgb(45 39 35 / .05); }
 .posy-app .app-card input, .posy-app .app-card [data-slot="input"] { background: #fff; }
+
+/* ================= Posy brand: plum ink, soft paper, five pastels. Applies to all app chrome and posy.page. =================
+   Type: Fraunces (display, soft), DM Sans (interface), JetBrains Mono (labels, ASCII). */
+.posy-app {
+  --bg: #faf6f1; --surface: #fffdfa; --text: #241f2e; --muted: #7b7389; --line: #e9e1ef; --accent: #a98be0; --ring: #a98be0;
+  --tint-peach: #fcdac6; --tint-butter: #fbebb2; --tint-mint: #c6ebd8; --tint-sky: #c8e1f7; --tint-lilac: #dacdf6; --tint-rose: #f8cad7;
+  --brand-ink: #241f2e; --brand-deep: #7048b8; --brand-lilac: #c9b6f3; --brand-rose: #f4b3c6; --brand-mint: #b7e4cf; --brand-butter: #f8e3a3; --brand-sky: #b9d9f3;
+  --dk-white: #fffdfa;
+  --dk-shadow: 0 1px 1px rgb(60 40 90 / .06), 0 2px 4px rgb(60 40 90 / .05), 0 16px 32px -14px rgb(60 40 90 / .26);
+  --dk-shadow-hi: 0 2px 2px rgb(60 40 90 / .06), 0 6px 10px rgb(60 40 90 / .05), 0 30px 50px -18px rgb(60 40 90 / .32);
+  --font-serif: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --font-geist: var(--font-dm-sans);
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-geist-mono: var(--font-jetbrains);
+  font-family: var(--font-sans);
+}
+.posy-app .app-h1, .posy-app .app-h2, .posy-app .app-num { font-variation-settings: "SOFT" 100, "WONK" 1; font-weight: 400; }
+.posy-app .app-h1 i, .posy-app .app-h2 i { font-style: italic; color: var(--brand-deep); }
+.posy-app .app-card { color: var(--brand-ink); }
+.posy-app .app-btn { background: var(--brand-ink); }
+.posy-app .app-btn:hover { background: color-mix(in oklab, var(--brand-ink) 86%, var(--brand-deep)); }
+.posy-app .app-btn-ghost { background: transparent; color: var(--brand-ink); box-shadow: inset 0 0 0 1px rgb(36 31 46 / .18); }
+.posy-app .app-nav a[aria-current="page"]::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5 Q 25 1 50 4.5 T 98 3' fill='none' stroke='%23a98be0' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.posy-app .app-step { background: var(--tint-lilac); color: var(--brand-deep); }
