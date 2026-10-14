@@ -1,6 +1,6 @@
 # Editing Posy with an AI agent
 
-Every Posy account has an API key page (**Agents** in the dashboard), a hosted MCP server, a REST API
+Every Posy account, self-hosted or on posy.page, has an API key page (**Agents** in the dashboard), a hosted MCP server, a REST API
 and a CLI. Agents edit your **draft**; nothing goes live until `publish` is called.
 
 ## Connect
@@ -15,6 +15,8 @@ claude mcp add --transport http posy https://YOUR-POSY/api/mcp --header "Authori
 
 Cursor, Codex and other MCP clients: add an HTTP server at `https://YOUR-POSY/api/mcp` with the header
 `Authorization: Bearer posy_...`. The Agents page has copy-paste snippets for each.
+
+`YOUR-POSY` is your own server or `posy.page`. The API, MCP server and CLI behave the same on both, so a script written for one works on the other by changing `POSY_URL`. `export` and `import` move a whole page between them.
 
 ## MCP tools
 
@@ -77,7 +79,7 @@ Each published page also has a plain-text version at `/<username>/llms.txt`.
 ## The CLI
 
 ```bash
-export POSY_URL=https://YOUR-POSY POSY_API_KEY=posy_...
+export POSY_URL=https://YOUR-POSY POSY_API_KEY=posy_...   # your server, or https://posy.page
 npm run posy -- get
 npm run posy -- add https://github.com/owner/repo --size w
 npm run posy -- add "Open to freelance work" --color mint
