@@ -1,0 +1,86 @@
+/* ================= Washi: a Japanese print ================= */
+.posy-style-washi { --ws-cjk: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif; --ws-ink: var(--text); --ws-red: var(--accent); --ws-rule: color-mix(in oklab, var(--text) 22%, transparent); --ws-paper: color-mix(in oklab, var(--surface) 70%, var(--bg)); }
+/* paper fibres: long thin strands over the page colour */
+.posy-style-washi .posy-backdrop::before { opacity: .55; mix-blend-mode: multiply;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='1600'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .02' numOctaves='5' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .38 0 0 0 0 .29 0 0 0 -.9 .42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E") center / cover no-repeat; }
+.dark.posy-style-washi .posy-backdrop::before { mix-blend-mode: screen; opacity: .18; }
+.posy-style-washi .posy-head { font-family: var(--font-head), var(--ws-cjk); }
+.ws-n, .ws-mark, .ws-seal span, .ws-note { font-family: var(--font-head), var(--ws-cjk) !important; }
+
+/* header: the name runs top to bottom beside a seal, a small print and the bio */
+.st-head-washi { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 clamp(28px, 6vw, 72px); align-items: start; padding-bottom: 34px; border-bottom: 1px solid var(--ws-rule); }
+.ws-name { display: flex; flex-direction: row-reverse; align-items: flex-start; gap: .14em; margin: 0; font-size: 58px; line-height: 1; letter-spacing: .12em; text-transform: uppercase; color: var(--ws-ink); }
+.ws-word { writing-mode: vertical-rl; text-orientation: upright; max-height: 9.5em; }
+.ws-name-edit { writing-mode: vertical-rl; display: block; max-height: 560px; }
+.ws-name i { font-style: normal; }
+.ws-name-long .ws-word { text-orientation: mixed; } .ws-name-long { letter-spacing: .04em; text-transform: none; }
+@container page (min-width: 700px) { .ws-name { font-size: 76px; } }
+.ws-side { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "top bio" "top cap" "top soc"; gap: 18px clamp(28px, 4vw, 48px); align-content: start; align-items: start; padding-top: 6px; }
+.ws-side > .ws-top { grid-area: top; } .ws-side > .ws-bio { grid-area: bio; } .ws-side > .ws-caption { grid-area: cap; } .ws-side > .posy-social-row { grid-area: soc; }
+.ws-side > :not(.ws-top) { justify-self: start; }
+.ws-top { display: flex; align-items: flex-end; gap: 18px; }
+.ws-top { flex-direction: column; align-items: flex-start; gap: 0; }
+.ws-top .ws-seal { margin: -26px 0 0 104px; position: relative; }
+.ws-print { width: 150px; padding: 8px 8px 24px; background: var(--ws-paper); box-shadow: 0 0 0 1px var(--ws-rule), 0 14px 28px -20px rgb(0 0 0 / .45); }
+.ws-print .posy-avatar, .ws-print button { width: 100%; height: auto; aspect-ratio: 4 / 5; border-radius: 0; box-shadow: none; }
+.ws-print .posy-avatar img { filter: saturate(.75) contrast(1.02); }
+.ws-seal { display: grid; place-items: center; width: 58px; height: 58px; rotate: -4deg; border-radius: 6px; background: var(--ws-red); color: var(--bg); box-shadow: inset 0 0 0 3px var(--ws-red), inset 0 0 0 4.5px color-mix(in oklab, var(--bg) 80%, transparent);
+  -webkit-mask-image: radial-gradient(circle at 30% 20%, #000 60%, rgb(0 0 0 / .82) 61%, #000 75%); mask-image: radial-gradient(circle at 30% 20%, #000 60%, rgb(0 0 0 / .82) 61%, #000 75%); }
+.ws-seal span { font-family: var(--font-head); font-size: 24px; font-weight: 600; letter-spacing: .02em; line-height: 1; }
+.ws-bio { max-width: 38ch; font-family: var(--font-head); font-size: 21px; line-height: 1.75; color: var(--ws-ink); }
+.ws-caption { display: flex; align-items: center; gap: 9px; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.ws-caption::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--ws-red); }
+.posy-style-washi .posy-social-row { gap: 6px; }
+.posy-style-washi .posy-social-row a, .posy-style-washi .posy-social-row > div > span { width: 38px; height: 38px; border-radius: 0; background: none; color: var(--ws-ink); box-shadow: inset 0 0 0 1px var(--ws-rule); transition: background .2s, color .2s; }
+.posy-style-washi .posy-social-row a:hover { background: var(--ws-ink); color: var(--bg); }
+@container page (max-width: 560px) {
+  .st-head-washi { grid-template-columns: 1fr; gap: 22px; }
+  .ws-side { grid-template-columns: 1fr; grid-template-areas: "top" "bio" "cap" "soc"; }
+  .ws-name { flex-direction: row; flex-wrap: wrap; gap: 0 .35em; font-size: 46px; letter-spacing: .06em; }
+  .ws-word, .ws-name-edit { writing-mode: horizontal-tb; }
+}
+
+/* sections: a red dot and a long rule */
+.posy-style-washi .posy-section { display: flex; align-items: center; gap: 14px; margin: 8px 0 22px; padding: 0; font-family: var(--font-head); font-size: 22px; font-weight: 500; letter-spacing: .08em; color: var(--ws-ink); }
+.posy-style-washi .posy-section::before { content: ""; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--ws-red); }
+.posy-style-washi .posy-section::after { content: ""; flex: 1; height: 1px; background: var(--ws-rule); }
+.posy-style-washi .posy-grid { --gap: 22px; }
+
+/* tiles: a print in a double-ruled frame */
+.ws-frame { position: relative; display: flex; flex-direction: column; gap: 12px; height: 100%; padding: 16px 16px 15px; background: var(--ws-paper); color: var(--ws-ink);
+  box-shadow: inset 0 0 0 1px var(--ws-rule), inset 0 0 0 5px var(--ws-paper), inset 0 0 0 6px color-mix(in oklab, var(--text) 10%, transparent); transition: box-shadow .3s, translate .3s; }
+.posy-tile:hover .ws-frame { translate: 0 -2px; box-shadow: inset 0 0 0 1px var(--ws-ink), inset 0 0 0 5px var(--ws-paper), inset 0 0 0 6px var(--ws-rule), 0 18px 30px -24px rgb(0 0 0 / .5); }
+.ws-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.ws-n { font-family: var(--font-head); font-size: 15px; font-weight: 600; color: var(--ws-red); }
+.ws-kind { font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+.ws-img { position: relative; flex: 1; min-height: 0; overflow: hidden; background: color-mix(in oklab, var(--text) 8%, transparent); }
+.ws-img img, .ws-img button img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.72) contrast(1.03) sepia(.08); transition: filter .5s; }
+.posy-tile:hover .ws-img img { filter: none; }
+.ws-cap { font-family: var(--font-head); font-size: 13.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ws-mark { position: absolute; right: 14px; top: 34px; font-family: var(--font-head); font-size: 88px; line-height: 1; color: color-mix(in oklab, var(--text) 9%, transparent); pointer-events: none; user-select: none; }
+.posy-size-s .ws-mark { font-size: 64px; }
+.ws-text { position: relative; display: grid; gap: 4px; margin-top: auto; min-width: 0; padding-right: 22px; }
+.ws-text b { font-family: var(--font-head); font-size: 20px; font-weight: 600; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.ws-text span { font-size: 12.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ws-go { position: absolute; right: 14px; bottom: 15px; width: 17px; height: 17px; color: var(--muted); transition: color .2s, translate .2s; }
+.posy-tile:hover .ws-go { color: var(--ws-red); translate: 2px -2px; }
+/* notes read top to bottom, right to left */
+.ws-note { flex: 1; min-height: 0; writing-mode: vertical-rl; font-family: var(--font-head); font-size: 19px; line-height: 1.85; letter-spacing: .06em; overflow: hidden; align-self: flex-end; }
+.posy-size-w .ws-note { writing-mode: horizontal-tb; align-self: stretch; font-size: 21px; line-height: 1.6; letter-spacing: .01em; }
+
+/* list layout */
+.posy-style-washi .posy-list { gap: 0; border-top: 1px solid var(--ws-rule); }
+.ws-line { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto 22px; align-items: baseline; gap: 14px; padding: 18px 6px; border-bottom: 1px solid var(--ws-rule); transition: background .2s; }
+.ws-line b { font-family: var(--font-head); font-size: 19px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ws-line .ws-go { position: static; align-self: center; }
+.posy-row-st:hover .ws-line { background: var(--ws-paper); }
+.posy-row-st:hover .ws-line .ws-go { color: var(--ws-red); }
+.ws-row-note { padding: 18px 6px 18px 64px; border-bottom: 1px solid var(--ws-rule); font-family: var(--font-head); font-size: 17px; line-height: 1.7; color: var(--muted); }
+.posy-style-washi.posy-layout-list .posy-section { margin: 26px 0 4px; }
+.posy-style-washi.posy-layout-list .st-head-washi { grid-template-columns: 1fr; justify-items: center; text-align: center; border-bottom: 0; padding-bottom: 8px; }
+.posy-style-washi.posy-layout-list .ws-name { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 0 .35em; font-size: 46px; }
+.posy-style-washi.posy-layout-list .ws-word { writing-mode: horizontal-tb; }
+.posy-style-washi.posy-layout-list .ws-side { grid-template-columns: 1fr; grid-template-areas: "top" "bio" "cap" "soc"; justify-items: center; }
+.posy-style-washi.posy-layout-list .ws-side > :not(.ws-top) { justify-self: center; }
+.posy-style-washi.posy-layout-list .posy-social-row { justify-content: center; }
+.posy-style-washi .posy-footer a { font-family: var(--font-head); letter-spacing: .1em; }
