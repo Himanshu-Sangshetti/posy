@@ -208,14 +208,14 @@ test('onboarding lets you choose style, layout and colours separately', async ({
   await page.click('button[type=submit]');
   await page.waitForURL(/onboarding/);
   await expect(page.getByRole('status').filter({ hasText: 'Available' })).toBeVisible();
-  await page.click('[data-style="washi"]');
+  await page.click('[data-style="minimal"]');
   await page.click('[data-layout="list"]');
-  await page.click('[data-preset="sakura"]');
+  await page.click('[data-preset="stone"]');
   await expect(page.frameLocator('iframe[title="Live preview of your page"]').getByRole('heading', { name: 'Test Person' }).first()).toBeVisible({ timeout: 15_000 });
   await page.getByRole('button', { name: 'Create my page' }).click();
   await page.waitForURL(/\/edit/);
   const { page: d } = await page.request.get('/api/v1/page').then(r => r.json());
-  expect(d.theme.style).toBe('washi');
+  expect(d.theme.style).toBe('minimal');
   expect(d.theme.layout).toBe('list');
-  expect(d.theme.preset).toBe('sakura');
+  expect(d.theme.preset).toBe('stone');
 });
