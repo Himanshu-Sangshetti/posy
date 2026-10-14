@@ -18,6 +18,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
 import { Page } from '../src/lib/schema';
+import { exportFile } from '../src/lib/portable';
 
 const [cmd, ...rest] = process.argv.slice(2);
 const flags: Record<string, string> = {};
@@ -87,7 +88,7 @@ switch (cmd) {
   }
   case 'export': {
     const s = await api('GET', '/api/v1/page');
-    const json = JSON.stringify({ $schema: `${BASE}/schema/page.schema.json`, ...s.page }, null, 2) + '\n';
+    const json = JSON.stringify(exportFile(s.page, BASE), null, 2) + '\n';
     if (args[0]) { fs.writeFileSync(args[0], json); ok(`wrote ${args[0]}`); } else process.stdout.write(json);
     break;
   }
