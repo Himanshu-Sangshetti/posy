@@ -4,6 +4,7 @@ import type { Page } from '@/lib/schema';
 import { THEMES, type Theme } from '@/lib/themes';
 import { cozy } from './cozy';
 import { soft } from './soft';
+import { terminal } from './terminal';
 import { fontPair, loadFonts } from './fonts';
 import { loadRoundable } from './images';
 import { isLight } from './util';
@@ -26,7 +27,7 @@ export type OgStyle = (input: OgInput) => Promise<{ element: React.ReactElement;
  * Share-image styles, keyed by `page.theme.style`. Add a style by writing an OgStyle and listing it here;
  * unknown or missing styles use "cozy".
  */
-const STYLES: Record<string, OgStyle> = { cozy, soft };
+const STYLES: Record<string, OgStyle> = { cozy, soft, terminal };
 
 export function themeOf(page: Page): Theme {
   const t = THEMES[page.theme.preset] ?? THEMES.cream;
