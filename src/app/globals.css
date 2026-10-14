@@ -602,7 +602,6 @@ a.posy-obj.posy-tile:hover, .posy-obj.posy-tile:hover { box-shadow: none; rotate
 .sc-chrome [cmdk-group-heading] { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10.5px !important; letter-spacing: .1em; text-transform: uppercase; font-weight: 400 !important; color: #7b7389 !important; padding: 12px 10px 6px !important; }
 .sc-chrome [cmdk-input-wrapper] { height: 52px; border-color: #e9e1ef; padding: 0 16px; }
 .sc-chrome [cmdk-item][data-disabled="true"] { opacity: .4; }
-=======
 /* app-chrome ===================================================================
    Sign-up, onboarding and dashboard. Plum ink on soft paper, five pastels, hairline borders.
    Tokens are also applied to <body> (ac-body) so portals (dialogs, menus, toasts) match. */
