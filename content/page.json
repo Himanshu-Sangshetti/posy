@@ -1,0 +1,126 @@
+{
+  "$schema": "../schema/page.schema.json",
+  "version": 1,
+  "profile": {
+    "name": "Alex Rivera",
+    "bio": "Designer and indie maker. I build small, calm software and write about the process.",
+    "location": "Lisbon"
+  },
+  "theme": {
+    "preset": "cream",
+    "font": "editorial",
+    "radius": "round",
+    "layout": "split",
+    "motion": true
+  },
+  "seo": {},
+  "tiles": [
+    {
+      "id": "t-x",
+      "size": "s",
+      "color": "auto",
+      "type": "social",
+      "platform": "x",
+      "handle": "alexrivera"
+    },
+    {
+      "id": "t-ig",
+      "size": "s",
+      "color": "auto",
+      "type": "social",
+      "platform": "instagram",
+      "handle": "alexrivera"
+    },
+    {
+      "id": "t-art",
+      "size": "l",
+      "color": "auto",
+      "type": "image",
+      "src": "/demo/dunes.svg",
+      "alt": "Warm abstract dunes",
+      "caption": "Sketches, spring 2026"
+    },
+    {
+      "id": "t-note",
+      "size": "w",
+      "color": "auto",
+      "type": "text",
+      "text": "Currently: making a **tiny journaling app** that only asks one question a day."
+    },
+    {
+      "id": "t-h1",
+      "size": "s",
+      "color": "auto",
+      "type": "heading",
+      "text": "Projects"
+    },
+    {
+      "id": "t-gh",
+      "size": "w",
+      "color": "auto",
+      "type": "github",
+      "repo": "vercel/next.js",
+      "description": "The React Framework",
+      "stars": 140000,
+      "language": "JavaScript"
+    },
+    {
+      "id": "t-site",
+      "size": "s",
+      "color": "auto",
+      "type": "link",
+      "url": "https://example.com",
+      "title": "Calm Notes",
+      "description": "A quiet notes app with no folders."
+    },
+    {
+      "id": "t-li",
+      "size": "s",
+      "color": "auto",
+      "type": "social",
+      "platform": "linkedin",
+      "handle": "alexrivera"
+    },
+    {
+      "id": "t-bloom",
+      "size": "t",
+      "color": "auto",
+      "type": "image",
+      "src": "/demo/bloom.svg",
+      "alt": "Pink and lilac bloom"
+    },
+    {
+      "id": "t-lagoon",
+      "size": "w",
+      "color": "auto",
+      "type": "image",
+      "src": "/demo/lagoon.svg",
+      "alt": "Blue-green lagoon",
+      "caption": "Palette study"
+    },
+    {
+      "id": "t-gh2",
+      "size": "s",
+      "color": "auto",
+      "type": "social",
+      "platform": "github",
+      "handle": "alexrivera"
+    },
+    {
+      "id": "t-coffee",
+      "size": "w",
+      "color": "auto",
+      "type": "text",
+      "text": "Open to small design collaborations. Coffee's on me in Lisbon."
+    },
+    {
+      "id": "t-mail",
+      "size": "s",
+      "color": "auto",
+      "type": "social",
+      "platform": "email",
+      "handle": "hello@example.com"
+    }
+  ],
+  "badge": true
+}

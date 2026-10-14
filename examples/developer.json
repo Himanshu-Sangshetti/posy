@@ -1,0 +1,19 @@
+{
+  "$schema": "../schema/page.schema.json",
+  "version": 1,
+  "profile": { "name": "Kai Morgan", "bio": "I build developer tools and write about shipping small things. Open source on weekends.", "location": "Berlin" },
+  "theme": { "preset": "midnight", "font": "soft", "radius": "soft", "layout": "split", "motion": true },
+  "seo": {},
+  "tiles": [
+    { "id": "d-gh", "type": "social", "platform": "github", "handle": "kaimorgan", "size": "s" },
+    { "id": "d-x", "type": "social", "platform": "x", "handle": "kaimorgan", "size": "s" },
+    { "id": "d-now", "type": "text", "text": "Now: a **tiny CLI** that turns any README into a changelog.", "size": "w" },
+    { "id": "d-h1", "type": "heading", "text": "Things I like" },
+    { "id": "d-r1", "type": "github", "repo": "pmndrs/zustand", "size": "w" },
+    { "id": "d-r2", "type": "github", "repo": "motiondivision/motion", "size": "w" },
+    { "id": "d-blog", "type": "link", "url": "https://example.com/blog", "title": "Writing", "description": "Notes on tools, focus and shipping.", "size": "w" },
+    { "id": "d-mail", "type": "social", "platform": "email", "handle": "kai@example.com", "size": "s" },
+    { "id": "d-bsky", "type": "social", "platform": "bluesky", "handle": "kai.bsky.social", "size": "s" }
+  ],
+  "badge": true
+}

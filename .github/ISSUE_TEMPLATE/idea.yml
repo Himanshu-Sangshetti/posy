@@ -1,0 +1,8 @@
+name: Idea
+description: A tile type, theme or improvement
+labels: [idea]
+body:
+  - type: textarea
+    id: idea
+    attributes: { label: The idea, description: Posy stays small on purpose. Tell us the problem it solves. }
+    validations: { required: true }

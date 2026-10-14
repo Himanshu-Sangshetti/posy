@@ -1,0 +1,14 @@
+name: Bug report
+description: Something looks or works wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes: { label: What happened, description: Screenshots help a lot for visual bugs. }
+    validations: { required: true }
+  - type: textarea
+    id: steps
+    attributes: { label: Steps to reproduce }
+  - type: input
+    id: env
+    attributes: { label: Browser and OS, placeholder: "Safari 19 on iOS" }
