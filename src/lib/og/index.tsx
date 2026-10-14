@@ -8,8 +8,8 @@ import { soft } from './soft';
 import { terminal } from './terminal';
 import { editorial } from './editorial';
 import { fontPair, loadFonts } from './fonts';
-import { loadRoundable } from './images';
-import { isLight } from './util';
+import { loadImage, loadRoundable } from './images';
+import { faviconKind, isLight } from './util';
 
 export { initials, isLight } from './util';
 
@@ -45,23 +45,73 @@ export async function ogFor(page: Page, opts: { link: string }): Promise<ImageRe
   return new ImageResponse(element, { ...OG_SIZE, fonts: await loadFonts(fonts), headers: CACHE });
 }
 
-/** Favicon: the avatar cropped round, or the first initial on the page's accent colour. */
+/**
+ * Favicon, in the page style's character. Cozy: the avatar cropped round, or the initial on the accent.
+ * Soft: a rounded square. Editorial: a serif initial in ink (greyscale portrait). Terminal: a block cursor
+ * on dark. Neon: a glowing ring.
+ */
 export async function faviconFor(page: Page | null): Promise<ImageResponse> {
   const size = 96;
+  const kind = faviconKind(page?.theme.style);
   const t = page ? themeOf(page) : THEMES.cream;
-  const avatar = page ? await loadRoundable(page.profile.avatar, size) : null;
-  const head = fontPair(page?.theme.font ?? 'editorial').head;
+  const src = page?.profile.avatar;
   const letter = page ? [...page.profile.name.trim()][0]?.toUpperCase() ?? 'P' : 'P';
-  const fonts = avatar ? undefined : await loadFonts([head]);
-  return new ImageResponse(
-    avatar
-      // eslint-disable-next-line @next/next/no-img-element
-      ? <div style={{ width: '100%', height: '100%', display: 'flex' }}><img src={avatar} width={size} height={size} style={{ borderRadius: size, objectFit: 'cover' }} alt="" /></div>
-      : (
-        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: size, background: t.accent }}>
-          <span style={{ fontFamily: `"${head.family}"`, fontWeight: head.weight, fontSize: head.family === 'Caveat' ? 74 : 58, lineHeight: 1, marginTop: head.family === 'Instrument Serif' || head.family === 'DM Serif Display' ? 4 : 0, color: isLight(t.accent) ? '#241f1b' : '#ffffff' }}>{letter}</span>
+  const ink = isLight(t.accent) ? '#241f1b' : '#ffffff';
+  const wrap = (child: React.ReactNode, style: React.CSSProperties = {}) => (
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', ...style }}>{child}</div>
+  );
+  const glyph = (family: string, weight: number, fontSize: number, color: string, extra: React.CSSProperties = {}) => (
+    <span style={{ display: 'flex', fontFamily: `"${family}"`, fontWeight: weight, fontSize, lineHeight: 1, color, ...extra }}>{letter}</span>
+  );
+  // eslint-disable-next-line @next/next/no-img-element
+  const photo = (url: string, style: React.CSSProperties) => <img src={url} width={size} height={size} style={{ objectFit: 'cover', ...style }} alt="" />;
+  let el: React.ReactElement;
+  let fonts: Parameters<typeof loadFonts>[0] = [];
+
+  if (kind === 'soft') {
+    const avatar = await loadRoundable(src, size);
+    fonts = avatar ? [] : [{ family: 'Nunito', weight: 800 }];
+    el = avatar ? wrap(photo(avatar, { borderRadius: 28 })) : wrap(glyph('Nunito', 800, 60, ink), { borderRadius: 28, background: t.accent });
+  } else if (kind === 'editorial') {
+    const avatar = await loadImage(src, size, size, { gray: true });
+    const head = fontPair(page?.theme.font ?? 'editorial').head;
+    const serif = head.family === 'Geist' ? { family: 'Instrument Serif', weight: 400 as const } : head;
+    fonts = avatar ? [] : [{ ...serif, italic: true }];
+    el = avatar ? wrap(photo(avatar, { borderRadius: size }))
+      : wrap(glyph(serif.family, serif.weight, 70, t.bg, { fontStyle: 'italic', marginTop: serif.family === 'Instrument Serif' ? 6 : 0 }), { borderRadius: size, background: t.text });
+  } else if (kind === 'terminal') {
+    const avatar = await loadImage(src, size, size, { gray: true });
+    fonts = [{ family: 'VT323', weight: 400 }];
+    el = wrap(
+      avatar ? (
+        <div style={{ display: 'flex', position: 'relative', width: 84, height: 84, borderRadius: 8, overflow: 'hidden' }}>
+          {photo(avatar, { width: 84, height: 84 })}
+          <div style={{ position: 'absolute', left: 0, top: 0, width: 84, height: 84, display: 'flex', background: t.accent, opacity: 0.35 }} />
+          <div style={{ position: 'absolute', right: 8, bottom: 8, width: 20, height: 36, display: 'flex', background: t.accent }} />
+        </div>
+      ) : (
+        <div style={{ display: 'flex', alignItems: 'flex-end', height: 60 }}>
+          <div style={{ display: 'flex', width: 44, height: 60, alignItems: 'flex-end', justifyContent: 'center', fontFamily: '"VT323"', fontSize: 78, lineHeight: 0.78, color: t.text }}>{letter}</div>
+          <div style={{ display: 'flex', width: 22, height: 44, marginLeft: 4, background: t.accent }} />
         </div>
       ),
-    { width: size, height: size, fonts, headers: CACHE },
-  );
+      { background: t.bg, border: `4px solid ${t.accent}`, borderRadius: 14 },
+    );
+  } else if (kind === 'neon') {
+    const avatar = await loadRoundable(src, 64);
+    fonts = [{ family: 'Chakra Petch', weight: 700 }];
+    el = wrap(
+      <div style={{ display: 'flex', width: 80, height: 80, borderRadius: 80, alignItems: 'center', justifyContent: 'center', border: `5px solid ${t.accent}`, boxShadow: `0 0 12px 3px ${t.accent}, inset 0 0 12px 1px ${t.accent}`, overflow: 'hidden', background: '#00000000' }}>
+        {avatar ? photo(avatar, { width: 66, height: 66, borderRadius: 66 }) : glyph('Chakra Petch', 700, 46, t.text, { textShadow: `0 0 10px ${t.accent}` })}
+      </div>,
+      { background: t.bg, borderRadius: 22 },
+    );
+  } else {
+    const avatar = await loadRoundable(src, size);
+    const head = fontPair(page?.theme.font ?? 'editorial').head;
+    fonts = avatar ? [] : [head];
+    el = avatar ? wrap(photo(avatar, { borderRadius: size }))
+      : wrap(glyph(head.family, head.weight, head.family === 'Caveat' ? 74 : 58, ink, { marginTop: head.family === 'Instrument Serif' || head.family === 'DM Serif Display' ? 4 : 0 }), { borderRadius: size, background: t.accent });
+  }
+  return new ImageResponse(el, { width: size, height: size, fonts: fonts.length ? await loadFonts(fonts) : undefined, headers: CACHE });
 }
