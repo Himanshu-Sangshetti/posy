@@ -11,6 +11,6 @@ export function AppBody() {
   }, []);
   return (
     <Toaster position="bottom-center" closeButton
-      toastOptions={{ classNames: { toast: '!rounded-[14px] !border !border-[var(--line)] !bg-[var(--surface)] !text-[var(--text)] !shadow-[0_12px_32px_-14px_rgb(80_50_130/.35)] !font-sans', description: '!text-[var(--muted)]' } }} />
+      toastOptions={{ classNames: { toast: '!rounded-[14px] !border !border-[var(--line)] !bg-[var(--surface)] !text-[var(--text)] !shadow-[0_12px_32px_-14px_rgb(22_20_15/.35)] !font-sans', description: '!text-[var(--muted)]' } }} />
   );
 }

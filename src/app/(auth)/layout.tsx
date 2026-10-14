@@ -20,11 +20,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <main className="mx-auto grid min-h-[calc(100dvh-84px)] max-w-[1180px] items-center gap-10 px-5 pb-14 sm:px-10 lg:grid-cols-[420px_1fr] lg:gap-16">
         {children}
         <BlurFade delay={0.12} className="hidden lg:block">
-          <figure aria-hidden className="relative overflow-hidden rounded-[32px] border border-[var(--line)] bg-[linear-gradient(150deg,#f1ebfc_0%,#fdeaf0_55%,#e8f2fb_100%)] p-8">
-            <div className="mx-auto w-fit overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface)] shadow-[0_30px_60px_-30px_rgb(80_50_130/.45)]">
+          <figure aria-hidden className="relative overflow-hidden rounded-[20px] border border-[var(--line)] bg-[linear-gradient(180deg,#eceef0_0%,#f3f1ec_100%)] p-8">
+            <div className="mx-auto w-fit overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface)] shadow-[0_30px_60px_-30px_rgb(22_20_15/.45)]">
               <div className="flex h-9 items-center gap-1.5 border-b border-[var(--line)] px-3.5">
-                <i className="size-2.5 rounded-full bg-[var(--ac-rose)]" /><i className="size-2.5 rounded-full bg-[var(--ac-butter)]" /><i className="size-2.5 rounded-full bg-[var(--ac-mint)]" />
-                <span className="ac-mono mx-auto rounded-full bg-[var(--bg)] px-3 py-0.5 text-[11.5px] text-[var(--muted)]">{SITE_HOST()}/yourname</span><span className="w-10" />
+                <i className="size-2.5 rounded-full border border-[var(--line)]" /><i className="size-2.5 rounded-full border border-[var(--line)]" /><i className="size-2.5 rounded-full border border-[var(--line)]" />
+                <span className="ac-mono mx-auto px-3 py-0.5 text-[11.5px] text-[var(--muted)]">{SITE_HOST()}/yourname</span><span className="w-10" />
               </div>
               <Thumbnail page={preview} width={1100} height={860} scale={0.5} />
             </div>

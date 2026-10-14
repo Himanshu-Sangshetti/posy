@@ -15,7 +15,7 @@ export function ShareDialog({ open, onOpenChange, url, live }: { open: boolean; 
   const [copied, setCopied] = useState(false);
   useEffect(() => {
     if (!open) return;
-    QRCode.toDataURL(url, { margin: 1, width: 480, color: { dark: '#241f2e', light: '#fffdfa' } }).then(setQr).catch(() => setQr(''));
+    QRCode.toDataURL(url, { margin: 1, width: 480, color: { dark: '#16140f', light: '#fbfaf7' } }).then(setQr).catch(() => setQr(''));
   }, [open, url]);
   const copy = async () => {
     await navigator.clipboard.writeText(url);
@@ -38,7 +38,7 @@ export function ShareDialog({ open, onOpenChange, url, live }: { open: boolean; 
           </Button>
         </div>
         <div className="grid place-items-center gap-3 rounded-[18px] p-5" style={{ background: 'linear-gradient(135deg, var(--tint-lilac), var(--tint-rose) 55%, var(--tint-peach))' }}>
-          <div className="grid size-48 place-items-center rounded-[16px] bg-[var(--surface)] p-2.5 shadow-[0_10px_30px_-14px_rgb(60_40_90/.4)]">
+          <div className="grid size-48 place-items-center rounded-[16px] bg-[var(--surface)] p-2.5 shadow-[0_10px_30px_-14px_rgb(22_20_15/.4)]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             {qr ? <img src={qr} alt="QR code for your page" className="size-full" /> : <div className="size-full animate-pulse rounded-[10px] bg-[var(--secondary)]" />}
           </div>

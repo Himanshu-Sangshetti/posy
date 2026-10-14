@@ -81,7 +81,7 @@ export function SettingsPanel({ username, email, host }: { username: string; ema
     <div className="grid gap-5">
       <Panel eyebrow="Profile" tone="lilac" title={<>Your <i>address</i></>} desc="Changing it breaks links you've already shared.">
         <div className="flex flex-wrap items-center gap-2.5">
-          <label className="flex h-11 min-w-[260px] flex-1 items-center rounded-xl border border-[var(--input)] bg-[var(--surface)] px-3.5 text-[15px] transition-shadow focus-within:border-[var(--ac-deep)] focus-within:shadow-[0_0_0_4px_rgb(169_139_224/.22)]">
+          <label className="flex h-11 min-w-[260px] flex-1 items-center rounded-xl border border-[var(--input)] bg-[var(--surface)] px-3.5 text-[15px] transition-shadow focus-within:border-[var(--ac-deep)] focus-within:shadow-[0_0_0_4px_rgb(228_87_46/.22)]">
             <span className="ac-mono text-[13.5px] text-[var(--muted)]">{host}/</span>
             <input aria-label="Username" value={name} onChange={e => setName(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))} className="min-w-0 flex-1 bg-transparent font-medium outline-none" />
             {check?.ok && <span className="ac-pill ac-tone-mint !normal-case !tracking-normal"><Check className="size-3.5" />Free</span>}

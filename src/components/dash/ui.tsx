@@ -38,7 +38,7 @@ export function Panel({ eyebrow, title, desc, action, children, className, tone 
     <section className={cn('ac-card ac-card-pad ac-rise min-w-0', className)}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          {eyebrow && <span className={cn('ac-pill mb-3', tone ? `ac-tone-${tone}` : 'ac-tone-lilac')}>{eyebrow}</span>}
+          {eyebrow && <Eyebrow className="mb-2.5">{eyebrow}</Eyebrow>}
           <h2 className="ac-display ac-h2">{title}</h2>
           {desc && <p className="mt-1.5 max-w-[60ch] text-[14.5px] leading-relaxed text-[var(--muted)]">{desc}</p>}
         </div>

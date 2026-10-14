@@ -95,7 +95,7 @@ export function TopBar({ username, site, saveState, unpublished, publishing, onP
           <Send className="size-3.5" /><span className="hidden sm:inline">Share</span>
         </Button>
         <Button type="button" onClick={onPublish} disabled={!unpublished || publishing || saveState !== 'saved'}
-          className="h-9 gap-1.5 rounded-[10px] bg-[var(--text)] px-4 text-[13.5px] text-[var(--surface)] shadow-[0_6px_16px_-8px_rgb(112_72_184/.7)] hover:bg-[#3a3248] disabled:opacity-100 disabled:shadow-none disabled:bg-[var(--sc-on)] disabled:text-[var(--muted)]">
+          className="h-9 gap-1.5 rounded-[10px] bg-[var(--text)] px-4 text-[13.5px] text-[var(--surface)] shadow-[0_6px_16px_-8px_rgb(22_20_15/.7)] hover:bg-[#3a3248] disabled:opacity-100 disabled:shadow-none disabled:bg-[var(--sc-on)] disabled:text-[var(--muted)]">
           {publishing && <Loader2 className="size-3.5 animate-spin" />}Publish
         </Button>
       </div>

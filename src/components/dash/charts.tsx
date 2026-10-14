@@ -104,7 +104,7 @@ export function AreaChart({ data, unit }: { data: { day: string; value: number }
         </svg>
       </div>
       {hv && hover !== null && (
-        <div role="status" className="pointer-events-none absolute -top-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3.5 py-2 shadow-[0_12px_28px_-14px_rgb(80_50_130/.4)]"
+        <div role="status" className="pointer-events-none absolute -top-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3.5 py-2 shadow-[0_12px_28px_-14px_rgb(22_20_15/.4)]"
           style={{ left: Math.min(Math.max(x(hover) - 70, 0), w - 140) }}>
           <div className="ac-mono text-[11px] uppercase tracking-[.06em] text-[var(--muted)]">{fmtDay(hv.day, { weekday: 'short', month: 'short', day: 'numeric' })}</div>
           <div className="ac-display text-[22px] leading-tight">{hv.value} <span className="font-sans text-[13px] text-[var(--muted)]">{hv.value === 1 ? unit.replace(/s$/, '') : unit}</span></div>

@@ -104,7 +104,7 @@ export function Dock({ device, setDevice, add, designOpen, onDesign, addOpen, se
       <div className={cn(CHROME, 'sc-float pointer-events-auto flex items-center gap-1 rounded-[18px] p-1.5')}>
         <Popover open={addOpen} onOpenChange={setAddOpen}>
           <PopoverTrigger asChild>
-            <Button type="button" aria-label="Add" className="h-10 gap-1.5 rounded-[12px] bg-[var(--text)] pl-3 pr-3.5 text-[14px] text-[var(--surface)] shadow-[0_6px_16px_-8px_rgb(112_72_184/.7)] hover:bg-[#3a3248] active:scale-[.97]">
+            <Button type="button" aria-label="Add" className="h-10 gap-1.5 rounded-[12px] bg-[var(--text)] pl-3 pr-3.5 text-[14px] text-[var(--surface)] shadow-[0_6px_16px_-8px_rgb(22_20_15/.7)] hover:bg-[#3a3248] active:scale-[.97]">
               <Plus className="size-[18px]" />Add
             </Button>
           </PopoverTrigger>
@@ -119,7 +119,7 @@ export function Dock({ device, setDevice, add, designOpen, onDesign, addOpen, se
         <ToggleGroup type="single" value={device} onValueChange={v => v && setDevice(v as Device)} aria-label="Preview size" className="gap-0.5 rounded-[12px] bg-[var(--secondary)] p-0.5">
           {([['desktop', 'Desktop', Monitor], ['mobile', 'Mobile', Smartphone]] as const).map(([id, label, Icon]) => (
             <Hint key={id} label={`${label} preview`}>
-              <ToggleGroupItem value={id} aria-label={label} className="size-9 rounded-[10px] text-[var(--muted)] hover:bg-transparent hover:text-[var(--text)] data-[state=on]:bg-[var(--surface)] data-[state=on]:text-[var(--text)] data-[state=on]:shadow-[0_1px_3px_rgb(60_40_90/.18)]">
+              <ToggleGroupItem value={id} aria-label={label} className="size-9 rounded-[10px] text-[var(--muted)] hover:bg-transparent hover:text-[var(--text)] data-[state=on]:bg-[var(--surface)] data-[state=on]:text-[var(--text)] data-[state=on]:shadow-[0_1px_3px_rgb(22_20_15/.18)]">
                 <Icon className="size-[17px]" />
               </ToggleGroupItem>
             </Hint>

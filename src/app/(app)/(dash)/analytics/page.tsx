@@ -170,8 +170,8 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
       </div>
 
       <dl className="grid grid-cols-3 gap-3 sm:gap-4">
-        {kpis.map(({ k, v, tone, suffix }) => (
-          <div key={k} className="ac-card ac-rise p-4 sm:p-5" style={{ background: `var(--ac-${tone}-bg)`, borderColor: `color-mix(in oklab, var(--ac-${tone}) 40%, var(--line))` }}>
+        {kpis.map(({ k, v, suffix }) => (
+          <div key={k} className="ac-card ac-rise p-4 sm:p-5">
             <dt className="ac-eyebrow !text-[var(--text)]/60">{k}</dt>
             <dd className="ac-display mt-2 text-[34px] leading-none tabular-nums sm:text-[48px]"><NumberTicker value={v} />{suffix}</dd>
           </div>

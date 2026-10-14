@@ -57,7 +57,7 @@ export function Onboarding({ initialUsername, styles, themes, host }: { initialU
         <h1 className="ac-display ac-h1 mt-3">Claim your <i>name</i></h1>
         <p className="ac-lede mt-3">This is your address on the web. Pick the look below and watch it come together in the preview.</p>
       </div>
-      <label className="ac-card flex h-16 items-center pl-5 pr-4 text-[18px] transition-shadow focus-within:border-[var(--ac-deep)] focus-within:shadow-[0_0_0_4px_rgb(169_139_224/.22)]">
+      <label className="ac-card flex h-16 items-center pl-5 pr-4 text-[18px] transition-shadow focus-within:border-[var(--ac-deep)] focus-within:shadow-[0_0_0_4px_rgb(228_87_46/.22)]">
         <span className="ac-mono text-[15px] text-[var(--muted)]">{host}/</span>
         <input autoFocus aria-label="Username" value={name} onChange={e => setName(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))} maxLength={30} placeholder="yourname"
           className="min-w-0 flex-1 bg-transparent font-medium outline-none placeholder:text-[var(--muted)]/50" />
@@ -158,7 +158,7 @@ export function Onboarding({ initialUsername, styles, themes, host }: { initialU
           <span className="text-[var(--text)]">{host}/{name || 'yourname'}</span> · {styleLabel} · {layout === 'bento' ? 'Bento' : 'List'} · {themeName}
         </p>
         <div className="flex items-center gap-3">
-          {error && <p role="alert" className="text-[13.5px] text-[#a43f5c]">{error}</p>}
+          {error && <p role="alert" className="text-[13.5px] text-[#b23a1c]">{error}</p>}
           <Button type="button" onClick={create} disabled={!check?.ok || busy} className="ac-btn ac-btn-primary h-11 px-6">
             {busy && <Loader2 className="size-4 animate-spin" />}Create my page
           </Button>

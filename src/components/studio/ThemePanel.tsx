@@ -125,7 +125,7 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
     <Tabs value={tab} onValueChange={v => onTab?.(v as DesignTab)} className="min-h-0 flex-1 gap-0">
       <TabsList className="mx-5 mb-4 grid h-10 w-auto shrink-0 grid-cols-5 rounded-full bg-[var(--secondary)] p-1">
         {(Object.keys(TAB_LABEL) as DesignTab[]).map(k => (
-          <TabsTrigger key={k} value={k} className="rounded-full px-1 text-[12.5px] text-[var(--muted)] data-[state=active]:bg-[var(--surface)] data-[state=active]:text-[var(--text)] data-[state=active]:shadow-[0_1px_3px_rgb(60_40_90/.18)]">{TAB_LABEL[k]}</TabsTrigger>
+          <TabsTrigger key={k} value={k} className="rounded-full px-1 text-[12.5px] text-[var(--muted)] data-[state=active]:bg-[var(--surface)] data-[state=active]:text-[var(--text)] data-[state=active]:shadow-[0_1px_3px_rgb(22_20_15/.18)]">{TAB_LABEL[k]}</TabsTrigger>
         ))}
       </TabsList>
 
