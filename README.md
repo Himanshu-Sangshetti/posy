@@ -56,7 +56,6 @@ Everything is optional locally; see [.env.example](.env.example).
 | `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` | Public URL (share links, OG images) |
 | `BETTER_AUTH_URL` / `BETTER_AUTH_SECRET` | | Required in production. Secret: `openssl rand -base64 32` |
 | `POSY_SIGNUP` | `first-user` | `open` lets anyone sign up, `closed` disables sign-up |
-| `POSY_ROOT` | `owner-page` | `marketing` shows a landing page at `/` instead (for a hosted multi-user site) |
 | `POSY_DATA_DIR` | `~/.posy` in dev, `.data` in production (`/data` in Docker) | Where the SQLite file and uploads live |
 | `DATABASE_URL`, `DATABASE_AUTH_TOKEN` | local file | Use Turso / libSQL instead |
 | `BLOB_READ_WRITE_TOKEN` | | Vercel Blob for uploads on Vercel |

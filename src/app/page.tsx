@@ -2,20 +2,19 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { edition } from '@/edition';
 import { ownerUsername } from '@/lib/pages';
-import { Landing } from '@/components/marketing/Landing';
 import UserPage, { generateMetadata as userMetadata } from './[username]/page';
 
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
-  if (edition.root === 'marketing') return {};
+  if (edition.root !== 'owner-page') return {};
   const username = await ownerUsername();
   return username ? userMetadata({ params: Promise.resolve({ username }) }) : {};
 }
 
-/** "/" is the owner's page (self-hosted) or the marketing site (POSY_ROOT=marketing). */
+/** Self-hosted: "/" is the owner's page. (The hosted platform replaces this with its own site.) */
 export default async function Home() {
-  if (edition.root === 'marketing') return <Landing />;
+  if (edition.root !== 'owner-page') redirect('/signup');
   const username = await ownerUsername();
   if (!username) redirect('/signup');
   return <UserPage params={Promise.resolve({ username })} />;

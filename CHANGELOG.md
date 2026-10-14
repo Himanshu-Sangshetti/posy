@@ -9,7 +9,7 @@ Posy is now a product you can sign up for or host yourself.
 - Cloud studio with a rebuilt design panel: backgrounds, tile styles, hover effects, more font pairs, list layout.
 - Agents: API keys, REST API, hosted MCP server at `/api/mcp`, live sync into the open studio.
 - Dashboard: analytics (views and clicks per tile), Agents, Settings (rename, export JSON, delete account).
-- Self-hosting: Docker image, migrations on start, `POSY_SIGNUP` and `POSY_ROOT` editions.
+- Self-hosting: Docker image, migrations on start, `POSY_SIGNUP` (first user owns the instance by default).
 - Static-export and `content/page.json` mode is gone; export your page as JSON from Settings instead.
 
 ## 1.0.0 — 2026-10-14
