@@ -31,7 +31,7 @@ export function PageFrame({ page, children, profile, className, interactive = tr
       <Backdrop />
       <MotionProvider enabled={page.theme.motion}>
         <div className="posy-layout">
-          {profile ?? <Profile page={page} />}
+          {profile ?? <Profile page={page} interactive={interactive} />}
           <main className="min-w-0">{children}</main>
         </div>
         {page.badge && (
@@ -76,7 +76,7 @@ export function SocialRow({ tiles }: { tiles: Extract<Tile, { type: 'social' }>[
   );
 }
 
-export function Profile({ page }: { page: Page }) {
+export function Profile({ page, interactive = true }: { page: Page; interactive?: boolean }) {
   const { name, bio, location } = page.profile;
   const list = page.theme.layout === 'list';
   const socials = list ? page.tiles.filter((t): t is Extract<Tile, { type: 'social' }> => t.type === 'social') : [];
@@ -87,7 +87,7 @@ export function Profile({ page }: { page: Page }) {
       {bio && <p className="posy-bio"><RichText text={bio} /></p>}
       <div className="posy-meta">
         {location && <span className="inline-flex items-center gap-1.5"><MapPin className="size-4" />{location}</span>}
-        <ShareButton url={page.seo.url} />
+        {interactive && <ShareButton url={page.seo.url} />}
       </div>
       {list && <SocialRow tiles={socials} />}
     </MotionHeader>
@@ -158,10 +158,10 @@ function ListTiles({ page }: { page: Page }) {
   );
 }
 
-/** The public, read-only page. */
-export function PageView({ page }: { page: Page }) {
+/** The public, read-only page. `contained` renders it inside a box (previews, thumbnails, mockups). */
+export function PageView({ page, contained }: { page: Page; contained?: boolean }) {
   return (
-    <PageFrame page={page}>
+    <PageFrame page={page} className={contained ? 'posy-contained' : undefined} interactive={!contained}>
       {page.theme.layout === 'list' ? <ListTiles page={page} /> : <BentoTiles page={page} />}
     </PageFrame>
   );

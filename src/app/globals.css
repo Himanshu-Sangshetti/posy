@@ -212,3 +212,12 @@ a.posy-tile:hover { box-shadow: 0 2px 4px rgb(20 16 12 / .05), 0 22px 44px -22px
 .posy-bg-image .posy-profile { color: #fff; }
 .posy-bg-image .posy-bio, .posy-bg-image .posy-meta, .posy-bg-image .posy-footer, .posy-bg-image .posy-section { color: rgb(255 255 255 / .82); text-shadow: 0 1px 12px rgb(0 0 0 / .25); }
 .posy-bg-image .posy-name { text-shadow: 0 2px 18px rgb(0 0 0 / .25); }
+
+/* Pages rendered inside a box (template previews, landing mockups) */
+.posy-contained { min-height: 100%; }
+.posy-contained .posy-backdrop { position: absolute; }
+.posy-contained .posy-profile { position: static !important; }
+
+/* A live page shown as a scaled-down thumbnail */
+.posy-thumb { position: relative; overflow: hidden; pointer-events: none; user-select: none; }
+.posy-thumb > div { position: absolute; top: 0; left: 0; transform-origin: top left; }
