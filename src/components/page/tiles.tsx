@@ -18,7 +18,7 @@ function Badge({ children, bg, fg }: { children: React.ReactNode; bg: string; fg
   );
 }
 
-function BrandIcon({ path, size = 20, color }: { path: string; size?: number; color?: string }) {
+export function BrandIcon({ path, size = 20, color }: { path: string; size?: number; color?: string }) {
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} fill={color ?? 'currentColor'} aria-hidden>
       <path d={path} />
@@ -205,4 +205,59 @@ export function TileContent({ tile, editing }: { tile: Tile; editing?: boolean }
 
 export function brandHex(tile: Tile): string | undefined {
   return tile.type === 'social' ? PLATFORMS[tile.platform].icon?.hex : undefined;
+}
+
+/* ---------- List layout (Linktree-style rows) ---------- */
+function RowText({ title, sub }: { title: string; sub?: string }) {
+  return (
+    <span className="min-w-0 flex-1">
+      <span className="block truncate text-[15.5px] font-semibold tracking-[-0.01em]">{title}</span>
+      {sub && <span className="block truncate text-[13px] text-[var(--muted)]">{sub}</span>}
+    </span>
+  );
+}
+const RowArrow = () => <ArrowUpRight aria-hidden className="size-4 shrink-0 text-[var(--muted)] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />;
+
+export function ListItem({ tile }: { tile: Tile }) {
+  switch (tile.type) {
+    case 'link':
+      return (
+        <div className="posy-row-inner">
+          {tile.image && tile.size !== 's'
+            // eslint-disable-next-line @next/next/no-img-element
+            ? <img src={asset(tile.image)} alt="" className="size-11 shrink-0 rounded-[12px] object-cover" loading="lazy" />
+            : <Badge bg="var(--surface)"><Favicon url={tile.url} /></Badge>}
+          <RowText title={tile.title || hostOf(tile.url)} sub={tile.description || hostOf(tile.url)} />
+          <RowArrow />
+        </div>
+      );
+    case 'github': {
+      const gh = PLATFORMS.github.icon as { path: string };
+      return (
+        <div className="posy-row-inner">
+          <Badge bg="var(--text)" fg="var(--surface)"><BrandIcon path={gh.path} /></Badge>
+          <RowText title={tile.repo} sub={[tile.stars !== undefined && `★ ${Intl.NumberFormat('en', { notation: 'compact' }).format(tile.stars)}`, tile.language, tile.description].filter(Boolean).join(' · ')} />
+          <RowArrow />
+        </div>
+      );
+    }
+    case 'text':
+      return <p className="px-6 py-5 text-center text-[16px] font-medium leading-relaxed"><RichText text={tile.text} /></p>;
+    case 'image':
+      return (
+        <div className="relative" style={{ aspectRatio: tile.size === 't' ? '4 / 5' : tile.size === 's' ? '1' : '16 / 10' }}>
+          <ImageTileView tile={tile} />
+        </div>
+      );
+    case 'video': {
+      const id = youtubeId(tile.url);
+      return id ? <div className="relative aspect-video"><VideoPlayer id={id} title={tile.title} /></div> : null;
+    }
+    case 'music': {
+      const src = spotifyEmbed(tile.url);
+      return src ? <iframe className="block h-[152px] w-full" src={`${src}?utm_source=generator&theme=0`} title="Spotify" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" /> : null;
+    }
+    default:
+      return null;
+  }
 }

@@ -18,15 +18,15 @@ export function MotionProvider({ enabled, children }: { enabled: boolean; childr
   );
 }
 
-type ShellProps = { href?: string | null; index: number; className?: string; style?: React.CSSProperties; label?: string; children?: ReactNode };
+type ShellProps = { href?: string | null; index: number; className?: string; style?: React.CSSProperties; label?: string; children?: ReactNode; lift?: boolean; tileId?: string };
 
-export function MotionShell({ href, index, className, style, label, children }: ShellProps) {
+export function MotionShell({ href, index, className, style, label, children, lift = true, tileId }: ShellProps) {
   // Entrance is CSS (.posy-rise) so tiles are visible even before any JavaScript runs.
-  const anim = { className: `${className ?? ''} posy-rise`, style: { ...style, '--i': index } as React.CSSProperties, initial: false as const };
+  const anim = { className: `${className ?? ''} posy-rise`, style: { ...style, '--i': index } as React.CSSProperties, initial: false as const, 'data-tile-id': tileId };
   if (href) {
     const external = /^https?:/.test(href);
     return (
-      <m.a href={href} aria-label={label} {...anim} whileHover={{ y: -4, transition: spring }} whileTap={{ scale: 0.98 }} {...(external ? { target: '_blank', rel: 'noopener' } : {})}>
+      <m.a href={href} aria-label={label} {...anim} whileHover={lift ? { y: -4, transition: spring } : undefined} whileTap={{ scale: 0.98 }} {...(external ? { target: '_blank', rel: 'noopener' } : {})}>
         {children}
       </m.a>
     );

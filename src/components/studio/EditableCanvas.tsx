@@ -46,9 +46,9 @@ function EditableProfile({ page, mode }: { page: Page; mode: Mode }) {
         </PopoverContent>
       </Popover>
       <textarea aria-label="Name" rows={1} value={name} placeholder="Your name" onChange={e => update({ name: e.target.value })}
-        className={cn(blank, 'posy-head mt-3 text-[42px] leading-[1.02] sm:text-[50px]', page.theme.layout === 'stack' && 'text-center')} />
+        className={cn(blank, 'posy-head mt-3 text-[42px] leading-[1.02] sm:text-[50px]', (page.theme.layout === 'list' || page.theme.align === 'center') && 'text-center')} />
       <textarea aria-label="Bio" value={bio} placeholder="A line about you" onChange={e => update({ bio: e.target.value })}
-        className={cn(blank, 'max-w-[34ch] text-[17px] leading-relaxed text-[var(--muted)]', page.theme.layout === 'stack' && 'text-center')} />
+        className={cn(blank, 'max-w-[34ch] text-[17px] leading-relaxed text-[var(--muted)]', (page.theme.layout === 'list' || page.theme.align === 'center') && 'text-center')} />
       <label className="inline-flex items-center gap-1.5 text-[14px] text-[var(--muted)]">
         <MapPin className="size-4 shrink-0" />
         <input aria-label="Location" value={location ?? ''} placeholder="Add location" onChange={e => update({ location: e.target.value || undefined })} className={cn(blank, 'w-auto min-w-[8ch]')} />

@@ -46,3 +46,26 @@ export function ShareButton({ url }: { url?: string }) {
     </button>
   );
 }
+
+/** Tilt and glow follow the pointer. One listener for the whole page; the visuals are CSS. */
+export function TileEffects() {
+  useEffect(() => {
+    let current: HTMLElement | null = null;
+    const reset = (el: HTMLElement | null) => { if (el) { el.style.removeProperty('--rx'); el.style.removeProperty('--ry'); } };
+    const move = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return;
+      const el = (e.target as HTMLElement | null)?.closest<HTMLElement>('.posy-tile') ?? null;
+      if (el !== current) { reset(current); current = el; }
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      el.style.setProperty('--mx', `${x}px`); el.style.setProperty('--my', `${y}px`);
+      el.style.setProperty('--rx', `${((y / r.height) - 0.5) * -7}deg`); el.style.setProperty('--ry', `${((x / r.width) - 0.5) * 9}deg`);
+    };
+    const leave = () => { reset(current); current = null; };
+    document.addEventListener('pointermove', move, { passive: true });
+    document.addEventListener('pointerleave', leave);
+    return () => { document.removeEventListener('pointermove', move); document.removeEventListener('pointerleave', leave); };
+  }, []);
+  return null;
+}

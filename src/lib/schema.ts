@@ -4,9 +4,14 @@ import { THEME_IDS, TINTS } from './themes';
 
 /** Tile footprint on the grid: small square, wide, tall, large square. */
 export const SIZES = ['s', 'w', 't', 'l'] as const;
-export const FONTS = ['soft', 'editorial', 'rounded', 'mono'] as const;
-export const RADII = ['sharp', 'soft', 'round'] as const;
-export const LAYOUTS = ['split', 'stack'] as const;
+export const FONTS = ['soft', 'editorial', 'classic', 'elegant', 'rounded', 'playful', 'modern', 'tech', 'mono', 'hand'] as const;
+export const RADII = ['sharp', 'soft', 'round', 'pill'] as const;
+export const LAYOUTS = ['bento', 'list'] as const;
+export const ALIGNS = ['side', 'center'] as const;
+export const BACKGROUNDS = ['solid', 'gradient', 'mesh', 'aurora', 'dots', 'grid', 'image'] as const;
+export const TILE_STYLES = ['soft', 'glass', 'outline', 'solid'] as const;
+export const EFFECTS = ['lift', 'tilt', 'glow', 'none'] as const;
+export const AVATARS = ['squircle', 'circle', 'square', 'hidden'] as const;
 export const COLORS = ['auto', 'surface', 'accent', ...TINTS] as const;
 
 const id = z.string().min(1).describe('Stable unique id, e.g. "t-abc123"');
@@ -79,23 +84,47 @@ export const GithubTile = z.object({
 
 export const Tile = z.discriminatedUnion('type', [LinkTile, SocialTile, TextTile, HeadingTile, ImageTile, VideoTile, MusicTile, GithubTile]);
 
+export const Background = z.object({
+  style: z.enum(BACKGROUNDS).default('solid'),
+  image: z.string().optional().describe('Background image when style is "image"'),
+  dim: z.number().min(0).max(80).default(20).describe('Darken an image background, 0–80 (%)'),
+  blur: z.number().min(0).max(24).default(0).describe('Blur an image background, 0–24 (px)'),
+  grain: z.boolean().default(true).describe('Subtle film grain over the background'),
+});
+
+export const Theme = z.object({
+  preset: z.enum(THEME_IDS).default('cream'),
+  accent: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().describe('Override the theme accent, e.g. "#e8a87c"'),
+  font: z.enum(FONTS).default('soft'),
+  radius: z.enum(RADII).default('round'),
+  layout: z.enum(LAYOUTS).default('bento').describe('bento = tile grid; list = Linktree-style stacked links'),
+  align: z.enum(ALIGNS).default('side').describe('bento only: profile beside the grid (side) or above it (center)'),
+  background: Background.default(Background.parse({})),
+  tileStyle: z.enum(TILE_STYLES).default('soft'),
+  effect: z.enum(EFFECTS).default('lift').describe('Hover effect on tiles'),
+  avatar: z.enum(AVATARS).default('squircle'),
+  motion: z.boolean().default(true),
+});
+
+/** v1 pages used layout "split" | "stack"; map them onto layout + align. */
+function migrateTheme(input: unknown) {
+  if (!input || typeof input !== 'object') return input;
+  const t = { ...(input as Record<string, unknown>) };
+  if (t.layout === 'split') { t.layout = 'bento'; t.align = t.align ?? 'side'; }
+  if (t.layout === 'stack') { t.layout = 'bento'; t.align = t.align ?? 'center'; }
+  return t;
+}
+
 export const Page = z.object({
   $schema: z.string().optional(),
-  version: z.literal(1).default(1),
+  version: z.union([z.literal(1), z.literal(2)]).default(2).transform(() => 2 as const),
   profile: z.object({
     name: z.string().min(1),
     bio: z.string().default(''),
     avatar: z.string().optional().describe('Image URL or /path in public/'),
     location: z.string().optional(),
   }),
-  theme: z.object({
-    preset: z.enum(THEME_IDS).default('cream'),
-    accent: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().describe('Override the theme accent, e.g. "#e8a87c"'),
-    font: z.enum(FONTS).default('soft'),
-    radius: z.enum(RADII).default('round'),
-    layout: z.enum(LAYOUTS).default('split').describe('split = profile beside the grid on desktop; stack = centred'),
-    motion: z.boolean().default(true),
-  }).default({ preset: 'cream', font: 'soft', radius: 'round', layout: 'split', motion: true }),
+  theme: z.preprocess(migrateTheme, Theme).default(Theme.parse({})),
   seo: z.object({
     title: z.string().optional(),
     description: z.string().optional(),
@@ -106,6 +135,8 @@ export const Page = z.object({
 });
 
 export type Page = z.infer<typeof Page>;
+export type ThemeSettings = z.infer<typeof Theme>;
+export type BackgroundSettings = z.infer<typeof Background>;
 export type Tile = z.infer<typeof Tile>;
 export type TileType = Tile['type'];
 export type Size = (typeof SIZES)[number];

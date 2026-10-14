@@ -42,6 +42,14 @@ export const THEMES = {
     id: 'paper', name: 'Paper', bg: '#f4f4f2', surface: '#ffffff', text: '#161616', muted: '#7b7b78', line: '#e4e4e1', accent: '#161616',
     tints: { peach: '#f3ece7', butter: '#f2f0e6', mint: '#e8efea', sky: '#e7ecf1', lilac: '#ecebf1', rose: '#f2e9ec' },
   }),
+  blush: light({
+    id: 'blush', name: 'Blush', bg: '#fbeef1', surface: '#fffafb', text: '#2f2226', muted: '#977f86', line: '#f2dde3', accent: '#df7f9c',
+    tints: { peach: '#fbe0d6', butter: '#f8edcf', mint: '#e0efe4', sky: '#dde8f5', lilac: '#ebdff4', rose: '#f9d3de' },
+  }),
+  sage: light({
+    id: 'sage', name: 'Sage', bg: '#eef1ea', surface: '#fbfcf8', text: '#232820', muted: '#7d8576', line: '#dfe5d8', accent: '#7c9a6d',
+    tints: { peach: '#f2e4d8', butter: '#efecd0', mint: '#d9e8d3', sky: '#d9e6e8', lilac: '#e3e1ec', rose: '#f0e0e0' },
+  }),
   midnight: {
     id: 'midnight', name: 'Midnight', dark: true, bg: '#11131b', surface: '#1a1d28', text: '#eceef5', muted: '#8d93a8', line: '#262a38', accent: '#a9b8ff',
     tints: { peach: '#2c2226', butter: '#2b2a22', mint: '#1d2a27', sky: '#1c2536', lilac: '#252239', rose: '#2d2030' },
@@ -49,6 +57,14 @@ export const THEMES = {
   mocha: {
     id: 'mocha', name: 'Mocha', dark: true, bg: '#171311', surface: '#221d1a', text: '#f2ebe4', muted: '#a0948a', line: '#2f2824', accent: '#e7b48f',
     tints: { peach: '#33241d', butter: '#2f2a1d', mint: '#1f2a22', sky: '#1e2630', lilac: '#2a2231', rose: '#33212a' },
+  },
+  dusk: {
+    id: 'dusk', name: 'Dusk', dark: true, bg: '#17131f', surface: '#211b2c', text: '#efe9f7', muted: '#9a90ab', line: '#2e2639', accent: '#d7a6f2',
+    tints: { peach: '#33232a', butter: '#2f2a25', mint: '#1f2a28', sky: '#1f2537', lilac: '#2c2240', rose: '#352135' },
+  },
+  ocean: {
+    id: 'ocean', name: 'Ocean', dark: true, bg: '#0d171d', surface: '#14212a', text: '#e6f1f5', muted: '#86a0ab', line: '#1e2f39', accent: '#7fd1c7',
+    tints: { peach: '#2b2523', butter: '#26281f', mint: '#16302c', sky: '#172b3a', lilac: '#202538', rose: '#2b2129' },
   },
 } satisfies Record<string, Theme>;
 

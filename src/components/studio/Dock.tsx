@@ -83,7 +83,7 @@ function AddPanel({ mode, add, close }: { mode: Mode; add: (t: Tile) => void; cl
 
 /* ---------- Theme ---------- */
 const ACCENTS = ['#e39b6f', '#e8886a', '#d97a9a', '#9a86d8', '#5e9bd6', '#5fb08a', '#c9a227', '#161616'];
-const RADIUS_GLYPH: Record<(typeof RADII)[number], string> = { sharp: '4px', soft: '8px', round: '13px' };
+const RADIUS_GLYPH: Record<(typeof RADII)[number], string> = { sharp: '4px', soft: '8px', round: '13px', pill: '20px' };
 
 function ThemePanel({ page }: { page: Page }) {
   const { updateTheme, setBadge } = useStudio();
@@ -145,7 +145,7 @@ function ThemePanel({ page }: { page: Page }) {
             {LAYOUTS.map(l => (
               <button key={l} type="button" onClick={() => updateTheme({ layout: l })} aria-pressed={t.layout === l}
                 className={cn('h-10 flex-1 rounded-[11px] border text-[13px] capitalize transition-colors', t.layout === l ? 'border-[var(--text)] bg-[var(--secondary)]' : 'border-[var(--line)] hover:bg-[var(--secondary)]')}>
-                {l === 'split' ? 'Side' : 'Centre'}
+                {l === 'bento' ? 'Bento' : 'List'}
               </button>
             ))}
           </div>

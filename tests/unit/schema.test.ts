@@ -7,9 +7,15 @@ import { tileBackground } from '@/lib/style';
 describe('page format', () => {
   it('fills sensible defaults from a minimal page', () => {
     const p = parsePage({ profile: { name: 'Ada' } });
-    expect(p.theme).toMatchObject({ preset: 'cream', font: 'soft', radius: 'round', layout: 'split', motion: true });
+    expect(p.theme).toMatchObject({ preset: 'cream', font: 'soft', radius: 'round', layout: 'bento', align: 'side', tileStyle: 'soft', effect: 'lift', motion: true });
+    expect(p.theme.background).toMatchObject({ style: 'solid', grain: true });
+    expect(p.version).toBe(2);
     expect(p.tiles).toEqual([]);
     expect(p.badge).toBe(true);
+  });
+  it('migrates v1 layouts', () => {
+    expect(parsePage({ version: 1, profile: { name: 'A' }, theme: { layout: 'split' } }).theme).toMatchObject({ layout: 'bento', align: 'side' });
+    expect(parsePage({ version: 1, profile: { name: 'A' }, theme: { layout: 'stack' } }).theme).toMatchObject({ layout: 'bento', align: 'center' });
   });
   it('rejects bad input with a useful path', () => {
     const r = Page.safeParse({ profile: { name: 'Ada' }, tiles: [{ id: 'x', type: 'github', repo: 'not a repo' }] });

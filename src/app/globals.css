@@ -63,30 +63,57 @@
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 10px; }
 }
 
-/* Soft grain so flat pastels don't look sterile. */
-.posy-grain::before {
-  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .035;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-.dark .posy-grain::before { opacity: .06; }
-
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
 
-/* ---------- Posy page layout ---------- */
-.posy-page { container: page / inline-size; min-height: 100dvh; position: relative; isolation: isolate; }
-.posy-layout { position: relative; z-index: 1; margin: 0 auto; width: 100%; max-width: 1200px; padding: 40px 18px 96px; display: grid; gap: 36px; }
-.posy-profile { display: flex; flex-direction: column; gap: 14px; }
-.posy-stack .posy-profile { align-items: center; text-align: center; }
-.posy-stack .posy-layout { max-width: 820px; }
-@container page (min-width: 700px) { .posy-layout { padding: 64px 40px 112px; gap: 48px; } }
+/* ================= Posy page ================= */
+.posy-page { container: page / inline-size; min-height: 100dvh; position: relative; isolation: isolate; color: var(--text); background: var(--bg); }
+.posy-layout { position: relative; z-index: 1; margin: 0 auto; width: 100%; max-width: 1200px; padding: 44px 18px 96px; display: grid; gap: 34px; }
+@container page (min-width: 700px) { .posy-layout { padding: 72px 40px 120px; gap: 48px; } }
 @container page (min-width: 1000px) {
-  .posy-split .posy-layout { grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: 64px; padding-top: 88px; }
-  .posy-split .posy-profile { position: sticky; top: 88px; align-self: start; }
+  .posy-layout-bento.posy-side .posy-layout { grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: 64px; padding-top: 92px; }
+  .posy-layout-bento.posy-side .posy-profile { position: sticky; top: 92px; align-self: start; }
 }
+.posy-layout-bento.posy-center .posy-layout { max-width: 860px; }
+.posy-layout-list .posy-layout { max-width: 600px; gap: 28px; }
 
+/* ---- profile ---- */
+.posy-profile { display: flex; flex-direction: column; gap: 14px; }
+.posy-center .posy-profile { align-items: center; text-align: center; }
+.posy-name { margin-top: 10px; font-size: 42px; line-height: 1.02; }
+@container page (min-width: 700px) { .posy-name { font-size: 50px; } }
+.posy-layout-list .posy-name { font-size: 34px; }
+.posy-bio { max-width: 36ch; white-space: pre-line; font-size: 17px; line-height: 1.6; color: var(--muted); }
+.posy-meta { display: flex; align-items: center; gap: 16px; font-size: 14px; color: var(--muted); }
+.posy-meta button:hover { color: var(--text); }
+.posy-avatar {
+  position: relative; width: 112px; height: 112px; flex-shrink: 0; overflow: hidden; color: var(--text);
+  border-radius: 36%; background: linear-gradient(135deg, var(--tint-peach), var(--tint-lilac));
+  box-shadow: 0 0 0 4px var(--surface), 0 14px 34px -16px rgb(0 0 0 / .4);
+}
+.posy-layout-list .posy-avatar { width: 96px; height: 96px; }
+.posy-avatar-circle .posy-avatar { border-radius: 50%; }
+.posy-avatar-square .posy-avatar { border-radius: 20%; }
+.posy-avatar-hidden .posy-avatar { display: none; }
+.posy-head { font-family: var(--font-head); font-weight: var(--head-weight, 640); letter-spacing: var(--head-track, -0.03em); font-synthesis: none; }
+.posy-section { margin: 0 0 16px; padding: 0 4px; font-size: 26px; line-height: 1.2; }
+.posy-layout-list .posy-section { margin: 14px 0 2px; font-size: 20px; text-align: center; }
+.posy-footer { position: relative; z-index: 1; padding-bottom: 40px; text-align: center; font-size: 13px; color: var(--muted); }
+.posy-footer a:hover { color: var(--text); }
+
+/* ---- social icon row (list layout) ---- */
+.posy-social-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 6px; }
+.posy-social-row a {
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 999px; color: var(--text);
+  background: color-mix(in oklab, var(--surface) 70%, transparent); border: 1px solid color-mix(in oklab, var(--text) 8%, transparent);
+  transition: background .3s, color .3s, transform .3s cubic-bezier(.2,.8,.2,1);
+}
+.posy-social-row a:hover { background: var(--brand); color: #fff; transform: translateY(-2px); }
+
+/* ---- bento grid ---- */
 .posy-grid-wrap { container: grid / inline-size; }
+.posy-grid-wrap + .posy-grid-wrap { margin-top: 44px; }
 .posy-grid {
   --cols: 4; --gap: 18px;
   display: grid; gap: var(--gap); grid-auto-flow: dense;
@@ -99,23 +126,89 @@
 .posy-size-t { grid-column: span 1; grid-row: span 2; }
 .posy-size-l { grid-column: span 2; grid-row: span 2; }
 
+/* ---- list rows ---- */
+.posy-list { display: flex; flex-direction: column; gap: 12px; }
+.posy-list .posy-tile { grid-column: auto; grid-row: auto; }
+.posy-row-inner { display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 10px 18px 10px 10px; }
+.posy-radius-pill .posy-row-inner { padding-left: 12px; }
+
+/* ---- tiles: shape + style ---- */
 .posy-tile {
-  position: relative; overflow: hidden; border-radius: var(--radius-tile);
+  position: relative; overflow: hidden; border-radius: var(--radius-tile); color: var(--text);
+  background: var(--tile-bg, var(--surface));
   border: 1px solid color-mix(in oklab, var(--text) 7%, transparent);
   box-shadow: 0 1px 2px rgb(20 16 12 / .04), 0 10px 30px -18px rgb(20 16 12 / .18);
-  transition: box-shadow .45s cubic-bezier(.2,.7,.2,1), border-color .45s;
-  color: var(--text);
+  transition: box-shadow .45s cubic-bezier(.2,.7,.2,1), border-color .45s, background-color .45s;
 }
 .dark .posy-tile { border-color: color-mix(in oklab, var(--text) 9%, transparent); box-shadow: 0 1px 2px rgb(0 0 0 / .3), 0 14px 34px -20px rgb(0 0 0 / .6); }
-a.posy-tile:hover, button.posy-tile:hover { box-shadow: 0 2px 4px rgb(20 16 12 / .05), 0 22px 44px -22px rgb(20 16 12 / .3); }
+a.posy-tile:hover { box-shadow: 0 2px 4px rgb(20 16 12 / .05), 0 22px 44px -22px rgb(20 16 12 / .32); }
 
-.posy-head { font-family: var(--font-head); font-weight: var(--head-weight, 640); letter-spacing: var(--head-track, -0.03em); font-synthesis: none; }
-.posy-grid-wrap + .posy-grid-wrap { margin-top: 44px; }
+.posy-tiles-solid .posy-tile { background: var(--surface); }
+.posy-tiles-glass .posy-tile {
+  background: color-mix(in oklab, var(--tile-bg) 50%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6);
+  border-color: color-mix(in oklab, #fff 55%, transparent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .55), 0 12px 32px -18px rgb(20 16 12 / .25);
+}
+.dark.posy-tiles-glass .posy-tile { border-color: rgb(255 255 255 / .09); box-shadow: inset 0 1px 0 rgb(255 255 255 / .07), 0 14px 34px -20px rgb(0 0 0 / .6); }
+.posy-tiles-outline .posy-tile { background: color-mix(in oklab, var(--surface) 35%, transparent); border: 1.5px solid color-mix(in oklab, var(--text) 13%, transparent); box-shadow: none; }
+.posy-tiles-outline a.posy-tile:hover { background: var(--tile-bg); box-shadow: none; }
+.posy-type-image, .posy-type-video, .posy-type-music { background: var(--surface); }
 
-/* Entrance: soft spring rise, staggered by tile index. "backwards" so hover transforms win afterwards. */
+/* ---- hover effects ---- */
+.posy-fx-tilt .posy-tile { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .45s; }
+.posy-fx-glow .posy-tile::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .35s; border-radius: inherit;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), color-mix(in oklab, var(--accent) 26%, transparent), transparent 42%);
+}
+.posy-fx-glow .posy-tile:hover::after { opacity: 1; }
+
+/* ---- entrance ---- */
 @keyframes posy-rise { from { opacity: 0; transform: translateY(18px) scale(.97); } }
 .posy-motion .posy-rise {
   animation: posy-rise .75s linear(0, .22 9%, .62 20%, .9 32%, 1.02 44%, 1.04 52%, 1.01 66%, 1) backwards;
   animation-delay: calc(min(var(--i, 0), 14) * 38ms);
 }
 .posy-motion header.posy-rise { animation-delay: 0ms; }
+
+/* ================= Backdrops ================= */
+.posy-backdrop { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; background: var(--bg); }
+.posy-backdrop::before, .posy-backdrop::after { content: ""; position: absolute; inset: 0; }
+.posy-noise { position: absolute; inset: 0; display: none; opacity: .045; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.posy-grain .posy-noise { display: block; }
+.dark .posy-noise { opacity: .07; mix-blend-mode: screen; }
+
+.posy-bg-gradient .posy-backdrop { background:
+  linear-gradient(168deg, color-mix(in oklab, var(--tint-peach) 80%, var(--bg)) 0%, var(--bg) 46%, color-mix(in oklab, var(--tint-sky) 75%, var(--bg)) 100%); }
+
+.posy-bg-mesh .posy-backdrop::before, .posy-bg-aurora .posy-backdrop::before { background:
+  radial-gradient(at 12% 16%, var(--tint-peach) 0, transparent 46%),
+  radial-gradient(at 86% 10%, var(--tint-lilac) 0, transparent 44%),
+  radial-gradient(at 74% 86%, var(--tint-mint) 0, transparent 48%),
+  radial-gradient(at 14% 90%, var(--tint-sky) 0, transparent 42%),
+  radial-gradient(at 52% 46%, var(--tint-butter) 0, transparent 50%); }
+
+.posy-bg-aurora .posy-backdrop::before { inset: -25%; filter: blur(48px) saturate(1.15); }
+.posy-motion.posy-bg-aurora .posy-backdrop::before { animation: posy-aurora 26s ease-in-out infinite alternate; }
+@keyframes posy-aurora {
+  0% { transform: translate3d(-4%, -3%, 0) rotate(0deg) scale(1); }
+  50% { transform: translate3d(5%, 4%, 0) rotate(8deg) scale(1.12); }
+  100% { transform: translate3d(-3%, 6%, 0) rotate(-6deg) scale(1.04); }
+}
+
+.posy-bg-dots .posy-backdrop::before {
+  background: radial-gradient(color-mix(in oklab, var(--text) 16%, transparent) 1.1px, transparent 1.6px) 0 0 / 22px 22px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 30%, transparent 100%); mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 30%, transparent 100%);
+}
+.posy-bg-grid .posy-backdrop::before {
+  background:
+    linear-gradient(color-mix(in oklab, var(--text) 7%, transparent) 1px, transparent 1px) 0 0 / 44px 44px,
+    linear-gradient(90deg, color-mix(in oklab, var(--text) 7%, transparent) 1px, transparent 1px) 0 0 / 44px 44px;
+  -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 25%, #000 25%, transparent 100%); mask-image: radial-gradient(ellipse 85% 75% at 50% 25%, #000 25%, transparent 100%);
+}
+.posy-bg-image .posy-backdrop::before { inset: -40px; background: var(--bg-image, none) center / cover no-repeat; filter: blur(var(--bg-blur, 0px)); }
+.posy-bg-image .posy-backdrop::after { background: rgb(0 0 0 / var(--bg-dim, .2)); }
+.posy-bg-image .posy-profile { color: #fff; }
+.posy-bg-image .posy-bio, .posy-bg-image .posy-meta, .posy-bg-image .posy-footer, .posy-bg-image .posy-section { color: rgb(255 255 255 / .82); text-shadow: 0 1px 12px rgb(0 0 0 / .25); }
+.posy-bg-image .posy-name { text-shadow: 0 2px 18px rgb(0 0 0 / .25); }

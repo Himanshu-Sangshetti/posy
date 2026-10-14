@@ -7,9 +7,17 @@
       "type": "string"
     },
     "version": {
-      "default": 1,
-      "type": "number",
-      "const": 1
+      "default": 2,
+      "anyOf": [
+        {
+          "type": "number",
+          "const": 1
+        },
+        {
+          "type": "number",
+          "const": 2
+        }
+      ]
     },
     "profile": {
       "type": "object",
@@ -35,13 +43,6 @@
       ]
     },
     "theme": {
-      "default": {
-        "preset": "cream",
-        "font": "soft",
-        "radius": "round",
-        "layout": "split",
-        "motion": true
-      },
       "type": "object",
       "properties": {
         "preset": {
@@ -54,8 +55,12 @@
             "sky",
             "peach",
             "paper",
+            "blush",
+            "sage",
             "midnight",
-            "mocha"
+            "mocha",
+            "dusk",
+            "ocean"
           ]
         },
         "accent": {
@@ -69,8 +74,14 @@
           "enum": [
             "soft",
             "editorial",
+            "classic",
+            "elegant",
             "rounded",
-            "mono"
+            "playful",
+            "modern",
+            "tech",
+            "mono",
+            "hand"
           ]
         },
         "radius": {
@@ -79,16 +90,104 @@
           "enum": [
             "sharp",
             "soft",
-            "round"
+            "round",
+            "pill"
           ]
         },
         "layout": {
-          "default": "split",
-          "description": "split = profile beside the grid on desktop; stack = centred",
+          "default": "bento",
+          "description": "bento = tile grid; list = Linktree-style stacked links",
           "type": "string",
           "enum": [
-            "split",
-            "stack"
+            "bento",
+            "list"
+          ]
+        },
+        "align": {
+          "default": "side",
+          "description": "bento only: profile beside the grid (side) or above it (center)",
+          "type": "string",
+          "enum": [
+            "side",
+            "center"
+          ]
+        },
+        "background": {
+          "default": {
+            "style": "solid",
+            "dim": 20,
+            "blur": 0,
+            "grain": true
+          },
+          "type": "object",
+          "properties": {
+            "style": {
+              "default": "solid",
+              "type": "string",
+              "enum": [
+                "solid",
+                "gradient",
+                "mesh",
+                "aurora",
+                "dots",
+                "grid",
+                "image"
+              ]
+            },
+            "image": {
+              "description": "Background image when style is \"image\"",
+              "type": "string"
+            },
+            "dim": {
+              "default": 20,
+              "description": "Darken an image background, 0–80 (%)",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 80
+            },
+            "blur": {
+              "default": 0,
+              "description": "Blur an image background, 0–24 (px)",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 24
+            },
+            "grain": {
+              "default": true,
+              "description": "Subtle film grain over the background",
+              "type": "boolean"
+            }
+          }
+        },
+        "tileStyle": {
+          "default": "soft",
+          "type": "string",
+          "enum": [
+            "soft",
+            "glass",
+            "outline",
+            "solid"
+          ]
+        },
+        "effect": {
+          "default": "lift",
+          "description": "Hover effect on tiles",
+          "type": "string",
+          "enum": [
+            "lift",
+            "tilt",
+            "glow",
+            "none"
+          ]
+        },
+        "avatar": {
+          "default": "squircle",
+          "type": "string",
+          "enum": [
+            "squircle",
+            "circle",
+            "square",
+            "hidden"
           ]
         },
         "motion": {
