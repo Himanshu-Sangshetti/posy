@@ -29,11 +29,11 @@ test('paste a link to add a tile', async ({ page }) => {
 test('design changes save to the draft', async ({ page }) => {
   await newUser(page);
   await page.getByRole('button', { name: 'Design' }).click();
+  await page.getByRole('button', { name: 'Glass' }).click();
+  await page.getByRole('tab', { name: 'Colour' }).click();
   await page.getByRole('button', { name: 'Midnight' }).click();
   await page.getByRole('tab', { name: 'Backdrop' }).click();
   await page.getByRole('button', { name: 'Aurora' }).click();
-  await page.getByRole('tab', { name: 'Tiles' }).click();
-  await page.getByRole('button', { name: 'Glass' }).click();
   await page.getByRole('tab', { name: 'Type' }).click();
   await page.getByRole('button', { name: 'Modern font' }).click();
   await saved(page);
@@ -157,7 +157,7 @@ test('export your page and delete your account', async ({ page }) => {
 
 test('the desk template turns tiles into objects, and a note can become a stamp', async ({ page, browser }) => {
   const u = await newUser(page, 'desk');
-  expect((await draft(page)).page.theme.layout).toBe('desk');
+  expect((await draft(page)).page.theme).toMatchObject({ style: 'cozy', layout: 'bento' });
   const note = page.locator('[data-tile]').filter({ hasText: 'Currently working on something new' });
   await note.click();
   await page.getByRole('button', { name: 'Round stamp' }).click();
