@@ -1,7 +1,7 @@
-// Washi: a Japanese print. Fibrous paper, sumi ink, double-ruled frames numbered in kanji, a red hanko seal,
-// the name set vertically like a book spine, and short notes typeset top to bottom.
+// Washi: a Japanese print. Real Edo-period woodblock prints (public domain), real paper, a seal made from a real
+// seal impression, double-ruled frames numbered in kanji, and short names set top to bottom like a book spine.
 import { ArrowUpRight } from 'lucide-react';
-import type { Tile } from '@/lib/schema';
+import type { Page, Tile } from '@/lib/schema';
 import { asset, cn } from '@/lib/utils';
 import { youtubeId } from '@/lib/url';
 import { VideoPlayer } from '../islands';
@@ -17,24 +17,45 @@ export function kanji(n: number) {
   return `${t > 1 ? DIGITS[t] : ''}十${DIGITS[o]}`;
 }
 
+/** Public-domain prints (Art Institute of Chicago, CC0), one per palette. Credits: public/looks/CREDITS.md. */
+export const WASHI_PRINTS: Record<string, { src: string; artist: string; title: string; year: string }> = {
+  kinari: { src: '/looks/washi/mishima-mist.jpg', artist: 'Utagawa Hiroshige', title: 'Mishima: Morning Mist', year: 'c. 1833' },
+  sakura: { src: '/looks/washi/benzaiten-snow.jpg', artist: 'Utagawa Hiroshige', title: 'Snow at Benzaiten Shrine', year: 'c. 1844' },
+  yomogi: { src: '/looks/washi/mitsuke-ferry.jpg', artist: 'Utagawa Hiroshige', title: 'Ferries Crossing the Tenryu River', year: 'c. 1837' },
+  sumi: { src: '/looks/washi/shower-summit.jpg', artist: 'Katsushika Hokusai', title: 'Shower Below the Summit', year: 'c. 1830' },
+};
+const printFor = (preset: string) => WASHI_PRINTS[preset] ?? WASHI_PRINTS.kinari;
+
 const initials = (name: string) => name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() || 'P';
 
-export function WashiHeader({ name, slots }: { name: string; slots: HeaderSlots }) {
+/** A seal pressed with the person's initials: the frame and ink grain come from a real Edo seal impression. */
+function Seal({ name }: { name: string }) {
+  return <span className="ws-seal" aria-hidden><span className="ws-seal-ink">{initials(name)}</span></span>;
+}
+
+export function WashiHeader({ page, slots }: { page: Page; slots: HeaderSlots }) {
+  const name = page.profile.name;
+  const vertical = name.trim().length <= 12 && typeof slots.name === 'string';
+  const art = printFor(page.theme.preset);
   return (
     <>
-      {/* each word is its own column, read right to left; the editor passes an input instead of text */}
-      <h1 className={cn('posy-head posy-name ws-name', name.length > 14 && 'ws-name-long', typeof slots.name !== 'string' && 'ws-name-edit')} aria-label={name}>
-        {typeof slots.name === 'string' ? slots.name.trim().split(/\s+/).map((w, i) => <span key={i} className="ws-word" aria-hidden>{w}</span>) : slots.name}
+      <h1 className={cn('posy-head posy-name ws-name', vertical ? 'ws-name-v' : 'ws-name-h')} aria-label={name}>
+        {vertical ? (slots.name as string).trim().split(/\s+/).map((w, i) => <span key={i} className="ws-word" aria-hidden>{w}</span>) : slots.name}
       </h1>
       <div className="ws-side">
         <div className="ws-top">
           {slots.avatar && <div className="ws-print">{slots.avatar}</div>}
-          <span className="ws-seal" aria-hidden><span>{initials(name)}</span></span>
+          <Seal name={name} />
         </div>
         {slots.bio && <div className="posy-bio ws-bio">{slots.bio}</div>}
         {slots.caption && <p className="ws-caption">{slots.caption}</p>}
         {slots.socials}
       </div>
+      <figure className="ws-art">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={art.src} alt={`${art.title}, ${art.artist}`} loading="eager" />
+        <figcaption><b>{art.artist}</b> · {art.title} · {art.year}</figcaption>
+      </figure>
     </>
   );
 }
@@ -79,7 +100,8 @@ export function WashiRow({ tile, index }: { tile: Tile; index: number }) {
   return (
     <div className="ws-line">
       <span className="ws-n">{kanji(index + 1)}</span>
-      <b>{m.title}</b>
+      {m.image ? <span className="ws-thumb"><Img src={m.image} /></span> : <span className="ws-thumb ws-thumb-empty" aria-hidden />}
+      <span className="ws-line-text"><b>{m.title}</b>{m.sub && m.sub !== m.title && tile.type !== 'image' && <span>{m.sub}</span>}</span>
       <span className="ws-kind">{m.kind}</span>
       <ArrowUpRight className="ws-go" aria-hidden />
     </div>

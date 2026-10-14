@@ -1,53 +1,65 @@
 /* ================= Washi: a Japanese print ================= */
 .posy-style-washi { --ws-cjk: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif; --ws-ink: var(--text); --ws-red: var(--accent); --ws-rule: color-mix(in oklab, var(--text) 22%, transparent); --ws-paper: color-mix(in oklab, var(--surface) 70%, var(--bg)); }
 /* paper fibres: long thin strands over the page colour */
-.posy-style-washi .posy-backdrop::before { opacity: .55; mix-blend-mode: multiply;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='1600'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .02' numOctaves='5' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .38 0 0 0 0 .29 0 0 0 -.9 .42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E") center / cover no-repeat; }
-.dark.posy-style-washi .posy-backdrop::before { mix-blend-mode: screen; opacity: .18; }
+.posy-style-washi .posy-backdrop::before { background: url(/looks/washi/paper.jpg) center / 760px repeat; mix-blend-mode: multiply; opacity: .7; }
+.dark.posy-style-washi .posy-backdrop::before { mix-blend-mode: soft-light; opacity: .35; filter: invert(1); }
 .posy-style-washi .posy-head { font-family: var(--font-head), var(--ws-cjk); }
 .ws-n, .ws-mark, .ws-seal span, .ws-note { font-family: var(--font-head), var(--ws-cjk) !important; }
 
-/* header: the name runs top to bottom beside a seal, a small print and the bio */
-.st-head-washi { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 clamp(28px, 6vw, 72px); align-items: start; padding-bottom: 34px; border-bottom: 1px solid var(--ws-rule); }
-.ws-name { display: flex; flex-direction: row-reverse; align-items: flex-start; gap: .14em; margin: 0; font-size: 58px; line-height: 1; letter-spacing: .12em; text-transform: uppercase; color: var(--ws-ink); }
-.ws-word { writing-mode: vertical-rl; text-orientation: upright; max-height: 9.5em; }
-.ws-name-edit { writing-mode: vertical-rl; display: block; max-height: 560px; }
+/* header: name, then you (a small print + your seal) and a few lines, then a real woodblock print mounted like a museum piece */
+.st-head-washi { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.05fr); grid-template-areas: "name side art"; gap: 0 clamp(28px, 4.5vw, 64px); align-items: start; padding-bottom: 40px; border-bottom: 1px solid var(--ws-rule); }
+.st-head-washi:has(.ws-name-h) { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); grid-template-areas: "name name" "side art"; row-gap: 30px; }
+.ws-name { grid-area: name; margin: 0; color: var(--ws-ink); }
+.ws-name-v { display: flex; flex-direction: row-reverse; align-items: flex-start; gap: .14em; font-size: 58px; line-height: 1; letter-spacing: .12em; text-transform: uppercase; }
+@container page (min-width: 700px) { .ws-name-v { font-size: 74px; } }
+.ws-word { writing-mode: vertical-rl; text-orientation: upright; }
+.ws-name-h { font-size: clamp(44px, 6.4vw, 84px); line-height: .95; letter-spacing: -.01em; overflow-wrap: anywhere; }
+.ws-name-h textarea { display: block; width: 100%; }
 .ws-name i { font-style: normal; }
-.ws-name-long .ws-word { text-orientation: mixed; } .ws-name-long { letter-spacing: .04em; text-transform: none; }
-@container page (min-width: 700px) { .ws-name { font-size: 76px; } }
-.ws-side { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "top bio" "top cap" "top soc"; gap: 18px clamp(28px, 4vw, 48px); align-content: start; align-items: start; padding-top: 6px; }
-.ws-side > .ws-top { grid-area: top; } .ws-side > .ws-bio { grid-area: bio; } .ws-side > .ws-caption { grid-area: cap; } .ws-side > .posy-social-row { grid-area: soc; }
-.ws-side > :not(.ws-top) { justify-self: start; }
-.ws-top { display: flex; align-items: flex-end; gap: 18px; }
-.ws-top { flex-direction: column; align-items: flex-start; gap: 0; }
-.ws-top .ws-seal { margin: -26px 0 0 104px; position: relative; }
-.ws-print { width: 150px; padding: 8px 8px 24px; background: var(--ws-paper); box-shadow: 0 0 0 1px var(--ws-rule), 0 14px 28px -20px rgb(0 0 0 / .45); }
+.ws-side { grid-area: side; display: grid; gap: 20px; justify-items: start; align-content: start; padding-top: 6px; min-width: 0; }
+.ws-top { position: relative; display: block; }
+.ws-print { width: 168px; padding: 9px 9px 30px; background: var(--ws-paper) url(/looks/washi/paper.jpg) center / 400px; background-blend-mode: multiply; box-shadow: 0 0 0 1px var(--ws-rule), 0 18px 30px -22px rgb(0 0 0 / .5); }
 .ws-print .posy-avatar, .ws-print button { width: 100%; height: auto; aspect-ratio: 4 / 5; border-radius: 0; box-shadow: none; }
-.ws-print .posy-avatar img { filter: saturate(.75) contrast(1.02); }
-.ws-seal { display: grid; place-items: center; width: 58px; height: 58px; rotate: -4deg; border-radius: 6px; background: var(--ws-red); color: var(--bg); box-shadow: inset 0 0 0 3px var(--ws-red), inset 0 0 0 4.5px color-mix(in oklab, var(--bg) 80%, transparent);
-  -webkit-mask-image: radial-gradient(circle at 30% 20%, #000 60%, rgb(0 0 0 / .82) 61%, #000 75%); mask-image: radial-gradient(circle at 30% 20%, #000 60%, rgb(0 0 0 / .82) 61%, #000 75%); }
-.ws-seal span { font-family: var(--font-head); font-size: 24px; font-weight: 600; letter-spacing: .02em; line-height: 1; }
-.ws-bio { max-width: 38ch; font-family: var(--font-head); font-size: 21px; line-height: 1.75; color: var(--ws-ink); }
-.ws-caption { display: flex; align-items: center; gap: 9px; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.ws-print .posy-avatar img { filter: saturate(.78) contrast(1.02) sepia(.06); }
+.ws-print .posy-avatar > span { font-family: var(--font-head); font-size: 44px; color: color-mix(in oklab, var(--text) 45%, transparent); }
+/* the seal: a real seal's frame and ink, your initials pressed in the middle */
+.ws-seal { position: absolute; right: -26px; bottom: -14px; display: grid; place-items: center; width: 74px; height: 74px; rotate: -5deg; background: url(/looks/washi/seal.png) center / contain no-repeat; mix-blend-mode: multiply; }
+.dark .ws-seal { mix-blend-mode: normal; filter: saturate(1.2) brightness(1.1); }
+.ws-seal-ink { font-family: var(--font-head), var(--ws-cjk); font-size: 21px; font-weight: 700; line-height: 1; letter-spacing: .02em; color: #c43c28;
+  -webkit-mask: url(/looks/washi/seal-grain.png) center / 40px; mask: url(/looks/washi/seal-grain.png) center / 40px; }
+.ws-top:not(:has(.ws-print)) .ws-seal { position: static; }
+.ws-bio { max-width: 34ch; font-family: var(--font-head); font-size: 20px; line-height: 1.7; color: var(--ws-ink); margin-top: 12px; }
+.ws-caption { display: flex; align-items: center; gap: 9px; font-size: 12.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .ws-caption::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--ws-red); }
 .posy-style-washi .posy-social-row { gap: 6px; }
 .posy-style-washi .posy-social-row a, .posy-style-washi .posy-social-row > div > span { width: 38px; height: 38px; border-radius: 0; background: none; color: var(--ws-ink); box-shadow: inset 0 0 0 1px var(--ws-rule); transition: background .2s, color .2s; }
 .posy-style-washi .posy-social-row a:hover { background: var(--ws-ink); color: var(--bg); }
+/* the mounted print */
+.ws-art { grid-area: art; margin: 0; padding: 14px 14px 12px; background: var(--ws-paper) url(/looks/washi/paper.jpg) center / 500px; background-blend-mode: multiply; box-shadow: 0 0 0 1px var(--ws-rule), 0 30px 50px -36px rgb(0 0 0 / .55); }
+.ws-art img { display: block; width: 100%; height: auto; box-shadow: 0 0 0 1px color-mix(in oklab, var(--text) 12%, transparent); }
+.ws-art figcaption { margin-top: 10px; font-size: 11.5px; letter-spacing: .04em; color: var(--muted); }
+.ws-art figcaption b { font-weight: 500; color: var(--ws-ink); }
+@container page (max-width: 860px) {
+  .st-head-washi, .st-head-washi:has(.ws-name-h) { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "art art" "name side"; row-gap: 28px; }
+  .st-head-washi:has(.ws-name-h) { grid-template-areas: "art art" "name name" "side side"; }
+}
 @container page (max-width: 560px) {
-  .st-head-washi { grid-template-columns: 1fr; gap: 22px; }
-  .ws-side { grid-template-columns: 1fr; grid-template-areas: "top" "bio" "cap" "soc"; }
-  .ws-name { flex-direction: row; flex-wrap: wrap; gap: 0 .35em; font-size: 46px; letter-spacing: .06em; }
-  .ws-word, .ws-name-edit { writing-mode: horizontal-tb; }
+  .st-head-washi, .st-head-washi:has(.ws-name-h) { grid-template-columns: 1fr; grid-template-areas: "art" "name" "side"; }
+  .ws-name-v { flex-direction: row; flex-wrap: wrap; gap: 0 .35em; font-size: 44px; letter-spacing: .06em; }
+  .ws-word { writing-mode: horizontal-tb; }
 }
 
 /* sections: a red dot and a long rule */
+.posy-style-washi.posy-layout-list .st-head-washi { grid-template-columns: 1fr; grid-template-areas: "art" "name" "side"; justify-items: center; text-align: center; row-gap: 26px; }
+.posy-style-washi.posy-layout-list .ws-name-v { flex-direction: row; gap: 0 .35em; font-size: 48px; letter-spacing: .06em; } .posy-style-washi.posy-layout-list .ws-word { writing-mode: horizontal-tb; }
+.posy-style-washi.posy-layout-list .ws-side { justify-items: center; } .posy-style-washi.posy-layout-list .ws-art { max-width: 520px; }
 .posy-style-washi .posy-section { display: flex; align-items: center; gap: 14px; margin: 8px 0 22px; padding: 0; font-family: var(--font-head); font-size: 22px; font-weight: 500; letter-spacing: .08em; color: var(--ws-ink); }
 .posy-style-washi .posy-section::before { content: ""; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--ws-red); }
 .posy-style-washi .posy-section::after { content: ""; flex: 1; height: 1px; background: var(--ws-rule); }
 .posy-style-washi .posy-grid { --gap: 22px; }
 
 /* tiles: a print in a double-ruled frame */
-.ws-frame { position: relative; display: flex; flex-direction: column; gap: 12px; height: 100%; padding: 16px 16px 15px; background: var(--ws-paper); color: var(--ws-ink);
+.ws-frame { position: relative; display: flex; flex-direction: column; gap: 12px; height: 100%; padding: 16px 16px 15px; background: var(--ws-paper) url(/looks/washi/paper.jpg) center / 520px; background-blend-mode: multiply; color: var(--ws-ink);
   box-shadow: inset 0 0 0 1px var(--ws-rule), inset 0 0 0 5px var(--ws-paper), inset 0 0 0 6px color-mix(in oklab, var(--text) 10%, transparent); transition: box-shadow .3s, translate .3s; }
 .posy-tile:hover .ws-frame { translate: 0 -2px; box-shadow: inset 0 0 0 1px var(--ws-ink), inset 0 0 0 5px var(--ws-paper), inset 0 0 0 6px var(--ws-rule), 0 18px 30px -24px rgb(0 0 0 / .5); }
 .ws-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
@@ -70,17 +82,19 @@
 
 /* list layout */
 .posy-style-washi .posy-list { gap: 0; border-top: 1px solid var(--ws-rule); }
-.ws-line { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto 22px; align-items: baseline; gap: 14px; padding: 18px 6px; border-bottom: 1px solid var(--ws-rule); transition: background .2s; }
+.ws-line { position: relative; display: grid; grid-template-columns: 40px 52px minmax(0, 1fr) auto 22px; align-items: center; gap: 16px; padding: 14px 6px; border-bottom: 1px solid var(--ws-rule); transition: background .2s; }
+.ws-thumb { width: 52px; height: 52px; padding: 3px; background: var(--ws-paper); box-shadow: 0 0 0 1px var(--ws-rule); overflow: hidden; }
+.ws-thumb img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.75) sepia(.06); }
+.ws-thumb-empty { background: var(--ws-paper) url(/looks/washi/paper.jpg) center / 300px; background-blend-mode: multiply; }
+.ws-line-text { display: grid; gap: 2px; min-width: 0; }
+.ws-line-text span { font-size: 12.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@container page (max-width: 520px) { .ws-line { grid-template-columns: 30px 44px minmax(0, 1fr) 18px; gap: 12px; } .ws-line .ws-kind { display: none; } .ws-thumb { width: 44px; height: 44px; } }
 .ws-line b { font-family: var(--font-head); font-size: 19px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ws-line .ws-go { position: static; align-self: center; }
 .posy-row-st:hover .ws-line { background: var(--ws-paper); }
 .posy-row-st:hover .ws-line .ws-go { color: var(--ws-red); }
-.ws-row-note { padding: 18px 6px 18px 64px; border-bottom: 1px solid var(--ws-rule); font-family: var(--font-head); font-size: 17px; line-height: 1.7; color: var(--muted); }
+.ws-row-note { padding: 16px 6px 16px 130px; border-bottom: 1px solid var(--ws-rule); font-family: var(--font-head); font-size: 17px; line-height: 1.7; color: var(--muted); }
 .posy-style-washi.posy-layout-list .posy-section { margin: 26px 0 4px; }
-.posy-style-washi.posy-layout-list .st-head-washi { grid-template-columns: 1fr; justify-items: center; text-align: center; border-bottom: 0; padding-bottom: 8px; }
-.posy-style-washi.posy-layout-list .ws-name { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 0 .35em; font-size: 46px; }
-.posy-style-washi.posy-layout-list .ws-word { writing-mode: horizontal-tb; }
-.posy-style-washi.posy-layout-list .ws-side { grid-template-columns: 1fr; grid-template-areas: "top" "bio" "cap" "soc"; justify-items: center; }
-.posy-style-washi.posy-layout-list .ws-side > :not(.ws-top) { justify-self: center; }
 .posy-style-washi.posy-layout-list .posy-social-row { justify-content: center; }
 .posy-style-washi .posy-footer a { font-family: var(--font-head); letter-spacing: .1em; }
+.posy-style-washi.posy-layout-list .ws-name-h { font-size: clamp(40px, 5.4vw, 60px); text-align: center; }

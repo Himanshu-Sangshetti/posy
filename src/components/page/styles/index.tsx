@@ -24,7 +24,7 @@ export function StyleHeader({ page, slots }: { page: Page; slots: HeaderSlots })
 function styledHeader(page: Page, slots: HeaderSlots) {
   switch (page.theme.style) {
     case 'cozy': return <CozyHeader slots={slots} />;
-    case 'washi': return <WashiHeader name={page.profile.name} slots={slots} />;
+    case 'washi': return <WashiHeader page={page} slots={slots} />;
     case 'lofi': return <LofiHeader name={page.profile.name} slots={slots} />;
     default: return null;
   }

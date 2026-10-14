@@ -1,0 +1,17 @@
+# Art and textures used by the looks
+
+Everything here is public domain or CC0, so it can be used and redistributed freely.
+
+| File | What | Source | Licence |
+|---|---|---|---|
+| washi/mishima-mist.jpg | Utagawa Hiroshige, *Mishima: Morning Mist*, c. 1833/34 | Art Institute of Chicago, 10926 | CC0 (public domain) |
+| washi/benzaiten-snow.jpg | Utagawa Hiroshige, *Snow at Benzaiten Shrine in Inokashira Pond*, c. 1844/45 | Art Institute of Chicago, 19040 | CC0 (public domain) |
+| washi/mitsuke-ferry.jpg | Utagawa Hiroshige, *Mitsuke: Ferries Crossing the Tenryu River*, c. 1837/42 | Art Institute of Chicago, 4368 | CC0 (public domain) |
+| washi/shower-summit.jpg | Katsushika Hokusai, *Shower Below the Summit*, c. 1830/33 | Art Institute of Chicago, 87008 | CC0 (public domain) |
+| washi/cranes-pine.jpg | Katsushika Hokusai, *Cranes on Snow-Covered Pine*, c. 1834 | Art Institute of Chicago, 21720 | CC0 (public domain) |
+| washi/wave.jpg | Katsushika Hokusai, *Under the Wave off Kanagawa*, 1830/33 | Art Institute of Chicago, 24645 | CC0 (public domain) |
+| washi/seal.png, washi/seal-grain.png | Frame and ink grain of the publisher's seal on Hiroshige's *Snow at Benzaiten Shrine* (characters removed) | Art Institute of Chicago, 19040 | CC0 (public domain) |
+| washi/paper.jpg | Paper 002 | ambientCG | CC0 |
+| desk/paper.jpg | Paper 001 | ambientCG | CC0 |
+| desk/oak.jpg | Wood 094 | ambientCG | CC0 |
+| desk/walnut.jpg | Wood 051 | ambientCG | CC0 |

@@ -6,7 +6,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { useState } from 'react';
 import { MapPin, ImagePlus, X } from 'lucide-react';
 import type { Page, Tile } from '@/lib/schema';
-import { PageFrame, TileShell, Avatar, sections } from '@/components/page/PageView';
+import { PageFrame, TileShell, Avatar, sections, ordinals } from '@/components/page/PageView';
 import { StyleHeader, StyleTile, StyleRow, headerClass, socialsInHeader, type StyleId } from '@/components/page/styles';
 import { TileContent, ListItem, BrandIcon } from '@/components/page/tiles';
 import { tileBackground } from '@/lib/style';
@@ -149,7 +149,7 @@ function SortableTile({ tile, index, look }: { tile: Tile; index: number; look: 
   );
 }
 
-function SortableRow({ tile, index, look }: { tile: Tile; index: number; look: StyleId }) {
+function SortableRow({ tile, index, ord, look }: { tile: Tile; index: number; ord?: number; look: StyleId }) {
   const selected = useStudio(s => s.selected === tile.id);
   const select = useStudio(s => s.select);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: tile.id });
@@ -159,7 +159,7 @@ function SortableRow({ tile, index, look }: { tile: Tile; index: number; look: S
       onClick={e => { e.stopPropagation(); select(tile.id); }} {...attributes} {...listeners}>
       <MotionShell index={index} lift={false} className={cn(look === 'minimal' ? 'posy-tile posy-row' : 'posy-row-st', 'group block cursor-grab active:cursor-grabbing', `posy-type-${tile.type}`, `posy-size-${tile.size}`, selected && 'outline outline-2 outline-offset-[3px] outline-[#e4572e]')}
         style={{ '--tile-bg': tileBackground(tile, index, brandHex(tile)) } as React.CSSProperties}>
-        {look !== 'minimal' ? <StyleRow style={look} tile={tile} index={index} /> : selected && tile.type === 'text' ? <InlineText tile={tile} /> : <ListItem tile={tile} />}
+        {look !== 'minimal' ? <StyleRow style={look} tile={tile} index={ord ?? index} /> : selected && tile.type === 'text' ? <InlineText tile={tile} /> : <ListItem tile={tile} />}
       </MotionShell>
       {selected && <TileToolbar tile={tile} />}
     </div>
@@ -217,7 +217,7 @@ export function EditableCanvas({ page }: { page: Page }) {
           <div onClick={() => select(null)} className="min-h-[50vh] pb-40">
             {list && (
               <div className="posy-list">
-                {page.tiles.map((tile, index) => tile.type === 'social' ? null : tile.type === 'heading' ? <SortableHeading key={tile.id} tile={tile} list /> : <SortableRow key={tile.id} tile={tile} index={index} look={look} />)}
+                {page.tiles.map((tile, index) => tile.type === 'social' ? null : tile.type === 'heading' ? <SortableHeading key={tile.id} tile={tile} list /> : <SortableRow key={tile.id} tile={tile} index={index} ord={ordinals(page.tiles).get(tile.id)} look={look} />)}
               </div>
             )}
             {!list && sections(gridTiles).map((s, i) => (
