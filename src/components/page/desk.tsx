@@ -23,7 +23,7 @@ export function deskTilt(tile: Tile): number {
 /** The paper colour of an object: the tile's chosen colour, or a sensible default for the object. */
 function paper(tile: Tile, fallback: string) {
   const c = tile.color;
-  if (c === 'auto') return `var(--tint-${fallback})`;
+  if (c === 'auto') return fallback === 'surface' ? 'var(--surface)' : `var(--tint-${fallback})`;
   if (c === 'surface') return 'var(--surface)';
   if (c === 'accent') return 'color-mix(in oklab, var(--accent) 30%, var(--surface))';
   return `var(--tint-${c})`;
@@ -181,4 +181,39 @@ export function DeskTile({ tile, editing }: { tile: Tile; editing?: boolean }) {
     case 'social': return <Sticker tile={tile} />;
     case 'heading': return null;
   }
+}
+
+/** Cozy header: a polaroid of you, a big signature-like name, stickers. */
+export function CozyHeader({ slots }: { slots: import('./styles/types').HeaderSlots }) {
+  return (
+    <>
+      {slots.avatar && (
+        <div className="dk-me">
+          {slots.avatar}
+          {slots.caption && <span className="dk-hand dk-me-cap">{slots.caption}</span>}
+        </div>
+      )}
+      <div className="dk-intro">
+        <h1 className="posy-head posy-name">{slots.name}</h1>
+        {slots.bio && <div className="posy-bio">{slots.bio}</div>}
+        {slots.socials}
+      </div>
+    </>
+  );
+}
+
+/** Cozy list row: a paper strip with a little photo, like a label stuck on a notebook. */
+export function CozyRow({ tile }: { tile: Tile }) {
+  if (tile.type === 'image' || tile.type === 'video' || (tile.type === 'text' && tile.look === 'stamp')) return <div className="dk-row-obj"><DeskTile tile={tile} /></div>;
+  if (tile.type === 'text') return <div className="dk-note dk-row-note" style={{ '--paper': paper(tile, 'butter') } as React.CSSProperties}><p className="dk-hand"><RichText text={tile.text} /></p></div>;
+  const img = tile.type === 'link' || tile.type === 'music' ? tile.image : undefined;
+  const title = tile.type === 'link' ? tile.title || hostOf(tile.url) : tile.type === 'music' ? tile.title || 'Listen on Spotify' : tile.type === 'github' ? tile.repo : tile.type === 'social' ? `@${tile.handle}` : '';
+  const sub = tile.type === 'link' ? hostOf(tile.url) : tile.type === 'music' ? tile.artist || 'Spotify' : tile.type === 'github' ? tile.description : tile.type === 'social' ? PLATFORMS[tile.platform].label : undefined;
+  return (
+    <div className="dk-strip" style={{ '--paper': paper(tile, 'surface') } as React.CSSProperties}>
+      {img ? <span className="dk-strip-img"><Img src={img} /></span> : tile.type === 'link' ? <span className="dk-tag-icon"><Favicon url={tile.url} /></span> : null}
+      <span className="dk-strip-text"><b className="dk-serif">{title}</b>{sub && <span className="dk-mono">{sub}</span>}</span>
+      <span className="dk-strip-go" aria-hidden>↗</span>
+    </div>
+  );
 }
