@@ -19,7 +19,7 @@ export function PaintedScene({ scene, focus = '50% 50%', className }: { scene: S
     <div className={cn('ps', `ps-${scene}`, className)} style={{ '--focus': focus } as CSSProperties}>
       <div className="ps-pic">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`/art/${scene}.jpg`} srcSet={`/art/${scene}-sm.jpg 768w, /art/${scene}.jpg 1536w`} sizes="100vw" alt={ALT[scene]} />
+        <img src={`/art/${scene}.webp`} srcSet={`/art/${scene}-sm.webp 768w, /art/${scene}.webp 1536w`} sizes="100vw" alt={ALT[scene]} loading={scene === 'lost' ? 'lazy' : undefined} />
         {scene === 'signup' && <>
           <span className="ps-beam" aria-hidden />
           {Array.from({ length: 18 }, (_, i) => <i key={i} className="ps-mote" style={at(8 + ((i * 37) % 44), 6 + ((i * 53) % 48), { animationDelay: `${-i * 1.3}s`, animationDuration: `${9 + (i % 5) * 2}s` })} aria-hidden />)}

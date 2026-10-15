@@ -14,7 +14,7 @@ export default async function DashLayout({ children }: { children: React.ReactNo
   return (
     <AppFrame>
       <DashHeader username={row.username} email={user.email} site={siteUrl()} extra={edition.nav} />
-      <SkyBand className="sb-strip" src="/art/rooftop.jpg" small="/art/rooftop-sm.jpg" position="50% 80%" />
+      <SkyBand className="sb-strip" src="/art/rooftop.webp" small="/art/rooftop-sm.webp" position="50% 80%" />
       <main className="mx-auto w-full max-w-[1040px] px-5 pb-24 pt-2 sm:px-8">{children}</main>
       {edition.id === 'self-hosted' && (
         <p className="pb-8 text-center text-[13px] text-[var(--muted)]">

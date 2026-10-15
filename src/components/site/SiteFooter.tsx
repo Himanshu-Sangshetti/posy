@@ -8,7 +8,7 @@ import './site.css';
 export function SiteFooter({ site, solo }: { site: SiteLinks; solo?: boolean }) {
   return (
     <footer className={solo ? 'lf lf-solo' : 'lf'}>
-      <PaintReveal src="/art/meadow.jpg" sketch="/art/meadow-sketch.jpg" className="lf-art" />
+      <PaintReveal src="/art/meadow.webp" sketch="/art/meadow-sketch.jpg" className="lf-art" />
       <p className="lf-word" aria-hidden>posy</p>
       <div className="lf-inner">
         <div className="lf-brand">

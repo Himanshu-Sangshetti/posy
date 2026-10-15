@@ -73,7 +73,7 @@ export function Onboarding({ initialUsername, initialStyle = 'cozy', styles, the
           </label>
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="ob-hero-art" src="/art/onboard.jpg" alt="A girl on the floor choosing which photos and records to pin up, her cat batting at a postcard" />
+        <img className="ob-hero-art" src="/art/onboard.webp" alt="A girl on the floor choosing which photos and records to pin up, her cat batting at a postcard" />
       </section>
       <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_400px]">
         <div className="grid min-w-0 gap-8">
