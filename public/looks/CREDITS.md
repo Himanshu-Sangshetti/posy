@@ -26,4 +26,5 @@ Made for Posy with Krea 2 Turbo (open weights, Krea 2 Community License; Krea cl
 | lofi/room-night.jpg | A 90s anime bedroom at night, rain on the window (Lofi, Night palette) |
 | lofi/room-violet.jpg | A rooftop room at dusk, fairy lights and a sleeping cat (Lofi, Violet hour palette) |
 | lofi/train-sunset.jpg | An empty train carriage at sunset by the sea (Lofi, Last train palette) |
+| ../samples/posy.jpg | A watercolour posy, the starter avatar on new pages |
 | desk/leaves.jpg | Afternoon light through leaves on a white wall, turned into a shadow map (Desk) |

@@ -16,7 +16,8 @@ const ids = (tiles: Record<string, unknown>[]) => tiles.map(t => ({ ...t, id: ne
 
 /** Starter pages. Links point to the platforms' home pages until the user edits them. */
 export function template(id: TemplateId, name: string): Page {
-  const profile = { name: name || 'Your name', bio: '' };
+  // A small painted posy stands in for a photo until people add their own.
+  const profile = { name: name || 'Your name', bio: '', avatar: '/samples/posy.jpg' };
   switch (id) {
     case 'desk':
       return parsePage({
