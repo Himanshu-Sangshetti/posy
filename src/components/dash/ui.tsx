@@ -31,11 +31,15 @@ export function PageHead({ eyebrow, title, lede, actions }: { eyebrow?: string; 
 }
 
 /** A titled card: mono eyebrow, serif title, optional description and header action. */
-export function Panel({ eyebrow, title, desc, action, children, className, tone }: {
+export function Panel({ eyebrow, title, desc, action, children, className, tone, art }: {
+  /** A painting across the top of the card. */
+  art?: string;
   eyebrow?: string; title: ReactNode; desc?: ReactNode; action?: ReactNode; children?: ReactNode; className?: string; tone?: 'rose' | 'lilac' | 'mint' | 'butter' | 'sky' | 'peach';
 }) {
   return (
-    <section className={cn('ac-card ac-card-pad ac-rise min-w-0', className)}>
+    <section className={cn('ac-card ac-card-pad ac-rise min-w-0', art && 'overflow-hidden', className)}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      {art && <img src={art} alt="" className="-mx-[22px] -mt-[22px] mb-6 aspect-[16/7] w-[calc(100%+44px)] max-w-none object-cover sm:-mx-[28px] sm:-mt-[28px] sm:w-[calc(100%+56px)]" />}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           {eyebrow && <Eyebrow className="mb-2.5">{eyebrow}</Eyebrow>}
