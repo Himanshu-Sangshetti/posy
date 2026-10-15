@@ -2,7 +2,7 @@
 
 // Canvas-layout edits. Each one is a single store update, so undo/redo and autosave treat it as one step.
 import type { Page, Size, Tile, TilePos } from '@/lib/schema';
-import { placeTiles, sizeBox, clampPos, layerTo, type Placed } from '@/lib/canvas-layout';
+import { placeTiles, looseStyle, sizeBox, clampPos, layerTo, type Placed } from '@/lib/canvas-layout';
 import { socialsInHeader } from '@/components/page/styles';
 import { useStudio } from './store';
 
@@ -17,7 +17,7 @@ export function commitCanvas(changes: Record<string, Partial<Tile>>) {
   const { page, patchTiles } = useStudio.getState();
   if (!page) return;
   const patches: Record<string, Partial<Tile>> = {};
-  for (const p of placeTiles(canvasTiles(page), page.theme.style === 'lofi')) if (!p.tile.pos) patches[p.tile.id] = { pos: p.pos };
+  for (const p of placeTiles(canvasTiles(page), looseStyle(page.theme.style))) if (!p.tile.pos) patches[p.tile.id] = { pos: p.pos };
   for (const [id, c] of Object.entries(changes)) patches[id] = { ...patches[id], ...c };
   patchTiles(patches);
 }
@@ -25,7 +25,7 @@ export function commitCanvas(changes: Record<string, Partial<Tile>>) {
 function current(id: string): { placed: Placed[]; me?: Placed } {
   const page = useStudio.getState().page;
   if (!page) return { placed: [] };
-  const placed = placeTiles(canvasTiles(page), page.theme.style === 'lofi');
+  const placed = placeTiles(canvasTiles(page), looseStyle(page.theme.style));
   return { placed, me: placed.find(p => p.tile.id === id) };
 }
 

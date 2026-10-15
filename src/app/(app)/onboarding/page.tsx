@@ -21,7 +21,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   const premium = (await entitlementsFor(user.id)).premium;
   const styles = STYLE_IDS.map(id => {
     const page = starterPage({ name: user.name, style: id });
-    return { id, label: STYLE_INFO[id].label, note: STYLE_INFO[id].note, preset: STYLE_INFO[id].preset, layout: STYLE_INFO[id].layout, locked: !premium && PREMIUM_STYLES.has(id), preview: <Thumbnail key={id} page={page} width={1100} height={960} scale={0.16} /> };
+    return { id, label: STYLE_INFO[id].label, note: STYLE_INFO[id].note, preset: STYLE_INFO[id].preset, layout: STYLE_INFO[id].layout, locked: !premium && PREMIUM_STYLES.has(id), preview: <Thumbnail key={id} page={page} width={1100} height={680} scale={0.26} /> };
   });
   const themes = Object.values(THEMES).map(t => ({ id: t.id, name: t.name, bg: t.bg, accent: t.accent, text: t.text, dark: t.dark, locked: !premium && PREMIUM_THEMES.has(t.id) }));
   return (

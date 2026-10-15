@@ -159,7 +159,7 @@ test('export your page and delete your account', async ({ page }) => {
 
 test('the desk template turns tiles into objects, and a note can become a stamp', async ({ page, browser }) => {
   const u = await newUser(page, 'desk');
-  expect((await draft(page)).page.theme).toMatchObject({ style: 'cozy', layout: 'bento' });
+  expect((await draft(page)).page.theme).toMatchObject({ style: 'cozy', layout: 'canvas' });
   const note = page.locator('[data-tile]').filter({ hasText: 'Currently working on something new' });
   await note.click();
   await page.getByRole('button', { name: 'Round stamp' }).click();

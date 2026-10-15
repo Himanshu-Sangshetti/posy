@@ -2,11 +2,11 @@ import { parsePage, newId, type Page } from './schema';
 import type { StyleId } from './styles';
 
 export const TEMPLATES = {
-  desk: { label: 'Desk', note: 'Polaroids, notes and a record' },
+  desk: { label: 'Desk', note: 'Polaroids and notes in the afternoon sun' },
   writer: { label: 'Washi', note: 'Paper, ink and a red seal' },
   developer: { label: 'Developer', note: 'Repos up front, in ink' },
-  night: { label: 'Lofi', note: 'A night-time anime still' },
-  creator: { label: 'Minimal', note: 'Quiet type, lots of room' },
+  night: { label: 'Lofi', note: 'A desktop left open' },
+  creator: { label: 'Minimal', note: 'Ink and paper, photos in 1-bit' },
   links: { label: 'Links', note: 'A clean list, like Linktree' },
   blank: { label: 'Blank', note: 'Start from nothing' },
 } as const;
@@ -21,7 +21,7 @@ export function template(id: TemplateId, name: string): Page {
     case 'desk':
       return parsePage({
         profile: { ...profile, bio: 'I make small, soft things on the internet. Say hi.', location: 'hello from home' },
-        theme: { style: 'cozy', preset: 'cream', font: 'editorial', layout: 'bento', avatar: 'square' },
+        theme: { style: 'cozy', preset: 'cream', font: 'editorial', layout: 'canvas', avatar: 'square' },
         tiles: ids([
           { type: 'social', platform: 'instagram', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'x', handle: 'yourname', size: 's' },
@@ -77,9 +77,12 @@ export function template(id: TemplateId, name: string): Page {
         tiles: ids([
           { type: 'social', platform: 'instagram', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'youtube', handle: 'yourname', size: 's' },
+          { type: 'image', src: '/samples/flowers.jpg', caption: 'lately', size: 'l' },
           { type: 'text', text: 'Currently working on **something new**. Updates soon.', size: 'w' },
           { type: 'heading', text: 'Latest' },
-          { type: 'link', url: 'https://example.com', title: 'My latest project', size: 'w' },
+          { type: 'link', url: 'https://example.com', title: 'My latest project', description: 'What I made this month', image: '/samples/tea.jpg', size: 'w' },
+          { type: 'music', url: 'https://open.spotify.com/', title: 'On repeat', artist: 'Spotify', image: '/samples/petunia.jpg', size: 'w' },
+          { type: 'image', src: '/samples/lemon.jpg', size: 's' },
           { type: 'social', platform: 'email', handle: 'you@example.com', size: 's' },
         ]),
       });

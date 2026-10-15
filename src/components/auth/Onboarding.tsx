@@ -56,8 +56,7 @@ export function Onboarding({ initialUsername, styles, themes, host }: { initialU
   return (
     <div className="ac-rise grid grid-cols-[minmax(0,1fr)] gap-8">
       <div>
-        <p className="ac-eyebrow">Step 2 of 2 · Your page</p>
-        <h1 className="ac-display ac-h1 mt-3">Claim your <i>name</i></h1>
+        <h1 className="ac-display ac-h1">Claim your <i>name</i></h1>
         <p className="ac-lede mt-3">This is your address on the web. Pick the look below and watch it come together in the preview.</p>
       </div>
       <label className="ac-card flex h-16 items-center pl-5 pr-4 text-[18px] transition-shadow focus-within:border-[var(--ac-deep)] focus-within:shadow-[0_0_0_4px_rgb(228_87_46/.22)]">
@@ -74,8 +73,8 @@ export function Onboarding({ initialUsername, styles, themes, host }: { initialU
       <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_400px]">
         <div className="grid min-w-0 gap-8">
           <section className="grid gap-4">
-            <div><p className="ac-eyebrow">01 · Style</p><h2 className="ac-display ac-h2 mt-2">The whole <i>feel</i></h2><p className="mt-1.5 text-[14.5px] text-[var(--muted)]">You can switch any time.</p></div>
-            <div role="radiogroup" aria-label="Style" className="grid grid-cols-2 gap-3 sm:grid-cols-3"
+            <div><h2 className="ac-display ac-h2">The whole <i>feel</i></h2><p className="mt-1.5 text-[14.5px] text-[var(--muted)]">You can switch any time.</p></div>
+            <div role="radiogroup" aria-label="Style" className="grid grid-cols-2 gap-3"
               onKeyDown={e => {
                 const d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
                 if (!d) return;
@@ -87,7 +86,7 @@ export function Onboarding({ initialUsername, styles, themes, host }: { initialU
                 <div key={o.id} role="radio" data-tpl={STARTER[o.id]} data-style={o.id} aria-checked={style === o.id} tabIndex={style === o.id ? 0 : -1}
                   onClick={() => pickStyle(o.id)} onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); pickStyle(o.id); } }}
                   className="ac-opt">
-                  <div className="grid h-[124px] place-items-center overflow-hidden rounded-[10px] border border-[var(--line)] bg-[var(--bg)]">{o.preview}</div>
+                  <div className="grid h-[150px] place-items-center overflow-hidden rounded-[10px] border border-[var(--line)] bg-[var(--bg)] sm:h-[176px]">{o.preview}</div>
                   <span className="px-0.5">
                     <span className="flex items-center justify-between gap-2">
                       <span className="text-[15px] font-semibold leading-none">{o.label}</span>
@@ -102,7 +101,7 @@ export function Onboarding({ initialUsername, styles, themes, host }: { initialU
           </section>
 
           <section className="grid gap-4">
-            <div><p className="ac-eyebrow">02 · Layout</p><h2 className="ac-display ac-h2 mt-2">How tiles <i>sit</i></h2></div>
+            <div><h2 className="ac-display ac-h2">How tiles <i>sit</i></h2></div>
             <div role="radiogroup" aria-label="Layout" className="grid grid-cols-3 gap-3">
               {([['bento', 'Grid', 'A mosaic of tiles of different sizes.'], ['list', 'List', 'One clean column, like a link in bio.'], ['canvas', 'Canvas', 'Place anything anywhere, overlap and tilt.']] as const).map(([id, label, note]) => (
                 <button key={id} type="button" role="radio" data-layout={id} aria-checked={layout === id} onClick={() => setLayout(id)} className="ac-opt">
@@ -120,7 +119,7 @@ export function Onboarding({ initialUsername, styles, themes, host }: { initialU
           </section>
 
           <section className="grid gap-4">
-            <div><p className="ac-eyebrow">03 · Colours</p><h2 className="ac-display ac-h2 mt-2">Pick a <i>palette</i></h2></div>
+            <div><h2 className="ac-display ac-h2">Pick a <i>palette</i></h2></div>
             <TooltipProvider delayDuration={150}>
               <div role="radiogroup" aria-label="Colours" className="flex flex-wrap gap-3">
                 {(STYLE_PALETTES[style as StyleId] ?? []).map(id => themes.find(t => t.id === id)).filter(t => !!t).map(t => (

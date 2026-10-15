@@ -80,6 +80,9 @@ export function placeTiles(tiles: Tile[], loose = false): Placed[] {
   return out;
 }
 
+/** Looks where things lie around (a desk, a desktop) place new tiles loosely; the others keep a neat grid. */
+export const looseStyle = (style: string) => style === 'lofi' || style === 'cozy';
+
 /** First free slot scanning rows top to bottom (CSS grid-auto-flow: dense). */
 function findSlot(rows: boolean[][], c: number, r: number) {
   for (let row = 0; ; row++) {

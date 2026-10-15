@@ -12,7 +12,7 @@ import { deskTilt } from './desk';
 import { StyleHeader, StyleTile, StyleRow, headerClass, socialsInHeader, type StyleId } from './styles';
 import { Halftone, LofiMenuBar } from './styles/lofi';
 import { Clouds3D } from './Clouds3D';
-import { placeTiles, canvasHeight, readingOrder, boxSize } from '@/lib/canvas-layout';
+import { placeTiles, looseStyle, canvasHeight, readingOrder, boxSize } from '@/lib/canvas-layout';
 import type { TilePos } from '@/lib/schema';
 import './canvas.css';
 
@@ -236,7 +236,7 @@ export const halfOnPhone = (pos: TilePos) => pos.w < 480;
 function CanvasTiles({ page }: { page: Page }) {
   const lift = page.theme.effect === 'lift';
   const tiles = socialsInHeader(page) ? page.tiles.filter(t => t.type !== 'social') : page.tiles;
-  const placed = placeTiles(tiles, page.theme.style === 'lofi');
+  const placed = placeTiles(tiles, looseStyle(page.theme.style));
   const ord = ordinals(page.tiles);
   return (
     <div className="posy-canvas-wrap">

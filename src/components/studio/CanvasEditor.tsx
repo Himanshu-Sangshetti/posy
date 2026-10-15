@@ -7,7 +7,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { RotateCw } from 'lucide-react';
 import type { Page, Tile, TilePos } from '@/lib/schema';
 import { TileShell, canvasVars, halfOnPhone } from '@/components/page/PageView';
-import { placeTiles, canvasHeight, readingOrder, boxSize, snapMove, resizeBox, snapRotation, CANVAS_WIDTH, type Box, type Guide, type Handle, type Placed } from '@/lib/canvas-layout';
+import { placeTiles, looseStyle, canvasHeight, readingOrder, boxSize, snapMove, resizeBox, snapRotation, CANVAS_WIDTH, type Box, type Guide, type Handle, type Placed } from '@/lib/canvas-layout';
 import { cn } from '@/lib/utils';
 import { useStudio } from './store';
 import { TileToolbar } from './TileControls';
@@ -44,7 +44,7 @@ export function CanvasEditor({ page, renderTile, renderHeading, labelFor }: Prop
 
   const selectedId = useStudio(s => s.selected);
   const select = useStudio(s => s.select);
-  const placed = useMemo(() => placeTiles(canvasTiles(page), page.theme.style === 'lofi'), [page]);
+  const placed = useMemo(() => placeTiles(canvasTiles(page), looseStyle(page.theme.style)), [page]);
   const [live, setLive] = useState<Live | null>(null);
   const shown = live ? placed.map(p => (p.tile.id === live.id ? { ...p, pos: live.pos } : p)) : placed;
   const selected = shown.find(p => p.tile.id === selectedId);

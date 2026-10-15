@@ -6,10 +6,10 @@ export type StyleId = (typeof STYLES)[number];
 
 /** What each style is, and the colours and fonts it starts with when you pick it. */
 export const STYLE_INFO: Record<StyleId, { label: string; note: string; preset: string; font: string; layout: 'bento' | 'list' | 'canvas' }> = {
-  cozy: { label: 'Desk', note: 'Polaroids, notes and a spinning record', preset: 'cream', font: 'editorial', layout: 'bento' },
-  minimal: { label: 'Minimal', note: 'Quiet type, lots of room', preset: 'paper', font: 'editorial', layout: 'bento' },
+  cozy: { label: 'Desk', note: 'Polaroids and notes in the afternoon sun', preset: 'cream', font: 'editorial', layout: 'canvas' },
+  minimal: { label: 'Minimal', note: 'Ink and paper, photos printed in 1-bit', preset: 'paper', font: 'editorial', layout: 'bento' },
   washi: { label: 'Washi', note: 'Paper, ink and a red seal', preset: 'kinari', font: 'washi', layout: 'bento' },
-  lofi: { label: 'Lofi', note: 'Anime windows, clouds and a clock', preset: 'daydream', font: 'lofi', layout: 'canvas' },
+  lofi: { label: 'Lofi', note: 'A desktop left open, windows you can drag', preset: 'daydream', font: 'lofi', layout: 'canvas' },
 };
 export const STYLE_IDS = Object.keys(STYLE_INFO) as StyleId[];
 export const PREMIUM_STYLES = new Set(PREMIUM.styles);
