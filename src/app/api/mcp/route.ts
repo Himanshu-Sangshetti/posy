@@ -2,9 +2,11 @@
 import { createMcpHandler, withMcpAuth } from 'mcp-handler';
 import { z } from 'zod';
 import { auth } from '@/lib/auth';
-import { getState, addTile, updateTile, removeTile, moveTile, setTheme, setProfile, publishPage } from '@/lib/page-ops';
+import { getState, createPageFor, addTiles, addTile, updateTile, removeTile, moveTile, setTheme, setProfile, publishPage } from '@/lib/page-ops';
 import { SIZES, COLORS, FONTS, RADII, LAYOUTS, ALIGNS, BACKGROUNDS, TILE_STYLES, EFFECTS, AVATARS, PHOTO_LOOKS } from '@/lib/schema';
 import { THEME_IDS } from '@/lib/themes';
+import { STYLE_IDS } from '@/lib/styles';
+import { TEMPLATES } from '@/lib/templates';
 import { PLATFORM_IDS } from '@/lib/platforms';
 
 const ok = (data: unknown) => ({ content: [{ type: 'text' as const, text: typeof data === 'string' ? data : JSON.stringify(data, null, 2) }] });
@@ -14,30 +16,66 @@ const run = <A,>(fn: (userId: string, args: A) => Promise<unknown>) => async (ar
   try { return ok(await fn(userOf(ctx), args)); } catch (e) { return fail(e); }
 };
 
-const INSTRUCTIONS = `Posy is a link-in-bio page builder. Every edit changes the user's DRAFT; call "publish" to make it live.
-Start with get_page. Tiles have stable ids. Sizes: s=1x1, w=2x1, t=1x2, l=2x2. "heading" tiles start sections.
+const INSTRUCTIONS = `Posy makes a link-in-bio page ("Linktree-like"). Every edit changes the user's DRAFT; call "publish" to make it live.
+Flow: get_page first. If it says there is no page, ask the user for a username and call create_page. Then add their links with
+add_tile (use "inputs" to add many at once), optionally set_profile and set_theme, then publish and give them the public URL.
+Tiles have stable ids. Sizes: s=1x1, w=2x1, t=1x2, l=2x2. "heading" tiles start sections.
 add_tile accepts any link (profiles, YouTube, Spotify, GitHub repos, images), an email, owner/repo, or plain text and picks the right tile.
 Keep pages calm: a few well-chosen tiles beat many. Ask before deleting things the user added.`;
+
+const READ = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
+const WRITE = { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false };
+const SET = { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false };
+const DESTROY = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false };
+// publish makes content public, so it is open-world even though it only changes this user's page.
+const PUBLISH = { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true };
+
+const NEXT_NO_PAGE = 'No page yet. Ask the user which username they want (3–30 letters, numbers, - or _), then call create_page.';
+const nextStep = (s: { hasUnpublishedChanges: boolean; page: { tiles: unknown[] } }) =>
+  !s.page.tiles.length ? 'The page is empty. Ask the user for their links and add them with add_tile (inputs[]).'
+  : s.hasUnpublishedChanges ? 'There are unpublished changes. Call publish when the user is happy, then share the URL.'
+  : 'Everything is published. Share the URL.';
 
 const handler = createMcpHandler(server => {
   server.registerTool('get_page', {
     title: 'Get page',
     description: 'The current draft (profile, theme, tiles with ids), public URL, version and whether there are unpublished changes.',
     inputSchema: z.object({}),
-  }, run(async userId => (await getState(userId)) ?? 'No page yet. Ask the user to claim a username in Posy first.'));
+    annotations: READ,
+  }, run(async userId => {
+    const s = await getState(userId);
+    return s ? { ...s, next: nextStep(s) } : NEXT_NO_PAGE;
+  }));
+
+  server.registerTool('create_page', {
+    title: 'Create page',
+    description: 'Claim a username and create the user\'s page (one per account). Do this once, when get_page says there is no page. Then add tiles and publish.',
+    inputSchema: z.object({
+      username: z.string().describe('3–30 letters, numbers, - or _. This becomes the public URL.'),
+      style: z.enum(STYLE_IDS).optional().describe('The look of the page. Omit to use a starter template.'),
+      layout: z.enum(LAYOUTS).optional(),
+      preset: z.enum(THEME_IDS).optional().describe('Colour theme'),
+      template: z.enum(Object.keys(TEMPLATES) as [keyof typeof TEMPLATES, ...(keyof typeof TEMPLATES)[]]).optional(),
+      empty: z.boolean().optional().describe('Start blank instead of with sample tiles (recommended when you will add the user\'s own links).'),
+    }),
+    annotations: WRITE,
+  }, run(async (userId, a: Record<string, unknown>) => ({ ...(await createPageFor(userId, a)), next: 'Add the user\'s links with add_tile (inputs[]), then publish.' })));
 
   server.registerTool('add_tile', {
     title: 'Add tile',
-    description: 'Add a tile. Pass `input` (a link, email, owner/repo or a note) to auto-detect, or a full `tile` object.',
+    description: 'Add tiles. Pass `inputs` (several links, emails, owner/repos or notes) or `input` (one) to auto-detect, or a full `tile` object.',
     inputSchema: z.object({
       input: z.string().optional().describe('e.g. "https://github.com/user", "owner/repo", "hi@me.com", "Open to work"'),
+      inputs: z.array(z.string()).max(30).optional().describe('Several inputs at once, added in order. Prefer this when the user gives you a list of links.'),
       tile: z.record(z.string(), z.unknown()).optional().describe('Full tile object, e.g. {"type":"heading","text":"Projects"}'),
       after: z.string().optional().describe('Insert after this tile id (default: end)'),
       size: z.enum(SIZES).optional(),
       color: z.enum(COLORS).optional(),
     }),
-  }, run(async (userId, a: { input?: string; tile?: Record<string, unknown>; after?: string; size?: string; color?: string }) => {
-    if (!a.input && !a.tile) throw new Error('Pass input or tile');
+    annotations: WRITE,
+  }, run(async (userId, a: { input?: string; inputs?: string[]; tile?: Record<string, unknown>; after?: string; size?: string; color?: string }) => {
+    if (a.inputs?.length) return { added: await addTiles(userId, a.inputs, a), next: 'Call publish when the user is happy.' };
+    if (!a.input && !a.tile) throw new Error('Pass inputs, input or tile');
     return { added: await addTile(userId, a.tile ?? a.input!, a) };
   }));
 
@@ -45,14 +83,15 @@ const handler = createMcpHandler(server => {
     title: 'Update tile',
     description: 'Change fields of a tile, e.g. {"size":"l"}, {"title":"New title"}, {"color":"mint"}, {"text":"…"}.',
     inputSchema: z.object({ id: z.string(), patch: z.record(z.string(), z.unknown()) }),
+    annotations: SET,
   }, run(async (userId, a: { id: string; patch: Record<string, unknown> }) => ({ updated: await updateTile(userId, a.id, a.patch) })));
 
   server.registerTool('remove_tile', {
-    title: 'Remove tile', description: 'Delete a tile by id.', inputSchema: z.object({ id: z.string() }),
+    title: 'Remove tile', description: 'Delete a tile by id.', inputSchema: z.object({ id: z.string() }), annotations: DESTROY,
   }, run(async (userId, a: { id: string }) => { await removeTile(userId, a.id); return 'Removed.'; }));
 
   server.registerTool('move_tile', {
-    title: 'Move tile', description: 'Move a tile to a 0-based position in the tile list.', inputSchema: z.object({ id: z.string(), position: z.number().int().min(0) }),
+    title: 'Move tile', description: 'Move a tile to a 0-based position in the tile list.', inputSchema: z.object({ id: z.string(), position: z.number().int().min(0) }), annotations: SET,
   }, run(async (userId, a: { id: string; position: number }) => { await moveTile(userId, a.id, a.position); return 'Moved.'; }));
 
   server.registerTool('set_theme', {
@@ -64,19 +103,21 @@ const handler = createMcpHandler(server => {
       tileStyle: z.enum(TILE_STYLES).optional(), effect: z.enum(EFFECTS).optional(), avatar: z.enum(AVATARS).optional(), photos: z.enum(PHOTO_LOOKS).optional(), motion: z.boolean().optional(), ambient: z.boolean().optional(),
       background: z.object({ style: z.enum(BACKGROUNDS).optional(), image: z.string().optional(), dim: z.number().optional(), blur: z.number().optional(), grain: z.boolean().optional(), color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional() }).optional(),
     }),
+    annotations: SET,
   }, run(async (userId, a: Record<string, unknown>) => ({ theme: await setTheme(userId, a) })));
 
   server.registerTool('set_profile', {
     title: 'Set profile', description: 'Change name, bio, avatar URL or location.',
     inputSchema: z.object({ name: z.string().optional(), bio: z.string().optional(), avatar: z.string().optional(), location: z.string().optional() }),
+    annotations: SET,
   }, run(async (userId, a: Record<string, string>) => ({ profile: await setProfile(userId, a) })));
 
   server.registerTool('publish', {
-    title: 'Publish', description: 'Make the draft live at the public URL.', inputSchema: z.object({}),
+    title: 'Publish', description: 'Make the draft live at the public URL.', inputSchema: z.object({}), annotations: PUBLISH,
   }, run(async userId => publishPage(userId)));
 
   server.registerTool('list_options', {
-    title: 'List options', description: 'Allowed values for themes, fonts, backgrounds, tile styles, sizes, colours and social platforms.', inputSchema: z.object({}),
+    title: 'List options', description: 'Allowed values for themes, fonts, backgrounds, tile styles, sizes, colours and social platforms.', inputSchema: z.object({}), annotations: READ,
   }, run(async () => ({ themes: THEME_IDS, fonts: FONTS, radius: RADII, layouts: LAYOUTS, align: ALIGNS, backgrounds: BACKGROUNDS, tileStyles: TILE_STYLES, effects: EFFECTS, avatars: AVATARS, photos: PHOTO_LOOKS, sizes: SIZES, colors: COLORS, platforms: PLATFORM_IDS })));
 }, { serverInfo: { name: 'posy', version: '2.0.0' }, instructions: INSTRUCTIONS });
 

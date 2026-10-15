@@ -11,7 +11,7 @@ import { entitlementsFor, assertAllowed, applyEntitlements } from './entitlement
 export const USERNAME_RE = /^[a-z0-9](?:[a-z0-9_-]{1,28}[a-z0-9])$/;
 const RESERVED = new Set(('about admin agents analytics api app apps assets auth blog dashboard demo docs edit editor explore faq ' +
   'billing checkout d domains help home legal login logout mcp new onboarding posy plan pricing privacy pro settings signin signout signup static status support ' +
-  'team templates terms u upgrade user users www _next favicon robots sitemap llms').split(' '));
+  'team templates terms u upgrade user users www _next favicon robots sitemap llms oauth well-known .well-known openapi schema uploads track unfurl').split(' '));
 
 export type UsernameCheck = { ok: true } | { ok: false; reason: string };
 
