@@ -15,6 +15,7 @@ export const FONT_PAIRS = {
   gallery: f('--font-geist', '--font-dm-serif', 400, '-0.01em', 'Gallery'),
   painted: f('--font-geist', '--font-young-serif', 400, '-0.015em', 'Painted'),
   night: f('--font-space', '--font-chakra', 700, '0.02em', 'Night'),
+  cobalt: f('--font-dm-sans', '--font-fraunces', 560, '-0.03em', 'Cobalt'),
   classic: f('--font-geist', '--font-fraunces', 560, '-0.03em', 'Classic'),
   elegant: f('--font-dm-sans', '--font-dm-serif', 400, '-0.015em', 'Elegant'),
   rounded: f('--font-nunito', '--font-nunito', 800, '-0.02em', 'Rounded'),

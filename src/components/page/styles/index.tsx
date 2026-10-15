@@ -10,6 +10,7 @@ import { PressHeader, PressTile, PressRow } from './press';
 import { GalleryHeader, GalleryTile, GalleryRow } from './gallery';
 import { PaintedHeader, PaintedTile, PaintedRow } from './painted';
 import { NightHeader, NightTile, NightRow } from './night';
+import { CobaltHeader, CobaltTile, CobaltRow } from './cobalt';
 import type { HeaderSlots } from './types';
 import './styles.css';
 import './minimal.css';
@@ -19,6 +20,7 @@ import './press.css';
 import './gallery.css';
 import './painted.css';
 import './night.css';
+import './cobalt.css';
 
 export type StyleId = Page['theme']['style'];
 
@@ -36,6 +38,7 @@ const RENDERERS: Partial<Record<StyleId, Renderer>> = {
   gallery: { Header: GalleryHeader, Tile: GalleryTile, Row: GalleryRow },
   painted: { Header: PaintedHeader, Tile: PaintedTile, Row: PaintedRow },
   night: { Header: NightHeader, Tile: NightTile, Row: NightRow },
+  cobalt: { Header: CobaltHeader, Tile: CobaltTile, Row: CobaltRow },
 };
 
 /** Every style except Minimal shows social links as a row in the header rather than as tiles. */

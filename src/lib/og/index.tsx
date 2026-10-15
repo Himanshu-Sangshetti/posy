@@ -28,7 +28,7 @@ export type OgStyle = (input: OgInput) => Promise<{ element: React.ReactElement;
  * Share-image styles, keyed by `page.theme.style`. Add a style by writing an OgStyle and listing it here;
  * unknown or missing styles use "cozy".
  */
-const STYLES: Record<string, OgStyle> = { cozy, minimal: soft, washi, lofi, press: soft, gallery: soft, painted: cozy, night: lofi };
+const STYLES: Record<string, OgStyle> = { cozy, minimal: soft, washi, lofi, press: soft, gallery: soft, painted: cozy, night: lofi, cobalt: soft };
 
 export function themeOf(page: Page): Theme {
   const t = THEMES[page.theme.preset] ?? THEMES.cream;

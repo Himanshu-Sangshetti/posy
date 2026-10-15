@@ -60,6 +60,11 @@ const LOOKS = {
   'golden-hour': plain({ id: 'golden-hour', name: 'Golden hour', bg: '#f6dfc4', surface: '#fdf7ee', text: '#3a2a20', muted: '#7a6152', line: '#ecdcc7', accent: '#c8572f' }),
   'dusk-sky': plain({ id: 'dusk-sky', name: 'Dusk', bg: '#e6d6e6', surface: '#fcf6f3', text: '#2e2534', muted: '#6d5f73', line: '#e8dbe2', accent: '#b8456a' }),
   starry: dark({ id: 'starry', name: 'Starry', bg: '#14203b', surface: '#f6f0e4', text: '#eef0f8', muted: '#a7b0c9', line: '#2a3858', accent: '#f2c46b' }),
+  // Cobalt: two inks on cream (the night palette prints cream on cobalt)
+  cobalt: plain({ id: 'cobalt', name: 'Cobalt', bg: '#ece2cb', surface: '#f6eedb', text: '#1a2d8f', muted: '#4c5ca0', line: '#1a2d8f', accent: '#2442c4' }),
+  vermilion: plain({ id: 'vermilion', name: 'Vermilion', bg: '#efe4cf', surface: '#f8efde', text: '#2b1d18', muted: '#73584d', line: '#b8321f', accent: '#cf3b25' }),
+  moonlit: dark({ id: 'moonlit', name: 'Moonlit', bg: '#0f1d57', surface: '#172a75', text: '#f1e5c9', muted: '#aab3dc', line: '#f1e5c9', accent: '#f3d58c' }),
+  verdigris: plain({ id: 'verdigris', name: 'Verdigris', bg: '#e7e2cf', surface: '#f2eddd', text: '#17463f', muted: '#4f6e67', line: '#17463f', accent: '#2c7a69' }),
   // Night
   neon: dark({ id: 'neon', name: 'Neon', bg: '#0c0915', surface: '#140f22', text: '#f6eefe', muted: '#a596bd', line: '#2a2140', accent: '#ff4fa3' }),
   'cyan-rain': dark({ id: 'cyan-rain', name: 'Cyan rain', bg: '#061217', surface: '#0b1c23', text: '#e6fbff', muted: '#83a9b3', line: '#173540', accent: '#3fe3ff' }),

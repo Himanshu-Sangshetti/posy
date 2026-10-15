@@ -13,6 +13,7 @@ export const STYLE_INFO: Record<StyleId, { label: string; note: string; preset: 
   washi: { label: 'Washi', note: 'Paper, ink and a red seal', preset: 'kinari', font: 'washi', layout: 'bento' },
   lofi: { label: 'Lofi', note: 'A desktop left open, windows you can drag', preset: 'daydream', font: 'lofi', layout: 'canvas' },
   night: { label: 'Night', note: 'Neon signs on a street after rain', preset: 'neon', font: 'night', layout: 'bento' },
+  cobalt: { label: 'Cobalt', note: 'A vintage print in two inks, under a crescent moon', preset: 'cobalt', font: 'cobalt', layout: 'bento' },
   minimal: { label: 'Minimal', note: 'Big type, hairlines and nothing extra', preset: 'paper', font: 'editorial', layout: 'bento' },
 };
 export const STYLE_IDS = Object.keys(STYLE_INFO) as StyleId[];
@@ -28,4 +29,5 @@ export const STYLE_PALETTES: Record<StyleId, string[]> = {
   gallery: ['white-cube', 'gallery-sage', 'oxblood', 'dark-room'],
   painted: ['morning', 'golden-hour', 'dusk-sky', 'starry'],
   night: ['neon', 'cyan-rain', 'sodium', 'ultraviolet'],
+  cobalt: ['cobalt', 'vermilion', 'moonlit', 'verdigris'],
 };

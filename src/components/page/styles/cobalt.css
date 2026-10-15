@@ -1,0 +1,180 @@
+/* ================= Cobalt: a vintage print in two inks ================= */
+.posy-style-cobalt {
+  --cb-ink: var(--text);
+  --cb-paper: var(--surface);
+  --cb-soft: color-mix(in oklab, var(--cb-ink) 66%, var(--bg));
+  --cb-rule: color-mix(in oklab, var(--cb-ink) 38%, transparent);
+  --cb-sky-ink: #f5ebd3; /* words lettered on the night sky */
+  --cb-duo: url(#cb-duo-cobalt);
+  --cb-sky: url(/looks/cobalt/sky-desk.jpg);
+  --cb-sky-phone: url(/looks/cobalt/sky-phone.jpg);
+  --cb-sky-fill: #0f479e; /* the top of the print, continued upward when the header is taller than the sky */
+  --cb-ease: cubic-bezier(.2, .8, .2, 1);
+}
+.posy-preset-vermilion { --cb-sky-fill: #b2341f; --cb-duo: url(#cb-duo-vermilion); --cb-sky: url(/looks/cobalt/sky-desk-vermilion.jpg); --cb-sky-phone: url(/looks/cobalt/sky-phone-vermilion.jpg); --cb-sky-ink: #f7eedb; }
+.posy-preset-moonlit { --cb-duo: url(#cb-duo-moonlit); }
+/* at night there is no cream plain: the print fades out at its horizon, into the dark paper */
+.posy-preset-moonlit .st-head-cobalt::before { -webkit-mask-image: linear-gradient(#000 calc(100% - 25.6cqw - 70px), transparent calc(100% - 25.6cqw + 60px)); mask-image: linear-gradient(#000 calc(100% - 25.6cqw - 70px), transparent calc(100% - 25.6cqw + 60px)); }
+@container page (max-width: 640px) { .posy-preset-moonlit .st-head-cobalt::before { -webkit-mask-image: linear-gradient(#000 calc(100% - 81cqw - 50px), transparent calc(100% - 81cqw + 60px)); mask-image: linear-gradient(#000 calc(100% - 81cqw - 50px), transparent calc(100% - 81cqw + 60px)); } }
+.posy-preset-verdigris { --cb-sky-fill: #1e4944; --cb-duo: url(#cb-duo-verdigris); --cb-sky: url(/looks/cobalt/sky-desk-verdigris.jpg); --cb-sky-phone: url(/looks/cobalt/sky-phone-verdigris.jpg); --cb-sky-ink: #f3ecda; }
+
+/* paper: the grain of a heavy cream stock, and a few stray specks of ink */
+.posy-style-cobalt .posy-backdrop::before { background: url(/looks/washi/paper.jpg) center / 760px repeat; mix-blend-mode: multiply; opacity: .32; filter: grayscale(1); }
+.posy-style-cobalt .posy-backdrop::after { opacity: .5;
+  background: radial-gradient(circle, color-mix(in oklab, var(--cb-ink) 55%, transparent) .7px, transparent 1.2px) 0 0 / 23px 29px,
+              radial-gradient(circle, color-mix(in oklab, var(--cb-ink) 35%, transparent) .6px, transparent 1.1px) 11px 7px / 37px 31px; }
+.dark.posy-style-cobalt .posy-backdrop::before { mix-blend-mode: soft-light; opacity: .22; filter: grayscale(1) invert(1); }
+.posy-style-cobalt .posy-layout { max-width: 1040px; }
+.posy-style-cobalt .posy-head { font-weight: var(--head-weight); font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144; }
+
+/* ---- header: lettered on the night sky, your portrait is the moon ---- */
+.posy-style-cobalt .st-head-cobalt { position: relative !important; } /* the sky is placed against the header, also in thumbnails */
+.st-head-cobalt { position: relative; display: grid; justify-items: center; gap: 14px; padding: 8px 0 clamp(40px, 6cqw, 72px); text-align: center; color: var(--cb-sky-ink); }
+/* The print runs edge to edge behind the header and dissolves into the paper below it. It is pinned by its bottom so the
+   horizon (59% down the picture) always falls just under the socials, whatever the header holds: the cream plain below the
+   horizon is 40.7% of the picture, and the picture is 0.63 of its width tall (2x on phones). */
+.st-head-cobalt::before { content: ""; position: absolute; z-index: -1; left: 50%; width: 100cqw; translate: -50% 0; top: -160px; bottom: calc(-25.6cqw - 24px);
+  background: linear-gradient(var(--cb-sky-fill), transparent) center bottom calc(63cqw - 150px) / 100% 150px no-repeat, var(--cb-sky) center bottom / 100% auto no-repeat, var(--cb-sky-fill);
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 180px), transparent); mask-image: linear-gradient(#000 calc(100% - 180px), transparent); }
+@container page (max-width: 640px) { .st-head-cobalt::before { background-image: linear-gradient(var(--cb-sky-fill), transparent), var(--cb-sky-phone); background-position: center bottom calc(200cqw - 150px), center bottom; bottom: calc(-81cqw - 16px); top: -80px; } }
+.cb-portrait { position: relative; width: clamp(112px, 13vw, 148px); margin-bottom: 6px; }
+.cb-portrait .posy-avatar { position: relative; width: 100%; height: auto; aspect-ratio: 1; border-radius: 50%; overflow: hidden;
+  box-shadow: 0 0 0 1.5px var(--cb-sky-ink), 0 0 0 9px color-mix(in oklab, var(--cb-sky-ink) 12%, transparent), 0 0 0 10px color-mix(in oklab, var(--cb-sky-ink) 55%, transparent), 0 26px 60px -24px rgb(4 12 50 / .7); }
+.cb-portrait .posy-avatar img { filter: var(--cb-duo); }
+/* a halo of printed rays behind the moon, turning very slowly */
+.cb-portrait::before { content: ""; position: absolute; inset: -46%; z-index: -1; border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, color-mix(in oklab, var(--cb-sky-ink) 55%, transparent) 0 .6deg, transparent .6deg 4.5deg);
+  -webkit-mask-image: radial-gradient(circle, transparent 34%, #000 36%, transparent 70%); mask-image: radial-gradient(circle, transparent 34%, #000 36%, transparent 70%);
+  animation: cb-turn 140s linear infinite; opacity: .8; }
+@keyframes cb-turn { to { rotate: 360deg; } }
+.cb-name { margin: 0; max-width: 14ch; font-size: clamp(50px, calc(100cqw / max(7, var(--nlen, 10)) * 1.3), 128px); line-height: .9; letter-spacing: -.035em; color: var(--cb-sky-ink); text-wrap: balance; overflow-wrap: anywhere;
+  text-shadow: 0 1px 0 rgb(0 0 0 / .14), 0 10px 50px rgb(6 16 70 / .55); }
+.cb-bio { margin: 0; max-width: 40ch; font-family: var(--font-head); font-style: italic; font-weight: 400; font-size: clamp(17px, 1.6vw, 20px); line-height: 1.45; color: color-mix(in oklab, var(--cb-sky-ink) 92%, transparent); text-wrap: pretty; text-shadow: 0 1px 2px rgb(6 16 70 / .55), 0 2px 18px rgb(6 16 70 / .55); }
+.cb-caption { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-size: 12.5px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: color-mix(in oklab, var(--cb-sky-ink) 82%, transparent); }
+.cb-moon { width: 1.1em; height: 1.1em; fill: currentColor; flex: none; }
+.cb-socials .posy-social-row { justify-content: center; gap: 10px; margin: 6px 0 0; }
+/* socials: little ink stamps on the sky */
+.posy-style-cobalt .posy-social-row a { width: 44px; height: 44px; border-radius: 50%; border: 1px solid color-mix(in oklab, var(--cb-sky-ink) 60%, transparent); background: color-mix(in oklab, var(--cb-sky-ink) 6%, transparent); color: var(--cb-sky-ink); box-shadow: none; }
+.posy-style-cobalt .posy-social-row a:hover { background: var(--cb-sky-ink); color: #142780; transform: translateY(-2px) rotate(-8deg); }
+
+/* ---- sections: an italic title between two printed rules ---- */
+.posy-style-cobalt .posy-section { display: flex; align-items: center; gap: 18px; margin: 0 0 24px; font-family: var(--font-head); font-style: italic; font-weight: 400; font-size: 30px; line-height: 1.1; color: var(--cb-ink); }
+.posy-style-cobalt .posy-section::before, .posy-style-cobalt .posy-section::after { content: ""; flex: 1; height: 0; border-top: 1px solid var(--cb-rule); border-bottom: 1px solid var(--cb-rule); padding-top: 2px; }
+.posy-style-cobalt .posy-grid { --gap: 22px; }
+@container grid (max-width: 600px) { .posy-style-cobalt .posy-grid { --gap: 14px; } }
+.posy-style-cobalt .posy-grid-wrap + .posy-grid-wrap { margin-top: 64px; }
+.posy-style-cobalt .posy-grid > .posy-tile { container: tile / size; }
+
+/* ---- a plate: cream stock inside a fine double rule, numbered in the corner ---- */
+.cb-plate { position: relative; display: flex; flex-direction: column; gap: 8px; height: 100%; min-height: 0; padding: 16px; color: var(--cb-ink); background: var(--cb-paper);
+  outline: 1px solid var(--cb-rule); outline-offset: -6px; box-shadow: 0 0 0 1px color-mix(in oklab, var(--cb-ink) 22%, transparent), 0 18px 34px -24px color-mix(in oklab, var(--cb-ink) 60%, transparent);
+  transition: translate .45s var(--cb-ease), box-shadow .45s var(--cb-ease); }
+.posy-tile:hover .cb-plate, .posy-tile:hover .cb-ticket { translate: 0 -4px; box-shadow: 0 0 0 1px color-mix(in oklab, var(--cb-ink) 40%, transparent), 0 28px 44px -26px color-mix(in oklab, var(--cb-ink) 75%, transparent); }
+figure.cb-plate { margin: 0; }
+.cb-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; min-width: 0; padding: 0 2px; }
+.cb-no { flex: none; font-family: var(--font-head); font-style: italic; font-size: 14px; color: var(--cb-soft); }
+.cb-kind { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10.5px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--cb-soft); }
+.cb-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; padding: 0 2px; font-family: var(--font-head); font-weight: var(--head-weight); font-size: 24px; line-height: 1.08; letter-spacing: -.015em; color: var(--cb-ink); font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 72; overflow-wrap: anywhere; }
+.cb-sub { margin: 0; padding: 0 2px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; font-size: 14px; line-height: 1.45; color: var(--cb-soft); }
+.cb-mono { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 18px; letter-spacing: -.02em; }
+.cb-meta { display: inline-flex; align-items: center; gap: 5px; padding: 0 2px; font-size: 13px; color: var(--cb-soft); }
+.cb-star { width: 13px; height: 13px; fill: currentColor; }
+.cb-card { justify-content: flex-end; }
+.cb-card .cb-top { position: absolute; top: 16px; left: 16px; right: 56px; }
+.cb-card-pic { justify-content: flex-start; padding: 12px 12px 16px; }
+.cb-card-pic .cb-top { position: static; order: -1; padding: 2px 48px 4px 6px; }
+.cb-card-pic .cb-title { margin-top: 4px; padding: 0 6px; }
+.cb-card-pic .cb-sub { padding: 0 6px; -webkit-line-clamp: 2; }
+/* the arrow sits in a little burst of printed rays that turns as you point at the plate */
+.cb-go { position: absolute; top: 12px; right: 12px; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: var(--cb-paper); background: var(--cb-ink); transition: transform .5s var(--cb-ease); }
+.cb-go::before { content: ""; position: absolute; inset: -9px; border-radius: 50%; background: repeating-conic-gradient(var(--cb-ink) 0 1.5deg, transparent 1.5deg 12deg);
+  -webkit-mask-image: radial-gradient(circle, transparent 54%, #000 56%, #000 70%, transparent 72%); mask-image: radial-gradient(circle, transparent 54%, #000 56%, #000 70%, transparent 72%); opacity: 0; transition: opacity .4s, rotate .9s var(--cb-ease); }
+.cb-go svg { position: relative; width: 16px; height: 16px; }
+.posy-tile:hover .cb-go { transform: rotate(-12deg); }
+.posy-tile:hover .cb-go::before { opacity: .9; rotate: 45deg; }
+.cb-card-pic .cb-go { top: 22px; right: 22px; }
+.cb-shop .cb-kind::before { content: "№ "; letter-spacing: 0; }
+
+/* ---- photos: reprinted in the two inks, with a fine halftone ---- */
+.cb-print { position: relative; display: block; flex: 1; min-height: 0; overflow: hidden; background: var(--cb-ink); }
+.cb-print img, .cb-print > div { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+.cb-print img { filter: var(--cb-duo); transition: scale 1.2s var(--cb-ease); }
+.cb-print::after { content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: .22;
+  background: radial-gradient(circle, var(--cb-ink) 32%, transparent 36%) 0 0 / 4px 4px; }
+.posy-tile:hover .cb-print img { scale: 1.04; }
+.cb-photo { padding: 10px 10px 8px; }
+.cb-photo figcaption, .cb-cap { display: flex; align-items: baseline; gap: 10px; min-width: 0; margin: 0; padding: 2px 6px 0; font-size: 13.5px; line-height: 1.3; color: var(--cb-soft); }
+.cb-photo figcaption span, .cb-cap span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-family: var(--font-head); font-style: italic; font-size: 16px; color: var(--cb-ink); }
+.cb-play { flex: none; width: 14px; height: 14px; fill: currentColor; align-self: center; }
+.cb-video .cb-screen .posy-video-play, .cb-video .cb-screen button { z-index: 2; }
+
+/* ---- notes: verse set in cream on a block of cobalt ---- */
+.cb-verse { position: relative; display: grid; align-content: center; height: 100%; margin: 0; padding: 26px clamp(20px, 7cqw, 40px); color: var(--cb-paper); background: var(--cb-ink); text-align: center;
+  box-shadow: 0 18px 34px -24px color-mix(in oklab, var(--cb-ink) 80%, transparent); overflow: hidden; }
+.cb-verse::before { content: ""; position: absolute; inset: 0; opacity: .14; background: repeating-radial-gradient(circle at 50% 120%, var(--cb-paper) 0 1px, transparent 1px 9px); }
+.cb-verse .cb-moon { position: relative; justify-self: center; width: 22px; height: 22px; margin-bottom: 12px; color: var(--cb-paper); }
+.cb-verse blockquote { position: relative; margin: 0; font-family: var(--font-head); font-style: italic; font-weight: 400; font-size: clamp(19px, min(8cqw, 11cqh), 32px); line-height: 1.25; text-wrap: balance;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 7; overflow: hidden; }
+.cb-verse a { color: inherit; }
+.dark .cb-verse { color: var(--bg); background: var(--cb-ink); }
+
+/* ---- stamp: the words set around a printed sun ---- */
+.cb-seal-wrap { display: grid; place-items: center; height: 100%; }
+.cb-seal { width: min(92%, 210px); height: auto; rotate: -8deg; filter: drop-shadow(0 10px 14px color-mix(in oklab, var(--cb-ink) 40%, transparent)); transition: rotate .8s var(--cb-ease); }
+.cb-seal-disc { fill: var(--cb-ink); }
+.cb-seal-sun { fill: none; stroke: var(--cb-paper); stroke-width: 22; stroke-dasharray: 1.2 5.4; opacity: .9; }
+.cb-seal-text { fill: var(--cb-paper); font-family: var(--font-body); font-size: 15px; font-weight: 700; letter-spacing: .14em; }
+.posy-tile:hover .cb-seal { rotate: 10deg; }
+
+/* ---- music: a disc of engraved rings with the cover printed on the label ---- */
+.cb-music { flex-direction: row; align-items: center; gap: 18px; padding: 16px 18px; }
+.cb-record { position: relative; flex: none; width: min(46%, 76cqh); aspect-ratio: 1; border-radius: 50%; background: var(--cb-ink); animation: cb-turn 9s linear infinite paused;
+  box-shadow: 0 10px 22px -10px color-mix(in oklab, var(--cb-ink) 80%, transparent); }
+.cb-record::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: repeating-radial-gradient(circle, transparent 0 2px, color-mix(in oklab, var(--cb-paper) 26%, transparent) 2px 2.6px); }
+.cb-record .cb-print { position: absolute; inset: 31%; border-radius: 50%; box-shadow: 0 0 0 2px var(--cb-paper); }
+.cb-record .cb-print::before { content: ""; position: absolute; z-index: 1; inset: 44%; border-radius: 50%; background: var(--cb-paper); }
+.posy-tile:hover .cb-record { animation-play-state: running; }
+.cb-text { display: grid; gap: 4px; min-width: 0; }
+.cb-music .cb-no { margin-bottom: 2px; }
+.cb-music .cb-title { -webkit-line-clamp: 2; }
+.posy-size-s .cb-music { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px; }
+.posy-size-s .cb-record { width: 56%; }
+.posy-size-s .cb-music .cb-title { font-size: 18px; }
+.posy-size-s .cb-music .cb-no { display: none; }
+
+/* ---- newsletters: a ticket with a perforated stub ---- */
+.cb-ticket { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; height: 100%; color: var(--cb-ink); background: var(--cb-paper);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--cb-ink) 22%, transparent), 0 18px 34px -24px color-mix(in oklab, var(--cb-ink) 60%, transparent); transition: translate .45s var(--cb-ease), box-shadow .45s var(--cb-ease);
+  -webkit-mask: radial-gradient(circle at calc(100% - var(--stub)) 0, transparent 9px, #000 9.5px) top / 100% 51% no-repeat, radial-gradient(circle at calc(100% - var(--stub)) 100%, transparent 9px, #000 9.5px) bottom / 100% 51% no-repeat;
+  mask: radial-gradient(circle at calc(100% - var(--stub)) 0, transparent 9px, #000 9.5px) top / 100% 51% no-repeat, radial-gradient(circle at calc(100% - var(--stub)) 100%, transparent 9px, #000 9.5px) bottom / 100% 51% no-repeat;
+  --stub: 74px; }
+.cb-ticket-body { display: flex; flex-direction: column; justify-content: center; gap: 6px; min-width: 0; padding: 18px 20px; }
+.cb-ticket-body .cb-title { padding: 0; -webkit-line-clamp: 2; }
+.cb-ticket-body .cb-sub { padding: 0; -webkit-line-clamp: 2; }
+.cb-ticket-stub { display: grid; place-content: center; justify-items: center; gap: 8px; width: var(--stub); color: var(--cb-paper); background: var(--cb-ink); border-left: 2px dashed var(--cb-paper); }
+.cb-ticket-stub span { writing-mode: vertical-rl; rotate: 180deg; font-size: 11px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; }
+@container tile (max-width: 260px) { .cb-ticket { --stub: 54px; } .cb-ticket-body { padding: 14px; } .cb-ticket-body .cb-sub { display: none; } }
+
+/* type follows the size of each tile */
+@container tile (min-width: 1px) {
+  .cb-title { font-size: clamp(17px, min(7cqw, 11cqh), 32px); }
+  .cb-card-pic .cb-title { font-size: clamp(16px, min(5.6cqw, 8cqh), 26px); }
+}
+@container tile (max-height: 200px) { .cb-card .cb-sub { -webkit-line-clamp: 1; } }
+
+/* ---- list layout: numbered rows between rules ---- */
+.posy-style-cobalt .posy-list { gap: 12px; }
+.cb-row { flex-direction: row; align-items: center; gap: 14px; height: auto; min-height: 72px; padding: 12px 58px 12px 16px; }
+.cb-row-no { flex: none; width: 2.6em; font-family: var(--font-head); font-style: italic; font-size: 17px; color: var(--cb-soft); }
+.cb-row-pic { flex: none; width: 54px; height: 54px; }
+.cb-row .cb-title { padding: 0; font-size: 20px; -webkit-line-clamp: 1; }
+.cb-row .cb-sub { padding: 0; -webkit-line-clamp: 1; }
+.cb-row .cb-go { top: 50%; margin-top: -18px; right: 14px; }
+.cb-row-verse { height: auto; padding: 22px 26px; }
+.cb-row-verse blockquote { font-size: 22px; }
+
+/* ---- dark palette: the paper is the night, the ink is cream ---- */
+.dark.posy-style-cobalt .cb-plate, .dark.posy-style-cobalt .cb-ticket { box-shadow: 0 0 0 1px color-mix(in oklab, var(--cb-ink) 26%, transparent), 0 18px 34px -22px rgb(0 0 0 / .6); }
+.dark.posy-style-cobalt .cb-print::after { mix-blend-mode: screen; opacity: .12; }
+
+@media (prefers-reduced-motion: reduce) { .cb-portrait::before, .cb-record { animation: none; } }

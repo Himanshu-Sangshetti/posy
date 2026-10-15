@@ -12,6 +12,7 @@ export const TEMPLATES = {
   gallery: { label: 'Gallery', note: 'Work on the wall' },
   painted: { label: 'Painted', note: 'A watercolour sky' },
   neon: { label: 'Night', note: 'Neon after rain' },
+  cobalt: { label: 'Cobalt', note: 'A print in two inks' },
   blank: { label: 'Blank', note: 'Start from nothing' },
 } as const;
 export type TemplateId = keyof typeof TEMPLATES;
@@ -198,13 +199,36 @@ export function template(id: TemplateId, name: string): Page {
           { type: 'image', src: art('night', 'photo2'), caption: 'the booth', size: 's' },
         ]),
       });
+    case 'cobalt': {
+      const pic = (n: string) => `/looks/cobalt/${n}.jpg`;
+      return parsePage({
+        profile: { ...profile, avatar: pic('avatar'), bio: 'Printmaker. Cobalt skies, quiet roads and very small people, two inks at a time.', location: 'Studio open on Fridays' },
+        theme: { style: 'cobalt', preset: 'cobalt', font: 'cobalt', layout: 'bento', align: 'center', avatar: 'circle' },
+        tiles: ids([
+          { type: 'social', platform: 'instagram', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'behance', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'email', handle: 'you@example.com', size: 's' },
+          { type: 'image', src: pic('photo1'), caption: 'Lamp, night print no. 4', size: 'l' },
+          { type: 'link', url: 'https://gumroad.com', title: 'The print shop', description: 'Small editions, signed and numbered. New prints on the first Friday of the month.', size: 'w' },
+          { type: 'text', text: 'Every print starts with one line. Then another, until the sky gives in.', size: 'w' },
+          { type: 'heading', text: 'From the studio' },
+          { type: 'image', src: pic('photo2'), caption: 'The long way up', size: 't' },
+          { type: 'video', url: VIDEO, title: 'Printing a night sky, start to finish', image: pic('video'), size: 'w' },
+          { type: 'music', url: 'https://open.spotify.com/', title: 'Ink & static', artist: 'What plays while the press runs', image: pic('music'), size: 'w' },
+          { type: 'link', url: 'https://substack.com', title: 'Notes from the press', description: 'A short letter each month: what I printed, and what went wrong.', size: 'w' },
+          { type: 'image', src: pic('photo3'), caption: 'Three riders', size: 'w' },
+          { type: 'text', text: 'Edition of 30', look: 'stamp', size: 's' },
+          { type: 'link', url: 'https://example.com/commissions', title: 'Commissions', description: 'Book covers, posters and gig prints', size: 's' },
+        ]),
+      });
+    }
     default:
       return parsePage({ profile, theme: { style: 'cozy', preset: 'cream', font: 'editorial', layout: 'bento' }, tiles: [] });
   }
 }
 
 /** The sample content shown for each style when you start from it. */
-export const STYLE_STARTERS: Record<StyleId, TemplateId> = { cozy: 'desk', minimal: 'creator', washi: 'writer', lofi: 'night', press: 'press', gallery: 'gallery', painted: 'painted', night: 'neon' };
+export const STYLE_STARTERS: Record<StyleId, TemplateId> = { cozy: 'desk', minimal: 'creator', washi: 'writer', lofi: 'night', press: 'press', gallery: 'gallery', painted: 'painted', night: 'neon', cobalt: 'cobalt' };
 
 /** A new page from independent choices: style, layout and colours (plus sample content or an empty page). */
 export function starterPage(o: { name: string; style: StyleId; layout?: 'bento' | 'list' | 'canvas'; preset?: string; empty?: boolean }): Page {
