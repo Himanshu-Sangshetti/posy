@@ -42,6 +42,7 @@ export function pageStyle(page: Page): React.CSSProperties {
     ...themeVars(t.preset as ThemeId, t.accent),
     ...FONT_VARS[t.font],
     '--radius-tile': `${RADIUS_PX[t.radius]}px`,
+    ...(bg.color ? { '--bg': bg.color } : {}),
     ...(bg.style === 'image' && bg.image ? { '--bg-image': `url("${bg.image.replace(/"/g, '%22')}")`, '--bg-dim': String(bg.dim / 100), '--bg-blur': `${bg.blur}px` } : {}),
   } as unknown as React.CSSProperties;
 }

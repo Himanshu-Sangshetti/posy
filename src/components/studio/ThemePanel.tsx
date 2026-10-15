@@ -16,6 +16,8 @@ import { cn } from '@/lib/utils';
 import { useStudio } from './store';
 import { storeImage } from './storage';
 
+/** Soft page colours to start from: paper, blush, sage, sky, lilac, butter, clay, night. */
+const PAGE_COLOURS = ['#f6f1e7', '#f6e4e1', '#e3ebdf', '#e0e9f2', '#e9e3f3', '#f5ecd2', '#ead9cc', '#1d1b22'];
 const ACCENTS = ['#e39b6f', '#e8886a', '#d97a9a', '#9a86d8', '#5e9bd6', '#5fb08a', '#c9a227', '#161616'];
 const choice = (on: boolean) => cn('sc-choice', on && 'is-on');
 const Label = ({ children, hint }: { children: React.ReactNode; hint?: string }) => (
@@ -57,36 +59,10 @@ function TileSwatch({ style }: { style: (typeof TILE_STYLES)[number] }) {
 }
 
 /** A tiny drawing of each style, so people can tell them apart at a glance. */
+/** A small real render of each look (public/looks/swatches). */
 function StyleSwatch({ id }: { id: StyleId }) {
-  const box = 'relative block h-[74px] w-full overflow-hidden rounded-[9px]';
-  switch (id) {
-    case 'cozy': return (
-      <span className={box} style={{ background: '#f5efe6' }}>
-        <span className="absolute left-3 top-3 h-11 w-10 -rotate-6 bg-white p-1 pb-3 shadow-md"><span className="block size-full" style={{ background: 'linear-gradient(160deg,#bcd6ee,#f3b8b8)' }} /></span>
-        <span className="absolute left-[60px] top-4 size-9 rotate-3 shadow-md" style={{ background: '#fbe9a6' }} />
-        <span className="absolute right-3 top-5 size-9 rounded-full shadow-md" style={{ background: '#2b2621' }}><span className="absolute inset-[38%] rounded-full bg-[#e4572e]" /></span>
-      </span>);
-    case 'minimal': return (
-      <span className={box} style={{ background: '#f4f4f2' }}>
-        <span className="absolute left-3 top-2.5 font-[family-name:var(--font-serif)] text-[24px] leading-none text-[#161616]">Aa</span>
-        <span className="absolute left-3 top-[40px] h-6 w-[42%] rounded-[6px] border border-[#e4e4e1] bg-white" />
-        <span className="absolute right-3 top-[40px] h-6 w-[38%] rounded-[6px] border border-[#e4e4e1] bg-white" />
-      </span>);
-    case 'washi': return (
-      <span className={box} style={{ background: '#f1ebdf', fontFamily: 'var(--font-cormorant), "Hiragino Mincho ProN", "Yu Mincho", serif' }}>
-        <span className="absolute left-3 top-2 text-[15px] leading-[1.05] text-[#1e1b17] [writing-mode:vertical-rl]">夜明け</span>
-        <span className="absolute left-10 top-3 h-[52px] w-[46%] shadow-[inset_0_0_0_1px_#1e1b1733,inset_0_0_0_4px_#f8f4ec,inset_0_0_0_5px_#1e1b171a] bg-[#f8f4ec]"><span className="absolute left-2 top-1.5 text-[11px] font-semibold text-[#c8402b]">一</span></span>
-        <span className="absolute right-3 top-3 grid size-7 rotate-[-4deg] place-items-center rounded-[4px] bg-[#c8402b] text-[11px] font-semibold text-[#f1ebdf]">MS</span>
-      </span>);
-    case 'lofi': return (
-      <span className={box} style={{ background: 'radial-gradient(circle, #8f7cff66 1px, transparent 1.5px) 0 0 / 6px 6px, linear-gradient(#121a33, #1b1f4a)' }}>
-        <span className="absolute left-3 top-3 h-12 w-[52%] overflow-hidden rounded-[5px] border border-[#ffffff26] bg-[#18213f]">
-          <span className="block h-3 border-b border-[#ffffff1f] px-1.5 text-[7px] leading-3 text-[#8d95c2]" style={{ fontFamily: 'var(--font-geist-mono)' }}>me.webp</span>
-          <span className="m-1 block h-[26px] rounded-[2px]" style={{ background: 'radial-gradient(circle, #000 0 40%, transparent 46%) 0 0 / 4px 4px, linear-gradient(150deg, #8f7cff, #3b5bdb)' }} />
-        </span>
-        <span className="absolute right-3 top-5 text-[11px] font-medium tracking-[.35em] text-[#e8ebff] [text-shadow:0_0_10px_#8f7cff]">YOU</span>
-      </span>);
-  }
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={`/looks/swatches/${id}.jpg`} alt="" loading="lazy" className="block h-[84px] w-full rounded-[9px] object-cover object-left-top" />;
 }
 
 function SwitchRow({ title, note, checked, onChange, disabled }: { title: string; note: string; checked: boolean; onChange: (v: boolean) => void; disabled?: boolean }) {
@@ -212,6 +188,20 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
             </label>
           </div>
         </div>
+        <div className="grid gap-2.5">
+          <Label hint="Under the textures and art">Page colour</Label>
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="button" onClick={() => setBg({ color: undefined })} aria-pressed={!bg.color}
+              className={cn('h-7 rounded-full border border-[var(--line)] px-3 text-[12px]', !bg.color && 'ring-2 ring-[var(--sc-deep)] ring-offset-2 ring-offset-[var(--surface)]')}>Palette</button>
+            {PAGE_COLOURS.map(c => (
+              <button key={c} type="button" aria-label={`Page colour ${c}`} onClick={() => setBg({ color: c })}
+                className={cn('size-7 rounded-full border border-[var(--line)] transition-transform hover:scale-110', bg.color === c && 'ring-2 ring-[var(--sc-deep)] ring-offset-2 ring-offset-[var(--surface)]')} style={{ background: c }} />
+            ))}
+            <label className="relative size-7 cursor-pointer overflow-hidden rounded-full border border-[var(--line)]" style={{ background: 'conic-gradient(#f87171, #fbbf24, #a3e635, #22d3ee, #818cf8, #e879f9, #f87171)' }} aria-label="Custom page colour">
+              <input type="color" value={bg.color ?? THEMES[t.preset as ThemeId].bg} onChange={e => setBg({ color: e.target.value })} className="absolute inset-0 cursor-pointer opacity-0" />
+            </label>
+          </div>
+        </div>
       </TabsContent>
 
       <TabsContent value="background" className="grid min-h-0 content-start gap-6 overflow-y-auto px-5 pb-8 pt-1">
@@ -240,6 +230,7 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
           </div>
         )}
         <SwitchRow title="Film grain" note="A faint paper texture over the backdrop" checked={bg.grain} onChange={v => setBg({ grain: v })} />
+        <SwitchRow title="Ambience" note="Light through leaves on Desk, clouds and rain on Lofi" checked={t.ambient} onChange={v => updateTheme({ ambient: v })} />
       </TabsContent>
 
       <TabsContent value="type" className="grid min-h-0 grid-cols-2 content-start gap-2 overflow-y-auto px-5 pb-8 pt-1">

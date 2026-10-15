@@ -25,7 +25,7 @@ Cursor, Codex and other MCP clients: add an HTTP server at `https://YOUR-POSY/ap
 | `get_page` | Draft (profile, theme, tiles with ids), public URL, version, unpublished-changes flag |
 | `add_tile` | Add from a link, email, `owner/repo` or note (auto-detected), or a full tile object |
 | `update_tile` / `remove_tile` / `move_tile` | Change fields, delete, reorder by id |
-| `set_theme` | Preset, accent, font, radius, layout (`bento`, `list`, `canvas`), alignment, background, tile style, hover effect, avatar, photos (`natural`, `mono`, `dither`, `ascii`) |
+| `set_theme` | Preset, accent, font, radius, layout (`bento`, `list`, `canvas`), alignment, background, tile style, hover effect, avatar, photos (`natural`, `mono`, `dither`, `ascii`), page colour (`background.color`), ambience on or off |
 | `set_profile` | Name, bio, avatar, location |
 | `publish` | Make the draft live |
 | `list_options` | Allowed values for themes, fonts, backgrounds, sizes, colours and platforms |

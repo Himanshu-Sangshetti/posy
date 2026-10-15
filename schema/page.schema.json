@@ -193,6 +193,11 @@
               "default": true,
               "description": "Subtle film grain over the background",
               "type": "boolean"
+            },
+            "color": {
+              "description": "Your own page colour, e.g. \"#f3e9dc\"; replaces the palette's background colour (textures and art still sit on top)",
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
             }
           }
         },
@@ -239,6 +244,11 @@
         },
         "motion": {
           "default": true,
+          "type": "boolean"
+        },
+        "ambient": {
+          "default": true,
+          "description": "Moving light and weather where a style has it: leaf shadows on Desk, clay clouds and rain on Lofi",
           "type": "boolean"
         }
       }

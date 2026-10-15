@@ -44,8 +44,8 @@ export function PageFrame({ page, children, profile, className, interactive = tr
   return (
     <div className={cn(pageClasses(page), className)} style={{ ...pageStyle(page), colorScheme: isDark(page) ? 'dark' : 'light' }}>
       <Backdrop />
-      {page.theme.style === 'lofi' && !isDark(page) && <Clouds3D />}
-      {page.theme.style === 'lofi' && isDark(page) && <div aria-hidden className="lf-rain" />}
+      {page.theme.style === 'lofi' && !isDark(page) && page.theme.ambient && <Clouds3D />}
+      {page.theme.style === 'lofi' && isDark(page) && page.theme.ambient && <div aria-hidden className="lf-rain" />}
       {page.theme.style === 'lofi' && <LofiMenuBar name={page.profile.name} pinned={interactive} />}
       {interactive && page.theme.style === 'lofi' && page.theme.layout === 'canvas' && <DraggableWindows />}
       <MotionProvider enabled={page.theme.motion}>
@@ -59,7 +59,7 @@ export function PageFrame({ page, children, profile, className, interactive = tr
           </footer>
         )}
       </MotionProvider>
-      {page.theme.style === 'cozy' && !isDark(page) && <div aria-hidden className="dk-sun"><i /></div>}
+      {page.theme.style === 'cozy' && !isDark(page) && page.theme.ambient && <div aria-hidden className="dk-sun"><i /></div>}
       {interactive && fx && <TileEffects />}
       {interactive && (photoLook(page) === 'dither' || photoLook(page) === 'ascii') && <DitherPhotos />}
     </div>

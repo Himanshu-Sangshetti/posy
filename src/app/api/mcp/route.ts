@@ -61,8 +61,8 @@ const handler = createMcpHandler(server => {
     inputSchema: z.object({
       preset: z.enum(THEME_IDS).optional(), accent: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
       font: z.enum(FONTS).optional(), radius: z.enum(RADII).optional(), layout: z.enum(LAYOUTS).optional(), align: z.enum(ALIGNS).optional(),
-      tileStyle: z.enum(TILE_STYLES).optional(), effect: z.enum(EFFECTS).optional(), avatar: z.enum(AVATARS).optional(), photos: z.enum(PHOTO_LOOKS).optional(), motion: z.boolean().optional(),
-      background: z.object({ style: z.enum(BACKGROUNDS).optional(), image: z.string().optional(), dim: z.number().optional(), blur: z.number().optional(), grain: z.boolean().optional() }).optional(),
+      tileStyle: z.enum(TILE_STYLES).optional(), effect: z.enum(EFFECTS).optional(), avatar: z.enum(AVATARS).optional(), photos: z.enum(PHOTO_LOOKS).optional(), motion: z.boolean().optional(), ambient: z.boolean().optional(),
+      background: z.object({ style: z.enum(BACKGROUNDS).optional(), image: z.string().optional(), dim: z.number().optional(), blur: z.number().optional(), grain: z.boolean().optional(), color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional() }).optional(),
     }),
   }, run(async (userId, a: Record<string, unknown>) => ({ theme: await setTheme(userId, a) })));
 

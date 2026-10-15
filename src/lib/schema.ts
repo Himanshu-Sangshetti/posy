@@ -115,6 +115,7 @@ export const Background = z.object({
   dim: z.number().min(0).max(80).default(20).describe('Darken an image background, 0–80 (%)'),
   blur: z.number().min(0).max(24).default(0).describe('Blur an image background, 0–24 (px)'),
   grain: z.boolean().default(true).describe('Subtle film grain over the background'),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().describe('Your own page colour, e.g. "#f3e9dc"; replaces the palette\'s background colour (textures and art still sit on top)'),
 });
 
 export const Theme = z.object({
@@ -131,6 +132,7 @@ export const Theme = z.object({
   avatar: z.enum(AVATARS).default('squircle'),
   photos: z.enum(PHOTO_LOOKS).optional().describe('How photos are printed: natural colour, mono (black and white), dither (1-bit pixels) or ascii (drawn in characters); dither and ascii turn to colour on hover. Unset = the style\'s own default (Minimal dithers)'),
   motion: z.boolean().default(true),
+  ambient: z.boolean().default(true).describe('Moving light and weather where a style has it: leaf shadows on Desk, clay clouds and rain on Lofi'),
 });
 
 /** v1 pages used layout "split" | "stack"; map them onto layout + align. */
