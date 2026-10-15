@@ -13,7 +13,7 @@ export function PaintReveal({ src, sketch, focus = CENTER, className }: { src: s
   useEffect(() => {
     const cv = ref.current!, box = wrap.current!;
     const ctx = cv.getContext('2d')!;
-    const img = new Image(); img.src = sketch;
+    const img = new Image(); // its source is set when the painting is about to scroll into view (below)
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let raf = 0, visible = false, dpr = 1, lastMove = 0;
     let pointer: { x: number; y: number } | null = null, last: { x: number; y: number } | null = null;
@@ -64,8 +64,10 @@ export function PaintReveal({ src, sketch, focus = CENTER, className }: { src: s
     window.addEventListener('pointermove', move, { passive: true }); document.addEventListener('pointerleave', leave);
     const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; kick(); }); io.observe(box);
     const ro = new ResizeObserver(fit);
+    // the sketch is a big image: fetch it only when the painting is within about a screen of view
+    const pre = new IntersectionObserver(([e]) => { if (e.isIntersecting) { img.src = sketch; pre.disconnect(); } }, { rootMargin: '900px' }); pre.observe(box);
     img.onload = () => { fit(); ro.observe(box); box.dataset.ready = '1'; kick(); };
-    return () => { cancelAnimationFrame(raf); io.disconnect(); ro.disconnect(); window.removeEventListener('pointermove', move); document.removeEventListener('pointerleave', leave); };
+    return () => { cancelAnimationFrame(raf); pre.disconnect(); io.disconnect(); ro.disconnect(); window.removeEventListener('pointermove', move); document.removeEventListener('pointerleave', leave); };
   }, [sketch, focus]);
 
   return (
