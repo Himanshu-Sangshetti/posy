@@ -97,8 +97,8 @@ export function AuthForm({ mode, providers, host }: { mode: Mode; providers: { g
         </Button>
       </form>
       <p className="mt-6 text-center text-[14px] text-[var(--muted)]">
-        {signup ? <>Already have a page? <Link href="/login" className="font-medium text-[var(--ac-deep)] underline-offset-4 hover:underline">Log in</Link></>
-          : <>New here? <Link href={`/signup${wanted ? `?username=${wanted}` : ''}`} className="font-medium text-[var(--ac-deep)] underline-offset-4 hover:underline">Make your page</Link></>}
+        {signup ? <>Already have a page? <Link href={oauth ? `/login?${params}` : '/login'} className="font-medium text-[var(--ac-deep)] underline-offset-4 hover:underline">Log in</Link></>
+          : <>New here? <Link href={oauth ? `/signup?${params}` : `/signup${wanted ? `?username=${wanted}` : ''}`} className="font-medium text-[var(--ac-deep)] underline-offset-4 hover:underline">Make your page</Link></>}
       </p>
         </div>
       </div>

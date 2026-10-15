@@ -132,3 +132,83 @@ test('OAuth end to end: register, log in, allow, token, call a tool, refresh', a
   const next = await refreshed.json();
   expect((await tool(anon, next.access_token, 'get_page')).isError).toBe(false);
 });
+
+test.describe('the Posy page file', () => {
+  test('docs, schema, openapi and llms.txt are public and point at each other', async ({ request }) => {
+    const llms = await (await request.get('/llms.txt')).text();
+    expect(llms).toContain('/new#p=');
+    expect(llms).toContain('/docs/agents');
+    expect(llms).not.toContain(`${SITE}/agents`); // that is the login-gated dashboard tab
+    for (const p of ['/docs/agents', '/docs/format', '/llms-full.txt', '/openapi.json', '/schema/brief.schema.json', '/schema/page.schema.json']) {
+      expect((await request.get(p)).status(), p).toBe(200);
+    }
+    expect((await (await request.get('/openapi.json')).json()).openapi).toBe('3.1.0');
+    expect((await (await request.get('/schema/brief.schema.json')).json()).properties.links).toBeTruthy();
+    expect(await (await request.get('/docs/format')).text()).toContain('Copy a prompt for your chat');
+  });
+
+  test('paste a chat reply on /new, preview it, sign up, and the page is waiting', async ({ page }) => {
+    const id = `f${Date.now().toString(36)}${Math.random().toString(36).slice(2, 4)}`;
+    const reply = 'Sure! Here is your page:\n```json\n' + JSON.stringify({ posy: 1, name: 'Fiona File', bio: 'Made in a chat', links: [{ heading: 'Find me' }, 'https://github.com/octocat', 'hi@example.com', { text: 'Open for work' }] }, null, 2) + '\n```';
+    await page.goto('/new');
+    await page.getByLabel('Paste the chat’s reply here').fill('nonsense');
+    await expect(page.locator('p[role=alert]')).toContainText('JSON');
+    await page.getByLabel('Paste the chat’s reply here').fill(reply);
+    await expect(page.getByText('Fiona File').first()).toBeVisible();
+    await page.getByLabel('Your address').fill(id);
+    await page.getByRole('button', { name: 'Make it mine' }).click();
+    await page.waitForURL(/signup\?draft=1/);
+    await page.fill('#name', 'Fiona File');
+    await page.fill('#email', `${id}@example.com`);
+    await page.fill('#password', 'pastel-garden-42');
+    await page.click('button[type=submit]');
+    await page.waitForURL(/\/new\?finish=1/);
+    await expect(page.getByLabel('Your address')).toHaveValue(id);
+    await page.getByRole('button', { name: 'Create my page' }).click();
+    await page.waitForURL(/\/edit/);
+    const d = await (await page.request.get('/api/v1/page')).json();
+    expect(d.username).toBe(id);
+    expect(d.page.profile.name).toBe('Fiona File');
+    expect(d.page.tiles.map((t: { type: string }) => t.type)).toEqual(['heading', 'social', 'social', 'text']);
+  });
+
+  test('the import API and MCP tool create a page from a file, and refuse to overwrite without replace', async ({ request }) => {
+    const { id } = await signUp(request);
+    const key = (await (await request.post('/api/auth/api-key/create', { data: { name: 't' }, headers: { origin: SITE } })).json()).key as string;
+    const file = { name: 'Ida Import', username: id, links: ['https://github.com/octocat', 'ida/atlas'] };
+    const made = await tool(request, key, 'import_page', { file });
+    expect(made.isError, made.text).toBe(false);
+    expect(made.data.created).toBe(true);
+    expect((await tool(request, key, 'get_page')).data.page.tiles).toHaveLength(2);
+    const again = await tool(request, key, 'import_page', { file });
+    expect(again.isError).toBe(true);
+    expect(again.text).toContain('replace');
+    expect((await tool(request, key, 'import_page', { file: { name: 'Ida Two', links: ['hi@example.com'] }, replace: true })).isError).toBe(false);
+    expect((await tool(request, key, 'get_page')).data.page.profile.name).toBe('Ida Two');
+    const bad = await request.post('/api/v1/page/import', { headers: { authorization: `Bearer ${key}` }, data: { file: 'not json' } });
+    expect(bad.status()).toBe(400);
+  });
+});
+
+test('a brand-new user can sign up in the middle of connecting an AI app', async ({ page, playwright }) => {
+  const anon = await playwright.request.newContext({ baseURL: SITE });
+  const reg = await anon.post('/api/auth/oauth2/register', { data: { client_name: 'Fresh connector', redirect_uris: [REDIRECT], token_endpoint_auth_method: 'none', grant_types: ['authorization_code'], response_types: ['code'] } });
+  const clientId = (await reg.json()).client_id as string;
+  const auth = new URL(`${SITE}/api/auth/oauth2/authorize`);
+  const challenge = createHash('sha256').update('v'.repeat(43)).digest('base64url');
+  Object.entries({ response_type: 'code', client_id: clientId, redirect_uri: REDIRECT, scope: 'openid profile email page:write', state: 's', code_challenge: challenge, code_challenge_method: 'S256', resource: `${SITE}/api/mcp` }).forEach(([k, v]) => auth.searchParams.set(k, v));
+  let callback = '';
+  await page.route(`${REDIRECT}**`, route => { callback = route.request().url(); return route.fulfill({ status: 200, body: 'ok' }); });
+  await page.goto(auth.toString());
+  await page.waitForURL(/\/login/);
+  await page.getByRole('link', { name: 'Make your page' }).click();
+  await page.waitForURL(/\/signup/);
+  const id = `n${Date.now().toString(36)}`;
+  await page.fill('#name', 'New Person');
+  await page.fill('#email', `${id}@example.com`);
+  await page.fill('#password', PASSWORD);
+  await page.click('button[type=submit]');
+  await page.waitForURL(/oauth\/consent/);
+  await page.getByRole('button', { name: 'Allow' }).click();
+  await expect.poll(() => callback, { timeout: 15_000 }).toContain('code=');
+});
