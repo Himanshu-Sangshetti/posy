@@ -52,7 +52,11 @@ export function CanvasEditor({ page, renderTile, renderHeading, labelFor }: Prop
   /** One pointer gesture: tracks on window, previews locally, commits on release if anything moved. */
   const gesture = (e: React.PointerEvent, p: Placed, mode: Live['mode'], update: (dx: number, dy: number, ev: PointerEvent) => { pos: TilePos; guides: Guide[] }) => {
     if (e.button !== 0 || stacked || !scale) return;
-    e.preventDefault();
+    // A press inside a text field you are typing in stays there (to place the caret or select text). Anywhere else,
+    // including buttons and fields inside the tile, the press can pick the tile up; a plain click still reaches them.
+    const field = (e.target as HTMLElement).closest('textarea, input, [contenteditable="true"]');
+    if (field && field === document.activeElement) return;
+    if (!field) e.preventDefault();
     e.stopPropagation();
     select(p.tile.id);
     const sx = e.clientX, sy = e.clientY;
@@ -60,6 +64,7 @@ export function CanvasEditor({ page, renderTile, renderHeading, labelFor }: Prop
     const onMove = (ev: PointerEvent) => {
       const dx = ev.clientX - sx, dy = ev.clientY - sy;
       if (!moved && Math.hypot(dx, dy) < 3) return;
+      if (!moved) { (document.activeElement as HTMLElement | null)?.blur?.(); window.getSelection()?.removeAllRanges(); }
       moved = true;
       last = update(dx, dy, ev);
       setLive({ id: p.tile.id, mode, ...last });
@@ -133,7 +138,7 @@ export function CanvasEditor({ page, renderTile, renderHeading, labelFor }: Prop
           return (
             <div key={p.tile.id} data-tile={p.tile.id} aria-label={labelFor(p.tile)} className={cn('posy-cv', p.tile.type === 'heading' ? 'posy-cv-heading' : halfOnPhone(p.pos) && 'posy-cv-half', !stacked && 'cursor-grab', live?.id === p.tile.id && live.mode === 'move' && 'cursor-grabbing')}
               style={{ ...canvasVars(p.pos), ...(live?.id === p.tile.id ? { zIndex: 9000 } : {}) }}
-              onPointerDown={e => startMove(e, p)}
+              onPointerDownCapture={e => { if (!(e.target as HTMLElement).closest('[data-handle]')) startMove(e, p); }}
               onDragStart={e => e.preventDefault()}
               onClick={e => { e.stopPropagation(); select(p.tile.id); }}>
               {p.tile.type === 'heading' ? renderHeading(p.tile, isSel) : renderTile({ ...p.tile, size: boxSize(p.tile, p.pos) } as Tile, p.index, isSel)}

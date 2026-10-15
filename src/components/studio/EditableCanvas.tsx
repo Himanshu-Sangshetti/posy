@@ -106,21 +106,25 @@ function EditableProfile({ page }: { page: Page }) {
   );
 }
 
+/** Clicking into a note continues it, rather than starting before the first word. */
+const caretToEnd = (e: React.FocusEvent<HTMLTextAreaElement>) => { const v = e.currentTarget; v.setSelectionRange(v.value.length, v.value.length); };
+
 function InlineText({ tile, desk }: { tile: Extract<Tile, { type: 'text' }>; desk?: boolean }) {
   const update = useStudio(s => s.updateTile);
   const big = tile.size === 'l' || tile.size === 't';
   if (desk) {
     return (
       <div className={cn('dk-note', `dk-note-${tile.size}`)} style={{ '--paper': tile.color === 'auto' ? 'var(--tint-butter)' : tile.color === 'surface' ? 'var(--surface)' : tile.color === 'accent' ? 'color-mix(in oklab, var(--accent) 30%, var(--surface))' : `var(--tint-${tile.color})` } as React.CSSProperties}>
-        <textarea autoFocus aria-label="Note" value={tile.text} onChange={e => update(tile.id, { text: e.target.value })}
+        <textarea autoFocus aria-label="Note" value={tile.text} onFocus={caretToEnd} onChange={e => update(tile.id, { text: e.target.value })}
           onPointerDown={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()}
-          className={cn(blank, 'dk-hand h-full text-[25px] leading-[1.12]')} />
+          rows={Math.max(1, Math.ceil(tile.text.length / 22))} style={{ fieldSizing: 'content' } as React.CSSProperties}
+          className={cn(blank, 'dk-hand max-h-full text-[25px] leading-[1.12]')} />
       </div>
     );
   }
   return (
     <div className={cn('flex h-full p-5', big ? 'items-end' : 'items-center')}>
-      <textarea autoFocus aria-label="Note" value={tile.text} onChange={e => update(tile.id, { text: e.target.value })}
+      <textarea autoFocus aria-label="Note" value={tile.text} onFocus={caretToEnd} onChange={e => update(tile.id, { text: e.target.value })}
         onPointerDown={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()}
         className={cn(blank, 'max-h-full font-medium leading-snug tracking-[-0.015em]', tile.size === 's' ? 'text-[15px]' : big ? 'text-[21px] leading-[1.3]' : 'text-[17px] leading-[1.45]')} />
     </div>
