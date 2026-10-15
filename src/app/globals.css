@@ -656,15 +656,42 @@ body.ac-body { background: var(--bg); font-family: var(--font-sans); }
 @keyframes dk-sway { 0% { transform: rotate(-.7deg) translate3d(-.8%, 0, 0) skewX(-1.2deg); } 55% { transform: rotate(.3deg) translate3d(.2%, .3%, 0) skewX(.4deg); } 100% { transform: rotate(.9deg) translate3d(.9%, .5%, 0) skewX(1.4deg); } }
 @media (prefers-reduced-motion: reduce) { .dk-sun i { animation: none !important; } }
 
-/* ---- sign up / log in: the form on a painting ---- */
-.au { background: #1b2238; }
-.au-head { position: fixed; z-index: 3; top: 0; left: 0; padding: 22px 28px; }
-.au-logo { display: inline-flex; padding: 8px 14px; border-radius: 999px; background: rgb(255 255 255 / .82); backdrop-filter: blur(12px); box-shadow: 0 8px 24px -12px rgb(0 0 0 / .4); }
-.au-main { position: relative; min-height: 100dvh; display: grid; align-items: center; padding: 96px clamp(20px, 6vw, 96px) 40px; }
-.au-art { position: fixed !important; }
-.au-card { position: relative; z-index: 2; width: min(440px, 100%); padding: 34px; border-radius: 26px; background: rgb(255 255 255 / .9); backdrop-filter: blur(18px) saturate(1.2);
-  box-shadow: 0 0 0 1px rgb(255 255 255 / .6) inset, 0 40px 80px -30px rgb(10 20 50 / .55); }
-@media (max-width: 640px) { .au-main { align-items: end; padding: 120px 14px 14px; } .au-card { padding: 26px 22px; } }
+/* ---- sign up / log in: the form on paper, the painting in a big frame beside it ---- */
+.au { background: #fff; }
+.au-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: clamp(24px, 4vw, 64px); min-height: 100svh; padding: 96px clamp(16px, 3vw, 40px) 40px clamp(20px, 6vw, 96px); }
+.au-side { display: grid; align-items: center; }
+.au-card { width: min(420px, 100%); justify-self: end; }
+.au-title { font-family: var(--font-serif); font-weight: 400; font-size: clamp(46px, 5vw, 64px); line-height: .95; letter-spacing: -.03em; }
+.au-title i { font-style: italic; }
+.au-lede { margin-top: 14px; font-size: 16.5px; line-height: 1.5; color: var(--muted); }
+.au-social { height: 48px; width: 100%; border-radius: 12px; gap: 10px; font-size: 15px; font-weight: 500; background: #fff; border: 1px solid var(--line); box-shadow: 0 1px 2px rgb(21 20 26 / .05); transition: border-color .2s, box-shadow .2s, transform .2s; }
+.au-social:hover { border-color: #c6c6ce; box-shadow: 0 8px 20px -12px rgb(21 20 26 / .3); transform: translateY(-1px); }
+.au-or { display: flex; align-items: center; gap: 12px; margin: 4px 0; font-size: 13px; color: var(--muted); } .au-or span { flex: 1; height: 1px; background: var(--line); }
+.au-frame { position: relative; margin: 0; min-height: 520px; border-radius: 28px; overflow: visible; box-shadow: 0 50px 90px -50px rgb(20 30 70 / .55); }
+.au-frame > .ps { border-radius: 28px; }
+.au-frame figcaption { position: absolute; z-index: 2; left: 28px; bottom: 24px; font-family: var(--font-serif); font-style: italic; font-size: clamp(20px, 2vw, 28px); color: #fff; text-shadow: 0 2px 16px rgb(0 0 0 / .5); }
+.au-signup .au-frame figcaption { left: auto; right: 28px; }
+@media (max-width: 900px) {
+  .au-main { grid-template-columns: 1fr; padding: 84px 16px 24px; gap: 20px; }
+  .au-frame { order: -1; min-height: 240px; height: 34svh; }
+  .au-card { justify-self: stretch; }
+}
+
+/* the page you're making, live, as you type your name (LivePreview) */
+.lv { position: absolute; z-index: 3; left: -48px; bottom: 9%; width: min(330px, 46%); border-radius: 14px; overflow: hidden; background: #f4ecdc; box-shadow: 0 30px 60px -24px rgb(20 20 50 / .55), 0 0 0 1px rgb(255 255 255 / .6); transform-origin: 30% 80%; }
+.lv-bar { display: flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px; background: #fff; border-bottom: 1px solid #ebe6dc; font-family: var(--font-geist-mono), monospace; font-size: 10.5px; color: #8b8696; }
+.lv-bar i { width: 7px; height: 7px; border-radius: 50%; background: #e2dfe6; } .lv-bar span { margin: 0 auto; padding-right: 26px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lv-page { padding: 16px 16px 18px; background: #f4ecdc url(/looks/desk/paper.jpg) center / 300px; background-blend-mode: multiply; }
+.lv-head { display: flex; gap: 12px; align-items: center; }
+.lv-pol { width: 64px; padding: 4px 4px 12px; background: #fff; box-shadow: 0 6px 12px -6px rgb(0 0 0 / .4); rotate: -4deg; }
+.lv-name { font-family: var(--font-serif); font-size: 30px; line-height: 1; letter-spacing: -.02em; color: #2b2621; word-break: break-word; } .lv-name i { color: #9a5b3c; }
+.lv-bio { margin-top: 6px; font-size: 11.5px; color: #7d7468; }
+.lv-tiles { display: grid; grid-template-columns: 1fr 1.2fr .8fr; gap: 10px; margin-top: 14px; align-items: end; }
+.lv-note { padding: 10px 8px; background: #fbe9a6; font-family: var(--font-caveat), cursive; font-size: 14px; line-height: 1.1; color: #4b3f2a; rotate: 3deg; box-shadow: 0 6px 10px -6px rgb(0 0 0 / .35); }
+.lv-photo { padding: 4px 4px 12px; background: #fff; rotate: -2deg; box-shadow: 0 6px 12px -6px rgb(0 0 0 / .4); } .lv-photo img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+.lv-rec { aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #e4572e 0 16%, #1f1b18 17% 100%); box-shadow: 0 6px 10px -6px rgb(0 0 0 / .5); animation: lv-spin 6s linear infinite; }
+@keyframes lv-spin { to { rotate: 1turn; } }
+@media (max-width: 900px) { .lv { left: 12px; bottom: -28px; width: 230px; } .lv-tiles { display: none; } }
 
 /* ---- 404: the kite caught in a tree ---- */
 .nf { position: relative; min-height: 100dvh; display: grid; align-items: end; padding: clamp(24px, 6vw, 80px); font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif; color: #fff; }
@@ -687,3 +714,4 @@ body.ac-body { background: var(--bg); font-family: var(--font-sans); }
   animation: ob-art 1.4s cubic-bezier(.2,.7,.2,1) both; }
 @keyframes ob-art { from { opacity: 0; transform: translateY(18px) rotate(1.5deg) scale(.97); } }
 @media (max-width: 860px) { .ob-hero { grid-template-columns: 1fr; } .ob-hero-art { order: -1; aspect-ratio: 16 / 9; } }
+.au-login .au-frame .ps-pic { left: auto; right: 0; translate: 0 -50%; }

@@ -17,4 +17,12 @@ export type Edition = {
   entitlements: (userId: string) => Promise<Entitlements>;
   /** Extra dashboard sections, e.g. the hosted platform's billing page. */
   nav?: { href: string; label: string }[];
+  /** The public site's top bar and footer (sign up, log in, marketing pages). */
+  site?: SiteLinks;
+};
+
+export type SiteLinks = {
+  nav: { name: string; link: string }[];
+  footer: { title: string; links: [label: string, href: string][] }[];
+  tagline?: string;
 };

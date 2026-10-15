@@ -11,18 +11,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { siGithub, siGoogle } from 'simple-icons';
 import { PaintedScene } from '@/components/art/PaintedScene';
+import { launchKite } from '@/components/studio/kite-launch';
+import { LivePreview } from './LivePreview';
 
 type Mode = 'login' | 'signup';
 
-function Social({ provider, label, path, next }: { provider: 'github' | 'google'; label: string; path: string; next: string }) {
+function Social({ provider, label, path, next, ready = true }: { provider: 'github' | 'google'; label: string; path: string; next: string; ready?: boolean }) {
   return (
-    <Button type="button" variant="outline" onClick={() => signIn.social({ provider, callbackURL: next })} className="ac-btn ac-btn-soft w-full">
+    <Button type="button" variant="outline" onClick={() => (ready ? signIn.social({ provider, callbackURL: next }) : toast('Google sign-in is almost here', { description: 'It switches on once the server has its Google keys (GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET).' }))} className="au-social">
       <svg viewBox="0 0 24 24" className="!size-[18px]" fill="currentColor" aria-hidden><path d={path} /></svg>{label}
     </Button>
   );
 }
 
-export function AuthForm({ mode, providers }: { mode: Mode; providers: { github: boolean; google: boolean } }) {
+export function AuthForm({ mode, providers, host }: { mode: Mode; providers: { github: boolean; google: boolean; googleReady?: boolean }; host: string }) {
   const router = useRouter();
   const params = useSearchParams();
   const wanted = params.get('username') ?? '';
@@ -30,6 +32,8 @@ export function AuthForm({ mode, providers }: { mode: Mode; providers: { github:
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [show, setShow] = useState(false);
+  const [name, setName] = useState('');
+  const [typing, setTyping] = useState(false);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -40,29 +44,31 @@ export function AuthForm({ mode, providers }: { mode: Mode; providers: { github:
       ? await signUp.email({ email, password, name: String(f.get('name') || email.split('@')[0]) })
       : await signIn.email({ email, password });
     if (res.error) { const m = res.error.message ?? 'Something went wrong'; setError(m); toast.error(m); setBusy(false); return; }
+    launchKite(e.currentTarget.querySelector('button[type=submit]'));
+    await new Promise(r => setTimeout(r, 900));
     router.push(next);
     router.refresh();
   }
 
   const signup = mode === 'signup';
   return (
-    <main className="au-main">
-    <PaintedScene scene={signup ? 'signup' : 'login'} className="au-art" />
-    <div className="ac-rise au-card">
-      <h1 className="ac-display text-[44px]">{signup ? <>Make your <i>page</i></> : <>Welcome <i>back</i></>}</h1>
-      <p className="mt-3 text-[15px] leading-relaxed text-[var(--muted)]">
-        {signup ? (wanted ? <>Claim <b className="ac-mono text-[13.5px] font-medium text-[var(--text)]">posy.page/{wanted}</b> in a minute.</> : 'Free, and it takes about a minute.') : 'Your page is right where you left it.'}
-      </p>
+    <main className={`au-main au-${mode}`}>
+      <div className="au-side">
+        <div className="au-card ac-rise">
+          <h1 className="au-title">{signup ? <>Make your <i>page</i></> : <>Welcome <i>back</i></>}</h1>
+          <p className="au-lede">
+            {signup ? (wanted ? <>Claim <b className="ac-mono text-[14px] font-medium text-[var(--text)]">{host}/{wanted}</b>. It takes about a minute.</> : 'Free, open source, and it takes about a minute.') : 'Your page is right where you left it.'}
+          </p>
       {(providers.github || providers.google) && (
         <div className="mt-6 grid gap-2.5">
+          {providers.google && <Social provider="google" label="Continue with Google" path={siGoogle.path} next={next} ready={providers.googleReady ?? true} />}
           {providers.github && <Social provider="github" label="Continue with GitHub" path={siGithub.path} next={next} />}
-          {providers.google && <Social provider="google" label="Continue with Google" path={siGoogle.path} next={next} />}
-          <div className="ac-eyebrow my-1.5 flex items-center gap-3"><span className="h-px flex-1 bg-[var(--line)]" />or<span className="h-px flex-1 bg-[var(--line)]" /></div>
+          <div className="au-or"><span />or with email<span /></div>
         </div>
       )}
-      <form onSubmit={submit} className="mt-6 grid gap-4">
+      <form onSubmit={submit} className="mt-6 grid gap-4" onFocus={() => setTyping(true)} onBlur={() => setTyping(false)}>
         {signup && (
-          <div className="grid gap-1.5"><Label htmlFor="name">Name</Label><Input id="name" name="name" autoComplete="name" placeholder="Ada Lovelace" className="ac-input" /></div>
+          <div className="grid gap-1.5"><Label htmlFor="name">Name</Label><Input id="name" name="name" autoComplete="name" placeholder="Mira Sol" className="ac-input" value={name} onChange={e => setName(e.target.value)} /></div>
         )}
         <div className="grid gap-1.5"><Label htmlFor="email">Email</Label><Input id="email" name="email" type="email" required autoComplete="email" placeholder="you@example.com" className="ac-input" /></div>
         <div className="grid gap-1.5">
@@ -84,7 +90,13 @@ export function AuthForm({ mode, providers }: { mode: Mode; providers: { github:
         {signup ? <>Already have a page? <Link href="/login" className="font-medium text-[var(--ac-deep)] underline-offset-4 hover:underline">Log in</Link></>
           : <>New here? <Link href={`/signup${wanted ? `?username=${wanted}` : ''}`} className="font-medium text-[var(--ac-deep)] underline-offset-4 hover:underline">Make your page</Link></>}
       </p>
-    </div>
+        </div>
+      </div>
+      <figure className="au-frame">
+        <PaintedScene scene={signup ? 'signup' : 'login'} className={typing ? 'is-typing' : undefined} />
+        {signup && <LivePreview name={name} username={wanted} host={host} />}
+        <figcaption>{signup ? 'Good morning. Let’s make something.' : 'Still up? Your page kept the light on.'}</figcaption>
+      </figure>
     </main>
   );
 }

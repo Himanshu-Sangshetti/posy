@@ -1,13 +1,17 @@
-import Link from 'next/link';
-import { Logo } from '@/components/brand';
 import { AppFrame } from '@/components/dash/ui';
+import { SiteNav } from '@/components/site/SiteNav';
+import { SiteFooter } from '@/components/site/SiteFooter';
+import { edition } from '@/edition';
+import { DEFAULT_SITE } from '@/lib/site-links';
 
-/** Sign up and log in: a painting from the Posy world fills the screen and the form sits on it (see AuthForm). */
+/** Sign up and log in: the site's own top bar and footer around the form and its painting (see AuthForm). */
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
+  const site = edition.site ?? DEFAULT_SITE;
   return (
     <AppFrame className="au">
-      <header className="au-head"><Link href="/" aria-label="Posy home" className="au-logo"><Logo /></Link></header>
+      <SiteNav items={site.nav} tone="light" pinned />
       {children}
+      <SiteFooter site={site} solo />
     </AppFrame>
   );
 }

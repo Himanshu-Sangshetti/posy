@@ -10,11 +10,9 @@
 .ps-mote { width: .35%; aspect-ratio: 1; border-radius: 50%; background: rgb(255 248 220 / .9); box-shadow: 0 0 6px rgb(255 240 200 / .9); animation: ps-mote 11s ease-in-out infinite; }
 @keyframes ps-mote { 0% { translate: 0 0; opacity: 0; } 20% { opacity: 1; } 50% { translate: 2cqw 3cqh; } 80% { opacity: .8; } 100% { translate: -1cqw 7cqh; opacity: 0; } }
 
-/* login: rain running down the window, the lamp glowing, the laptop's light */
-.ps-rain { overflow: hidden; opacity: .55; mix-blend-mode: screen; animation: ps-rain .9s linear infinite;
-  background-image: repeating-linear-gradient(100deg, transparent 0 22px, rgb(210 225 255 / .35) 22px 23px, transparent 23px 47px), repeating-linear-gradient(98deg, transparent 0 13px, rgb(210 225 255 / .25) 13px 14px, transparent 14px 31px);
-  background-size: 100% 60px, 100% 40px; }
-@keyframes ps-rain { to { background-position: -6px 60px, -4px 40px; } }
+/* login: the lamp glowing, the laptop's light, and the cat waking when you type */
+.ps-pic > img.ps-awake { position: absolute; inset: auto; height: auto; opacity: 0; transition: opacity .35s ease; }
+.is-typing .ps-pic > img.ps-awake { opacity: 1; }
 .ps-glow { width: 26%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; mix-blend-mode: screen; background: radial-gradient(circle, rgb(255 214 140 / .55), rgb(255 190 110 / .15) 40%, transparent 70%); animation: ps-glow 5s ease-in-out infinite; }
 @keyframes ps-glow { 50% { opacity: .7; scale: .96; } 52% { opacity: .55; } 54% { opacity: .75; } }
 .ps-screen { mix-blend-mode: screen; background: rgb(150 190 255 / .18); border-radius: 4px; animation: ps-screen 3.2s steps(3) infinite; }

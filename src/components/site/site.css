@@ -1,0 +1,50 @@
+/* The public site's top bar and footer, shared by the landing page and sign up / log in. */
+.lp-nav, .lf { --ink: #15141a; --accent: #e4572e; --serif: var(--font-serif), "Iowan Old Style", Georgia, serif; font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif; }
+/* ---------- nav (Aceternity Resizable Navbar) ---------- */
+.lp-nav { top: 0 !important; padding-top: 10px; }
+.lp-navbody { padding: 8px 10px 8px 18px !important; }
+.lp-navbody.bg-white\/80 { min-width: 860px !important; }
+.lp-navbody .lp-logo, .lp-navbody .lp-link, .lp-navitems a { color: #fff !important; transition: color .3s; }
+.lp-navitems a { font-size: 14.5px; }
+.lp-navitems a > div { background: rgb(255 255 255 / .16) !important; }
+.lp-navbody.bg-white\/80 .lp-logo, .lp-navbody.bg-white\/80 .lp-link, .lp-navbody.bg-white\/80 .lp-navitems a { color: var(--ink) !important; }
+.lp-navbody.bg-white\/80 .lp-navitems a > div { background: rgb(21 20 26 / .06) !important; }
+.lp-navbody:not(.bg-white\/80) .lp-logo circle { fill: #fff; }
+.lp-navbody.bg-white\/80 { border-radius: 999px; }
+.lp-link { padding: 8px 12px; border-radius: 999px; font-size: 14.5px; }
+.lp-cta { display: inline-flex; padding: 9px 16px; border-radius: 999px; background: var(--ink); color: #fff !important; font-size: 14px; font-weight: 500; transition: background .2s; white-space: nowrap; }
+.lp-cta:hover { background: var(--accent); }
+.lp-navbody:not(.bg-white\/80) .lp-cta { background: #fff; color: var(--ink) !important; }
+.lp-logo { border-radius: 8px; outline: none; }
+.lp-navbody svg.tabler-icon { color: #fff; } .lp-navbody.bg-white\/80 svg.tabler-icon { color: var(--ink); }
+
+/* ---------- footer: the same meadow, close up, under your feet ---------- */
+.lf { position: relative; z-index: 2; overflow: hidden; isolation: isolate; margin-top: -26vh; padding: 26vh 0 40px; background: linear-gradient(transparent, #1f3a17 34vh); color: #fff; pointer-events: none; }
+.lf a { pointer-events: auto; }
+.lf-art { position: absolute; inset: 0; z-index: -2; -webkit-mask-image: linear-gradient(transparent, #000 26vh); mask-image: linear-gradient(transparent, #000 26vh); }
+.lf-art img, .lf-art canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0%; }
+.lf::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgb(20 40 16 / 0) 30vh, rgb(20 40 16 / .35) 55%, rgb(16 32 13 / .88) 85%); }
+.lf-word { position: absolute; left: 50%; top: calc(26vh + 10px); translate: -50% 0; z-index: -1; font-family: var(--serif); font-size: clamp(150px, 24vw, 380px); line-height: .8; letter-spacing: -.05em;
+  color: rgb(255 255 255 / .94); text-shadow: 0 10px 40px rgb(20 40 16 / .45); white-space: nowrap; pointer-events: none; user-select: none; }
+.lf-inner { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 32px; width: min(1200px, 100% - 40px); margin: 0 auto; padding-top: clamp(190px, 24.5vw, 390px); }
+.lf-brand p { max-width: 22ch; margin-top: 14px; font-family: var(--serif); font-size: 28px; line-height: 1.1; letter-spacing: -.01em; text-shadow: 0 2px 16px rgb(0 0 0 / .4); }
+.lf-mark { width: 44px !important; height: 44px !important; }
+.lf-mark circle { fill: #fff; }
+.lf nav { display: grid; align-content: start; gap: 10px; font-size: 15px; }
+.lf h4 { margin-bottom: 6px; font-family: var(--serif); font-size: 26px; font-weight: 400; letter-spacing: -.01em; color: #ffe2b8; }
+.lf nav a { color: rgb(255 255 255 / .85); text-shadow: 0 1px 10px rgb(0 0 0 / .45); transition: color .2s; } .lf nav a:hover { color: #fff; }
+@media (max-width: 760px) { .lf-inner { grid-template-columns: 1fr 1fr; } .lf-brand { grid-column: span 2; } }
+
+@media (max-width: 760px) { .lf-inner { padding-top: 150px; } }
+.lp-navbody.bg-white\/80 a.lp-link[target] { display: none; }
+.lf { -webkit-user-select: none; user-select: none; }
+/* over light paper the bar starts in ink */
+.lp-nav-light .lp-navbody:not(.bg-white\/80) .lp-logo, .lp-nav-light .lp-navbody:not(.bg-white\/80) .lp-link, .lp-nav-light .lp-navbody:not(.bg-white\/80) .lp-navitems a { color: var(--ink) !important; }
+.lp-nav-light .lp-navbody:not(.bg-white\/80) .lp-logo circle { fill: var(--ink); }
+.lp-nav-light .lp-navbody:not(.bg-white\/80) .lp-cta { background: var(--ink); color: #fff !important; }
+.lp-nav-light .lp-navitems a > div { background: rgb(21 20 26 / .06) !important; }
+.lp-nav .lp-navbody svg.lucide { color: #fff; } .lp-nav .lp-navbody.bg-white\/80 svg.lucide, .lp-nav-light .lp-navbody svg.lucide { color: var(--ink); }
+/* on pages without a closing painting above it, the footer starts below the content and fades up out of white */
+.lf.lf-solo { margin-top: 0; padding-top: 20vh; }
+.lf.lf-solo .lf-word { top: calc(20vh + 10px); }
+.lf.lf-solo .lf-art { -webkit-mask-image: linear-gradient(transparent, #000 22vh); mask-image: linear-gradient(transparent, #000 22vh); }
