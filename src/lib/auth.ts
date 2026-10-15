@@ -18,7 +18,7 @@ export const auth = betterAuth({
   appName: 'Posy',
   // OAuth for AI apps needs one fixed public URL (issuer and resource), so set NEXT_PUBLIC_SITE_URL, also in development.
   // Without it, development still works for the web app: Better Auth infers the URL from each request.
-  baseURL: env.BETTER_AUTH_URL || env.NEXT_PUBLIC_SITE_URL || undefined,
+  baseURL: env.BETTER_AUTH_URL || env.NEXT_PUBLIC_SITE_URL || siteUrl(),
   trustedOrigins: env.NODE_ENV === 'production' ? [] : ['http://localhost:*', 'http://127.0.0.1:*'],
   secret: env.BETTER_AUTH_SECRET || 'dev-only-secret-change-me-in-production-0123456789',
   database: drizzleAdapter(db, { provider: 'sqlite', schema }),
