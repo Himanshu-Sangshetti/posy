@@ -28,3 +28,7 @@ Made for Posy with Krea 2 Turbo (open weights, Krea 2 Community License; Krea cl
 | lofi/train-sunset.jpg | An empty train carriage at sunset by the sea (Lofi, Last train palette) |
 | ../samples/posy.jpg | A watercolour posy, the starter avatar on new pages |
 | desk/leaves.jpg | Afternoon light through leaves on a white wall, turned into a shadow map (Desk) |
+| painted/sky-*.jpg | Watercolour skies, one per Painted palette (morning, golden hour, dusk, starry) |
+| night/bg-street.jpg | A rainy neon alley at night, shown blurred behind the Night look |
+| painted/deckle.png, painted/blob.png | Torn-paper edge and painted-blob masks, drawn procedurally for Posy |
+| {desk,minimal,press,gallery,washi,lofi,painted,night}/{avatar,photo1,photo2,cover,music,video}.jpg | Placeholder pictures for each look's starter page, painted in that look's style |
