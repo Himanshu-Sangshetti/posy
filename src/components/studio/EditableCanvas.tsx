@@ -183,6 +183,7 @@ function SortableSocialIcon({ tile, desk }: { tile: Extract<Tile, { type: 'socia
       <span className={cn(desk ? 'dk-stk cursor-grab' : 'grid size-11 cursor-grab place-items-center rounded-full border border-[color-mix(in_oklab,var(--text)_8%,transparent)] bg-[color-mix(in_oklab,var(--surface)_70%,transparent)]', selected && 'outline outline-2 outline-offset-2 outline-[#e4572e]')}>
         {p.icon?.path ? <BrandIcon path={p.icon.path} size={19} /> : tile.platform === 'email' ? <span className="text-[17px]">@</span> : <span className="text-[14px] font-bold">in</span>}
       </span>
+      <span className="posy-social-label">{p.label}</span>
       {selected && <TileToolbar tile={tile} />}
     </div>
   );

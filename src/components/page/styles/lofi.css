@@ -184,3 +184,7 @@
 .posy-motion .lf-rain { animation: lf-rain 1.6s linear infinite; }
 @keyframes lf-rain { to { background-position: -32px 240px, -38px 320px, -46px 420px; } }
 @media (prefers-reduced-motion: reduce) { .lf-rain { animation: none !important; } }
+
+/* the editor's sortable icons get the same desktop-icon look */
+.posy-style-lofi .posy-social-row > div[data-tile] { display: flex; flex-direction: column; align-items: center; gap: 7px; width: 78px; padding: 4px 0; }
+.posy-style-lofi .posy-social-row > div[data-tile] > span:first-child { box-sizing: content-box; width: 22px; height: 22px; padding: 11px; border-radius: 12px; background: var(--surface); border: var(--lf-bw) solid var(--lf-edge); box-shadow: 2px 2px 0 var(--lf-edge); }
