@@ -1,5 +1,5 @@
 // Washi: a Japanese print. Real Edo-period woodblock prints (public domain), real paper, a seal made from a real
-// seal impression, double-ruled frames numbered in kanji, and short names set top to bottom like a book spine.
+// seal impression, double-ruled frames, and short names set top to bottom like a book spine.
 import { ArrowUpRight } from 'lucide-react';
 import type { Page, Tile } from '@/lib/schema';
 import { asset, cn } from '@/lib/utils';
@@ -8,14 +8,6 @@ import { VideoPlayer } from '../islands';
 import { RichText } from '../tiles';
 import { tileMeta, compact } from './meta';
 import type { HeaderSlots } from './types';
-
-const DIGITS = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
-/** 1 → 一, 12 → 十二, 40 → 四十. */
-export function kanji(n: number) {
-  if (n < 10) return DIGITS[n] || '〇';
-  const t = Math.floor(n / 10) % 10, o = n % 10;
-  return `${t > 1 ? DIGITS[t] : ''}十${DIGITS[o]}`;
-}
 
 /** Public-domain prints (Art Institute of Chicago, CC0), one per palette. Credits: public/looks/CREDITS.md. */
 export const WASHI_PRINTS: Record<string, { src: string; artist: string; title: string; year: string }> = {
@@ -69,12 +61,11 @@ const Img = ({ src }: { src: string }) => (
 
 export function WashiTile({ tile, index, editing }: { tile: Tile; index: number; editing?: boolean }) {
   const m = tileMeta(tile);
-  const n = kanji(index + 1);
+  void index;
   const vid = tile.type === 'video' ? youtubeId(tile.url) : null;
   const pic = tile.type === 'image' || tile.type === 'video' || ((tile.type === 'link' || tile.type === 'music') && tile.size !== 's' && m.image);
   return (
     <div className={cn('ws-frame', `ws-t-${tile.type}`)}>
-      <div className="ws-meta"><span className="ws-n">{n}</span></div>
       {tile.type === 'text' && <p className="ws-note"><RichText text={tile.text} /></p>}
       {pic && (
         <div className="ws-img">
@@ -96,12 +87,11 @@ export function WashiTile({ tile, index, editing }: { tile: Tile; index: number;
   );
 }
 
-export function WashiRow({ tile, index }: { tile: Tile; index: number }) {
+export function WashiRow({ tile }: { tile: Tile; index: number }) {
   const m = tileMeta(tile);
   if (tile.type === 'text') return <p className="ws-row-note"><RichText text={tile.text} /></p>;
   return (
     <div className="ws-line">
-      <span className="ws-n">{kanji(index + 1)}</span>
       {m.image ? <span className="ws-thumb"><Img src={m.image} /></span> : <span className={cn('ws-thumb ws-pattern', `ws-pattern-${m.kind === 'shop' ? 'asanoha' : m.kind === 'repo' ? 'kikko' : 'seigaiha'}`)} aria-hidden />}
       <span className="ws-line-text"><b>{m.title || 'Photo'}</b>{m.sub && m.sub !== m.title && tile.type !== 'image' && <span>{m.sub}</span>}</span>
       <ArrowUpRight className="ws-go" aria-hidden />
