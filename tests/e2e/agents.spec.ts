@@ -1,7 +1,7 @@
 import { test, expect, type APIRequestContext } from '@playwright/test';
 import { createHash, randomBytes } from 'node:crypto';
 
-const SITE = 'http://localhost:3211';
+const SITE = process.env.POSY_TEST_SITE ?? 'http://localhost:3211';
 const REDIRECT = 'http://127.0.0.1:53682/callback';
 const PASSWORD = 'pastel-garden-42';
 
