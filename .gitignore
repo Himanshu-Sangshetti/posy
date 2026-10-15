@@ -21,3 +21,8 @@ next-env.d.ts
 
 # local database
 .data/
+
+# local databases and Vercel links
+*.db
+*.sqlite
+.vercel
