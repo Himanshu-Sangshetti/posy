@@ -202,3 +202,25 @@ a.posy-row:hover .sf-row-go { translate: 2px -2px; background: var(--text); colo
 .posy-style-minimal .sf-cover { background: color-mix(in oklab, var(--text) 6%, var(--surface)); box-shadow: 0 0 0 1px var(--mn-rule); }
 .posy-style-minimal .sf-play { background: var(--text); box-shadow: none; }
 .posy-style-minimal .sf-title, .posy-style-minimal .sf-music .sf-title { font-variation-settings: normal; }
+
+/* ---------- the default finish: no cards at all. A hairline over each piece, photos as plain plates, type does the work ---------- */
+.posy-style-minimal.posy-tiles-soft .posy-grid { --gap: 30px; row-gap: 34px; }
+.posy-style-minimal.posy-tiles-soft .posy-grid .posy-tile { --r: 0px; overflow: visible; background: none; border: 0; border-top: 1px solid var(--text); border-radius: 0; }
+.posy-style-minimal.posy-tiles-soft .posy-grid a.posy-tile:hover { border-color: var(--text); box-shadow: none; translate: none; }
+.posy-style-minimal.posy-tiles-soft .posy-grid :is(.sf-link, .sf-social, .sf-text) { padding: 14px 0 0; }
+.posy-style-minimal.posy-tiles-soft .posy-grid .sf-badge { width: 22px; height: 22px; border-radius: 0; background: none !important; box-shadow: none !important; place-items: start; }
+.posy-style-minimal.posy-tiles-soft .posy-grid .sf-badge-round { width: 22px; height: 22px; }
+.posy-style-minimal.posy-tiles-soft .posy-grid a.posy-tile:hover .sf-badge { rotate: none; scale: none; background: none !important; color: var(--accent) !important; }
+.posy-style-minimal.posy-tiles-soft .posy-grid .sf-title { font-family: var(--font-head); font-weight: var(--head-weight, 400); font-size: 22px; line-height: 1.08; letter-spacing: var(--head-track, -.015em); }
+.posy-style-minimal.posy-tiles-soft .posy-grid a.posy-tile:hover .sf-title { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.posy-style-minimal.posy-tiles-soft .posy-grid .sf-media { border-radius: 0; box-shadow: none; }
+.posy-style-minimal.posy-tiles-soft .posy-grid .sf-go { top: 12px; right: 0; width: 22px; height: 22px; background: none; box-shadow: none; }
+/* photos: a plain plate under the rule, the caption set underneath like a figure */
+.posy-style-minimal.posy-tiles-soft .posy-grid .sf-photo { inset: 14px 0 0; border-radius: 0; box-shadow: none; }
+.posy-style-minimal.posy-tiles-soft .posy-grid .posy-tile:has(.sf-cap) .sf-photo { bottom: 26px; }
+.posy-style-minimal.posy-tiles-soft .posy-grid .sf-cap { left: 0; bottom: 0; max-width: 100%; padding: 0; border-radius: 0; background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; color: var(--sf-ink-soft); font-size: 13px; font-weight: 450; -webkit-line-clamp: 1; }
+.posy-style-minimal.posy-tiles-soft .posy-grid a.posy-tile:hover .sf-photo > img { scale: 1.02; }
+/* notes: set large, no quote mark */
+.posy-style-minimal.posy-tiles-soft .posy-grid .sf-text { align-items: flex-start; }
+.posy-style-minimal.posy-tiles-soft .posy-grid .sf-text-big::before { display: none; }
+.posy-style-minimal.posy-tiles-soft .posy-grid .sf-text p { font-size: 26px; line-height: 1.18; }
