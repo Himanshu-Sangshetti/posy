@@ -3,9 +3,9 @@ import { ImageResponse } from 'next/og';
 import type { Page } from '@/lib/schema';
 import { THEMES, type Theme } from '@/lib/themes';
 import { cozy } from './cozy';
-import { neon } from './neon';
 import { soft } from './soft';
-import { editorial } from './editorial';
+import { washi } from './washi';
+import { lofi } from './lofi';
 import { fontPair, loadFonts } from './fonts';
 import { loadImage, loadRoundable } from './images';
 import { faviconKind, isLight } from './util';
@@ -28,7 +28,7 @@ export type OgStyle = (input: OgInput) => Promise<{ element: React.ReactElement;
  * Share-image styles, keyed by `page.theme.style`. Add a style by writing an OgStyle and listing it here;
  * unknown or missing styles use "cozy".
  */
-const STYLES: Record<string, OgStyle> = { cozy, minimal: soft, washi: editorial, lofi: neon };
+const STYLES: Record<string, OgStyle> = { cozy, minimal: soft, washi, lofi };
 
 export function themeOf(page: Page): Theme {
   const t = THEMES[page.theme.preset] ?? THEMES.cream;
