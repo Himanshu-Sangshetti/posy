@@ -1,21 +1,15 @@
 import { cn } from '@/lib/utils';
 
-/** Posy mark: a six-petal flower drawn like a typed asterisk, in vermilion. */
+/** Posy mark: the calico cat curled up asleep, from the painted Posy world. Vector, three colours (public/brand). */
 export function PosyMark({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 32 32" className={cn('size-6', className)} aria-hidden>
-      <g stroke="#e4572e" strokeWidth="5.2" strokeLinecap="round">
-        <path d="M16 5.5v21" /><path d="M6.9 10.75l18.2 10.5" /><path d="M6.9 21.25l18.2-10.5" />
-      </g>
-      <circle cx="16" cy="16" r="2.6" fill="#16140f" />
-    </svg>
-  );
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src="/brand/posy-cat.svg" alt="" aria-hidden width={24} height={24} className={cn('size-6 shrink-0', className)} draggable={false} />;
 }
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <span className={cn('inline-flex items-center gap-1.5 font-[family-name:var(--font-serif)] text-[27px] leading-none tracking-[-0.02em]', className)}>
-      <PosyMark className="size-[22px] translate-y-[1px]" />posy
+    <span className={cn('inline-flex items-center gap-2 font-[family-name:var(--font-serif)] text-[27px] leading-none tracking-[-0.02em]', className)}>
+      <PosyMark className="size-[28px]" />posy
     </span>
   );
 }
