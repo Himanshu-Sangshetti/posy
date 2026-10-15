@@ -43,8 +43,9 @@ export function clampPos(p: Partial<TilePos> & Box): TilePos {
  * A position for every tile. Tiles that have one keep it; the rest flow like the bento grid
  * (4 columns, dense packing, a heading starts a new section) below any placed tiles,
  * so switching an existing page to canvas looks right straight away.
+ * `loose` nudges each auto-placed tile off the grid so neighbours overlap a little, like windows left open on a desktop.
  */
-export function placeTiles(tiles: Tile[]): Placed[] {
+export function placeTiles(tiles: Tile[], loose = false): Placed[] {
   const placed = tiles.filter(t => t.pos);
   let cursor = placed.length ? Math.max(...placed.map(t => t.pos!.y + t.pos!.h)) + GAP * 3 : 0;
   let rows: boolean[][] = [];
@@ -67,7 +68,14 @@ export function placeTiles(tiles: Tile[]): Placed[] {
       while (rows.length <= y) rows.push(Array(COLS).fill(false));
       for (let x = col; x < col + c; x++) rows[y][x] = true;
     }
-    out.push({ tile, index, pos: { x: col * (CELL + GAP), y: top + row * (CELL + GAP), w: span(c), h: span(r), r: 0, z: 0 } });
+    const pos = { x: col * (CELL + GAP), y: top + row * (CELL + GAP), w: span(c), h: span(r), r: 0, z: 0 };
+    if (loose) {
+      const h = hash(tile.id);
+      pos.x = clamp(pos.x + ((h % 7) - 3) * 12, 0, CANVAS_WIDTH - pos.w);
+      pos.y = Math.max(0, pos.y + (((h >> 3) % 5) - 1) * 14);
+      pos.z = index;
+    }
+    out.push({ tile, index, pos });
   });
   return out;
 }
@@ -167,5 +175,6 @@ export function layerTo(placed: { tile: Tile; pos: TilePos }[], id: string, wher
   return where === 'front' ? Math.max(...zs) + 1 : Math.min(...zs) - 1;
 }
 
+function hash(s: string) { let h = 2166136261; for (const ch of s) h = Math.imul(h ^ ch.codePointAt(0)!, 16777619) >>> 0; return h; }
 function clamp(v: number, lo: number, hi: number) { return Math.min(hi, Math.max(lo, v)); }
 function num(v: unknown, d: number) { return typeof v === 'number' && Number.isFinite(v) ? v : d; }

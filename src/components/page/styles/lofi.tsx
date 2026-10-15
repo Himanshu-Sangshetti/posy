@@ -1,7 +1,8 @@
-// Lofi: a night-time anime still. A deep blue room, every tile a small app window with a title bar, photos turned
-// into a halftone print in the page colours (full colour on hover), the name set wide in capitals.
-import { ArrowUpRight, Mail, Minus, Play, ShoppingBag, X } from 'lucide-react';
+// Lofi: a desktop left open. Every tile is a small app window (Photos, Notes, Music, Terminal, Mail) with a classic
+// pinstriped title bar, over a sky of clay clouds by day or a painted anime room at night. Visitors can drag windows.
+import { ArrowUpRight, Globe, Mail, Play, ShoppingBag, SkipBack, SkipForward } from 'lucide-react';
 import type { Tile } from '@/lib/schema';
+import { PLATFORMS } from '@/lib/platforms';
 import { asset, cn } from '@/lib/utils';
 import { hostOf, youtubeId } from '@/lib/url';
 import { LiveClock, VideoPlayer } from '../islands';
@@ -9,20 +10,20 @@ import { BrandIcon, RichText } from '../tiles';
 import { tileMeta, compact } from './meta';
 import type { HeaderSlots } from './types';
 
-const slug = (s: string) => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 22) || 'untitled';
-
-/** The file a tile pretends to be, for its window title. */
-export function fileName(tile: Tile, n: number) {
-  const pad = String(n + 1).padStart(2, '0');
+/** Every tile is a small app on the desktop: the window title says which one. */
+export function appName(tile: Tile) {
   switch (tile.type) {
-    case 'image': return `photo_${pad}.webp`;
-    case 'video': return `${slug(tile.title || 'video')}.mp4`;
-    case 'music': return `${slug(tile.title || 'track')}.mp3`;
-    case 'text': return `note_${pad}.txt`;
-    case 'github': return `${tile.repo.split('/').pop()}.git`;
-    case 'social': return `${tile.platform}.url`;
-    case 'link': return `${hostOf(tile.url).split('.').slice(-2, -1)[0] || 'link'}.url`;
-    default: return `item_${pad}`;
+    case 'image': return 'Photos';
+    case 'video': return 'Player';
+    case 'music': return 'Music';
+    case 'text': return 'Notes';
+    case 'github': return 'Terminal';
+    case 'social': return PLATFORMS[tile.platform].label;
+    case 'link': {
+      const k = tileMeta(tile).kind;
+      return k === 'newsletter' ? 'Mail' : k === 'shop' ? 'Shop' : hostOf(tile.url).replace(/^www\./, '') || 'Browser';
+    }
+    default: return '';
   }
 }
 
@@ -36,25 +37,28 @@ export function Halftone({ src, className }: { src: string; className?: string }
   );
 }
 
-function Bar({ name }: { name: string }) {
+/** A classic title bar: close box, pinstripes, the app's name in the middle, zoom box. */
+export function Bar({ title }: { title: string }) {
   return (
     <div className="lf-bar">
-      <span className="lf-file">{name}</span>
-      <span className="lf-ctl" aria-hidden><Minus /><X /></span>
+      <i className="lf-box" aria-hidden />
+      <span className="lf-stripes" aria-hidden />
+      {title && <span className="lf-title">{title}</span>}
+      <span className="lf-stripes" aria-hidden />
+      <i className="lf-box lf-zoom" aria-hidden />
     </div>
   );
 }
 
-/** A barcode that is the same for the same name, like a sticker on a sketchbook. */
-function Barcode({ seed }: { seed: string }) {
-  let h = 2166136261; const bars: number[] = [];
-  for (const ch of seed + 'posy') h = Math.imul(h ^ ch.codePointAt(0)!, 16777619) >>> 0;
-  for (let i = 0; i < 34; i++) { h = Math.imul(h ^ (h >>> 13), 2246822507) >>> 0; bars.push(1 + (h % 3)); }
-  let x = 0;
+/** The bar across the top of a Lofi page, like an old desktop: a flower, your name, the time. */
+export function LofiMenuBar({ name, pinned }: { name: string; pinned?: boolean }) {
   return (
-    <svg className="lf-barcode" viewBox={`0 0 ${bars.reduce((a, b) => a + b + 1.5, 0)} 24`} aria-hidden>
-      {bars.map((w, i) => { const r = <rect key={i} x={x} y={0} width={w} height={24} />; x += w + 1.5; return r; })}
-    </svg>
+    <div className={cn('lf-menubar', pinned && 'lf-menubar-pinned')} aria-hidden>
+      <svg viewBox="0 0 24 24" className="lf-flower"><path d="M12 2.5c1.6 0 2.4 2.6 2.1 5.3 2.1-1.7 4.8-2.5 5.6-1.1.8 1.4-1.2 3.3-3.8 4.3 2.6 1 4.6 2.9 3.8 4.3-.8 1.4-3.5.6-5.6-1.1.3 2.7-.5 5.3-2.1 5.3s-2.4-2.6-2.1-5.3c-2.1 1.7-4.8 2.5-5.6 1.1-.8-1.4 1.2-3.3 3.8-4.3-2.6-1-4.6-2.9-3.8-4.3.8-1.4 3.5-.6 5.6 1.1C9.6 5.1 10.4 2.5 12 2.5Z" /><circle cx="12" cy="12" r="2.3" /></svg>
+      <b>{name}</b>
+      <span className="lf-menu-gap" />
+      <LiveClock />
+    </div>
   );
 }
 
@@ -63,7 +67,7 @@ export function LofiHeader({ name, slots }: { name: string; slots: HeaderSlots }
     <>
       {slots.avatar && (
         <div className="lf-win lf-me">
-          <Bar name="me.webp" />
+          <Bar title="me" />
           <div className="lf-me-body">{slots.avatar}</div>
         </div>
       )}
@@ -72,54 +76,83 @@ export function LofiHeader({ name, slots }: { name: string; slots: HeaderSlots }
         {slots.bio && <div className="posy-bio">{slots.bio}</div>}
         {slots.caption && <p className="lf-status"><i aria-hidden />{slots.caption}</p>}
         {slots.socials}
-        <div className="lf-meta"><LiveClock /><Barcode seed={name} /></div>
       </div>
     </>
   );
 }
 
+function AppIcon({ tile, icon }: { tile: Tile; icon?: string }) {
+  const k = tileMeta(tile).kind;
+  const I = k === 'shop' ? ShoppingBag : k === 'newsletter' ? Mail : Globe;
+  return <span className="lf-app" aria-hidden>{icon ? <BrandIcon path={icon} size={26} /> : <I size={26} strokeWidth={1.6} />}</span>;
+}
+
+const ACTION: Record<string, string> = { newsletter: 'Subscribe', shop: 'Browse', repo: 'Star', link: 'Open' };
+
 export function LofiTile({ tile, index, editing }: { tile: Tile; index: number; editing?: boolean }) {
+  void index;
   const m = tileMeta(tile);
   const vid = tile.type === 'video' ? youtubeId(tile.url) : null;
-  const pic = tile.type === 'image' || (tile.type === 'link' && tile.size !== 's' && m.image);
+  const pic = tile.type === 'link' && tile.size !== 's' && m.image;
   return (
-    <div className={cn('lf-win', `lf-t-${tile.type}`)}>
-      <Bar name={fileName(tile, index)} />
+    <div className={cn('lf-win', `lf-t-${tile.type}`, `lf-k-${m.kind}`)}>
+      <Bar title={appName(tile)} />
       <div className="lf-body">
         {tile.type === 'text' && <p className="lf-note"><RichText text={tile.text} /></p>}
-        {vid && <div className="lf-img lf-vid"><VideoPlayer id={vid} title={tile.type === 'video' ? tile.title : undefined} editing={editing} thumb={tile.type === 'video' && tile.image ? asset(tile.image) : undefined} /></div>}
-        {pic && m.image && <Halftone src={m.image} className="lf-img" />}
+
+        {tile.type === 'image' && <>
+          <Halftone src={tile.src} className="lf-img" />
+          {tile.caption && <p className="lf-cap">{tile.caption}</p>}
+        </>}
+
+        {tile.type === 'video' && <>
+          {vid && <div className="lf-img lf-vid"><VideoPlayer id={vid} title={tile.title} editing={editing} thumb={tile.image ? asset(tile.image) : undefined} /></div>}
+        </>}
+
         {tile.type === 'music' && (
-          <div className="lf-track">
+          <div className="lf-player">
             {m.image ? <Halftone src={m.image} className="lf-cover" /> : <span className="lf-cover" />}
-            <span className="lf-play" aria-hidden><Play /></span>
+            <div className="lf-track">
+              <b>{m.title}</b>
+              <span>{m.sub}</span>
+              <span className="lf-progress" aria-hidden><i /></span>
+              <span className="lf-controls" aria-hidden><SkipBack /><span className="lf-play"><Play /></span><SkipForward /></span>
+            </div>
           </div>
         )}
-        {(tile.type === 'link' || tile.type === 'github' || tile.type === 'social') && !pic && (
-          <span className="lf-glyph" aria-hidden>{m.icon ? <BrandIcon path={m.icon} size={40} /> : (() => { const I = m.kind === 'shop' ? ShoppingBag : m.kind === 'newsletter' ? Mail : ArrowUpRight; return <I size={40} strokeWidth={1.4} />; })()}</span>
-        )}
-        {tile.type !== 'text' && tile.type !== 'image' && (
-          <div className="lf-text">
-            <b>{m.title}</b>
-            {tile.type === 'github'
-              ? <span>{tile.stars !== undefined && `★ ${compact(tile.stars)}`}{tile.language && ` · ${tile.language}`}</span>
-              : m.sub && m.sub !== m.title && <span>{m.sub}</span>}
+
+        {tile.type === 'github' && (
+          <div className="lf-term">
+            <p><span className="lf-ps">~ $</span> git clone {tile.repo}</p>
+            {tile.description && <p className="lf-out">{tile.description}</p>}
+            {(tile.stars !== undefined || tile.language) && <p className="lf-out">{tile.stars !== undefined && `★ ${compact(tile.stars)}`}{tile.stars !== undefined && tile.language && '  ·  '}{tile.language}</p>}
+            <p><span className="lf-ps">~ $</span> <i className="lf-caret" /></p>
           </div>
         )}
-        {tile.type === 'image' && tile.caption && <p className="lf-cap">{tile.caption}</p>}
+
+        {(tile.type === 'link' || tile.type === 'social') && (pic ? <>
+          <Halftone src={m.image!} className="lf-img" />
+          <div className="lf-text"><b>{m.title}</b>{m.sub && m.sub !== m.title && <span>{m.sub}</span>}</div>
+        </> : (
+          <div className="lf-page">
+            <AppIcon tile={tile} icon={m.icon} />
+            <div className="lf-text"><b>{m.title}</b>{m.sub && m.sub !== m.title && <span>{m.sub}</span>}</div>
+            <span className="lf-btn" aria-hidden>{tile.type === 'social' ? 'Follow' : ACTION[m.kind] ?? 'Open'}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
-export function LofiRow({ tile, index }: { tile: Tile; index: number }) {
+export function LofiRow({ tile }: { tile: Tile; index: number }) {
   const m = tileMeta(tile);
   if (tile.type === 'text') return <p className="lf-row-note"><RichText text={tile.text} /></p>;
   return (
     <div className="lf-line">
-      <span className="lf-file">{fileName(tile, index)}</span>
-      <b>{m.title}</b>
-      <span className="lf-open">open ↗</span>
+      {m.image ? <Halftone src={m.image} className="lf-line-pic" /> : <AppIcon tile={tile} icon={m.icon} />}
+      <span className="lf-line-text"><b>{m.title}</b><span>{appName(tile)}</span></span>
+      <ArrowUpRight className="lf-open" aria-hidden />
     </div>
   );
 }

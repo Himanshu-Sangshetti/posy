@@ -17,7 +17,7 @@ export function commitCanvas(changes: Record<string, Partial<Tile>>) {
   const { page, patchTiles } = useStudio.getState();
   if (!page) return;
   const patches: Record<string, Partial<Tile>> = {};
-  for (const p of placeTiles(canvasTiles(page))) if (!p.tile.pos) patches[p.tile.id] = { pos: p.pos };
+  for (const p of placeTiles(canvasTiles(page), page.theme.style === 'lofi')) if (!p.tile.pos) patches[p.tile.id] = { pos: p.pos };
   for (const [id, c] of Object.entries(changes)) patches[id] = { ...patches[id], ...c };
   patchTiles(patches);
 }
@@ -25,7 +25,7 @@ export function commitCanvas(changes: Record<string, Partial<Tile>>) {
 function current(id: string): { placed: Placed[]; me?: Placed } {
   const page = useStudio.getState().page;
   if (!page) return { placed: [] };
-  const placed = placeTiles(canvasTiles(page));
+  const placed = placeTiles(canvasTiles(page), page.theme.style === 'lofi');
   return { placed, me: placed.find(p => p.tile.id === id) };
 }
 

@@ -44,7 +44,7 @@ export function CanvasEditor({ page, renderTile, renderHeading, labelFor }: Prop
 
   const selectedId = useStudio(s => s.selected);
   const select = useStudio(s => s.select);
-  const placed = useMemo(() => placeTiles(canvasTiles(page)), [page]);
+  const placed = useMemo(() => placeTiles(canvasTiles(page), page.theme.style === 'lofi'), [page]);
   const [live, setLive] = useState<Live | null>(null);
   const shown = live ? placed.map(p => (p.tile.id === live.id ? { ...p, pos: live.pos } : p)) : placed;
   const selected = shown.find(p => p.tile.id === selectedId);
