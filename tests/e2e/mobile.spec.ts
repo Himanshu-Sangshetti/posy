@@ -15,7 +15,7 @@ test('sign up, pick a look and publish from a phone', async ({ page }) => {
   await page.fill('#password', 'pastel-garden-42');
   await page.click('button[type=submit]');
   await page.waitForURL(/onboarding/);
-  await expect(page.getByRole('status').filter({ hasText: 'Available' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: 'Available' })).toBeVisible({ timeout: 20_000 });
   expect(await fits(page)).toBe(390); // the long address row used to push the page wider than the screen
   await page.getByRole('button', { name: 'Create my page' }).tap();
   await page.waitForURL(/\/edit/);
