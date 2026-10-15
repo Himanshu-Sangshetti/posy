@@ -15,15 +15,15 @@ type StyleOpt = { id: string; label: string; note: string; preset: string; layou
 type Layout = 'bento' | 'list' | 'canvas';
 type ThemeOpt = { id: string; name: string; bg: string; accent: string; text: string; dark: boolean; locked: boolean };
 // Starter ids kept as data attributes so the choice is easy to script (the style's sample content).
-const STARTER: Record<string, string> = { cozy: 'desk', minimal: 'creator', washi: 'writer', lofi: 'night' };
+const STARTER: Record<string, string> = { cozy: 'desk', minimal: 'creator', washi: 'writer', lofi: 'night', press: 'press', gallery: 'gallery', painted: 'painted', night: 'neon' };
 
-export function Onboarding({ initialUsername, styles, themes, host }: { initialUsername: string; styles: StyleOpt[]; themes: ThemeOpt[]; host: string }) {
+export function Onboarding({ initialUsername, initialStyle = 'cozy', styles, themes, host }: { initialUsername: string; initialStyle?: string; styles: StyleOpt[]; themes: ThemeOpt[]; host: string }) {
   const router = useRouter();
   const [name, setName] = useState(initialUsername.toLowerCase());
   const [check, setCheck] = useState<{ ok: boolean; reason?: string } | null>(null);
-  const [style, setStyle] = useState('cozy');
-  const [layout, setLayout] = useState<Layout>(styles.find(x => x.id === 'cozy')?.layout ?? 'bento');
-  const [preset, setPreset] = useState(styles.find(x => x.id === 'cozy')?.preset ?? 'cream');
+  const [style, setStyle] = useState(initialStyle);
+  const [layout, setLayout] = useState<Layout>(styles.find(x => x.id === initialStyle)?.layout ?? 'bento');
+  const [preset, setPreset] = useState(styles.find(x => x.id === initialStyle)?.preset ?? 'cream');
   const [empty, setEmpty] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');

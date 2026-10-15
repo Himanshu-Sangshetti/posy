@@ -28,7 +28,11 @@ export function AuthForm({ mode, providers, host }: { mode: Mode; providers: { g
   const router = useRouter();
   const params = useSearchParams();
   const wanted = params.get('username') ?? '';
-  const next = mode === 'signup' ? `/onboarding${wanted ? `?username=${encodeURIComponent(wanted)}` : ''}` : '/edit';
+  // the look someone picked on the landing page carries through to onboarding
+  const carry = new URLSearchParams();
+  if (wanted) carry.set('username', wanted);
+  if (params.get('look')) carry.set('look', params.get('look')!);
+  const next = mode === 'signup' ? `/onboarding${carry.size ? `?${carry}` : ''}` : '/edit';
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [show, setShow] = useState(false);
