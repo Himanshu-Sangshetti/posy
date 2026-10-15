@@ -646,3 +646,12 @@ body.ac-body { background: var(--bg); font-family: var(--font-sans); }
 .posy-photos-mono :is(.posy-tile, .posy-obj):hover img { filter: none; }
 .posy-photos-dither :is(.posy-tile, .posy-avatar, .posy-obj) img:not(.posy-dith-on) { filter: grayscale(1) contrast(1.15); }
 .posy-dith { position: absolute; z-index: 0; pointer-events: none; image-rendering: pixelated; border-radius: inherit; }
+
+/* ---- Desk by a window: afternoon light through leaves falls across the desk and everything on it, swaying slowly ---- */
+.dk-sun { position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; mix-blend-mode: multiply; }
+.posy-contained .dk-sun { position: absolute; }
+.dk-sun i { position: absolute; inset: -5%; background: url(/looks/desk/leaves.jpg) 70% 30% / cover no-repeat; opacity: .62; transform-origin: 80% -10%; }
+.dk-sun::before { content: ""; position: absolute; inset: 0; z-index: 1; background: radial-gradient(70% 60% at 12% 4%, rgb(255 236 205 / 0), rgb(255 226 190 / .22) 70%, rgb(238 214 186 / .32)); }
+.posy-motion .dk-sun i { animation: dk-sway 11s ease-in-out infinite alternate; }
+@keyframes dk-sway { 0% { transform: rotate(-.7deg) translate3d(-.8%, 0, 0) skewX(-1.2deg); } 55% { transform: rotate(.3deg) translate3d(.2%, .3%, 0) skewX(.4deg); } 100% { transform: rotate(.9deg) translate3d(.9%, .5%, 0) skewX(1.4deg); } }
+@media (prefers-reduced-motion: reduce) { .dk-sun i { animation: none !important; } }

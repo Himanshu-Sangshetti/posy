@@ -58,6 +58,7 @@ export function PageFrame({ page, children, profile, className, interactive = tr
           </footer>
         )}
       </MotionProvider>
+      {page.theme.style === 'cozy' && !isDark(page) && <div aria-hidden className="dk-sun"><i /></div>}
       {interactive && fx && <TileEffects />}
       {interactive && photoLook(page) === 'dither' && <DitherPhotos />}
     </div>

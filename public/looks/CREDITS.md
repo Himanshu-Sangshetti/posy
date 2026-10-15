@@ -12,6 +12,7 @@ Everything here is public domain or CC0, so it can be used and redistributed fre
 | washi/wave.jpg | Katsushika Hokusai, *Under the Wave off Kanagawa*, 1830/33 | Art Institute of Chicago, 24645 | CC0 (public domain) |
 | washi/seal.png, washi/seal-grain.png | Frame and ink grain of the publisher's seal on Hiroshige's *Snow at Benzaiten Shrine* (characters removed) | Art Institute of Chicago, 19040 | CC0 (public domain) |
 | washi/paper.jpg | Paper 002 | ambientCG | CC0 |
+| Washi patterns (seigaiha, asanoha, kikko) | Traditional Japanese motifs drawn as SVG in washi.css | — | Public domain motifs |
 | desk/paper.jpg | Paper 001 | ambientCG | CC0 |
 | desk/oak.jpg | Wood 094 | ambientCG | CC0 |
 | desk/walnut.jpg | Wood 051 | ambientCG | CC0 |
@@ -25,3 +26,4 @@ Made for Posy with Krea 2 Turbo (open weights, Krea 2 Community License; Krea cl
 | lofi/room-night.jpg | A 90s anime bedroom at night, rain on the window (Lofi, Night palette) |
 | lofi/room-violet.jpg | A rooftop room at dusk, fairy lights and a sleeping cat (Lofi, Violet hour palette) |
 | lofi/train-sunset.jpg | An empty train carriage at sunset by the sea (Lofi, Last train palette) |
+| desk/leaves.jpg | Afternoon light through leaves on a white wall, turned into a shadow map (Desk) |
