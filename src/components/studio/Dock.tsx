@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Plus, Palette, Monitor, Smartphone, Undo2, Redo2, Type, Heading, ImagePlus, Link2, CornerDownLeft } from 'lucide-react';
+import { Plus, Palette, Monitor, Smartphone, Undo2, Redo2, Type, Heading, ImagePlus, Link2, CornerDownLeft, Music2, Play, FolderGit2, AtSign } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Page, Tile } from '@/lib/schema';
 import { newId } from '@/lib/schema';
@@ -49,13 +49,22 @@ export const newSection = (): Tile => ({ id: newId(), type: 'heading', text: 'Ne
 export const newLink = (): Tile => ({ id: newId(), type: 'link', url: 'https://example.com', title: 'My link', size: 's', color: 'auto' });
 
 const KINDS = [
-  { label: 'Note', icon: Type, tint: 'var(--brand-butter)', make: newNote },
-  { label: 'Section', icon: Heading, tint: 'var(--brand-sky)', make: newSection },
-  { label: 'Link', icon: Link2, tint: 'var(--brand-mint)', make: newLink },
+  { label: 'Note', icon: Type, tint: '#fbe9a6', make: newNote },
+  { label: 'Section', icon: Heading, tint: '#e3e8f6', make: newSection },
+  { label: 'Link', icon: Link2, tint: '#dcefd8', make: newLink },
+] as const;
+/** Kinds that start from a link: picking one asks for that kind of link. */
+const FROM_LINK = [
+  { label: 'Music', icon: Music2, tint: '#d9f2e2', hint: 'Paste a Spotify, Apple Music or SoundCloud link' },
+  { label: 'Video', icon: Play, tint: '#fbdcd4', hint: 'Paste a YouTube link' },
+  { label: 'Repo', icon: FolderGit2, tint: '#e8e4f4', hint: 'Paste a GitHub repo, like github.com/you/project' },
+  { label: 'Social', icon: AtSign, tint: '#f6e3f0', hint: 'Paste your Instagram, X, TikTok… profile link' },
 ] as const;
 
 function AddPanel({ add, close }: { add: (t: Tile) => void; close: () => void }) {
   const [value, setValue] = useState('');
+  const [hint, setHint] = useState('Paste a link, an email, or write a note');
+  const input = useRef<HTMLInputElement>(null);
   const file = useRef<HTMLInputElement>(null);
   const quick = (t: Tile) => { add(t); close(); };
   const submit = () => { if (!value.trim()) return; add(tileFromInput(value)); setValue(''); close(); };
@@ -65,21 +74,26 @@ function AddPanel({ add, close }: { add: (t: Tile) => void; close: () => void })
       <div className="grid gap-1.5">
         <p className="sc-eyebrow">Paste anything</p>
         <div className="relative">
-          <Input autoFocus value={value} onChange={e => setValue(e.target.value)} onKeyDown={e => e.key === 'Enter' && submit()}
-            placeholder="Paste a link, an email, or write a note" className="h-11 rounded-[12px] border-[var(--line)] bg-[var(--bg)] pr-11 text-[14.5px] shadow-none focus-visible:border-[var(--sc-deep)] focus-visible:ring-[var(--sc-on)]" />
+          <Input ref={input} autoFocus value={value} onChange={e => setValue(e.target.value)} onKeyDown={e => e.key === 'Enter' && submit()}
+            placeholder={hint} className="h-11 rounded-[12px] border-[var(--line)] bg-[var(--bg)] pr-11 text-[14.5px] shadow-none focus-visible:border-[var(--sc-deep)] focus-visible:ring-[var(--sc-on)]" />
           <span className="sc-kbd pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2"><CornerDownLeft className="size-3" /></span>
         </div>
       </div>
       <div className="grid gap-1.5">
         <p className="sc-eyebrow">Or start with</p>
         <div className="grid grid-cols-4 gap-1">
+          {FROM_LINK.map(({ label, icon: Icon, tint, hint: h }) => (
+            <button key={label} type="button" onClick={() => { setHint(h); input.current?.focus(); }} className={chip}>
+              <span className="grid size-10 place-items-center rounded-[12px]" style={{ background: tint }}><Icon className="size-[18px]" /></span>{label}
+            </button>
+          ))}
           {KINDS.map(({ label, icon: Icon, tint, make }) => (
             <button key={label} type="button" onClick={() => quick(make())} className={chip}>
               <span className="grid size-10 place-items-center rounded-[12px]" style={{ background: tint }}><Icon className="size-[18px]" /></span>{label}
             </button>
           ))}
           <button type="button" onClick={() => file.current?.click()} className={chip}>
-            <span className="grid size-10 place-items-center rounded-[12px]" style={{ background: 'var(--brand-rose)' }}><ImagePlus className="size-[18px]" /></span>Image
+            <span className="grid size-10 place-items-center rounded-[12px]" style={{ background: '#f6dfd6' }}><ImagePlus className="size-[18px]" /></span>Image
           </button>
         </div>
       </div>
@@ -101,10 +115,10 @@ export function Dock({ device, setDevice, add, designOpen, onDesign, addOpen, se
   const canRedo = useHistory(s => s.futureStates.length > 0);
   return (
     <div className={cn('pointer-events-none fixed inset-x-0 bottom-5 z-40 flex justify-center px-3 transition-[padding] duration-300', designOpen && 'sm:pr-[392px] max-sm:hidden')} onClick={e => e.stopPropagation()}>
-      <div className={cn(CHROME, 'sc-float pointer-events-auto flex items-center gap-1 rounded-[18px] p-1.5')}>
+      <div className={cn(CHROME, 'sc-float sc-dock pointer-events-auto flex items-center gap-1 rounded-full p-1.5')}>
         <Popover open={addOpen} onOpenChange={setAddOpen}>
           <PopoverTrigger asChild>
-            <Button type="button" aria-label="Add" className="h-10 gap-1.5 rounded-[12px] bg-[var(--text)] pl-3 pr-3.5 text-[14px] text-[var(--surface)] shadow-[0_6px_16px_-8px_rgb(22_20_15/.7)] hover:bg-[#3a3248] active:scale-[.97]">
+            <Button type="button" aria-label="Add" className="sc-add h-11 gap-1.5 rounded-full pl-3.5 pr-4 text-[14.5px] active:scale-[.96]">
               <Plus className="size-[18px]" />Add
             </Button>
           </PopoverTrigger>

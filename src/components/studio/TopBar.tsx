@@ -1,5 +1,6 @@
 'use client';
 
+import { AppTabs } from '@/components/dash/AppTabs';
 import Link from 'next/link';
 import { useState } from 'react';
 import { ArrowUpRight, BarChart3, Bot, Check, ChevronDown, Command, Copy, Loader2, LogOut, PenLine, Send, Settings } from 'lucide-react';
@@ -46,7 +47,8 @@ export function NavMenu({ username, site, current }: { username: string; site: s
   );
 }
 
-export function TopBar({ username, site, saveState, unpublished, publishing, onPublish, onShare, onCommand }: {
+export function TopBar({ username, site, saveState, unpublished, publishing, onPublish, onShare, onCommand, extra }: {
+  extra?: { href: string; label: string }[];
   username: string; site: string; saveState: SaveState; unpublished: boolean; publishing: boolean;
   onPublish: () => void; onShare: () => void; onCommand: () => void;
 }) {
@@ -62,8 +64,8 @@ export function TopBar({ username, site, saveState, unpublished, publishing, onP
     <header onClick={e => e.stopPropagation()} className={cn(CHROME, 'sc-bar fixed inset-x-0 top-0 z-40 grid h-14 grid-cols-[1fr_auto_1fr] items-center gap-3 px-3 sm:px-4')}>
       <div className="flex items-center gap-1">
         <NavMenu username={username} site={site} current="/edit" />
-        <span className="mx-1 hidden h-4 w-px bg-[var(--line)] sm:block" />
-        <span className="sc-title hidden text-[19px] leading-none sm:block">Editor</span>
+        <AppTabs extra={extra} className="ml-1 hidden lg:inline-flex" />
+        <span className="sc-title ml-1 text-[19px] leading-none lg:hidden">Editor</span>
       </div>
 
       <div className="hidden items-center gap-0.5 rounded-full border border-[var(--line)] bg-[var(--surface)] py-0.5 pl-3.5 pr-0.5 text-[13px] sm:flex">
@@ -95,8 +97,8 @@ export function TopBar({ username, site, saveState, unpublished, publishing, onP
           <Send className="size-3.5" /><span className="hidden sm:inline">Share</span>
         </Button>
         <Button type="button" data-publish onClick={onPublish} disabled={!unpublished || publishing || saveState !== 'saved'}
-          className="h-9 gap-1.5 rounded-[10px] bg-[var(--text)] px-4 text-[13.5px] text-[var(--surface)] shadow-[0_6px_16px_-8px_rgb(22_20_15/.7)] hover:bg-[#3a3248] disabled:opacity-100 disabled:shadow-none disabled:bg-[var(--sc-on)] disabled:text-[var(--muted)]">
-          {publishing && <Loader2 className="size-3.5 animate-spin" />}Publish
+          className={cn('sc-publish h-9 gap-1.5 rounded-full px-4 text-[13.5px] disabled:opacity-100', unpublished && 'is-ready')}>
+          {publishing ? <Loader2 className="size-3.5 animate-spin" /> : unpublished ? <span className="sc-publish-dot" aria-hidden /> : <Check className="size-3.5" />}{unpublished ? 'Publish' : 'Published'}
         </Button>
       </div>
     </header>

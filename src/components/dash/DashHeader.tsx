@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { ArrowUpRight, BarChart3, Bot, LogOut, PenLine, Settings } from 'lucide-react';
 import { signOut } from '@/lib/auth-client';
 import { Logo } from '@/components/brand';
+import { AppTabs } from './AppTabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -17,12 +18,8 @@ export function DashHeader({ username, email, site, extra = [] }: { username: st
   return (
     <header className="ac-head">
       <div className="mx-auto flex w-full max-w-[1040px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-3 sm:px-8">
-        <Link href="/edit" aria-label="Posy editor" className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"><Logo /></Link>
-        <nav aria-label="Sections" className="ac-seg order-3 w-full justify-between overflow-x-auto sm:order-none sm:w-auto sm:justify-start">
-          {[...TABS.map(([h, l]) => [h, l] as const), ...extra.map(e => [e.href, e.label] as const)].map(([href, label]) => (
-            <Link key={href} href={href} aria-current={path === href ? 'page' : undefined}>{label}</Link>
-          ))}
-        </nav>
+        <Link href="/" aria-label="Posy home" className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"><Logo /></Link>
+        <AppTabs extra={extra} className="order-3 w-full justify-between overflow-x-auto sm:order-none sm:w-auto sm:justify-start" />
         <div className="flex items-center gap-1.5">
           <TooltipProvider delayDuration={200}>
             <Tooltip>

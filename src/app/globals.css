@@ -715,3 +715,24 @@ body.ac-body { background: var(--bg); font-family: var(--font-sans); }
 @keyframes ob-art { from { opacity: 0; transform: translateY(18px) rotate(1.5deg) scale(.97); } }
 @media (max-width: 860px) { .ob-hero { grid-template-columns: 1fr; } .ob-hero-art { order: -1; aspect-ratio: 16 / 9; } }
 .au-login .au-frame .ps-pic { left: auto; right: 0; translate: 0 -50%; }
+
+/* ---- the app's section tabs (editor + dashboard) ---- */
+.app-tabs { display: inline-flex; gap: 2px; padding: 4px; border-radius: 999px; background: rgb(21 20 26 / .05); }
+.app-tabs a { position: relative; display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 999px; font-size: 14px; font-weight: 500; color: #62626e; transition: color .2s; outline: none; white-space: nowrap; }
+.app-tabs a:hover, .app-tabs a[aria-current="page"] { color: #15141a; }
+.app-tabs a:focus-visible { box-shadow: 0 0 0 2px rgb(228 87 46 / .45); }
+.app-tab-on { position: absolute; inset: 0; border-radius: 999px; background: #fff; box-shadow: 0 1px 2px rgb(21 20 26 / .08), 0 4px 12px -6px rgb(21 20 26 / .25); }
+
+/* ---- editor: the dock and the publish button ---- */
+.sc-dock { box-shadow: 0 1px 1px rgb(21 20 26 / .04), 0 24px 50px -20px rgb(21 20 26 / .35), 0 0 0 1px rgb(21 20 26 / .06) !important; animation: sc-dock-in .7s cubic-bezier(.2,1.2,.3,1) both; }
+@keyframes sc-dock-in { from { transform: translateY(30px) scale(.94); opacity: 0; } }
+.sc-dock button { transition: transform .25s cubic-bezier(.2,1.6,.4,1), background .2s, color .2s; }
+.sc-dock button:not(:disabled):hover { transform: translateY(-2px); }
+.sc-add { background: #e4572e !important; color: #fff !important; box-shadow: 0 8px 20px -8px rgb(228 87 46 / .8) !important; }
+.sc-add:hover { background: #d24a23 !important; }
+.sc-publish { background: #f1f1f4 !important; color: #62626e !important; box-shadow: none; }
+.sc-publish.is-ready { background: #15141a !important; color: #fff !important; box-shadow: 0 8px 20px -10px rgb(21 20 26 / .8); }
+.sc-publish.is-ready:hover { background: #e4572e !important; }
+.sc-publish-dot { width: 7px; height: 7px; border-radius: 50%; background: #e4572e; box-shadow: 0 0 0 0 rgb(228 87 46 / .6); animation: sc-ping 1.6s ease-out infinite; }
+.sc-publish.is-ready:hover .sc-publish-dot { background: #fff; }
+@keyframes sc-ping { to { box-shadow: 0 0 0 8px rgb(228 87 46 / 0); } }

@@ -30,7 +30,7 @@ const typing = () => {
   return !!el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
 };
 
-export type StudioInit = { page: Page; version: number; username: string; hasUnpublished: boolean; site: string; entitlements: Entitlements };
+export type StudioInit = { page: Page; version: number; username: string; hasUnpublished: boolean; site: string; entitlements: Entitlements; nav?: { href: string; label: string }[] };
 
 export function Studio({ init }: { init: StudioInit }) {
   const router = useRouter();
@@ -179,7 +179,7 @@ export function Studio({ init }: { init: StudioInit }) {
     <TooltipProvider delayDuration={300}>
       <div onClick={() => useStudio.getState().select(null)} className={cn('min-h-dvh', isDark(page) && 'dark')}
         style={{ ...pageStyle(page), background: device === 'mobile' ? 'color-mix(in oklab, var(--bg) 82%, var(--text))' : undefined }}>
-        <TopBar username={init.username} site={init.site} saveState={saveState} unpublished={unpublished} publishing={publishing}
+        <TopBar extra={init.nav} username={init.username} site={init.site} saveState={saveState} unpublished={unpublished} publishing={publishing}
           onPublish={doPublish} onShare={() => setShareOpen(true)} onCommand={() => setCmdOpen(true)} />
         <div className={cn('transition-[padding] duration-300', designOpen && 'sm:pr-[380px]')}>
           {device === 'desktop' ? <div className="pt-14">{canvas}</div> : (
