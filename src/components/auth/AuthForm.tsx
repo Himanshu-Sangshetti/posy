@@ -38,13 +38,14 @@ export function AuthForm({ mode, providers, host }: { mode: Mode; providers: { g
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setBusy(true); setError('');
-    const f = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const f = new FormData(form);
     const email = String(f.get('email')), password = String(f.get('password'));
     const res = mode === 'signup'
       ? await signUp.email({ email, password, name: String(f.get('name') || email.split('@')[0]) })
       : await signIn.email({ email, password });
     if (res.error) { const m = res.error.message ?? 'Something went wrong'; setError(m); toast.error(m); setBusy(false); return; }
-    launchKite(e.currentTarget.querySelector('button[type=submit]'));
+    launchKite(form.querySelector('button[type=submit]'));
     await new Promise(r => setTimeout(r, 900));
     router.push(next);
     router.refresh();
