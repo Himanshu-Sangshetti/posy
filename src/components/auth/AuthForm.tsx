@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
 import { Eye, EyeOff, Loader2, TriangleAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { signIn, signUp } from '@/lib/auth-client';
@@ -24,9 +24,10 @@ function Social({ provider, label, path, next, ready = true }: { provider: 'gith
   );
 }
 
-export function AuthForm({ mode, providers, host }: { mode: Mode; providers: { github: boolean; google: boolean; googleReady?: boolean }; host: string }) {
+/** `query` is the page's query string, read on the server, so the form renders with the page instead of after the browser has loaded the scripts. */
+export function AuthForm({ mode, providers, host, query = '' }: { mode: Mode; providers: { github: boolean; google: boolean; googleReady?: boolean }; host: string; query?: string }) {
   const router = useRouter();
-  const params = useSearchParams();
+  const params = useMemo(() => new URLSearchParams(query), [query]);
   const wanted = params.get('username') ?? '';
   // the look someone picked on the landing page carries through to onboarding
   const carry = new URLSearchParams();

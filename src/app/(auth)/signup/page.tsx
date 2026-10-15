@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { AuthForm } from '@/components/auth/AuthForm';
@@ -9,7 +8,8 @@ import { edition } from '@/edition';
 
 export const metadata: Metadata = { title: 'Sign up · Posy' };
 
-export default async function SignupPage() {
+export default async function SignupPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   if (await currentUser()) redirect('/edit');
-  return <Suspense><AuthForm mode="signup" host={SITE_HOST()} providers={{ ...providers, google: providers.google || edition.id === 'cloud', googleReady: providers.google }} /></Suspense>;
+  const query = new URLSearchParams(Object.entries(await searchParams).flatMap(([k, v]) => (Array.isArray(v) ? v : v === undefined ? [] : [v]).map(x => [k, x] as [string, string]))).toString();
+  return <AuthForm mode="signup" host={SITE_HOST()} query={query} providers={{ ...providers, google: providers.google || edition.id === 'cloud', googleReady: providers.google }} />;
 }

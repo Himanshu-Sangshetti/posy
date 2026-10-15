@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Check, Copy, Loader2, TriangleAlert, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { PageView } from '@/components/page/PageView';
@@ -14,9 +14,9 @@ import { BriefError, briefFromQuery, briefPrompt, briefToPage, decodeBrief, extr
 const KEY = 'posy:brief';
 
 /** Paste or upload a Posy page file, preview it, and make it yours. Also finishes the job after sign-up (?finish=1). */
-export function NewFromFile({ signedIn, hasPage, site }: { signedIn: boolean; hasPage: boolean; site: string }) {
+export function NewFromFile({ signedIn, hasPage, site, query = '' }: { signedIn: boolean; hasPage: boolean; site: string; query?: string }) {
   const router = useRouter();
-  const params = useSearchParams();
+  const params = useMemo(() => new URLSearchParams(query), [query]);
   const finish = params.get('finish') === '1';
   const [text, setText] = useState('');
   const [username, setUsername] = useState(params.get('username') ?? '');

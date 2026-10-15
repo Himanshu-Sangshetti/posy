@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { currentUser } from '@/lib/session';
 import { pageForUser } from '@/lib/pages';
@@ -12,8 +11,9 @@ export const metadata: Metadata = {
 };
 
 /** Load a Posy page file (written by any chat, or exported from another Posy). Public: nobody needs an account to preview. */
-export default async function NewPage() {
+export default async function NewPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const user = await currentUser();
   const hasPage = user ? !!(await pageForUser(user.id)) : false;
-  return <Suspense><NewFromFile signedIn={!!user} hasPage={hasPage} site={siteUrl()} /></Suspense>;
+  const query = new URLSearchParams(Object.entries(await searchParams).flatMap(([k, v]) => (Array.isArray(v) ? v : v === undefined ? [] : [v]).map(x => [k, x] as [string, string]))).toString();
+  return <NewFromFile signedIn={!!user} hasPage={hasPage} site={siteUrl()} query={query} />;
 }
