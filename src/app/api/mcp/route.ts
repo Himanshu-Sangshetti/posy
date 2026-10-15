@@ -1,7 +1,9 @@
 // Hosted MCP server: lets Claude, Cursor, Codex & co. edit a Posy page with the user's API key.
 import { createMcpHandler, withMcpAuth } from 'mcp-handler';
 import { z } from 'zod';
+import { createLocalJWKSet, jwtVerify } from 'jose';
 import { auth } from '@/lib/auth';
+import { siteUrl } from '@/lib/site';
 import { getState, createPageFor, addTiles, addTile, updateTile, removeTile, moveTile, setTheme, setProfile, publishPage } from '@/lib/page-ops';
 import { SIZES, COLORS, FONTS, RADII, LAYOUTS, ALIGNS, BACKGROUNDS, TILE_STYLES, EFFECTS, AVATARS, PHOTO_LOOKS } from '@/lib/schema';
 import { THEME_IDS } from '@/lib/themes';
@@ -121,12 +123,25 @@ const handler = createMcpHandler(server => {
   }, run(async () => ({ themes: THEME_IDS, fonts: FONTS, radius: RADII, layouts: LAYOUTS, align: ALIGNS, backgrounds: BACKGROUNDS, tileStyles: TILE_STYLES, effects: EFFECTS, avatars: AVATARS, photos: PHOTO_LOOKS, sizes: SIZES, colors: COLORS, platforms: PLATFORM_IDS })));
 }, { serverInfo: { name: 'posy', version: '2.0.0' }, instructions: INSTRUCTIONS });
 
+const RESOURCE = () => `${siteUrl()}/api/mcp`;
+
+// One endpoint, two kinds of bearer: "posy_…" API keys, and OAuth access tokens (JWTs) from claude.ai, ChatGPT, Cursor …
 const verify = async (_req: Request, token?: string) => {
   if (!token) return undefined;
-  const r = await auth.api.verifyApiKey({ body: { key: token } }).catch(() => null);
-  if (!r?.valid || !r.key) return undefined;
-  return { token, clientId: r.key.id, scopes: ['page:write'], extra: { userId: r.key.referenceId } };
+  if (token.startsWith('posy_')) {
+    const r = await auth.api.verifyApiKey({ body: { key: token } }).catch(() => null);
+    if (!r?.valid || !r.key) return undefined;
+    return { token, clientId: r.key.id, scopes: ['page:write'], extra: { userId: r.key.referenceId } };
+  }
+  try {
+    const { baseURL } = await auth.$context;
+    const jwks = createLocalJWKSet(await auth.api.getJwks());
+    const { payload } = await jwtVerify(token, jwks, { issuer: baseURL, audience: RESOURCE() });
+    const scopes = String(payload.scope ?? '').split(' ').filter(Boolean);
+    if (!payload.sub) return undefined;
+    return { token, clientId: String(payload.azp ?? payload.client_id ?? 'oauth'), scopes, expiresAt: payload.exp, extra: { userId: payload.sub } };
+  } catch { return undefined; }
 };
 
-const authed = withMcpAuth(handler, verify, { required: true });
+const authed = withMcpAuth(handler, verify, { required: true, resourceUrl: siteUrl() });
 export { authed as GET, authed as POST, authed as DELETE };

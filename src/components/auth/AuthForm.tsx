@@ -32,6 +32,8 @@ export function AuthForm({ mode, providers, host }: { mode: Mode; providers: { g
   const carry = new URLSearchParams();
   if (wanted) carry.set('username', wanted);
   if (params.get('look')) carry.set('look', params.get('look')!);
+  // Arrived from an AI app's connect flow: Better Auth sends the browser back to it after sign-in, so don't go to /edit.
+  const oauth = params.has('sig');
   const next = mode === 'signup' ? `/onboarding${carry.size ? `?${carry}` : ''}` : '/edit';
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -51,6 +53,7 @@ export function AuthForm({ mode, providers, host }: { mode: Mode; providers: { g
     if (res.error) { const m = res.error.message ?? 'Something went wrong'; setError(m); toast.error(m); setBusy(false); return; }
     launchKite(form.querySelector('button[type=submit]'));
     await new Promise(r => setTimeout(r, 900));
+    if (oauth) return; // the OAuth redirect is already on its way
     router.push(next);
     router.refresh();
   }
