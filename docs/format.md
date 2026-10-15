@@ -9,6 +9,16 @@ at [`/new`](/new), in the editor (Import), or through the API. No connector or a
 2. Paste the prompt into your chat and answer its questions (name, bio, links, vibe).
 3. Paste the JSON it returns back into the box on `/new`. Check the preview, then **Make it mine**.
 
+## The one-link way
+
+An agent that can only write text can hand over a normal link. No JSON, no encoding:
+
+```
+/new?name=Mira%20Sol&bio=Illustrator&links=https://github.com/mira,hi@mira.so,mira/atlas
+```
+
+It opens a live preview, and one button makes the page yours. Fields: `name`, `bio`, `links` (comma-separated URLs, emails or `owner/repo`), `username`, `look`, `theme`, `layout`, `location`, `avatar`.
+
 ## The brief
 
 ```json

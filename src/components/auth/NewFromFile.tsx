@@ -9,7 +9,7 @@ import { PageView } from '@/components/page/PageView';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { BriefError, briefPrompt, briefToPage, decodeBrief, extractJson, type BriefResult } from '@/lib/brief';
+import { BriefError, briefFromQuery, briefPrompt, briefToPage, decodeBrief, extractJson, usernameFromName, type BriefResult } from '@/lib/brief';
 
 const KEY = 'posy:brief';
 
@@ -30,9 +30,12 @@ export function NewFromFile({ signedIn, hasPage, site }: { signedIn: boolean; ha
     try {
       const h = window.location.hash.match(/^#p=(.+)$/);
       if (h) { setText(JSON.stringify(decodeBrief(h[1]), null, 2)); return; }
+      const fromQuery = briefFromQuery(params);
+      if (fromQuery) { setText(JSON.stringify(fromQuery, null, 2)); return; }
       const saved = localStorage.getItem(KEY);
       if (saved && (finish || signedIn)) setText(saved);
     } catch { /* a bad link just starts empty */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finish, signedIn]);
 
   const read = useMemo((): { ok: true; r: BriefResult } | { ok: false; error: string } | null => {
@@ -42,7 +45,8 @@ export function NewFromFile({ signedIn, hasPage, site }: { signedIn: boolean; ha
   }, [text]);
   const parsed = read?.ok ? read.r : null;
 
-  useEffect(() => { if (parsed?.username && !username) setUsername(parsed.username); }, [parsed, username]);
+  // an address is suggested from the name, so nobody has to think of one
+  useEffect(() => { if (parsed && !username) setUsername(parsed.username ?? usernameFromName(parsed.page.profile.name)); }, [parsed, username]);
 
   const host = site.replace(/^https?:\/\//, '');
   async function copyPrompt() {

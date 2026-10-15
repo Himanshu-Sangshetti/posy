@@ -172,6 +172,25 @@ test.describe('the Posy page file', () => {
     expect(d.page.tiles.map((t: { type: string }) => t.type)).toEqual(['heading', 'social', 'social', 'text']);
   });
 
+  test('one plain link from a chat opens a preview with an address already suggested, and signing up finishes it', async ({ page }) => {
+    const name = `Quinn ${Date.now().toString(36)}`;
+    await page.goto(`/new?name=${encodeURIComponent(name)}&bio=Hello&links=https://github.com/octocat,hi@example.com`);
+    await expect(page.getByText(name).first()).toBeVisible();
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    await expect(page.getByLabel('Your address')).toHaveValue(slug);
+    await page.getByRole('button', { name: 'Make it mine' }).click();
+    await page.waitForURL(/signup\?draft=1/);
+    await page.fill('#email', `${slug}@example.com`);
+    await page.fill('#password', 'pastel-garden-42');
+    await page.click('button[type=submit]');
+    await page.waitForURL(/\/new\?finish=1/);
+    await page.getByRole('button', { name: 'Create my page' }).click();
+    await page.waitForURL(/\/edit/);
+    const d = await (await page.request.get('/api/v1/page')).json();
+    expect(d.username).toBe(slug);
+    expect(d.page.tiles).toHaveLength(2);
+  });
+
   test('the import API and MCP tool create a page from a file, and refuse to overwrite without replace', async ({ request }) => {
     const { id } = await signUp(request);
     const key = (await (await request.post('/api/auth/api-key/create', { data: { name: 't' }, headers: { origin: SITE } })).json()).key as string;

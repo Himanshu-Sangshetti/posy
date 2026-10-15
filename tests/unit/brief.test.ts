@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readBrief, briefToPage, extractJson, encodeBrief, decodeBrief, briefPrompt, BriefError } from '@/lib/brief';
+import { briefFromQuery, usernameFromName, readBrief, briefToPage, extractJson, encodeBrief, decodeBrief, briefPrompt, BriefError } from '@/lib/brief';
 import { STYLE_IDS } from '@/lib/styles';
 
 const brief = { posy: 1, username: 'mira', name: 'Mira Sol', bio: 'Illustrator', look: STYLE_IDS[0], links: [{ heading: 'Find me' }, 'https://github.com/mira', 'mira/atlas', 'hi@mira.so', { url: 'https://mira.so', title: 'Portfolio', size: 'w' }, { text: 'Open for work' }] };
@@ -55,5 +55,19 @@ describe('brief', () => {
 
   it('extractJson ignores a line comment', () => {
     expect(extractJson('{ "name": "a", // note\n "links": [] }')).toEqual({ name: 'a', links: [] });
+  });
+
+  it('builds a page from a plain link, with no encoding', () => {
+    const q = new URLSearchParams('name=Mira%20Sol&bio=Illustrator&links=https://github.com/mira,hi@mira.so%20mira/atlas&link=https://mira.so');
+    const { page, warnings } = briefToPage(briefFromQuery(q));
+    expect(warnings).toEqual([]);
+    expect(page.profile).toMatchObject({ name: 'Mira Sol', bio: 'Illustrator' });
+    expect(page.tiles.map(t => t.type)).toEqual(['social', 'social', 'github', 'link']);
+    expect(briefFromQuery(new URLSearchParams('utm_source=x'))).toBeNull();
+  });
+
+  it('suggests an address from a name', () => {
+    expect(usernameFromName('Mira Sol')).toBe('mira-sol');
+    expect(usernameFromName('  José Ñandú! ')).toBe('jose-nandu');
   });
 });

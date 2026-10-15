@@ -9,11 +9,12 @@ export function GET() {
 > Posy is an open-source link-in-bio page builder (a Linktree alternative). A page is one JSON document with a public schema, and AI assistants can make and edit pages.
 
 ## To make someone a Posy page (no account, no tools needed)
-Write the page as a short JSON "brief" and give the user this link, which opens a live preview they can keep:
+Give the user ONE link. It opens a live preview of their page, and one button makes it theirs. No encoding needed, just a normal URL:
 
-  ${s}/new#p=<base64url of the JSON>
+  ${s}/new?name=Mira%20Sol&bio=Illustrator&links=https://github.com/mira,hi@mira.so,mira/atlas
 
-Or ask them to paste the JSON at ${s}/new. Brief format (full spec: ${s}/docs/format):
+Query fields: name, bio, links (comma-separated URLs, emails, owner/repo), username, look, theme, layout, location, avatar. URL-encode spaces as %20.
+For longer pages use a JSON brief at ${s}/new#p=<base64url of the JSON>, or ask them to paste the JSON at ${s}/new. Brief format (full spec: ${s}/docs/format):
 
   {"posy":1,"name":"Mira Sol","bio":"Illustrator","look":"${STYLE_IDS[0]}","links":[{"heading":"Find me"},"https://github.com/mira","hi@mira.so",{"text":"Open for work"}]}
 

@@ -123,6 +123,23 @@ export function briefToPage(input: unknown): BriefResult {
 /** Everything in one: text from a chat → page. Throws BriefError with a message a person can act on. */
 export const readBrief = (text: string) => briefToPage(extractJson(text));
 
+/**
+ * The simplest link a chat can write, with no encoding at all:
+ *   /new?name=Mira&bio=Illustrator&links=https://github.com/mira,hi@mira.so,mira/atlas
+ * `links` may be separated by commas, spaces or newlines, or repeated (`&link=…&link=…`). Also: username, look, theme, layout, avatar, location.
+ * Returns null when the query holds no page.
+ */
+export function briefFromQuery(q: URLSearchParams): object | null {
+  const links = [...q.getAll('links'), ...q.getAll('link')].flatMap(v => v.split(/[\s,]+/)).map(v => v.trim()).filter(Boolean);
+  const name = q.get('name')?.trim();
+  if (!name && !links.length) return null;
+  const pick = (k: string) => q.get(k)?.trim() || undefined;
+  return { posy: 1, name: name || 'My page', bio: pick('bio'), username: pick('username'), look: pick('look'), theme: pick('theme'), layout: pick('layout'), avatar: pick('avatar'), location: pick('location'), links };
+}
+
+/** A friendly address from a name: "Mira Sol" becomes "mira-sol". */
+export const usernameFromName = (name: string) => name.trim().toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 30);
+
 /** Compact, URL-safe encoding for /new#p=… */
 export const encodeBrief = (brief: object) => btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(brief)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 export function decodeBrief(hash: string): unknown {
