@@ -34,7 +34,9 @@ export function AuthForm({ mode, providers, host }: { mode: Mode; providers: { g
   if (params.get('look')) carry.set('look', params.get('look')!);
   // Arrived from an AI app's connect flow: Better Auth sends the browser back to it after sign-in, so don't go to /edit.
   const oauth = params.has('sig');
-  const next = mode === 'signup' ? `/onboarding${carry.size ? `?${carry}` : ''}` : '/edit';
+  // A page file was loaded on /new: finish creating it there instead of going through onboarding.
+  const draft = params.get('draft') === '1';
+  const next = draft ? `/new?finish=1${wanted ? `&username=${encodeURIComponent(wanted)}` : ''}` : mode === 'signup' ? `/onboarding${carry.size ? `?${carry}` : ''}` : '/edit';
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [show, setShow] = useState(false);

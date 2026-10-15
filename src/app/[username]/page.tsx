@@ -38,8 +38,18 @@ export default async function UserPage({ params }: Props) {
   if (!r) notFound();
   const page = await withLiveData(r.page);
   const bg = THEMES[page.theme.preset].bg;
+  const url = `${siteUrl()}/${r.row.username}`;
+  const jsonLd = {
+    '@context': 'https://schema.org', '@type': 'ProfilePage', url, dateModified: r.row.publishedAt?.toISOString(),
+    mainEntity: {
+      '@type': 'Person', name: page.profile.name, description: page.profile.bio || undefined, url,
+      ...(page.profile.avatar ? { image: page.profile.avatar.startsWith('http') ? page.profile.avatar : `${siteUrl()}${page.profile.avatar}` } : {}),
+      sameAs: page.tiles.flatMap(t => (t.type === 'link' || t.type === 'social') && t.url?.startsWith('http') ? [t.url] : []),
+    },
+  };
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <style>{`html,body{background:${bg}}`}</style>
       <PageView page={page} />
       <PageAnalytics username={r.row.username} />

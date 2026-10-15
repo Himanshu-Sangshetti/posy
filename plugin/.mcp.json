@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "posy": { "type": "http", "url": "https://posy.page/api/mcp" }
+  }
+}

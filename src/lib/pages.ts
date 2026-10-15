@@ -8,7 +8,8 @@ import { parsePage, Page, type Page as PageData } from './schema';
 import { template, type TemplateId } from './templates';
 import { entitlementsFor, assertAllowed, applyEntitlements } from './entitlements';
 
-export const USERNAME_RE = /^[a-z0-9](?:[a-z0-9_-]{1,28}[a-z0-9])$/;
+import { USERNAME_RE } from './username';
+export { USERNAME_RE };
 const RESERVED = new Set(('about admin agents analytics api app apps assets auth blog dashboard demo docs edit editor explore faq ' +
   'billing checkout d domains help home legal login logout mcp new onboarding posy plan pricing privacy pro settings signin signout signup static status support ' +
   'team templates terms u upgrade user users www _next favicon robots sitemap llms oauth well-known .well-known openapi schema uploads track unfurl').split(' '));

@@ -1,6 +1,7 @@
 import 'server-only';
 import { arrayMove } from './array';
 import { eq } from 'drizzle-orm';
+import { readBrief, briefToPage } from './brief';
 import { db } from '@/db';
 import { user } from '@/db/auth-schema';
 import { pageForUser, saveDraft, publish, hasUnpublished, createPage } from './pages';
@@ -52,6 +53,27 @@ export async function createPageFor(userId: string, b: { username?: unknown; tem
   const tpl = (typeof b.template === 'string' && b.template in TEMPLATES ? b.template : 'blank') as TemplateId;
   const row = await createPage(userId, String(b.username ?? ''), name, tpl, page);
   return { username: row.username, url: `${siteUrl()}/${row.username}` };
+}
+
+/**
+ * Load a Posy brief (or full page JSON) as the user's page. Creates the page when there is none (needs a username);
+ * with an existing page it replaces the draft, but only when `replace` is true.
+ */
+export async function importBrief(userId: string, input: unknown, opts: { username?: string; replace?: boolean } = {}) {
+  const { page: parsed, username: fromFile, warnings } = typeof input === 'string' ? readBrief(input) : briefToPage(input);
+  const tiles = await Promise.all(parsed.tiles.map(t => enrichTile(t).catch(() => t)));
+  const page = { ...parsed, tiles };
+  const existing = await pageForUser(userId);
+  if (existing) {
+    if (!opts.replace) throw new Error('This account already has a page. Pass replace: true to overwrite the draft with this file.');
+    await saveDraft(userId, page);
+    return { username: existing.username, url: `${siteUrl()}/${existing.username}`, tiles: tiles.length, warnings, created: false };
+  }
+  const username = (opts.username ?? fromFile ?? '').trim().toLowerCase();
+  if (!username) throw new Error('Pick a username for the page (3–30 letters, numbers, - or _).');
+  assertAllowed(page, await entitlementsFor(userId));
+  const row = await createPage(userId, username, page.profile.name, 'blank', page);
+  return { username: row.username, url: `${siteUrl()}/${row.username}`, tiles: tiles.length, warnings, created: true };
 }
 
 export class PageExistsError extends Error {

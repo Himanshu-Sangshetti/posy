@@ -1,0 +1,10 @@
+{
+  "name": "posy",
+  "version": "1.0.0",
+  "description": "Make and edit a Posy link-in-bio page. Adds the Posy MCP server and a make-a-page skill.",
+  "author": { "name": "Himanshu Sangshetti" },
+  "homepage": "https://posy.page",
+  "repository": "https://github.com/Himanshu-Sangshetti/posy",
+  "license": "MIT",
+  "keywords": ["link-in-bio", "linktree", "mcp"]
+}

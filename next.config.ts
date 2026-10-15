@@ -7,7 +7,7 @@ const config: NextConfig = {
   serverExternalPackages: ['@libsql/client'],
   // Docker / plain Node hosting: a self-contained server in .next/standalone
   output: process.env.POSY_STANDALONE ? 'standalone' : undefined,
-  outputFileTracingIncludes: { '/*': ['./drizzle/**/*'] },
+  outputFileTracingIncludes: { '/*': ['./drizzle/**/*'], '/llms-full.txt': ['./docs/*.md'] },
 };
 
 export default config;

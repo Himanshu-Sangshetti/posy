@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { createLocalJWKSet, jwtVerify } from 'jose';
 import { auth } from '@/lib/auth';
 import { siteUrl } from '@/lib/site';
-import { getState, createPageFor, addTiles, addTile, updateTile, removeTile, moveTile, setTheme, setProfile, publishPage } from '@/lib/page-ops';
+import { getState, importBrief, createPageFor, addTiles, addTile, updateTile, removeTile, moveTile, setTheme, setProfile, publishPage } from '@/lib/page-ops';
 import { SIZES, COLORS, FONTS, RADII, LAYOUTS, ALIGNS, BACKGROUNDS, TILE_STYLES, EFFECTS, AVATARS, PHOTO_LOOKS } from '@/lib/schema';
 import { THEME_IDS } from '@/lib/themes';
 import { STYLE_IDS } from '@/lib/styles';
@@ -62,6 +62,17 @@ const handler = createMcpHandler(server => {
     }),
     annotations: WRITE,
   }, run(async (userId, a: Record<string, unknown>) => ({ ...(await createPageFor(userId, a)), next: 'Add the user\'s links with add_tile (inputs[]), then publish.' })));
+
+  server.registerTool('import_page', {
+    title: 'Import page file',
+    description: 'Load a whole page at once from a Posy brief (name, bio, look, theme, links[]) or a full page JSON. Creates the page if there is none (pass username); with an existing page it replaces the draft only when replace is true.',
+    inputSchema: z.object({
+      file: z.union([z.string(), z.record(z.string(), z.unknown())]).describe('The brief or page JSON, as an object or text. Format: /docs/format'),
+      username: z.string().optional(),
+      replace: z.boolean().optional().describe('Overwrite an existing draft. Ask the user first.'),
+    }),
+    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false },
+  }, run(async (userId, a: { file: string | Record<string, unknown>; username?: string; replace?: boolean }) => ({ ...(await importBrief(userId, a.file, a)), next: 'Review with get_page, then publish.' })));
 
   server.registerTool('add_tile', {
     title: 'Add tile',

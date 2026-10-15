@@ -1,0 +1,7 @@
+{
+  "name": "posy",
+  "version": "1.0.0",
+  "description": "Make and edit a Posy link-in-bio page. Adds the Posy MCP server.",
+  "author": { "name": "Himanshu Sangshetti" },
+  "homepage": "https://posy.page"
+}

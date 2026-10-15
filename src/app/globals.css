@@ -737,3 +737,18 @@ body.ac-body { background: var(--bg); font-family: var(--font-sans); }
 .sc-publish.is-ready:hover .sc-publish-dot { background: #fff; }
 @keyframes sc-ping { to { box-shadow: 0 0 0 8px rgb(228 87 46 / 0); } }
 .nf-logo { display: inline-flex; padding: 8px 14px; border-radius: 999px; background: rgb(255 255 255 / .85); backdrop-filter: blur(12px); box-shadow: 0 8px 24px -12px rgb(0 0 0 / .4); }
+
+/* Public docs (/docs/*), rendered from markdown */
+.posy-doc { color: var(--text); font-size: 16px; line-height: 1.65; }
+.posy-doc h1 { font-family: var(--font-serif); font-weight: 400; font-size: clamp(36px, 6vw, 52px); letter-spacing: -0.02em; line-height: 1.04; margin: 0 0 20px; }
+.posy-doc h2 { font-family: var(--font-serif); font-weight: 400; font-size: 28px; margin: 40px 0 10px; letter-spacing: -0.01em; }
+.posy-doc p, .posy-doc ul, .posy-doc ol { margin: 12px 0; color: var(--muted); }
+.posy-doc li { margin: 4px 0; }
+.posy-doc strong { color: var(--text); font-weight: 600; }
+.posy-doc a { color: var(--ac-deep); text-underline-offset: 4px; text-decoration: underline; }
+.posy-doc code { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: .88em; background: var(--surface); border: 1px solid var(--input); border-radius: 6px; padding: 1px 5px; }
+.posy-doc pre { margin: 16px 0; padding: 16px 18px; overflow-x: auto; background: var(--surface); border: 1px solid var(--input); border-radius: 14px; }
+.posy-doc pre code { background: none; border: 0; padding: 0; font-size: 13px; line-height: 1.6; color: var(--text); }
+.posy-doc table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14.5px; }
+.posy-doc th, .posy-doc td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--input); }
+.posy-doc th { color: var(--muted); font-weight: 500; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }

@@ -1,19 +1,34 @@
 import { siteUrl } from '@/lib/site';
+import { STYLE_IDS } from '@/lib/styles';
+import { THEME_IDS } from '@/lib/themes';
 
 export function GET() {
   const s = siteUrl();
   return new Response(`# Posy
 
-> Posy is an open-source link-in-bio page builder. Every page is one JSON document with a public schema.
+> Posy is an open-source link-in-bio page builder (a Linktree alternative). A page is one JSON document with a public schema, and AI assistants can make and edit pages.
 
-## For AI agents
-- Edit a user's page with the MCP server at ${s}/api/mcp. Sign in with OAuth (claude.ai, ChatGPT, Cursor and VS Code do this by themselves), or send a posy_ API key as "Authorization: Bearer posy_…".
-- REST: GET/PUT ${s}/api/v1/page, POST ${s}/api/v1/page/tiles, POST ${s}/api/v1/page/publish.
+## To make someone a Posy page (no account, no tools needed)
+Write the page as a short JSON "brief" and give the user this link, which opens a live preview they can keep:
+
+  ${s}/new#p=<base64url of the JSON>
+
+Or ask them to paste the JSON at ${s}/new. Brief format (full spec: ${s}/docs/format):
+
+  {"posy":1,"name":"Mira Sol","bio":"Illustrator","look":"${STYLE_IDS[0]}","links":[{"heading":"Find me"},"https://github.com/mira","hi@mira.so",{"text":"Open for work"}]}
+
+Links may be URLs, emails, owner/repo or notes; Posy picks the right tile. Looks: ${STYLE_IDS.join(', ')}. Themes: ${THEME_IDS.join(', ')}.
+
+## For AI agents with tools
+- MCP server (Streamable HTTP): ${s}/api/mcp. Sign in with OAuth (claude.ai, ChatGPT, Cursor and VS Code do it for you), or send a posy_ API key as "Authorization: Bearer posy_…".
+- Start with get_page. If there is no page, call create_page, then add_tile (use inputs[] for many links), then publish.
+- Connect guide: ${s}/docs/agents
+- REST: GET/PUT ${s}/api/v1/page, POST ${s}/api/v1/page/tiles, POST ${s}/api/v1/page/import, POST ${s}/api/v1/page/publish. OpenAPI: ${s}/openapi.json
 - Read any published page: ${s}/api/v1/public/<username> (JSON) or ${s}/<username>/llms.txt (Markdown).
-- Page format: ${s}/schema/page.schema.json
+- Schemas: ${s}/schema/page.schema.json, ${s}/schema/brief.schema.json
 
-## Docs
-- Agent guide: ${s}/docs/agents
+## More
+- Full guide for agents: ${s}/llms-full.txt
 - Source: https://github.com/Himanshu-Sangshetti/posy
 `, { headers: { 'Content-Type': 'text/markdown; charset=utf-8' } });
 }

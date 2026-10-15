@@ -1,0 +1,15 @@
+{
+  "name": "posy",
+  "owner": { "name": "Himanshu Sangshetti", "url": "https://github.com/Himanshu-Sangshetti" },
+  "metadata": { "description": "Make and edit a Posy link-in-bio page from Claude Code." },
+  "plugins": [
+    {
+      "name": "posy",
+      "source": "./plugin",
+      "description": "Make a link-in-bio page, add links, change the look and publish, by just asking.",
+      "version": "1.0.0",
+      "category": "productivity",
+      "keywords": ["link-in-bio", "linktree", "mcp", "portfolio"]
+    }
+  ]
+}
