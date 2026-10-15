@@ -30,3 +30,6 @@
   .posy-style-cozy .posy-name { font-size: max(52px, calc(104px * 11 / max(11, var(--nlen, 0)))); }
   .posy-style-cozy.posy-layout-list .posy-name { font-size: max(52px, calc(64px * 11 / max(11, var(--nlen, 0)))); }
 }
+
+/* ================= Grid tiles are size containers, so type scales with the tile, not just the screen ================= */
+:is(.posy-style-press, .posy-style-gallery, .posy-style-painted, .posy-style-night) .posy-grid > .posy-tile { container: tile / size; }

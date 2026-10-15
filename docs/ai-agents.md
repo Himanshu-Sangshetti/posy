@@ -45,6 +45,10 @@ Cursor, Codex and other MCP clients: add an HTTP server at `https://YOUR-POSY/ap
    On the default **desk** layout every tile is an object: images are polaroids, notes are sticky notes, Spotify is a record,
    YouTube is a ticket, GitHub repos are index cards, newsletter links (Substack, Buttondown, beehiiv…) are envelopes and
    links with a preview image are postcards. Social tiles become stickers under the name.
+   Other looks (`theme.style`) draw the same tiles as their own objects: `press` (headlines, ink-printed photos, pull
+   quotes, a coupon for newsletters, a classified ad for shops), `gallery` (framed works with wall labels), `painted`
+   (watercolour paper, letters, wax seals), `night` (neon signs, jukebox, arcade screen), `washi`, `lofi` and `minimal`.
+   A `text` tile with `look: "stamp"` is each look's badge (stamp, red dot, wax seal, blinking sign).
 3. Colours: `auto`, `surface`, `accent` or a pastel tint (`peach`, `butter`, `mint`, `sky`, `lilac`, `rose`).
 4. Keep pages calm: a few well-chosen tiles beat many. Ask before deleting things the user added.
 5. Edits are version-checked, so an agent and the person in the studio can work at the same time.

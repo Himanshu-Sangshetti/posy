@@ -22,7 +22,7 @@ export function Favicon({ url }: { url: string }) {
   return <img ref={ref} src={`https://icons.duckduckgo.com/ip3/${host}.ico`} alt="" width={20} height={20} className="size-5 rounded-[5px]" onError={() => setFailed(true)} loading="lazy" />;
 }
 
-export function VideoPlayer({ id, title, editing, thumb }: { id: string; title?: string; editing?: boolean; thumb?: string }) {
+export function VideoPlayer({ id, title, editing, thumb, overlay = true }: { id: string; title?: string; editing?: boolean; thumb?: string; overlay?: boolean }) {
   const [playing, setPlaying] = useState(false);
   if (playing && !editing)
     return <iframe className="size-full" src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`} title={title || 'Video'} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />;
@@ -34,7 +34,7 @@ export function VideoPlayer({ id, title, editing, thumb }: { id: string; title?:
       <span className="absolute left-1/2 top-1/2 grid size-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white/90 shadow-lg backdrop-blur transition-transform duration-300 group-hover:scale-110">
         <Play className="ml-0.5 size-5 fill-[#1b1b1b] text-[#1b1b1b]" />
       </span>
-      {title && <span className="absolute inset-x-4 bottom-3 line-clamp-1 text-[14px] font-medium text-white">{title}</span>}
+      {title && overlay && <span className="absolute inset-x-4 bottom-3 line-clamp-1 text-[14px] font-medium text-white">{title}</span>}
     </button>
   );
 }

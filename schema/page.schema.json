@@ -81,6 +81,22 @@
             "night-blue",
             "violet",
             "rain",
+            "newsprint",
+            "salmon",
+            "ivory",
+            "late-edition",
+            "white-cube",
+            "gallery-sage",
+            "oxblood",
+            "dark-room",
+            "morning",
+            "golden-hour",
+            "dusk-sky",
+            "starry",
+            "neon",
+            "cyan-rain",
+            "sodium",
+            "ultraviolet",
             "sunset"
           ]
         },
@@ -97,6 +113,10 @@
             "editorial",
             "washi",
             "lofi",
+            "press",
+            "gallery",
+            "painted",
+            "night",
             "classic",
             "elegant",
             "rounded",
@@ -124,13 +144,17 @@
         },
         "style": {
           "default": "cozy",
-          "description": "cozy = Desk: tiles as objects on a desk (polaroids, sticky notes, records); minimal = paper and ink, photos printed as 1-bit dither that turn to colour on hover; washi = a Japanese print (paper, ink, kanji numerals, red seal); lofi = a desktop left open (tiles as little app windows with pinstriped title bars, clay clouds by day, painted anime rooms at night)",
+          "description": "cozy = Desk: tiles as objects on a desk (polaroids, sticky notes, records); minimal = an editorial page, paper and ink, hairlines and big type; washi = a Japanese print (woodblock print header, paper, ink, red seal); lofi = a desktop left open (tiles as little app windows with pinstriped title bars, clay clouds by day, painted anime rooms at night); press = a weekend newspaper (masthead, headlines, halftone photos, pull quotes, coupon and classified ads); gallery = a small gallery (framed works with wall labels, wall text, red dot stickers); painted = a watercolour sky (deckled paper cards, painted edges, wax seals); night = a neon street after rain (lit signs, posters, jukebox, arcade screen)",
           "type": "string",
           "enum": [
             "cozy",
             "minimal",
+            "press",
+            "gallery",
             "washi",
-            "lofi"
+            "lofi",
+            "painted",
+            "night"
           ]
         },
         "layout": {
@@ -248,7 +272,7 @@
         },
         "ambient": {
           "default": true,
-          "description": "Moving light and weather where a style has it: leaf shadows on Desk, clay clouds and rain on Lofi",
+          "description": "Moving light and weather where a style has it: leaf shadows on Desk, clay clouds and rain on Lofi, rain on Night",
           "type": "boolean"
         }
       }

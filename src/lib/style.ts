@@ -11,6 +11,10 @@ export const FONT_PAIRS = {
   editorial: f('--font-geist', '--font-serif', 400, '-0.01em', 'Editorial'),
   washi: f('--font-geist', '--font-cormorant', 600, '0.01em', 'Washi'),
   lofi: f('--font-geist', '--font-geist', 500, '0em', 'Lofi'),
+  press: f('--font-geist', '--font-bodoni', 700, '-0.02em', 'Press'),
+  gallery: f('--font-geist', '--font-dm-serif', 400, '-0.01em', 'Gallery'),
+  painted: f('--font-geist', '--font-young-serif', 400, '-0.015em', 'Painted'),
+  night: f('--font-space', '--font-chakra', 700, '0.02em', 'Night'),
   classic: f('--font-geist', '--font-fraunces', 560, '-0.03em', 'Classic'),
   elegant: f('--font-dm-sans', '--font-dm-serif', 400, '-0.015em', 'Elegant'),
   rounded: f('--font-nunito', '--font-nunito', 800, '-0.02em', 'Rounded'),
@@ -67,7 +71,7 @@ export function pageClasses(page: Page): string {
   ].filter(Boolean).join(' ');
 }
 /** How photos are printed: what the page chose, or its style's default. */
-export const photoLook = (page: Page) => page.theme.photos ?? (page.theme.style === 'minimal' ? 'dither' : 'natural');
+export const photoLook = (page: Page) => page.theme.photos ?? 'natural';
 export const isDark = (page: Page) => THEMES[page.theme.preset as ThemeId]?.dark ?? false;
 
 /** Background for a tile: the plain card colour, or the tint someone picked for it. */

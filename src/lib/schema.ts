@@ -6,11 +6,11 @@ import { CANVAS_WIDTH } from './canvas-layout';
 
 /** Tile footprint on the grid: small square, wide, tall, large square. */
 export const SIZES = ['s', 'w', 't', 'l'] as const;
-export const BASE_FONTS = ['soft', 'editorial', 'washi', 'lofi', 'classic', 'elegant', 'rounded', 'playful', 'modern', 'tech', 'mono', 'hand', 'terminal', 'cyber', 'storybook', 'journal', 'stationery'] as const;
+export const BASE_FONTS = ['soft', 'editorial', 'washi', 'lofi', 'press', 'gallery', 'painted', 'night', 'classic', 'elegant', 'rounded', 'playful', 'modern', 'tech', 'mono', 'hand', 'terminal', 'cyber', 'storybook', 'journal', 'stationery'] as const;
 export const FONTS = [...BASE_FONTS, ...Object.keys(EDITION_FONT_PAIRS)] as [string, ...string[]];
 export const RADII = ['sharp', 'soft', 'round', 'pill'] as const;
 /** The look of the whole page. Independent of the layout. */
-export const STYLES = ['cozy', 'minimal', 'washi', 'lofi'] as const;
+export const STYLES = ['cozy', 'minimal', 'press', 'gallery', 'washi', 'lofi', 'painted', 'night'] as const;
 /** Styles that were retired, and the look each one moves to. */
 const RETIRED_STYLES: Record<string, (typeof STYLES)[number]> = { soft: 'minimal', editorial: 'minimal', terminal: 'minimal', neon: 'lofi' };
 export const LAYOUTS = ['bento', 'list', 'canvas'] as const;
@@ -123,7 +123,7 @@ export const Theme = z.object({
   accent: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().describe('Override the theme accent, e.g. "#e8a87c"'),
   font: z.enum(FONTS).default('editorial'),
   radius: z.enum(RADII).default('round'),
-  style: z.enum(STYLES).default('cozy').describe('cozy = Desk: tiles as objects on a desk (polaroids, sticky notes, records); minimal = paper and ink, photos printed as 1-bit dither that turn to colour on hover; washi = a Japanese print (paper, ink, kanji numerals, red seal); lofi = a desktop left open (tiles as little app windows with pinstriped title bars, clay clouds by day, painted anime rooms at night)'),
+  style: z.enum(STYLES).default('cozy').describe('cozy = Desk: tiles as objects on a desk (polaroids, sticky notes, records); minimal = an editorial page, paper and ink, hairlines and big type; washi = a Japanese print (woodblock print header, paper, ink, red seal); lofi = a desktop left open (tiles as little app windows with pinstriped title bars, clay clouds by day, painted anime rooms at night); press = a weekend newspaper (masthead, headlines, halftone photos, pull quotes, coupon and classified ads); gallery = a small gallery (framed works with wall labels, wall text, red dot stickers); painted = a watercolour sky (deckled paper cards, painted edges, wax seals); night = a neon street after rain (lit signs, posters, jukebox, arcade screen)'),
   layout: z.enum(LAYOUTS).default('bento').describe('bento = grid of tiles; list = Linktree-style stacked links; canvas = free placement, each tile at its own `pos` (x, y, w, h in a 1200-wide space, rotation r, layer z)'),
   align: z.enum(ALIGNS).default('side').describe('minimal style + bento only: profile beside the grid (side) or above it (center)'),
   background: Background.default(Background.parse({})),
@@ -132,7 +132,7 @@ export const Theme = z.object({
   avatar: z.enum(AVATARS).default('squircle'),
   photos: z.enum(PHOTO_LOOKS).optional().describe('How photos are printed: natural colour, mono (black and white), dither (1-bit pixels) or ascii (drawn in characters); dither and ascii turn to colour on hover. Unset = the style\'s own default (Minimal dithers)'),
   motion: z.boolean().default(true),
-  ambient: z.boolean().default(true).describe('Moving light and weather where a style has it: leaf shadows on Desk, clay clouds and rain on Lofi'),
+  ambient: z.boolean().default(true).describe('Moving light and weather where a style has it: leaf shadows on Desk, clay clouds and rain on Lofi, rain on Night'),
 });
 
 /** v1 pages used layout "split" | "stack"; map them onto layout + align. */

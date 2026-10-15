@@ -26,7 +26,7 @@ const DARK_TINTS = { peach: '#33261f', butter: '#2f2b1e', mint: '#1f2b24', sky: 
 const dark = (t: Omit<Theme, 'dark' | 'tints'>): Theme => ({ ...t, dark: true, tints: DARK_TINTS });
 const plain = (t: Omit<Theme, 'dark' | 'tints'>): Theme => ({ ...t, dark: false, tints: LIGHT_TINTS });
 
-/** Palettes made for the four looks: one solid colour each, an ink and one accent. */
+/** Palettes made for the looks: one solid colour each, an ink and one accent. */
 const LOOKS = {
   // Desk
   oak: plain({ id: 'oak', name: 'Oak', bg: '#e8dccb', surface: '#f7f1e6', text: '#2b241d', muted: '#6b5d4f', line: '#d8cab5', accent: '#a5683f' }),
@@ -45,6 +45,26 @@ const LOOKS = {
   'night-blue': dark({ id: 'night-blue', name: 'Night', bg: '#121a33', surface: '#18213f', text: '#e8ebff', muted: '#8d95c2', line: '#26305a', accent: '#8f7cff' }),
   violet: dark({ id: 'violet', name: 'Violet hour', bg: '#170f2b', surface: '#1f1638', text: '#f1eaff', muted: '#9d8fc4', line: '#2e2350', accent: '#c77dff' }),
   rain: dark({ id: 'rain', name: 'Rain', bg: '#0f1a1f', surface: '#15232a', text: '#e3f1f3', muted: '#85a3a8', line: '#213740', accent: '#5fd4d0' }),
+  // Press
+  newsprint: plain({ id: 'newsprint', name: 'Newsprint', bg: '#ece6d8', surface: '#f4efe3', text: '#151412', muted: '#5f5a50', line: '#151412', accent: '#c4301c' }),
+  salmon: plain({ id: 'salmon', name: 'Salmon', bg: '#fbe9dc', surface: '#fff3ea', text: '#1d1714', muted: '#6b5a50', line: '#1d1714', accent: '#0d5e8a' }),
+  ivory: plain({ id: 'ivory', name: 'Ivory', bg: '#f7f4ec', surface: '#fffdf7', text: '#111111', muted: '#5d5b55', line: '#111111', accent: '#111111' }),
+  'late-edition': dark({ id: 'late-edition', name: 'Late edition', bg: '#161513', surface: '#1e1c19', text: '#eee7d8', muted: '#a39a89', line: '#eee7d8', accent: '#ff6a4d' }),
+  // Gallery
+  'white-cube': plain({ id: 'white-cube', name: 'White cube', bg: '#f3f2ef', surface: '#ffffff', text: '#1b1b1a', muted: '#6f6d68', line: '#dedcd6', accent: '#d2232a' }),
+  'gallery-sage': plain({ id: 'gallery-sage', name: 'Sage wall', bg: '#c9cfbf', surface: '#f6f5ef', text: '#1e231c', muted: '#4f5848', line: '#b2b9a6', accent: '#b1352b' }),
+  oxblood: dark({ id: 'oxblood', name: 'Oxblood', bg: '#4a1d1f', surface: '#f3ece1', text: '#f4e9dc', muted: '#cfae9f', line: '#6a3234', accent: '#e0b25c' }),
+  'dark-room': dark({ id: 'dark-room', name: 'Dark room', bg: '#141414', surface: '#f1efe9', text: '#ecebe7', muted: '#97958f', line: '#2a2a2a', accent: '#e3463b' }),
+  // Painted
+  morning: plain({ id: 'morning', name: 'Morning', bg: '#dbe9f3', surface: '#fbf7ef', text: '#26313a', muted: '#5f6b74', line: '#e7dfd0', accent: '#d9553a' }),
+  'golden-hour': plain({ id: 'golden-hour', name: 'Golden hour', bg: '#f6dfc4', surface: '#fdf7ee', text: '#3a2a20', muted: '#7a6152', line: '#ecdcc7', accent: '#c8572f' }),
+  'dusk-sky': plain({ id: 'dusk-sky', name: 'Dusk', bg: '#e6d6e6', surface: '#fcf6f3', text: '#2e2534', muted: '#6d5f73', line: '#e8dbe2', accent: '#b8456a' }),
+  starry: dark({ id: 'starry', name: 'Starry', bg: '#14203b', surface: '#f6f0e4', text: '#eef0f8', muted: '#a7b0c9', line: '#2a3858', accent: '#f2c46b' }),
+  // Night
+  neon: dark({ id: 'neon', name: 'Neon', bg: '#0c0915', surface: '#140f22', text: '#f6eefe', muted: '#a596bd', line: '#2a2140', accent: '#ff4fa3' }),
+  'cyan-rain': dark({ id: 'cyan-rain', name: 'Cyan rain', bg: '#061217', surface: '#0b1c23', text: '#e6fbff', muted: '#83a9b3', line: '#173540', accent: '#3fe3ff' }),
+  sodium: dark({ id: 'sodium', name: 'Sodium', bg: '#140d07', surface: '#1e140b', text: '#fff1de', muted: '#b59a7a', line: '#3a2814', accent: '#ffad3b' }),
+  ultraviolet: dark({ id: 'ultraviolet', name: 'Ultraviolet', bg: '#0e0820', surface: '#171030', text: '#f1ebff', muted: '#9f92c8', line: '#2c2152', accent: '#a879ff' }),
   sunset: dark({ id: 'sunset', name: 'Last train', bg: '#1f1426', surface: '#281b31', text: '#ffe9e4', muted: '#b391a0', line: '#3a2840', accent: '#ff8a7a' }),
 } satisfies Record<string, Theme>;
 
