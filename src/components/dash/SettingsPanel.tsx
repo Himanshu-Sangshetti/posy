@@ -12,7 +12,7 @@ import { Panel } from './ui';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 
-export function SettingsPanel({ username, email, host }: { username: string; email: string; host: string }) {
+export function SettingsPanel({ username, email, host, hasPassword = true }: { username: string; email: string; host: string; hasPassword?: boolean }) {
   const router = useRouter();
   const [name, setName] = useState(username);
   const [check, setCheck] = useState<{ ok: boolean; reason?: string } | null>(null);
@@ -71,8 +71,13 @@ export function SettingsPanel({ username, email, host }: { username: string; ema
 
   async function remove() {
     setDeleting(true); setDelError('');
-    const r = await authClient.deleteUser({ password });
-    if (r.error) { setDelError(r.error.message ?? 'Could not delete'); setDeleting(false); return; }
+    // without a password, Better Auth accepts a recent sign-in instead
+    const r = await authClient.deleteUser(hasPassword ? { password } : {});
+    if (r.error) {
+      const stale = !hasPassword && /fresh|expired|re-?auth/i.test(`${r.error.code ?? ''} ${r.error.message ?? ''}`);
+      setDelError(stale ? 'For safety, log out and sign in again, then delete within a day.' : r.error.message ?? 'Could not delete');
+      setDeleting(false); return;
+    }
     window.location.href = '/';
   }
 
@@ -124,9 +129,11 @@ export function SettingsPanel({ username, email, host }: { username: string; ema
               <DialogTitle className="ac-display text-[24px]">Delete your account?</DialogTitle>
               <DialogDescription>Your page, analytics and keys are removed for good. {host}/{username} becomes free for anyone.</DialogDescription>
             </DialogHeader>
-            <Input type="password" placeholder="Your password" value={password} onChange={e => setPassword(e.target.value)} className="ac-input" />
+            {hasPassword
+              ? <Input type="password" placeholder="Your password" value={password} onChange={e => setPassword(e.target.value)} className="ac-input" />
+              : <Input aria-label="Type your username to confirm" placeholder={`Type ${username} to confirm`} value={password} onChange={e => setPassword(e.target.value)} className="ac-input" />}
             {delError && <p role="alert" className="text-[14px] text-[#a43f5c]">{delError}</p>}
-            <Button type="button" onClick={remove} disabled={!password || deleting} className="ac-btn w-full bg-[var(--destructive)] text-white hover:bg-[#a63a4b]">{deleting && <Loader2 className="size-4 animate-spin" />}Delete forever</Button>
+            <Button type="button" onClick={remove} disabled={(hasPassword ? !password : password.trim().toLowerCase() !== username.toLowerCase()) || deleting} className="ac-btn w-full bg-[var(--destructive)] text-white hover:bg-[#a63a4b]">{deleting && <Loader2 className="size-4 animate-spin" />}Delete forever</Button>
           </DialogContent>
         </Dialog>
       </Panel>
