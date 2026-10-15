@@ -736,3 +736,4 @@ body.ac-body { background: var(--bg); font-family: var(--font-sans); }
 .sc-publish-dot { width: 7px; height: 7px; border-radius: 50%; background: #e4572e; box-shadow: 0 0 0 0 rgb(228 87 46 / .6); animation: sc-ping 1.6s ease-out infinite; }
 .sc-publish.is-ready:hover .sc-publish-dot { background: #fff; }
 @keyframes sc-ping { to { box-shadow: 0 0 0 8px rgb(228 87 46 / 0); } }
+.nf-logo { display: inline-flex; padding: 8px 14px; border-radius: 999px; background: rgb(255 255 255 / .85); backdrop-filter: blur(12px); box-shadow: 0 8px 24px -12px rgb(0 0 0 / .4); }
