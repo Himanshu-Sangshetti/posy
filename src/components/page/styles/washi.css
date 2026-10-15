@@ -110,3 +110,6 @@
 
 .ws-thumb.ws-pattern { flex: none; max-height: none; margin: 0; padding: 0; background: var(--ws-seigaiha) center / 30px auto; box-shadow: 0 0 0 3px var(--ws-paper), 0 0 0 4px var(--ws-rule); }
 .ws-thumb.ws-pattern-asanoha { background: var(--ws-asanoha) center / 22px auto; } .ws-thumb.ws-pattern-kikko { background: var(--ws-kikko) center / 20px auto; }
+/* small notes on phones read across instead of down, so long lines never spill out of the frame */
+.ws-t-text { container-type: inline-size; }
+@container (max-width: 250px) { .ws-note { writing-mode: horizontal-tb; align-self: stretch; font-size: 17px; line-height: 1.5; letter-spacing: .01em; } }
