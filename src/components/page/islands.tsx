@@ -148,6 +148,10 @@ export function DitherPhotos() {
     const css = getComputedStyle(page);
     const rgb = (v: string) => { const c = document.createElement('canvas').getContext('2d')!; c.fillStyle = v.trim() || '#000'; const h = c.fillStyle as string; return h.startsWith('#') ? [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)) : [0, 0, 0]; };
     const ink = rgb(css.getPropertyValue('--text')), paper = rgb(css.getPropertyValue('--surface'));
+    // dark pixels always print in the darker colour, so dark palettes don't turn photos into negatives
+    const lum = (c: number[]) => c[0] * .299 + c[1] * .587 + c[2] * .114;
+    const [dark, light] = lum(ink) <= lum(paper) ? [ink, paper] : [paper, ink];
+    const onDark = lum(paper) < lum(ink);
     const PX = 2, BLOCK = 6;
     const cleanups: (() => void)[] = [];
     // React may still be hydrating parts of the page and drop nodes it didn't render; put our canvas back if so.
@@ -181,7 +185,7 @@ export function DitherPhotos() {
           L[i] = o;
           for (const [dx, dy] of [[1, 0], [2, 0], [-1, 1], [0, 1], [1, 1], [0, 2]]) { const xx = x + dx, yy = y + dy; if (xx >= 0 && xx < bw && yy < bh) L[yy * bw + xx] += e; }
         }
-        for (let i = 0; i < L.length; i++) { const c = L[i] ? paper : ink; px.data.set([c[0], c[1], c[2], 255], i * 4); }
+        for (let i = 0; i < L.length; i++) { const c = L[i] ? light : dark; px.data.set([c[0], c[1], c[2], 255], i * 4); }
         data = px; ctx.putImageData(px, 0, 0);
         shuffle();
       };
@@ -200,13 +204,13 @@ export function DitherPhotos() {
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.fillStyle = `rgb(${paper.join(',')})`; ctx.fillRect(0, 0, w, h);
         ctx.fillStyle = `rgb(${ink.join(',')})`; ctx.font = `600 ${CH}px ui-monospace, "Geist Mono", Menlo, monospace`; ctx.textBaseline = 'top';
-        const lum = new Float32Array(cols * rows);
-        for (let i = 0; i < lum.length; i++) lum[i] = (px.data[i * 4] * .299 + px.data[i * 4 + 1] * .587 + px.data[i * 4 + 2] * .114) / 255;
+        const tone = new Float32Array(cols * rows);
+        for (let i = 0; i < tone.length; i++) tone[i] = (px.data[i * 4] * .299 + px.data[i * 4 + 1] * .587 + px.data[i * 4 + 2] * .114) / 255;
         // stretch each photo's own range so it always uses the whole ramp, with a little gamma to open the lights
-        const sorted = Float32Array.from(lum).sort(), lo = sorted[Math.floor(sorted.length * .04)], hi = sorted[Math.floor(sorted.length * .96)] || 1;
+        const sorted = Float32Array.from(tone).sort(), lo = sorted[Math.floor(sorted.length * .04)], hi = sorted[Math.floor(sorted.length * .96)] || 1;
         for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
-          const l = Math.min(1, Math.max(0, (lum[y * cols + x] - lo) / Math.max(.05, hi - lo)));
-          const ch = RAMP[Math.min(RAMP.length - 1, Math.round(Math.pow(1 - l, 1.3) * (RAMP.length - 1)))];
+          const l = Math.min(1, Math.max(0, (tone[y * cols + x] - lo) / Math.max(.05, hi - lo)));
+          const ch = RAMP[Math.min(RAMP.length - 1, Math.round(Math.pow(onDark ? l : 1 - l, 1.3) * (RAMP.length - 1)))];
           if (ch !== ' ') ctx.fillText(ch, x * CW, y * CH);
         }
         ctx.setTransform(1, 0, 0, 1, 0, 0);

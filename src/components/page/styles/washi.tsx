@@ -102,8 +102,8 @@ export function WashiRow({ tile, index }: { tile: Tile; index: number }) {
   return (
     <div className="ws-line">
       <span className="ws-n">{kanji(index + 1)}</span>
-      {m.image ? <span className="ws-thumb"><Img src={m.image} /></span> : <span className="ws-thumb ws-thumb-empty" aria-hidden />}
-      <span className="ws-line-text"><b>{m.title}</b>{m.sub && m.sub !== m.title && tile.type !== 'image' && <span>{m.sub}</span>}</span>
+      {m.image ? <span className="ws-thumb"><Img src={m.image} /></span> : <span className={cn('ws-thumb ws-pattern', `ws-pattern-${m.kind === 'shop' ? 'asanoha' : m.kind === 'repo' ? 'kikko' : 'seigaiha'}`)} aria-hidden />}
+      <span className="ws-line-text"><b>{m.title || 'Photo'}</b>{m.sub && m.sub !== m.title && tile.type !== 'image' && <span>{m.sub}</span>}</span>
       <ArrowUpRight className="ws-go" aria-hidden />
     </div>
   );

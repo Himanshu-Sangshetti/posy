@@ -72,7 +72,7 @@ export function placeTiles(tiles: Tile[], loose = false): Placed[] {
     if (loose) {
       const h = hash(tile.id);
       pos.x = clamp(pos.x + ((h % 7) - 3) * 12, 0, CANVAS_WIDTH - pos.w);
-      pos.y = Math.max(0, pos.y + (((h >> 3) % 5) - 1) * 14);
+      pos.y += ((h >> 3) % 4) * 10; // only ever down, so a tile never covers the heading above it
       pos.z = index;
     }
     out.push({ tile, index, pos });
