@@ -211,6 +211,8 @@ export function starterPage(o: { name: string; style: StyleId; layout?: 'bento' 
   const base = template(STYLE_STARTERS[o.style], o.name);
   return parsePage({
     ...base,
+    // an empty page is yours from the start: no sample face, bio or caption from the starter's persona
+    profile: o.empty ? { name: base.profile.name } : base.profile,
     theme: { ...base.theme, ...(o.layout ? { layout: o.layout } : {}), ...(o.preset ? { preset: o.preset } : {}) },
     tiles: o.empty ? [] : base.tiles,
   });
