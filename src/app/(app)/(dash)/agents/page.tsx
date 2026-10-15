@@ -12,7 +12,7 @@ export default async function AgentsPage() {
   const row = (await pageForUser(user.id))!;
   return (
     <div className="grid gap-8">
-      <PageHead eyebrow="Agents · MCP" title={<>Let your <i>AI</i> edit your page</>} lede="Connect Claude, Cursor or Codex once, then just ask: add a link, change the look, publish." />
+      <PageHead eyebrow="Agents · MCP" title={<>Let your <i>AI</i> edit your page</>} lede="Connect Claude, ChatGPT or Cursor once, then just ask: make my page, add a link, change the look, publish." />
       <AgentsPanel site={siteUrl()} username={row.username} />
     </div>
   );

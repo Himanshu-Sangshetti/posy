@@ -124,7 +124,7 @@ export function NewFromFile({ signedIn, hasPage, site }: { signedIn: boolean; ha
       <section aria-label="Preview" className="min-w-0">
         {parsed ? (
           <div className="overflow-hidden rounded-[22px] border border-[var(--input)] shadow-[0_30px_60px_-30px_rgb(22_20_15/.35)]">
-            <div className="h-[min(760px,80svh)] overflow-y-auto"><PageView page={parsed.page} contained /></div>
+            <div className="relative isolate h-[min(760px,80svh)] overflow-y-auto [transform:translateZ(0)]"><div className="relative min-h-full"><PageView page={parsed.page} contained /></div></div>
           </div>
         ) : (
           <div className="grid h-full min-h-72 place-items-center rounded-[22px] border border-dashed border-[var(--input)] p-8 text-center text-[var(--muted)]">

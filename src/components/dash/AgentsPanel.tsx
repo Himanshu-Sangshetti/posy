@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Copy, KeyRound, Loader2, ShieldAlert, Trash2 } from 'lucide-react';
+import { Copy, ExternalLink, KeyRound, Loader2, ShieldAlert, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { authClient } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { CodeBlock } from './CodeBlock';
 import { Panel } from './ui';
+import { briefPrompt } from '@/lib/brief';
 
 type Key = { id: string; name: string | null; start: string | null; createdAt: Date | string };
 
@@ -33,6 +34,8 @@ export function AgentsPanel({ site, username }: { site: string; username: string
   const [revoking, setRevoking] = useState(false);
   const mcp = `${site}/api/mcp`;
   const key = fresh ?? 'posy_YOUR_KEY';
+  const cursorLink = `cursor://anysphere.cursor-deeplink/mcp/install?name=posy&config=${typeof btoa === 'function' ? btoa(JSON.stringify({ url: mcp })) : ''}`;
+  const vscodeLink = `vscode:mcp/install?${encodeURIComponent(JSON.stringify({ name: 'posy', type: 'http', url: mcp }))}`;
 
   const load = async () => {
     const r = await authClient.apiKey.list();
@@ -61,7 +64,69 @@ export function AgentsPanel({ site, username }: { site: string; username: string
 
   return (
     <div className="grid gap-5">
-      <Panel eyebrow="Step 1" tone="rose" title={<>Create a <i>key</i></>} desc="A key lets an agent edit your page. You can revoke it any time.">
+      <Panel eyebrow="Connect" tone="lilac" title={<>Connect your <i>AI</i></>} desc="Sign in to Posy from your AI app. There is nothing to install and no key to copy.">
+        <Tabs defaultValue="claude">
+          <TabsList className="ac-seg !h-auto flex-wrap">
+            {[['claude', 'Claude'], ['chatgpt', 'ChatGPT'], ['cursor', 'Cursor'], ['vscode', 'VS Code'], ['code', 'Claude Code'], ['codex', 'Codex']].map(([v, l]) => (
+              <TabsTrigger key={v} value={v} className="!h-[34px] flex-none rounded-full px-3.5 text-[14px] shadow-none">{l}</TabsTrigger>
+            ))}
+          </TabsList>
+          <TabsContent value="claude" className="mt-4 grid gap-3">
+            <p className="text-[14.5px] leading-relaxed text-[var(--muted)]">In claude.ai or the Claude app: <b className="font-medium text-[var(--text)]">Settings → Connectors → Add custom connector</b>. Name it Posy, paste the address, and sign in when it asks.</p>
+            <CodeBlock label="Connector address" code={mcp} />
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" onClick={() => copy(mcp, 'Address copied')} className="ac-btn ac-btn-primary"><Copy className="size-4" />Copy address</Button>
+              <Button asChild variant="outline" className="ac-btn ac-btn-soft"><a href="https://claude.ai/settings/connectors" target="_blank" rel="noopener"><ExternalLink className="size-4" />Open Claude connectors</a></Button>
+            </div>
+          </TabsContent>
+          <TabsContent value="chatgpt" className="mt-4 grid gap-3">
+            <p className="text-[14.5px] leading-relaxed text-[var(--muted)]">In ChatGPT: <b className="font-medium text-[var(--text)]">Settings → Apps &amp; Connectors → Advanced → Developer mode</b>, then <b className="font-medium text-[var(--text)]">Create</b>. Paste the address, choose OAuth, and sign in.</p>
+            <CodeBlock label="Connector address" code={mcp} />
+            <div className="flex flex-wrap gap-2"><Button type="button" onClick={() => copy(mcp, 'Address copied')} className="ac-btn ac-btn-primary"><Copy className="size-4" />Copy address</Button></div>
+          </TabsContent>
+          <TabsContent value="cursor" className="mt-4 grid gap-3">
+            <p className="text-[14.5px] leading-relaxed text-[var(--muted)]">One click adds Posy to Cursor. It opens a Posy sign-in the first time you use it.</p>
+            <div className="flex flex-wrap gap-2"><Button asChild className="ac-btn ac-btn-primary"><a href={cursorLink}>Add to Cursor</a></Button></div>
+          </TabsContent>
+          <TabsContent value="vscode" className="mt-4 grid gap-3">
+            <CodeBlock label="Terminal" code={`code --add-mcp '${JSON.stringify({ name: 'posy', type: 'http', url: mcp })}'`} />
+            <div className="flex flex-wrap gap-2"><Button asChild variant="outline" className="ac-btn ac-btn-soft"><a href={vscodeLink}>Install in VS Code</a></Button></div>
+          </TabsContent>
+          <TabsContent value="code" className="mt-4 grid gap-3">
+            <CodeBlock label="Terminal" code={`claude mcp add --transport http posy ${mcp}`} />
+            <p className="text-[14.5px] leading-relaxed text-[var(--muted)]">Then run <code className="ac-mono">/mcp</code> in Claude Code and choose <b className="font-medium text-[var(--text)]">Authenticate</b>.</p>
+          </TabsContent>
+          <TabsContent value="codex" className="mt-4"><CodeBlock label="Terminal" code={`codex mcp add posy --url ${mcp}`} /></TabsContent>
+        </Tabs>
+      </Panel>
+
+      <Panel eyebrow="Any chat" tone="mint" title={<>No connector? Use a <i>file</i></>} desc="Ask ChatGPT, Gemini or any chat to write your page as a small JSON file, then load it here.">
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" onClick={() => copy(briefPrompt(site), 'Prompt copied. Paste it into your chat.')} className="ac-btn ac-btn-primary"><Copy className="size-4" />Copy a prompt for your chat</Button>
+          <Button asChild variant="outline" className="ac-btn ac-btn-soft"><a href="/new">Load a page file</a></Button>
+          <Button asChild variant="ghost" className="ac-btn"><a href="/docs/format" target="_blank" rel="noopener">How the file works</a></Button>
+        </div>
+      </Panel>
+
+      <Panel eyebrow="Try it" tone="rose" title={<>Ask for what you <i>want</i></>} desc="Click a prompt to copy it, then paste it into your agent.">
+        <ul className="grid gap-2.5 sm:grid-cols-2">
+          {PROMPTS.map((p, i) => (
+            <li key={p}>
+              <button type="button" onClick={() => copy(p, 'Prompt copied')} className={`ac-tone-${TONES[i % 4]} group h-full w-full rounded-2xl p-4 text-left text-[14.5px] leading-snug outline-none transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[var(--ring)]`}>
+                <span className="ac-mono mb-2 flex items-center justify-between text-[10.5px] uppercase tracking-[.08em] opacity-70">Prompt {i + 1}<Copy className="size-3.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" /></span>
+                &ldquo;{p}&rdquo;
+              </button>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-5 text-[14px] leading-relaxed text-[var(--muted)]">
+          Edits land in your draft and show up in the editor live. Your agent publishes only when you ask. Anyone&apos;s agent can read your published page at{' '}
+          <a className="ac-mono text-[12.5px] text-[var(--ac-deep)] underline underline-offset-4" href={`${site}/${username}/llms.txt`} target="_blank" rel="noopener">/{username}/llms.txt</a> and{' '}
+          <a className="ac-mono text-[12.5px] text-[var(--ac-deep)] underline underline-offset-4" href={`${site}/api/v1/public/${username}`} target="_blank" rel="noopener">JSON</a>.
+        </p>
+      </Panel>
+
+      <Panel eyebrow="Advanced" tone="butter" title={<>API <i>keys</i></>} desc="For scripts and tools that cannot sign in with a browser. A key lets them edit your page. You can revoke it any time.">
         <form className="flex flex-wrap gap-2" onSubmit={e => { e.preventDefault(); create(); }}>
           <Input aria-label="Key name" value={name} onChange={e => setName(e.target.value)} className="ac-input max-w-[280px]" />
           <Button type="submit" disabled={busy} className="ac-btn ac-btn-primary">
@@ -96,10 +161,7 @@ export function AgentsPanel({ site, username }: { site: string; username: string
             </TableBody>
           </Table>
         </div>
-      </Panel>
-
-      <Panel eyebrow="Step 2" tone="lilac" title={<>Connect your <i>agent</i></>} desc="Posy speaks MCP, so it works with Claude, Cursor, Codex and anything else that does.">
-        <Tabs defaultValue="claude">
+        <Tabs defaultValue="claude" className="mt-6">
           <TabsList className="ac-seg !h-auto flex-wrap">
             {[['claude', 'Claude Code'], ['cursor', 'Cursor'], ['codex', 'Codex'], ['other', 'Other apps'], ['rest', 'REST']].map(([v, l]) => (
               <TabsTrigger key={v} value={v} className="!h-[34px] flex-none rounded-full px-3.5 text-[14px] shadow-none">{l}</TabsTrigger>
@@ -117,24 +179,6 @@ export function AgentsPanel({ site, username }: { site: string; username: string
             <CodeBlock label="Publish" code={`curl -X POST ${site}/api/v1/page/publish -H "Authorization: Bearer ${key}"`} />
           </TabsContent>
         </Tabs>
-      </Panel>
-
-      <Panel eyebrow="Step 3" tone="mint" title={<>Ask for what you <i>want</i></>} desc="Click a prompt to copy it, then paste it into your agent.">
-        <ul className="grid gap-2.5 sm:grid-cols-2">
-          {PROMPTS.map((p, i) => (
-            <li key={p}>
-              <button type="button" onClick={() => copy(p, 'Prompt copied')} className={`ac-tone-${TONES[i % 4]} group h-full w-full rounded-2xl p-4 text-left text-[14.5px] leading-snug outline-none transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[var(--ring)]`}>
-                <span className="ac-mono mb-2 flex items-center justify-between text-[10.5px] uppercase tracking-[.08em] opacity-70">Prompt {i + 1}<Copy className="size-3.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" /></span>
-                &ldquo;{p}&rdquo;
-              </button>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-5 text-[14px] leading-relaxed text-[var(--muted)]">
-          Edits land in your draft and show up in the editor live. Your agent publishes only when you ask. Anyone&apos;s agent can read your published page at{' '}
-          <a className="ac-mono text-[12.5px] text-[var(--ac-deep)] underline underline-offset-4" href={`${site}/${username}/llms.txt`} target="_blank" rel="noopener">/{username}/llms.txt</a> and{' '}
-          <a className="ac-mono text-[12.5px] text-[var(--ac-deep)] underline underline-offset-4" href={`${site}/api/v1/public/${username}`} target="_blank" rel="noopener">JSON</a>.
-        </p>
       </Panel>
 
       <Dialog open={!!doomed} onOpenChange={o => !o && setDoomed(null)}>
