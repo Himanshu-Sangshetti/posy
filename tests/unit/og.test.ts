@@ -44,7 +44,7 @@ describe('share image helpers', () => {
     expect(glowFor('#ff3ea5', 'auto', 1)).toBe('#2be4ff');
   });
   it('maps each style to its favicon drawing, and falls back to cozy', () => {
-    expect(faviconKind('lofi')).toBe('neon');
+    expect(faviconKind('lofi')).toBe('soft');
     expect(faviconKind('washi')).toBe('editorial');
     expect(faviconKind('minimal')).toBe('soft');
     expect(faviconKind('whatever')).toBe('cozy');
