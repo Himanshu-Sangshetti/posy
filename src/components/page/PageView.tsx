@@ -44,7 +44,8 @@ export function PageFrame({ page, children, profile, className, interactive = tr
   return (
     <div className={cn(pageClasses(page), className)} style={{ ...pageStyle(page), colorScheme: isDark(page) ? 'dark' : 'light' }}>
       <Backdrop />
-      {page.theme.style === 'lofi' && !isDark(page) && page.theme.ambient && <Clouds3D />}
+      {/* the WebGL clouds only run on a real page, never in thumbnails and previews (each one is a full-size canvas) */}
+      {interactive && page.theme.style === 'lofi' && !isDark(page) && page.theme.ambient && <Clouds3D />}
       {(page.theme.style === 'lofi' || page.theme.style === 'night') && isDark(page) && page.theme.ambient && <div aria-hidden className="lf-rain" />}
       {page.theme.style === 'lofi' && <LofiMenuBar name={page.profile.name} pinned={interactive} />}
       {interactive && page.theme.style === 'lofi' && page.theme.layout === 'canvas' && <DraggableWindows />}
