@@ -61,11 +61,11 @@ export function Onboarding({ initialUsername, initialStyle = 'cozy', styles, the
             <h1 className="ac-display ac-h1">Claim your <i>name</i></h1>
             <p className="ac-lede mt-3">This is where people will find you. Then pick a look below and watch your page come together.</p>
           </div>
-          <label className="ac-card flex h-16 items-center pl-5 pr-4 text-[18px] transition-shadow focus-within:border-[var(--ac-deep)] focus-within:shadow-[0_0_0_4px_rgb(228_87_46/.22)]">
+          <label className="ac-card flex h-16 min-w-0 items-center pl-5 pr-4 text-[18px] transition-shadow focus-within:border-[var(--ac-deep)] focus-within:shadow-[0_0_0_4px_rgb(228_87_46/.22)]">
             <span className="ac-mono text-[15px] text-[var(--muted)]">{host}/</span>
             <input autoFocus aria-label="Username" value={name} onChange={e => setName(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))} maxLength={30} placeholder="yourname"
-              className="min-w-0 flex-1 bg-transparent font-medium outline-none placeholder:text-[var(--muted)]/50" />
-            <span className="ml-2 flex items-center gap-1.5 text-[13.5px]" role="status" aria-live="polite">
+              className="w-0 min-w-0 flex-1 bg-transparent font-medium outline-none placeholder:text-[var(--muted)]/50" />
+            <span className="ml-2 flex shrink-0 items-center gap-1.5 text-[13.5px]" role="status" aria-live="polite">
               {name && !check && <Loader2 className="size-4 animate-spin text-[var(--muted)]" />}
               {check?.ok && <span className="ac-pill ac-tone-mint !normal-case !tracking-normal"><Check className="size-3.5" />Available</span>}
               {check && !check.ok && <span className="ac-pill ac-tone-rose !normal-case !tracking-normal"><X className="size-3.5" />{check.reason}</span>}

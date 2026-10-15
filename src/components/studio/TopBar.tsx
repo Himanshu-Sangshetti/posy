@@ -64,7 +64,8 @@ export function TopBar({ username, site, saveState, unpublished, publishing, onP
     <header onClick={e => e.stopPropagation()} className={cn(CHROME, 'sc-bar fixed inset-x-0 top-0 z-40 grid h-14 grid-cols-[1fr_auto_1fr] items-center gap-3 px-3 sm:px-4')}>
       <div className="flex items-center gap-1">
         <NavMenu username={username} site={site} current="/edit" />
-        <AppTabs extra={extra} className="ml-1 hidden lg:inline-flex" />
+        {/* wrapped: `.app-tabs` sets its own display, which would beat a `hidden` class on the nav itself */}
+        <div className="ml-1 hidden lg:block"><AppTabs extra={extra} /></div>
         <span className="sc-title ml-1 text-[19px] leading-none lg:hidden">Editor</span>
       </div>
 

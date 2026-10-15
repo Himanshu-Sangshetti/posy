@@ -739,7 +739,9 @@ body.ac-body { background: var(--bg); font-family: var(--font-sans); }
 .nf-logo { display: inline-flex; padding: 8px 14px; border-radius: 999px; background: rgb(255 255 255 / .85); backdrop-filter: blur(12px); box-shadow: 0 8px 24px -12px rgb(0 0 0 / .4); }
 
 /* Public docs (/docs/*), rendered from markdown */
-.posy-doc { color: var(--text); font-size: 16px; line-height: 1.65; }
+.posy-doc { color: var(--text); font-size: 16px; line-height: 1.65; max-width: 100%; min-width: 0; overflow-wrap: break-word; }
+.posy-doc pre { max-width: 100%; }
+.posy-doc table { display: block; max-width: 100%; overflow-x: auto; }
 .posy-doc h1 { font-family: var(--font-serif); font-weight: 400; font-size: clamp(36px, 6vw, 52px); letter-spacing: -0.02em; line-height: 1.04; margin: 0 0 20px; }
 .posy-doc h2 { font-family: var(--font-serif); font-weight: 400; font-size: 28px; margin: 40px 0 10px; letter-spacing: -0.01em; }
 .posy-doc p, .posy-doc ul, .posy-doc ol { margin: 12px 0; color: var(--muted); }
