@@ -55,21 +55,26 @@ export function Onboarding({ initialUsername, styles, themes, host }: { initialU
   const themeName = themes.find(t => t.id === preset)?.name ?? '';
   return (
     <div className="ac-rise grid grid-cols-[minmax(0,1fr)] gap-8">
-      <div>
-        <h1 className="ac-display ac-h1">Claim your <i>name</i></h1>
-        <p className="ac-lede mt-3">This is your address on the web. Pick the look below and watch it come together in the preview.</p>
-      </div>
-      <label className="ac-card flex h-16 items-center pl-5 pr-4 text-[18px] transition-shadow focus-within:border-[var(--ac-deep)] focus-within:shadow-[0_0_0_4px_rgb(228_87_46/.22)]">
-        <span className="ac-mono text-[15px] text-[var(--muted)]">{host}/</span>
-        <input autoFocus aria-label="Username" value={name} onChange={e => setName(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))} maxLength={30} placeholder="yourname"
-          className="min-w-0 flex-1 bg-transparent font-medium outline-none placeholder:text-[var(--muted)]/50" />
-        <span className="ml-2 flex items-center gap-1.5 text-[13.5px]" role="status" aria-live="polite">
-          {name && !check && <Loader2 className="size-4 animate-spin text-[var(--muted)]" />}
-          {check?.ok && <span className="ac-pill ac-tone-mint !normal-case !tracking-normal"><Check className="size-3.5" />Available</span>}
-          {check && !check.ok && <span className="ac-pill ac-tone-rose !normal-case !tracking-normal"><X className="size-3.5" />{check.reason}</span>}
-        </span>
-      </label>
-
+      <section className="ob-hero">
+        <div className="ob-hero-copy">
+          <div>
+            <h1 className="ac-display ac-h1">Claim your <i>name</i></h1>
+            <p className="ac-lede mt-3">This is where people will find you. Then pick a look below and watch your page come together.</p>
+          </div>
+          <label className="ac-card flex h-16 items-center pl-5 pr-4 text-[18px] transition-shadow focus-within:border-[var(--ac-deep)] focus-within:shadow-[0_0_0_4px_rgb(228_87_46/.22)]">
+            <span className="ac-mono text-[15px] text-[var(--muted)]">{host}/</span>
+            <input autoFocus aria-label="Username" value={name} onChange={e => setName(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))} maxLength={30} placeholder="yourname"
+              className="min-w-0 flex-1 bg-transparent font-medium outline-none placeholder:text-[var(--muted)]/50" />
+            <span className="ml-2 flex items-center gap-1.5 text-[13.5px]" role="status" aria-live="polite">
+              {name && !check && <Loader2 className="size-4 animate-spin text-[var(--muted)]" />}
+              {check?.ok && <span className="ac-pill ac-tone-mint !normal-case !tracking-normal"><Check className="size-3.5" />Available</span>}
+              {check && !check.ok && <span className="ac-pill ac-tone-rose !normal-case !tracking-normal"><X className="size-3.5" />{check.reason}</span>}
+            </span>
+          </label>
+        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="ob-hero-art" src="/art/onboard.jpg" alt="A girl on the floor choosing which photos and records to pin up, her cat batting at a postcard" />
+      </section>
       <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_400px]">
         <div className="grid min-w-0 gap-8">
           <section className="grid gap-4">

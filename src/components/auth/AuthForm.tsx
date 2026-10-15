@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { siGithub, siGoogle } from 'simple-icons';
+import { PaintedScene } from '@/components/art/PaintedScene';
 
 type Mode = 'login' | 'signup';
 
@@ -45,11 +46,12 @@ export function AuthForm({ mode, providers }: { mode: Mode; providers: { github:
 
   const signup = mode === 'signup';
   return (
-    <div className="ac-rise ac-card mx-auto w-full max-w-[420px] p-7 sm:p-9">
-      <p className="ac-eyebrow">{signup ? 'Step 1 of 2 · Account' : 'Welcome back'}</p>
-      <h1 className="ac-display mt-3 text-[40px]">{signup ? <>Make your <i>page</i></> : <>Log <i>in</i></>}</h1>
+    <main className="au-main">
+    <PaintedScene scene={signup ? 'signup' : 'login'} className="au-art" />
+    <div className="ac-rise au-card">
+      <h1 className="ac-display text-[44px]">{signup ? <>Make your <i>page</i></> : <>Welcome <i>back</i></>}</h1>
       <p className="mt-3 text-[15px] leading-relaxed text-[var(--muted)]">
-        {signup ? (wanted ? <>Claim <b className="ac-mono text-[13.5px] font-medium text-[var(--text)]">posy.page/{wanted}</b> in a minute.</> : 'Free, and it takes a minute.') : 'Pick up where you left off.'}
+        {signup ? (wanted ? <>Claim <b className="ac-mono text-[13.5px] font-medium text-[var(--text)]">posy.page/{wanted}</b> in a minute.</> : 'Free, and it takes about a minute.') : 'Your page is right where you left it.'}
       </p>
       {(providers.github || providers.google) && (
         <div className="mt-6 grid gap-2.5">
@@ -83,5 +85,6 @@ export function AuthForm({ mode, providers }: { mode: Mode; providers: { github:
           : <>New here? <Link href={`/signup${wanted ? `?username=${wanted}` : ''}`} className="font-medium text-[var(--ac-deep)] underline-offset-4 hover:underline">Make your page</Link></>}
       </p>
     </div>
+    </main>
   );
 }

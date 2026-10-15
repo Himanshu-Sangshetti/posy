@@ -1,5 +1,6 @@
 'use client';
 
+import { launchKite } from './kite-launch';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Toaster, toast } from 'sonner';
@@ -107,6 +108,7 @@ export function Studio({ init }: { init: StudioInit }) {
     try {
       const url = await publish();
       setUnpublished(false);
+      launchKite(document.querySelector('[data-publish]'));
       toast.success('Your page is live', { description: 'Anyone with the link can see it now.', action: { label: 'View', onClick: () => window.open(url, '_blank') } });
     } catch { toast.error('Could not publish. Try again.'); }
     finally { setPublishing(false); }

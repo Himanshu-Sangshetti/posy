@@ -1,0 +1,45 @@
+/* PaintedScene: the picture is drawn into a 3:2 box that covers its container, so overlays in % stay put. */
+.ps { position: absolute; inset: 0; overflow: hidden; container-type: size; background: #1b2238; }
+.ps-pic { position: absolute; left: 50%; top: 50%; width: max(100cqw, 150cqh); aspect-ratio: 3 / 2; translate: -50% -50%; }
+.ps-pic > img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ps-pic > :not(img) { position: absolute; pointer-events: none; }
+
+/* signup: the morning beam breathes and dust drifts slowly through it */
+.ps-beam { inset: 0; background: linear-gradient(115deg, rgb(255 236 190 / 0) 25%, rgb(255 236 190 / .35) 40%, rgb(255 236 190 / 0) 55%); mix-blend-mode: soft-light; animation: ps-beam 7s ease-in-out infinite; }
+@keyframes ps-beam { 50% { opacity: .35; } }
+.ps-mote { width: .35%; aspect-ratio: 1; border-radius: 50%; background: rgb(255 248 220 / .9); box-shadow: 0 0 6px rgb(255 240 200 / .9); animation: ps-mote 11s ease-in-out infinite; }
+@keyframes ps-mote { 0% { translate: 0 0; opacity: 0; } 20% { opacity: 1; } 50% { translate: 2cqw 3cqh; } 80% { opacity: .8; } 100% { translate: -1cqw 7cqh; opacity: 0; } }
+
+/* login: rain running down the window, the lamp glowing, the laptop's light */
+.ps-rain { overflow: hidden; opacity: .55; mix-blend-mode: screen; animation: ps-rain .9s linear infinite;
+  background-image: repeating-linear-gradient(100deg, transparent 0 22px, rgb(210 225 255 / .35) 22px 23px, transparent 23px 47px), repeating-linear-gradient(98deg, transparent 0 13px, rgb(210 225 255 / .25) 13px 14px, transparent 14px 31px);
+  background-size: 100% 60px, 100% 40px; }
+@keyframes ps-rain { to { background-position: -6px 60px, -4px 40px; } }
+.ps-glow { width: 26%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; mix-blend-mode: screen; background: radial-gradient(circle, rgb(255 214 140 / .55), rgb(255 190 110 / .15) 40%, transparent 70%); animation: ps-glow 5s ease-in-out infinite; }
+@keyframes ps-glow { 50% { opacity: .7; scale: .96; } 52% { opacity: .55; } 54% { opacity: .75; } }
+.ps-screen { mix-blend-mode: screen; background: rgb(150 190 255 / .18); border-radius: 4px; animation: ps-screen 3.2s steps(3) infinite; }
+@keyframes ps-screen { 50% { opacity: .4; } }
+
+/* lost: a cloud's shadow passing over the hill, and the tree swaying a little in the wind */
+.ps-shade { inset: 0; background: radial-gradient(40% 30% at 50% 50%, rgb(20 40 70 / .28), transparent 70%); mix-blend-mode: multiply; animation: ps-shade 26s linear infinite; }
+@keyframes ps-shade { from { translate: -60% 30%; } to { translate: 80% 30%; } }
+.ps-sway { inset: 0; background: radial-gradient(30% 35% at 82% 22%, rgb(255 255 230 / .14), transparent 70%); mix-blend-mode: soft-light; animation: ps-sway 4s ease-in-out infinite alternate; }
+@keyframes ps-sway { to { translate: -1% .5%; } }
+.ps-lost .ps-pic > img { animation: ps-drift 30s ease-in-out infinite alternate; transform-origin: 75% 25%; }
+@keyframes ps-drift { to { scale: 1.04; } }
+
+@media (prefers-reduced-motion: reduce) { .ps-pic * { animation: none !important; } }
+
+/* SkyBand */
+.sb { position: absolute; inset: 0 0 auto; z-index: -1; height: clamp(360px, 52vh, 520px); overflow: hidden; pointer-events: none;
+  -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent); }
+.sb-pic { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: sb-drift 40s ease-in-out infinite alternate; }
+@keyframes sb-drift { from { scale: 1.02; } to { scale: 1.08; translate: -1% 0; } }
+.sb::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgb(255 255 255 / .55), rgb(255 255 255 / .1) 45%, rgb(255 255 255 / .55)); }
+.sb-cloud { position: absolute; top: 14%; left: 0; width: min(26vw, 340px); opacity: .9; animation: sb-cloud 70s linear infinite; }
+@keyframes sb-cloud { from { translate: -40vw 0; } to { translate: 120vw 3vh; } }
+@media (prefers-reduced-motion: reduce) { .sb-pic, .sb-cloud { animation: none; } }
+/* in-flow variant: a painted strip above the page title (the dashboard) */
+.sb.sb-strip { position: relative; inset: auto; z-index: 0; height: clamp(170px, 30vh, 270px); margin-top: -62px;
+  -webkit-mask-image: linear-gradient(#000 70%, transparent); mask-image: linear-gradient(#000 70%, transparent); }
+.sb.sb-strip::after { background: linear-gradient(rgb(255 255 255 / .35), rgb(255 255 255 / 0) 40%); }
