@@ -77,6 +77,7 @@
             "sakura",
             "yomogi",
             "sumi",
+            "daydream",
             "night-blue",
             "violet",
             "rain",
@@ -123,7 +124,7 @@
         },
         "style": {
           "default": "cozy",
-          "description": "cozy = Desk: tiles as objects on a desk (polaroids, sticky notes, records); minimal = quiet type and plain cards; washi = a Japanese print (paper, ink, kanji numerals, red seal); lofi = a night-time anime still (tiles as little app windows, halftone photos)",
+          "description": "cozy = Desk: tiles as objects on a desk (polaroids, sticky notes, records); minimal = paper and ink, photos printed as 1-bit dither that turn to colour on hover; washi = a Japanese print (paper, ink, kanji numerals, red seal); lofi = a desktop left open (tiles as little app windows with pinstriped title bars, clay clouds by day, painted anime rooms at night)",
           "type": "string",
           "enum": [
             "cozy",
@@ -224,6 +225,15 @@
             "circle",
             "square",
             "hidden"
+          ]
+        },
+        "photos": {
+          "description": "How photos are printed: natural colour, mono (black and white) or dither (1-bit pixels, colour on hover). Unset = the style's own default (Minimal dithers)",
+          "type": "string",
+          "enum": [
+            "natural",
+            "mono",
+            "dither"
           ]
         },
         "motion": {

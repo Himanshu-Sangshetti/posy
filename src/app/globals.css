@@ -640,3 +640,9 @@ body.ac-body { background: var(--bg); font-family: var(--font-sans); }
 .posy-style-cozy .dk-note { background-image: linear-gradient(170deg, color-mix(in oklab, var(--paper) 75%, white), var(--paper)), url(/looks/desk/paper.jpg); background-size: auto, 300px; background-blend-mode: multiply; }
 .posy-style-cozy.posy-preset-oak .posy-bio { color: #3b2d1f; }
 .posy-style-cozy.posy-preset-slate .posy-bio { color: #d9cfc3; }
+
+/* ---- photo looks (theme.photos): mono, or dither (canvas from DitherPhotos; black and white until it draws) ---- */
+.posy-photos-mono :is(.posy-tile, .posy-avatar, .posy-obj) img { filter: grayscale(1) contrast(1.08); transition: filter .5s; }
+.posy-photos-mono :is(.posy-tile, .posy-obj):hover img { filter: none; }
+.posy-photos-dither :is(.posy-tile, .posy-avatar, .posy-obj) img:not(.posy-dith-on) { filter: grayscale(1) contrast(1.15); }
+.posy-dith { position: absolute; z-index: 0; pointer-events: none; image-rendering: pixelated; border-radius: inherit; }

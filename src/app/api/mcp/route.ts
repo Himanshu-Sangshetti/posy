@@ -3,7 +3,7 @@ import { createMcpHandler, withMcpAuth } from 'mcp-handler';
 import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { getState, addTile, updateTile, removeTile, moveTile, setTheme, setProfile, publishPage } from '@/lib/page-ops';
-import { SIZES, COLORS, FONTS, RADII, LAYOUTS, ALIGNS, BACKGROUNDS, TILE_STYLES, EFFECTS, AVATARS } from '@/lib/schema';
+import { SIZES, COLORS, FONTS, RADII, LAYOUTS, ALIGNS, BACKGROUNDS, TILE_STYLES, EFFECTS, AVATARS, PHOTO_LOOKS } from '@/lib/schema';
 import { THEME_IDS } from '@/lib/themes';
 import { PLATFORM_IDS } from '@/lib/platforms';
 
@@ -61,7 +61,7 @@ const handler = createMcpHandler(server => {
     inputSchema: z.object({
       preset: z.enum(THEME_IDS).optional(), accent: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
       font: z.enum(FONTS).optional(), radius: z.enum(RADII).optional(), layout: z.enum(LAYOUTS).optional(), align: z.enum(ALIGNS).optional(),
-      tileStyle: z.enum(TILE_STYLES).optional(), effect: z.enum(EFFECTS).optional(), avatar: z.enum(AVATARS).optional(), motion: z.boolean().optional(),
+      tileStyle: z.enum(TILE_STYLES).optional(), effect: z.enum(EFFECTS).optional(), avatar: z.enum(AVATARS).optional(), photos: z.enum(PHOTO_LOOKS).optional(), motion: z.boolean().optional(),
       background: z.object({ style: z.enum(BACKGROUNDS).optional(), image: z.string().optional(), dim: z.number().optional(), blur: z.number().optional(), grain: z.boolean().optional() }).optional(),
     }),
   }, run(async (userId, a: Record<string, unknown>) => ({ theme: await setTheme(userId, a) })));
@@ -77,7 +77,7 @@ const handler = createMcpHandler(server => {
 
   server.registerTool('list_options', {
     title: 'List options', description: 'Allowed values for themes, fonts, backgrounds, tile styles, sizes, colours and social platforms.', inputSchema: z.object({}),
-  }, run(async () => ({ themes: THEME_IDS, fonts: FONTS, radius: RADII, layouts: LAYOUTS, align: ALIGNS, backgrounds: BACKGROUNDS, tileStyles: TILE_STYLES, effects: EFFECTS, avatars: AVATARS, sizes: SIZES, colors: COLORS, platforms: PLATFORM_IDS })));
+  }, run(async () => ({ themes: THEME_IDS, fonts: FONTS, radius: RADII, layouts: LAYOUTS, align: ALIGNS, backgrounds: BACKGROUNDS, tileStyles: TILE_STYLES, effects: EFFECTS, avatars: AVATARS, photos: PHOTO_LOOKS, sizes: SIZES, colors: COLORS, platforms: PLATFORM_IDS })));
 }, { serverInfo: { name: 'posy', version: '2.0.0' }, instructions: INSTRUCTIONS });
 
 const verify = async (_req: Request, token?: string) => {

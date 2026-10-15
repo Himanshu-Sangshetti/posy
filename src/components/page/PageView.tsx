@@ -3,14 +3,14 @@ import { MapPin } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { Page, Tile } from '@/lib/schema';
 import { PLATFORMS, profileUrl } from '@/lib/platforms';
-import { pageStyle, pageClasses, tileBackground, isDark } from '@/lib/style';
+import { pageStyle, pageClasses, tileBackground, isDark, photoLook } from '@/lib/style';
 import { asset, cn } from '@/lib/utils';
 import { MotionProvider, MotionShell, MotionHeader } from './motion';
-import { ShareButton, TileEffects } from './islands';
+import { ShareButton, TileEffects, DraggableWindows, DitherPhotos } from './islands';
 import { TileContent, tileHref, brandHex, RichText, ListItem, BrandIcon } from './tiles';
 import { deskTilt } from './desk';
 import { StyleHeader, StyleTile, StyleRow, headerClass, socialsInHeader, type StyleId } from './styles';
-import { Halftone } from './styles/lofi';
+import { Halftone, LofiMenuBar } from './styles/lofi';
 import { Clouds3D } from './Clouds3D';
 import { placeTiles, canvasHeight, readingOrder, boxSize } from '@/lib/canvas-layout';
 import type { TilePos } from '@/lib/schema';
@@ -45,6 +45,8 @@ export function PageFrame({ page, children, profile, className, interactive = tr
     <div className={cn(pageClasses(page), className)} style={{ ...pageStyle(page), colorScheme: isDark(page) ? 'dark' : 'light' }}>
       <Backdrop />
       {page.theme.style === 'lofi' && !isDark(page) && <Clouds3D />}
+      {page.theme.style === 'lofi' && <LofiMenuBar name={page.profile.name} pinned={interactive} />}
+      {interactive && page.theme.style === 'lofi' && page.theme.layout === 'canvas' && <DraggableWindows />}
       <MotionProvider enabled={page.theme.motion}>
         <div className="posy-layout">
           {profile ?? <Profile page={page} interactive={interactive} />}
@@ -57,6 +59,7 @@ export function PageFrame({ page, children, profile, className, interactive = tr
         )}
       </MotionProvider>
       {interactive && fx && <TileEffects />}
+      {interactive && photoLook(page) === 'dither' && <DitherPhotos />}
     </div>
   );
 }
@@ -85,6 +88,7 @@ export function SocialRow({ tiles }: { tiles: Extract<Tile, { type: 'social' }>[
           <a key={t.id} href={profileUrl(t.platform, t.handle, t.url)} target={t.platform === 'email' ? undefined : '_blank'} rel="noopener" aria-label={`${p.label}: ${t.handle}`}
             style={{ '--brand': `#${p.icon?.hex ?? '6b7280'}` } as React.CSSProperties}>
             {p.icon?.path ? <BrandIcon path={p.icon.path} size={19} /> : t.platform === 'email' ? <span className="text-[17px]">@</span> : <span className="text-[14px] font-bold">in</span>}
+            <span className="posy-social-label">{p.label}</span>
           </a>
         );
       })}
@@ -122,7 +126,7 @@ export function Profile({ page, interactive = true }: { page: Page; interactive?
   return (
     <MotionHeader className="posy-profile">
       <Avatar page={page} />
-      <h1 className="posy-head posy-name">{name}</h1>
+      <h1 className="posy-head posy-name" style={{ '--nlen': name.length } as React.CSSProperties}>{name}</h1>
       {bio && <p className="posy-bio"><RichText text={bio} /></p>}
       <div className="posy-meta">
         {location && <span className="sf-pill"><MapPin className="size-3.5" />{location}</span>}
@@ -231,7 +235,7 @@ export const halfOnPhone = (pos: TilePos) => pos.w < 480;
 function CanvasTiles({ page }: { page: Page }) {
   const lift = page.theme.effect === 'lift';
   const tiles = socialsInHeader(page) ? page.tiles.filter(t => t.type !== 'social') : page.tiles;
-  const placed = placeTiles(tiles);
+  const placed = placeTiles(tiles, page.theme.style === 'lofi');
   const ord = ordinals(page.tiles);
   return (
     <div className="posy-canvas-wrap">

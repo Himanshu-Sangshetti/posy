@@ -16,7 +16,7 @@
 .posy-style-minimal.posy-avatar-squircle .posy-avatar { border-radius: 28%; }
 .posy-style-minimal.posy-avatar-square .posy-avatar { border-radius: 10px; }
 .posy-style-minimal .posy-name { margin-top: 18px; font-size: 48px; line-height: .98; letter-spacing: -.02em; text-wrap: balance; overflow-wrap: anywhere; }
-@container page (min-width: 700px) { .posy-style-minimal .posy-name { font-size: 64px; } }
+@container page (min-width: 700px) { .posy-style-minimal .posy-name { font-size: max(48px, calc(80px * 9 / max(9, var(--nlen, 9)))); } }
 .posy-style-minimal.posy-layout-list .posy-name { font-size: 40px; }
 .posy-style-minimal .posy-bio { font-family: var(--font-body); font-size: 17px; line-height: 1.55; max-width: 34ch; color: var(--sf-ink-soft); text-wrap: pretty; }
 .posy-style-minimal .posy-meta { flex-wrap: wrap; gap: 16px; margin-top: 6px; }

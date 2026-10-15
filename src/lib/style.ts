@@ -60,10 +60,13 @@ export function pageClasses(page: Page): string {
     `posy-tiles-${t.tileStyle}`,
     `posy-fx-${t.effect}`,
     `posy-avatar-${t.avatar}`,
+    `posy-photos-${photoLook(page)}`,
     t.motion && 'posy-motion',
     isDark(page) && 'dark',
   ].filter(Boolean).join(' ');
 }
+/** How photos are printed: what the page chose, or its style's default. */
+export const photoLook = (page: Page) => page.theme.photos ?? (page.theme.style === 'minimal' ? 'dither' : 'natural');
 export const isDark = (page: Page) => THEMES[page.theme.preset as ThemeId]?.dark ?? false;
 
 /** Background for a tile: the plain card colour, or the tint someone picked for it. */

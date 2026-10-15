@@ -4,9 +4,9 @@ import { useRef, useState } from 'react';
 import { ImagePlus, Loader2, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Page } from '@/lib/schema';
-import { FONTS, RADII, BACKGROUNDS, TILE_STYLES, EFFECTS, AVATARS } from '@/lib/schema';
+import { FONTS, RADII, BACKGROUNDS, TILE_STYLES, EFFECTS, AVATARS, PHOTO_LOOKS } from '@/lib/schema';
 import { THEMES, THEME_IDS, PREMIUM_THEMES, type ThemeId } from '@/lib/themes';
-import { ALL_FONT_PAIRS as FONT_PAIRS, FONT_VARS, PREMIUM_FONTS } from '@/lib/style';
+import { ALL_FONT_PAIRS as FONT_PAIRS, FONT_VARS, PREMIUM_FONTS, photoLook } from '@/lib/style';
 import { useEntitlements } from './entitlements';
 import { STYLE_IDS, STYLE_INFO, STYLE_PALETTES, PREMIUM_STYLES, type StyleId } from '@/lib/styles';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -100,6 +100,8 @@ function SwitchRow({ title, note, checked, onChange, disabled }: { title: string
 
 const proNote = () => toast('Part of Posy Pro', { description: 'Upgrade from Settings to use premium themes, fonts and more.' });
 
+const PHOTO_LABEL: Record<(typeof PHOTO_LOOKS)[number], string> = { natural: 'Colour', mono: 'Black & white', dither: 'Dither' };
+
 export type DesignTab = 'style' | 'colour' | 'type' | 'layout' | 'background';
 const TAB_LABEL: Record<DesignTab, string> = { style: 'Style', colour: 'Colour', type: 'Type', layout: 'Layout', background: 'Backdrop' };
 
@@ -166,6 +168,14 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
           <div className="grid grid-cols-4 gap-2">
             {EFFECTS.map(f => (
               <button key={f} type="button" aria-pressed={t.effect === f} onClick={() => updateTheme({ effect: f })} className={cn('h-10 text-[13px]', choice(t.effect === f))}>{FX_LABEL[f]}</button>
+            ))}
+          </div>
+        </div>
+        <div className="grid gap-2.5">
+          <Label>Photos</Label>
+          <div className="grid grid-cols-3 gap-2">
+            {PHOTO_LOOKS.map(f => (
+              <button key={f} type="button" aria-pressed={photoLook(page) === f} onClick={() => updateTheme({ photos: f })} className={cn('h-10 text-[13px]', choice(photoLook(page) === f))}>{PHOTO_LABEL[f]}</button>
             ))}
           </div>
         </div>

@@ -98,3 +98,124 @@ export function PageAnalytics({ username }: { username: string }) {
 }
 
 const RAMP = ' .:-=+*#%@';
+
+/** Lofi canvas pages: visitors can pick a window up by its title bar and move it, like a real desktop.
+ *  Nothing is saved; a click that ends a drag doesn't open the link. Off on phones (the canvas is a column there). */
+export function DraggableWindows() {
+  useEffect(() => {
+    let top = 100;
+    let drag: { el: HTMLElement; x: number; y: number; ox: number; oy: number; moved: boolean } | null = null;
+    let swallow = false;
+    const down = (e: PointerEvent) => {
+      const t = e.target as HTMLElement;
+      const win = t.closest<HTMLElement>('.posy-cv');
+      if (!win || e.button !== 0 || !window.matchMedia('(min-width: 640px)').matches) return;
+      win.style.zIndex = String(++top);
+      if (!t.closest('.lf-bar')) return;
+      const [ox, oy] = (win.style.translate || '0px 0px').split(' ').map(v => parseFloat(v) || 0);
+      drag = { el: win, x: e.clientX, y: e.clientY, ox, oy, moved: false };
+      win.classList.add('lf-dragging');
+      e.preventDefault();
+    };
+    const move = (e: PointerEvent) => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+      drag.el.style.translate = `${drag.ox + dx}px ${drag.oy + dy}px`;
+    };
+    const up = () => { if (!drag) return; swallow = drag.moved; drag.el.classList.remove('lf-dragging'); drag = null; };
+    const click = (e: MouseEvent) => { if (swallow) { e.preventDefault(); e.stopPropagation(); swallow = false; } };
+    document.addEventListener('pointerdown', down);
+    window.addEventListener('pointermove', move, { passive: true });
+    window.addEventListener('pointerup', up);
+    document.addEventListener('click', click, true);
+    return () => { document.removeEventListener('pointerdown', down); window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); document.removeEventListener('click', click, true); };
+  }, []);
+  return null;
+}
+
+/**
+ * Photos printed as 1-bit dither in the page's ink, on its paper. Hovering a tile dissolves the print block by block
+ * to the real photo, and back. Each photo is drawn once into a canvas over the <img>; without JS (or if an image host
+ * refuses CORS) the CSS fallback shows it in black and white instead.
+ */
+export function DitherPhotos() {
+  useEffect(() => {
+    const page = document.querySelector<HTMLElement>('.posy-photos-dither');
+    if (!page) return;
+    const css = getComputedStyle(page);
+    const rgb = (v: string) => { const c = document.createElement('canvas').getContext('2d')!; c.fillStyle = v.trim() || '#000'; const h = c.fillStyle as string; return h.startsWith('#') ? [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)) : [0, 0, 0]; };
+    const ink = rgb(css.getPropertyValue('--text')), paper = rgb(css.getPropertyValue('--surface'));
+    const PX = 2, BLOCK = 6;
+    const cleanups: (() => void)[] = [];
+    // React may still be hydrating parts of the page and drop nodes it didn't render; put our canvas back if so.
+    const canvases = new WeakMap<HTMLImageElement, HTMLCanvasElement>();
+
+    const print = (img: HTMLImageElement) => {
+      const had = canvases.get(img);
+      if (had) { if (!had.isConnected && img.isConnected) img.insertAdjacentElement('afterend', had); return; }
+      if (img.closest('.posy-dither-skip')) return;
+      const src = new Image(); src.crossOrigin = 'anonymous'; src.src = img.currentSrc || img.src;
+      const cv = document.createElement('canvas'); cv.className = 'posy-dith'; cv.setAttribute('aria-hidden', 'true');
+      canvases.set(img, cv);
+      let data: ImageData | null = null, order: number[] = [], shown = 1, raf = 0, bw = 0, bh = 0;
+      const draw = () => {
+        const w = img.offsetWidth, h = img.offsetHeight;
+        if (!w || !h || !src.naturalWidth) return;
+        Object.assign(cv.style, { left: `${img.offsetLeft}px`, top: `${img.offsetTop}px`, width: `${w}px`, height: `${h}px` });
+        bw = Math.ceil(w / PX); bh = Math.ceil(h / PX); cv.width = bw; cv.height = bh;
+        const ctx = cv.getContext('2d', { willReadFrequently: true })!;
+        const s = Math.max(bw / src.naturalWidth, bh / src.naturalHeight);
+        ctx.drawImage(src, (bw - src.naturalWidth * s) / 2, (bh - src.naturalHeight * s) / 2, src.naturalWidth * s, src.naturalHeight * s);
+        let px: ImageData;
+        try { px = ctx.getImageData(0, 0, bw, bh); } catch { cv.remove(); img.classList.remove('posy-dith-on'); return; }
+        // luminance with a little contrast, then Atkinson error diffusion (keeps highlights open, like an old Mac print)
+        const L = new Float32Array(bw * bh);
+        for (let i = 0; i < L.length; i++) { const l = (px.data[i * 4] * .299 + px.data[i * 4 + 1] * .587 + px.data[i * 4 + 2] * .114) / 255; L[i] = Math.min(1, Math.max(0, (Math.pow(l, 1.12) - .5) * 1.12 + .5)); }
+        for (let y = 0; y < bh; y++) for (let x = 0; x < bw; x++) {
+          const i = y * bw + x, o = L[i] < .5 ? 0 : 1, e = (L[i] - o) / 8;
+          L[i] = o;
+          for (const [dx, dy] of [[1, 0], [2, 0], [-1, 1], [0, 1], [1, 1], [0, 2]]) { const xx = x + dx, yy = y + dy; if (xx >= 0 && xx < bw && yy < bh) L[yy * bw + xx] += e; }
+        }
+        for (let i = 0; i < L.length; i++) { const c = L[i] ? paper : ink; px.data.set([c[0], c[1], c[2], 255], i * 4); }
+        data = px; ctx.putImageData(px, 0, 0);
+        const n = Math.ceil(bw / BLOCK) * Math.ceil(bh / BLOCK);
+        order = Array.from({ length: n }, (_, i) => i).sort(() => Math.random() - .5);
+        shown = 1;
+        img.classList.add('posy-dith-on');
+      };
+      // dissolve: blocks of the print are removed (or put back) in a random order over ~420ms
+      const animate = (to: number) => {
+        cancelAnimationFrame(raf);
+        if (!data) return;
+        const ctx = cv.getContext('2d')!; const cols = Math.ceil(bw / BLOCK);
+        const from = shown, t0 = performance.now();
+        const step = (now: number) => {
+          const k = Math.min(1, (now - t0) / 420), v = from + (to - from) * k;
+          const a = Math.round(order.length * Math.min(shown, v)), b = Math.round(order.length * Math.max(shown, v));
+          for (let j = a; j < b; j++) {
+            const bx = (order[j] % cols) * BLOCK, by = Math.floor(order[j] / cols) * BLOCK;
+            if (to < shown) ctx.clearRect(bx, by, BLOCK, BLOCK); else ctx.putImageData(data!, 0, 0, bx, by, BLOCK, BLOCK);
+          }
+          shown = v;
+          if (k < 1) raf = requestAnimationFrame(step);
+        };
+        raf = requestAnimationFrame(step);
+      };
+      const tile = img.closest<HTMLElement>('.posy-tile, .posy-avatar, .posy-obj') ?? img.parentElement!;
+      const enter = () => animate(0), leave = () => animate(1);
+      tile.addEventListener('pointerenter', enter); tile.addEventListener('pointerleave', leave);
+      tile.addEventListener('focusin', enter); tile.addEventListener('focusout', leave);
+      const ro = new ResizeObserver(() => { cancelAnimationFrame(raf); draw(); });
+      img.insertAdjacentElement('afterend', cv);
+      const go = () => { draw(); ro.observe(img); };
+      if (src.complete && src.naturalWidth) go(); else { src.onload = go; src.onerror = () => cv.remove(); }
+      cleanups.push(() => { cancelAnimationFrame(raf); ro.disconnect(); cv.remove(); tile.removeEventListener('pointerenter', enter); tile.removeEventListener('pointerleave', leave); tile.removeEventListener('focusin', enter); tile.removeEventListener('focusout', leave); });
+    };
+    const scan = () => page.querySelectorAll<HTMLImageElement>('.posy-tile img, .posy-avatar img, .posy-obj img').forEach(img => { if (img.width >= 48 || img.offsetWidth >= 48) print(img); });
+    scan();
+    const mo = new MutationObserver(scan); mo.observe(page, { childList: true, subtree: true });
+    return () => { mo.disconnect(); cleanups.forEach(f => f()); };
+  }, []);
+  return null;
+}

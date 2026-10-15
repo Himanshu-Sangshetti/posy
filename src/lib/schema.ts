@@ -20,6 +20,7 @@ export const BACKGROUNDS = ['solid', 'dots', 'grid', 'image'] as const;
 export const TILE_STYLES = ['soft', 'glass', 'outline', 'solid'] as const;
 export const EFFECTS = ['lift', 'tilt', 'glow', 'none'] as const;
 export const AVATARS = ['squircle', 'circle', 'square', 'hidden'] as const;
+export const PHOTO_LOOKS = ['natural', 'mono', 'dither'] as const;
 export const COLORS = ['auto', 'surface', 'accent', ...TINTS] as const;
 
 const id = z.string().min(1).describe('Stable unique id, e.g. "t-abc123"');
@@ -121,13 +122,14 @@ export const Theme = z.object({
   accent: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().describe('Override the theme accent, e.g. "#e8a87c"'),
   font: z.enum(FONTS).default('editorial'),
   radius: z.enum(RADII).default('round'),
-  style: z.enum(STYLES).default('cozy').describe('cozy = Desk: tiles as objects on a desk (polaroids, sticky notes, records); minimal = quiet type and plain cards; washi = a Japanese print (paper, ink, kanji numerals, red seal); lofi = a night-time anime still (tiles as little app windows, halftone photos)'),
+  style: z.enum(STYLES).default('cozy').describe('cozy = Desk: tiles as objects on a desk (polaroids, sticky notes, records); minimal = paper and ink, photos printed as 1-bit dither that turn to colour on hover; washi = a Japanese print (paper, ink, kanji numerals, red seal); lofi = a desktop left open (tiles as little app windows with pinstriped title bars, clay clouds by day, painted anime rooms at night)'),
   layout: z.enum(LAYOUTS).default('bento').describe('bento = grid of tiles; list = Linktree-style stacked links; canvas = free placement, each tile at its own `pos` (x, y, w, h in a 1200-wide space, rotation r, layer z)'),
   align: z.enum(ALIGNS).default('side').describe('minimal style + bento only: profile beside the grid (side) or above it (center)'),
   background: Background.default(Background.parse({})),
   tileStyle: z.enum(TILE_STYLES).default('soft'),
   effect: z.enum(EFFECTS).default('lift').describe('Hover effect on tiles'),
   avatar: z.enum(AVATARS).default('squircle'),
+  photos: z.enum(PHOTO_LOOKS).optional().describe('How photos are printed: natural colour, mono (black and white) or dither (1-bit pixels, colour on hover). Unset = the style\'s own default (Minimal dithers)'),
   motion: z.boolean().default(true),
 });
 
