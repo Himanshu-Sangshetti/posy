@@ -35,13 +35,20 @@ function Seal({ name }: { name: string }) {
 
 export function WashiHeader({ page, slots }: { page: Page; slots: HeaderSlots }) {
   const name = page.profile.name;
-  const vertical = name.trim().length <= 12 && typeof slots.name === 'string';
+  // Short names go in a title slip on the print, read top to bottom, like the cartouche on a real woodblock print.
+  const slip = name.trim().length <= 16 && typeof slots.name === 'string';
   const art = printFor(page.theme.preset);
   return (
     <>
-      <h1 className={cn('posy-head posy-name ws-name', vertical ? 'ws-name-v' : 'ws-name-h')} aria-label={name}>
-        {vertical ? (slots.name as string).trim().split(/\s+/).map((w, i) => <span key={i} className="ws-word" aria-hidden>{w}</span>) : slots.name}
-      </h1>
+      {!slip && <h1 className="posy-head posy-name ws-name ws-name-h" aria-label={name}>{slots.name}</h1>}
+      <figure className="ws-art">
+        <div className="ws-art-mount">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={art.src} alt={`${art.title}, ${art.artist}`} loading="eager" />
+          {slip && <h1 className="posy-head posy-name ws-name ws-slip" aria-label={name}><span aria-hidden>{slots.name as string}</span></h1>}
+        </div>
+        <figcaption><b>{art.artist}</b> · {art.title} · {art.year}</figcaption>
+      </figure>
       <div className="ws-side">
         <div className="ws-top">
           {slots.avatar && <div className="ws-print">{slots.avatar}</div>}
@@ -51,11 +58,6 @@ export function WashiHeader({ page, slots }: { page: Page; slots: HeaderSlots })
         {slots.caption && <p className="ws-caption">{slots.caption}</p>}
         {slots.socials}
       </div>
-      <figure className="ws-art">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={art.src} alt={`${art.title}, ${art.artist}`} loading="eager" />
-        <figcaption><b>{art.artist}</b> · {art.title} · {art.year}</figcaption>
-      </figure>
     </>
   );
 }
@@ -72,7 +74,7 @@ export function WashiTile({ tile, index, editing }: { tile: Tile; index: number;
   const pic = tile.type === 'image' || tile.type === 'video' || ((tile.type === 'link' || tile.type === 'music') && tile.size !== 's' && m.image);
   return (
     <div className={cn('ws-frame', `ws-t-${tile.type}`)}>
-      <div className="ws-meta"><span className="ws-n">{n}</span><span className="ws-kind">{m.kind}</span></div>
+      <div className="ws-meta"><span className="ws-n">{n}</span></div>
       {tile.type === 'text' && <p className="ws-note"><RichText text={tile.text} /></p>}
       {pic && (
         <div className="ws-img">
@@ -80,7 +82,7 @@ export function WashiTile({ tile, index, editing }: { tile: Tile; index: number;
         </div>
       )}
       {tile.type === 'image' && tile.caption && <p className="ws-cap">{tile.caption}</p>}
-      {!pic && tile.type !== 'text' && <span className="ws-mark" aria-hidden>{n}</span>}
+      {!pic && tile.type !== 'text' && <span className={cn('ws-pattern', `ws-pattern-${m.kind === 'shop' ? 'asanoha' : m.kind === 'repo' ? 'kikko' : 'seigaiha'}`)} aria-hidden />}
       {tile.type !== 'text' && tile.type !== 'image' && (
         <div className="ws-text">
           <b>{m.title}</b>
@@ -102,7 +104,6 @@ export function WashiRow({ tile, index }: { tile: Tile; index: number }) {
       <span className="ws-n">{kanji(index + 1)}</span>
       {m.image ? <span className="ws-thumb"><Img src={m.image} /></span> : <span className="ws-thumb ws-thumb-empty" aria-hidden />}
       <span className="ws-line-text"><b>{m.title}</b>{m.sub && m.sub !== m.title && tile.type !== 'image' && <span>{m.sub}</span>}</span>
-      <span className="ws-kind">{m.kind}</span>
       <ArrowUpRight className="ws-go" aria-hidden />
     </div>
   );
