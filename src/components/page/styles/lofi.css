@@ -133,7 +133,7 @@
 .posy-style-lofi.dark .posy-social-label { text-shadow: 0 1px 8px rgb(0 0 0 / .8); }
 .posy-style-lofi .posy-social-row a:hover > :first-child { translate: 0 -2px; background: var(--accent); color: var(--bg); }
 .posy-style-lofi .posy-social-row a:hover .posy-social-label { background: var(--text); color: var(--surface); text-shadow: none; }
-@container page (max-width: 560px) { .st-head-lofi { grid-template-columns: 1fr; } .lf-me { width: 150px; } .posy-style-lofi .posy-social-row a { width: 70px; } }
+@container page (max-width: 560px) { .st-head-lofi { grid-template-columns: 1fr; } .lf-me { width: 150px; } .posy-style-lofi .posy-social-row { margin-left: -6px; gap: 4px 0; } .posy-style-lofi .posy-social-row a { width: 58px; } .posy-style-lofi .posy-social-row a > :first-child { padding: 9px; } .posy-style-lofi .posy-social-row .posy-social-label { font-size: 11px; padding: 1px 2px; } }
 
 .posy-style-lofi .posy-section { display: flex; align-items: center; gap: 12px; margin: 8px 0 18px; padding: 0; font-family: var(--font-geist-mono), monospace; font-size: 12.5px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--text); }
 .posy-style-lofi .posy-section::before { content: ""; width: 9px; height: 9px; background: var(--accent); }
