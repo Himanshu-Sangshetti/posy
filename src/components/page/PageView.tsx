@@ -61,7 +61,7 @@ export function PageFrame({ page, children, profile, className, interactive = tr
       </MotionProvider>
       {page.theme.style === 'cozy' && !isDark(page) && <div aria-hidden className="dk-sun"><i /></div>}
       {interactive && fx && <TileEffects />}
-      {interactive && photoLook(page) === 'dither' && <DitherPhotos />}
+      {interactive && (photoLook(page) === 'dither' || photoLook(page) === 'ascii') && <DitherPhotos />}
     </div>
   );
 }

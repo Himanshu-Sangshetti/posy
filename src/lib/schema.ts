@@ -20,7 +20,7 @@ export const BACKGROUNDS = ['solid', 'dots', 'grid', 'image'] as const;
 export const TILE_STYLES = ['soft', 'glass', 'outline', 'solid'] as const;
 export const EFFECTS = ['lift', 'tilt', 'glow', 'none'] as const;
 export const AVATARS = ['squircle', 'circle', 'square', 'hidden'] as const;
-export const PHOTO_LOOKS = ['natural', 'mono', 'dither'] as const;
+export const PHOTO_LOOKS = ['natural', 'mono', 'dither', 'ascii'] as const;
 export const COLORS = ['auto', 'surface', 'accent', ...TINTS] as const;
 
 const id = z.string().min(1).describe('Stable unique id, e.g. "t-abc123"');
@@ -129,7 +129,7 @@ export const Theme = z.object({
   tileStyle: z.enum(TILE_STYLES).default('soft'),
   effect: z.enum(EFFECTS).default('lift').describe('Hover effect on tiles'),
   avatar: z.enum(AVATARS).default('squircle'),
-  photos: z.enum(PHOTO_LOOKS).optional().describe('How photos are printed: natural colour, mono (black and white) or dither (1-bit pixels, colour on hover). Unset = the style\'s own default (Minimal dithers)'),
+  photos: z.enum(PHOTO_LOOKS).optional().describe('How photos are printed: natural colour, mono (black and white), dither (1-bit pixels) or ascii (drawn in characters); dither and ascii turn to colour on hover. Unset = the style\'s own default (Minimal dithers)'),
   motion: z.boolean().default(true),
 });
 

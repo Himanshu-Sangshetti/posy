@@ -100,7 +100,7 @@ function SwitchRow({ title, note, checked, onChange, disabled }: { title: string
 
 const proNote = () => toast('Part of Posy Pro', { description: 'Upgrade from Settings to use premium themes, fonts and more.' });
 
-const PHOTO_LABEL: Record<(typeof PHOTO_LOOKS)[number], string> = { natural: 'Colour', mono: 'Black & white', dither: 'Dither' };
+const PHOTO_LABEL: Record<(typeof PHOTO_LOOKS)[number], string> = { natural: 'Colour', mono: 'B&W', dither: 'Dither', ascii: 'ASCII' };
 
 export type DesignTab = 'style' | 'colour' | 'type' | 'layout' | 'background';
 const TAB_LABEL: Record<DesignTab, string> = { style: 'Style', colour: 'Colour', type: 'Type', layout: 'Layout', background: 'Backdrop' };
@@ -173,7 +173,7 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
         </div>
         <div className="grid gap-2.5">
           <Label>Photos</Label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-4 gap-2">
             {PHOTO_LOOKS.map(f => (
               <button key={f} type="button" aria-pressed={photoLook(page) === f} onClick={() => updateTheme({ photos: f })} className={cn('h-10 text-[13px]', choice(photoLook(page) === f))}>{PHOTO_LABEL[f]}</button>
             ))}

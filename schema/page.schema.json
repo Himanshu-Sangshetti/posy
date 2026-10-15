@@ -228,12 +228,13 @@
           ]
         },
         "photos": {
-          "description": "How photos are printed: natural colour, mono (black and white) or dither (1-bit pixels, colour on hover). Unset = the style's own default (Minimal dithers)",
+          "description": "How photos are printed: natural colour, mono (black and white), dither (1-bit pixels) or ascii (drawn in characters); dither and ascii turn to colour on hover. Unset = the style's own default (Minimal dithers)",
           "type": "string",
           "enum": [
             "natural",
             "mono",
-            "dither"
+            "dither",
+            "ascii"
           ]
         },
         "motion": {

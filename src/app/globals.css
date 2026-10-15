@@ -644,7 +644,7 @@ body.ac-body { background: var(--bg); font-family: var(--font-sans); }
 /* ---- photo looks (theme.photos): mono, or dither (canvas from DitherPhotos; black and white until it draws) ---- */
 .posy-photos-mono :is(.posy-tile, .posy-avatar, .posy-obj) img { filter: grayscale(1) contrast(1.08); transition: filter .5s; }
 .posy-photos-mono :is(.posy-tile, .posy-obj):hover img { filter: none; }
-.posy-photos-dither :is(.posy-tile, .posy-avatar, .posy-obj) img:not(.posy-dith-on) { filter: grayscale(1) contrast(1.15); }
+:is(.posy-photos-dither, .posy-photos-ascii) :is(.posy-tile, .posy-avatar, .posy-obj) img:not(.posy-dith-on) { filter: grayscale(1) contrast(1.15); }
 .posy-dith { position: absolute; z-index: 0; pointer-events: none; image-rendering: pixelated; border-radius: inherit; }
 
 /* ---- Desk by a window: afternoon light through leaves falls across the desk and everything on it, swaying slowly ---- */

@@ -97,6 +97,7 @@ export function PageAnalytics({ username }: { username: string }) {
   return null;
 }
 
+/** Characters from light to dark, for photos drawn as ASCII. */
 const RAMP = ' .:-=+*#%@';
 
 /** Lofi canvas pages: visitors can pick a window up by its title bar and move it, like a real desktop.
@@ -141,8 +142,9 @@ export function DraggableWindows() {
  */
 export function DitherPhotos() {
   useEffect(() => {
-    const page = document.querySelector<HTMLElement>('.posy-photos-dither');
+    const page = document.querySelector<HTMLElement>('.posy-photos-dither, .posy-photos-ascii');
     if (!page) return;
+    const ascii = page.classList.contains('posy-photos-ascii');
     const css = getComputedStyle(page);
     const rgb = (v: string) => { const c = document.createElement('canvas').getContext('2d')!; c.fillStyle = v.trim() || '#000'; const h = c.fillStyle as string; return h.startsWith('#') ? [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)) : [0, 0, 0]; };
     const ink = rgb(css.getPropertyValue('--text')), paper = rgb(css.getPropertyValue('--surface'));
@@ -158,11 +160,13 @@ export function DitherPhotos() {
       const src = new Image(); src.crossOrigin = 'anonymous'; src.src = img.currentSrc || img.src;
       const cv = document.createElement('canvas'); cv.className = 'posy-dith'; cv.setAttribute('aria-hidden', 'true');
       canvases.set(img, cv);
-      let data: ImageData | null = null, order: number[] = [], shown = 1, raf = 0, bw = 0, bh = 0;
+      let data: ImageData | null = null, order: number[] = [], shown = 1, raf = 0, bw = 0, bh = 0, blk = BLOCK;
       const draw = () => {
         const w = img.offsetWidth, h = img.offsetHeight;
         if (!w || !h || !src.naturalWidth) return;
         Object.assign(cv.style, { left: `${img.offsetLeft}px`, top: `${img.offsetTop}px`, width: `${w}px`, height: `${h}px` });
+        if (ascii) { drawAscii(w, h); return; }
+        blk = BLOCK;
         bw = Math.ceil(w / PX); bh = Math.ceil(h / PX); cv.width = bw; cv.height = bh;
         const ctx = cv.getContext('2d', { willReadFrequently: true })!;
         const s = Math.max(bw / src.naturalWidth, bh / src.naturalHeight);
@@ -179,7 +183,38 @@ export function DitherPhotos() {
         }
         for (let i = 0; i < L.length; i++) { const c = L[i] ? paper : ink; px.data.set([c[0], c[1], c[2], 255], i * 4); }
         data = px; ctx.putImageData(px, 0, 0);
-        const n = Math.ceil(bw / BLOCK) * Math.ceil(bh / BLOCK);
+        shuffle();
+      };
+      // ASCII: the photo as characters of a mono font, darker cells get denser glyphs (like efecto.app)
+      const drawAscii = (w: number, h: number) => {
+        const dpr = Math.min(2, window.devicePixelRatio || 1), CH = 11, CW = CH * .6;
+        const cols = Math.ceil(w / CW), rows = Math.ceil(h / CH);
+        const probe = document.createElement('canvas'); probe.width = cols; probe.height = rows;
+        const pc = probe.getContext('2d', { willReadFrequently: true })!;
+        const s = Math.max(cols / src.naturalWidth, rows / src.naturalHeight);
+        pc.drawImage(src, (cols - src.naturalWidth * s) / 2, (rows - src.naturalHeight * s) / 2, src.naturalWidth * s, src.naturalHeight * s);
+        let px: ImageData;
+        try { px = pc.getImageData(0, 0, cols, rows); } catch { cv.remove(); img.classList.remove('posy-dith-on'); return; }
+        bw = cv.width = Math.round(w * dpr); bh = cv.height = Math.round(h * dpr); blk = Math.round(CH * dpr);
+        const ctx = cv.getContext('2d', { willReadFrequently: true })!;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.fillStyle = `rgb(${paper.join(',')})`; ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = `rgb(${ink.join(',')})`; ctx.font = `600 ${CH}px ui-monospace, "Geist Mono", Menlo, monospace`; ctx.textBaseline = 'top';
+        const lum = new Float32Array(cols * rows);
+        for (let i = 0; i < lum.length; i++) lum[i] = (px.data[i * 4] * .299 + px.data[i * 4 + 1] * .587 + px.data[i * 4 + 2] * .114) / 255;
+        // stretch each photo's own range so it always uses the whole ramp, with a little gamma to open the lights
+        const sorted = Float32Array.from(lum).sort(), lo = sorted[Math.floor(sorted.length * .04)], hi = sorted[Math.floor(sorted.length * .96)] || 1;
+        for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+          const l = Math.min(1, Math.max(0, (lum[y * cols + x] - lo) / Math.max(.05, hi - lo)));
+          const ch = RAMP[Math.min(RAMP.length - 1, Math.round(Math.pow(1 - l, 1.3) * (RAMP.length - 1)))];
+          if (ch !== ' ') ctx.fillText(ch, x * CW, y * CH);
+        }
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        data = ctx.getImageData(0, 0, bw, bh);
+        shuffle();
+      };
+      const shuffle = () => {
+        const n = Math.ceil(bw / blk) * Math.ceil(bh / blk);
         order = Array.from({ length: n }, (_, i) => i).sort(() => Math.random() - .5);
         shown = 1;
         img.classList.add('posy-dith-on');
@@ -188,14 +223,14 @@ export function DitherPhotos() {
       const animate = (to: number) => {
         cancelAnimationFrame(raf);
         if (!data) return;
-        const ctx = cv.getContext('2d')!; const cols = Math.ceil(bw / BLOCK);
+        const ctx = cv.getContext('2d')!; const cols = Math.ceil(bw / blk);
         const from = shown, t0 = performance.now();
         const step = (now: number) => {
           const k = Math.min(1, (now - t0) / 420), v = from + (to - from) * k;
           const a = Math.round(order.length * Math.min(shown, v)), b = Math.round(order.length * Math.max(shown, v));
           for (let j = a; j < b; j++) {
-            const bx = (order[j] % cols) * BLOCK, by = Math.floor(order[j] / cols) * BLOCK;
-            if (to < shown) ctx.clearRect(bx, by, BLOCK, BLOCK); else ctx.putImageData(data!, 0, 0, bx, by, BLOCK, BLOCK);
+            const bx = (order[j] % cols) * blk, by = Math.floor(order[j] / cols) * blk;
+            if (to < shown) ctx.clearRect(bx, by, blk, blk); else ctx.putImageData(data!, 0, 0, bx, by, blk, blk);
           }
           shown = v;
           if (k < 1) raf = requestAnimationFrame(step);
