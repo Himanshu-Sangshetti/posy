@@ -45,6 +45,7 @@ export function PageFrame({ page, children, profile, className, interactive = tr
     <div className={cn(pageClasses(page), className)} style={{ ...pageStyle(page), colorScheme: isDark(page) ? 'dark' : 'light' }}>
       <Backdrop />
       {page.theme.style === 'lofi' && !isDark(page) && <Clouds3D />}
+      {page.theme.style === 'lofi' && isDark(page) && <div aria-hidden className="lf-rain" />}
       {page.theme.style === 'lofi' && <LofiMenuBar name={page.profile.name} pinned={interactive} />}
       {interactive && page.theme.style === 'lofi' && page.theme.layout === 'canvas' && <DraggableWindows />}
       <MotionProvider enabled={page.theme.motion}>
