@@ -11,7 +11,7 @@ export const TEMPLATES = {
   press: { label: 'Press', note: 'A weekend paper' },
   gallery: { label: 'Gallery', note: 'Work on the wall' },
   painted: { label: 'Painted', note: 'A watercolour sky' },
-  neon: { label: 'Night', note: 'Neon after rain' },
+  neon: { label: 'Night', note: 'A HUD after dark' },
   cobalt: { label: 'Cobalt', note: 'A print in two inks' },
   blank: { label: 'Blank', note: 'Start from nothing' },
 } as const;
@@ -182,7 +182,7 @@ export function template(id: TemplateId, name: string): Page {
     case 'neon':
       return parsePage({
         profile: { ...profile, avatar: art('night', 'avatar'), bio: 'Late sets and slow beats. Live every Friday after midnight.', location: 'live fridays' },
-        theme: { style: 'night', preset: 'neon', font: 'night', layout: 'bento', avatar: 'squircle' },
+        theme: { style: 'night', preset: 'netrunner', font: 'night', layout: 'bento', avatar: 'square' },
         tiles: ids([
           { type: 'social', platform: 'twitch', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'soundcloud', handle: 'yourname', size: 's' },
@@ -190,13 +190,16 @@ export function template(id: TemplateId, name: string): Page {
           { type: 'social', platform: 'discord', handle: 'yourname', size: 's' },
           { type: 'image', src: art('night', 'photo1'), caption: 'the walk home, 2 a.m.', size: 'l' },
           { type: 'text', text: 'Live tonight', look: 'stamp', size: 's' },
-          { type: 'text', text: 'Bring headphones. Stay till sunrise.', size: 's' },
+          { type: 'link', url: 'https://example.com/booking', title: 'Booking', description: 'Clubs, raves, rooftops', size: 's' },
           { type: 'music', url: 'https://open.spotify.com/', title: 'Midnight mix vol. 3', artist: 'Spotify', image: art('night', 'music'), size: 'w' },
           { type: 'heading', text: 'This week' },
           { type: 'video', url: VIDEO, title: 'Arcade sessions, ep. 7', image: art('night', 'video'), size: 'w' },
           { type: 'link', url: 'https://example.com/tapes', title: 'Rooftop tapes', description: 'New EP, out now', image: art('night', 'cover'), size: 'w' },
+          { type: 'text', text: 'Bring headphones. Stay till sunrise.', size: 'w' },
           { type: 'link', url: 'https://shop.example.com', title: 'Merch', description: 'Hoodies, tapes, stickers', size: 's' },
           { type: 'image', src: art('night', 'photo2'), caption: 'the booth', size: 's' },
+          { type: 'github', repo: 'yourname/ghostwire', description: 'A tiny synth that turns network traffic into sound.', stars: 812, language: 'Rust', size: 'w' },
+          { type: 'link', url: 'https://substack.com', title: 'Transmissions', description: 'Set times and new tapes, once a month', size: 'w' },
         ]),
       });
     case 'cobalt': {

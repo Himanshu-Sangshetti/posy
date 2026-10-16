@@ -41,3 +41,6 @@ export function tileMeta(t: Tile): Meta {
 }
 
 export const compact = (n: number) => Intl.NumberFormat('en', { notation: 'compact' }).format(n);
+
+/** A small, fast, repeatable random series from a string (a tile's id), so procedural art never changes between visits. */
+export const seeded = (id: string) => { let h = 2166136261; for (let i = 0; i < id.length; i++) h = Math.imul(h ^ id.charCodeAt(i), 16777619); let x = h >>> 0 || 1; return () => ((x = (Math.imul(x, 1664525) + 1013904223) >>> 0) / 4294967296); };

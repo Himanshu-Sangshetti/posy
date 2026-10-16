@@ -9,7 +9,7 @@ import { asset, cn } from '@/lib/utils';
 import { hostOf, youtubeId } from '@/lib/url';
 import { VideoPlayer } from '../islands';
 import { RichText } from '../tiles';
-import { tileMeta, compact } from './meta';
+import { tileMeta, compact, seeded } from './meta';
 import type { HeaderSlots } from './types';
 
 /** The palettes made for this look; each has its own pair of inks (see cobalt.css). Any other palette prints in its own text and paper colours. */
@@ -64,8 +64,6 @@ const roman = (n: number) => { let s = ''; for (const [v, r] of ROMAN) while (n 
 /** Every plate on the page carries its number, like the plates in an old book. */
 const No = ({ index }: { index: number }) => <span className="cb-no">Pl. {roman(index + 1)}</span>;
 
-/** A small, fast, repeatable random series from a tile's id, so each plate gets its own print that never changes. */
-const seeded = (id: string) => { let h = 2166136261; for (let i = 0; i < id.length; i++) h = Math.imul(h ^ id.charCodeAt(i), 16777619); let x = h >>> 0 || 1; return () => ((x = (Math.imul(x, 1664525) + 1013904223) >>> 0) / 4294967296); };
 const f1 = (n: number) => Math.round(n * 10) / 10;
 
 /**

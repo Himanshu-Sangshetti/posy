@@ -65,6 +65,11 @@ const LOOKS = {
   vermilion: plain({ id: 'vermilion', name: 'Vermilion', bg: '#efe4cf', surface: '#f8efde', text: '#2b1d18', muted: '#73584d', line: '#b8321f', accent: '#cf3b25' }),
   moonlit: dark({ id: 'moonlit', name: 'Moonlit', bg: '#0f1d57', surface: '#172a75', text: '#f1e5c9', muted: '#aab3dc', line: '#f1e5c9', accent: '#f3d58c' }),
   verdigris: plain({ id: 'verdigris', name: 'Verdigris', bg: '#e7e2cf', surface: '#f2eddd', text: '#17463f', muted: '#4f6e67', line: '#17463f', accent: '#2c7a69' }),
+  // Night: a HUD after dark, in one signal colour (the older neon palettes below still render)
+  netrunner: dark({ id: 'netrunner', name: 'Netrunner', bg: '#0b0b08', surface: '#121210', text: '#ecead6', muted: '#8f8b6c', line: '#34321a', accent: '#f3e600' }),
+  ice: dark({ id: 'ice', name: 'Ice', bg: '#03080e', surface: '#08131d', text: '#dcf7ff', muted: '#6a8fa0', line: '#123444', accent: '#45efff' }),
+  redline: dark({ id: 'redline', name: 'Redline', bg: '#0c0505', surface: '#150a0a', text: '#ffe8e2', muted: '#a37871', line: '#401714', accent: '#ff3b2f' }),
+  daylight: plain({ id: 'daylight', name: 'Daylight', bg: '#f2e400', surface: '#f7ec42', text: '#0b0b08', muted: '#4b4614', line: '#0b0b08', accent: '#0b0b08' }),
   // Night
   neon: dark({ id: 'neon', name: 'Neon', bg: '#0c0915', surface: '#140f22', text: '#f6eefe', muted: '#a596bd', line: '#2a2140', accent: '#ff4fa3' }),
   'cyan-rain': dark({ id: 'cyan-rain', name: 'Cyan rain', bg: '#061217', surface: '#0b1c23', text: '#e6fbff', muted: '#83a9b3', line: '#173540', accent: '#3fe3ff' }),
