@@ -1,0 +1,366 @@
+/* ================= Washi scene: a folding screen on a computer, a hanging scroll on a phone ================= */
+.wss {
+  --wss-ink: var(--text); --wss-muted: var(--muted); --wss-red: var(--accent);
+  --wss-paper: #fbf7ee; --wss-paper-edge: rgb(60 40 20 / .14);
+  --wss-indigo: #2e467a; --wss-violet: #8c76a8; --wss-sakura: #d98f9a; --wss-moegi: #7f9a5a;
+  --wss-gold: #b88d3e; --wss-lacquer: #211a15; --wss-cord: #8f2e21; --wss-wood: #4a3122;
+  --wss-ground: color-mix(in oklab, #d9b968 62%, var(--bg));
+  --wss-shadow: 0 1px 1px rgb(60 40 20 / .1), 0 14px 26px -16px rgb(60 40 20 / .45);
+  --wss-lift: 0 1px 1px rgb(60 40 20 / .1), 0 26px 40px -18px rgb(60 40 20 / .5);
+  --wss-ease: cubic-bezier(.2, .8, .2, 1);
+  --wss-bounce: linear(0, .3 8%, .78 20%, 1.04 32%, 1.08 40%, 1.02 55%, .99 70%, 1);
+  color: var(--wss-ink);
+}
+.wss-dark {
+  --wss-paper: #2b2824; --wss-paper-edge: rgb(0 0 0 / .4);
+  --wss-indigo: #5d77b4; --wss-violet: #9c86ba; --wss-sakura: #c27a87; --wss-moegi: #8ea86a;
+  --wss-gold: #b79a5c; --wss-lacquer: #0c0b0a; --wss-cord: #b5452f; --wss-wood: #2a1d15;
+  --wss-ground: color-mix(in oklab, #8d929b 26%, #1d1c1b);
+  --wss-shadow: 0 1px 1px rgb(0 0 0 / .4), 0 16px 28px -14px rgb(0 0 0 / .8);
+  --wss-lift: 0 1px 1px rgb(0 0 0 / .4), 0 28px 44px -16px rgb(0 0 0 / .85);
+}
+.posy-preset-sakura .wss { --wss-ground: color-mix(in oklab, #dcb878 52%, var(--bg)); }
+.posy-preset-yomogi .wss { --wss-ground: color-mix(in oklab, #ccb66a 55%, var(--bg)); }
+/* the scene draws its own headings and lays out its own pieces; the shared entrance becomes a paper-light one */
+.posy-motion .wss .posy-rise { animation: none; }
+.wss .sc-piece { outline: none; }
+.wss .posy-head { font-family: var(--font-head), "Hiragino Mincho ProN", "Yu Mincho", serif; }
+.wss-title, .wss-bio, .wss-where, .wss-caption, .wss-note p, .wss-hanko-ink, .wss-seal span, .wss-sseal b { font-family: var(--font-head), "Hiragino Mincho ProN", "Yu Mincho", serif; }
+
+/* ---------- materials ---------- */
+/* paper: long fibres, a little warmth, gold leaf flecks (kirihaku) */
+.wss-paperlike, .wss-tz-paper, .wss-strip, .wss-masthead, .wss-portrait, .wss-mount, .wss-note, .wss-honshi, .wss-name-slip, .wss-name-band, .wss-music-strip {
+  background-color: var(--wss-paper);
+  background-image: radial-gradient(circle at 18% 22%, var(--wss-gold) 0 1.1px, transparent 1.5px), radial-gradient(circle at 76% 38%, var(--wss-gold) 0 .9px, transparent 1.3px),
+    radial-gradient(circle at 42% 71%, var(--wss-gold) 0 1.2px, transparent 1.6px), radial-gradient(circle at 88% 84%, var(--wss-gold) 0 .8px, transparent 1.2px),
+    linear-gradient(color-mix(in oklab, var(--wss-paper) 55%, transparent), color-mix(in oklab, var(--wss-paper) 55%, transparent)), url(/looks/washi/paper.jpg);
+  background-size: 190px 230px, 230px 190px, 260px 250px, 170px 210px, auto, 420px;
+  background-blend-mode: normal, normal, normal, normal, normal, multiply;
+}
+.wss-dark :is(.wss-tz-paper, .wss-strip, .wss-masthead, .wss-portrait, .wss-mount, .wss-note, .wss-honshi, .wss-name-slip, .wss-name-band, .wss-music-strip) { background-blend-mode: normal, normal, normal, normal, normal, soft-light; }
+/* handmade edges: torn, fibrous deckle instead of a cut rectangle; the shadow follows the torn edge */
+.wss-tz-paper, .wss-strip, .wss-note, .wss-mount, .wss-music-strip, .wss-portrait { -webkit-mask-box-image: url(/looks/washi/deckle.png) 60 fill / 14px stretch; }
+.wss-tanzaku, .wss-strip-piece, .wss-x, .wss-me { filter: drop-shadow(0 1px 1px rgb(60 40 20 / .14)) drop-shadow(0 10px 12px rgb(60 40 20 / .2)); transition: filter .35s; }
+.wss-dark :is(.wss-tanzaku, .wss-strip-piece, .wss-x, .wss-me) { filter: drop-shadow(0 1px 1px rgb(0 0 0 / .5)) drop-shadow(0 12px 14px rgb(0 0 0 / .55)); }
+.sc-piece:is(:hover, .is-hover, :focus-visible) :is(.wss-tanzaku), .wss-strip-piece:is(:hover, .is-hover, :focus-visible), .wss-x:is(:hover, .is-hover, :focus-visible) { filter: drop-shadow(0 1px 1px rgb(60 40 20 / .14)) drop-shadow(0 18px 18px rgb(60 40 20 / .28)); }
+.wss-x-stamp, .wss-x-photo:has(.wss-ogi) { filter: none; }
+/* dyed clouds (uchigumori): masks cut from a rendered cloud-dyed tanzaku, coloured per slip */
+
+/* ---------- the site's seal and your seal ---------- */
+.wss-sseal { position: relative; display: grid; place-items: center; flex: none; width: 26px; height: 26px; background: var(--wss-red); color: var(--wss-paper);
+  -webkit-mask: url(/looks/washi/ink.png) center / 100% 100%; mask: url(/looks/washi/ink.png) center / 100% 100%; rotate: -3deg; transition: scale .25s var(--wss-ease), rotate .4s var(--wss-ease); }
+.wss-dark .wss-sseal { color: #f3ead8; }
+.wss-sseal b { font-size: 17px; font-weight: 700; line-height: 1; translate: 0 -1px; }
+.wss-sseal-lg { width: 38px; height: 38px; }
+.wss-sseal-lg b { font-size: 23px; }
+.wss-seal { position: absolute; display: grid; place-items: center; width: 62px; height: 62px; rotate: -6deg; background: url(/looks/washi/seal.png) center / contain no-repeat; mix-blend-mode: multiply; }
+.wss-dark .wss-seal { mix-blend-mode: normal; filter: saturate(1.15) brightness(1.08); }
+.wss-seal span { font-size: 18px; font-weight: 700; line-height: 1; color: #c13a26; -webkit-mask: url(/looks/washi/seal-grain.png) center / 40px; mask: url(/looks/washi/seal-grain.png) center / 40px; }
+
+/* ---------- link: a tall poem slip hanging from the cord (computer) ---------- */
+.wss-tanzaku { position: relative; padding-top: 24px; transform-origin: 50% 0; }
+.wss-tanzaku::before { content: ""; position: absolute; left: 50%; top: 0; width: 1.5px; height: 26px; translate: -50% 0; background: var(--wss-cord); }
+.wss-tanzaku::after { content: ""; position: absolute; left: 50%; top: -3px; width: 7px; height: 7px; translate: -50% 0; border-radius: 50%; background: var(--wss-cord); box-shadow: inset 0 -1px 1px rgb(0 0 0 / .3); }
+.wss-tz-paper { position: relative; display: flex; flex-direction: column; gap: 10px; min-height: 290px; padding: 62px 20px 18px; overflow: hidden; color: #221c16; transition: translate .35s var(--wss-ease); }
+.wss-tanzaku:not(.wss-tanzaku-feature) .wss-tz-paper { justify-content: center; }
+.wss-tanzaku:not(.wss-tanzaku-feature) .wss-sign { margin-top: auto; }
+.wss-tanzaku:not(.wss-tanzaku-feature) .wss-title { margin-top: auto; }
+.wss-dark .wss-tz-paper { color: #ece4d4; }
+.wss-tz-paper::before, .wss-tz-paper::after { content: ""; position: absolute; left: -6%; right: -6%; height: 74px; pointer-events: none; -webkit-mask: url(/looks/washi/kumo-top.png) top center / 100% 100% no-repeat; mask: url(/looks/washi/kumo-top.png) top center / 100% 100% no-repeat; opacity: .9; transition: opacity .4s, translate 1.2s var(--wss-ease); }
+.wss-tz-paper::before { top: 0; height: 96px; background: var(--dye-a, var(--wss-indigo)); }
+.wss-tz-paper::after { bottom: 0; height: 70px; background: var(--dye-b, var(--wss-violet)); -webkit-mask-image: url(/looks/washi/kumo-bottom.png); mask-image: url(/looks/washi/kumo-bottom.png); opacity: .7; }
+.wss-tz-paper > * { position: relative; z-index: 1; }
+.wss-hang:nth-child(3n + 1) .wss-tz-paper { --dye-a: var(--wss-indigo); --dye-b: var(--wss-violet); }
+.wss-hang:nth-child(3n + 2) .wss-tz-paper { --dye-a: var(--wss-violet); --dye-b: var(--wss-indigo); }
+.wss-hang:nth-child(3n) .wss-tz-paper { --dye-a: var(--wss-sakura); --dye-b: var(--wss-moegi); }
+.wss-tanzaku .wss-title { display: block; font-size: 25px; font-weight: 600; line-height: 1.12; letter-spacing: -.003em; overflow-wrap: anywhere; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; }
+.wss-tanzaku[data-len="s"] .wss-title { font-size: 34px; line-height: 1.02; }
+.wss-tanzaku[data-len="l"] .wss-title { font-size: 21px; }
+.wss-sub { font-family: var(--font-head), serif; font-style: italic; font-size: 16.5px; line-height: 1.32; color: color-mix(in oklab, currentColor 68%, transparent); overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; }
+.wss-meta { font-size: 13px; letter-spacing: .02em; color: color-mix(in oklab, currentColor 62%, transparent); }
+/* the signature corner: where the slip goes, signed with that site's seal */
+.wss-sign { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 14px; }
+.wss-sign .wss-site { min-width: 0; font-family: var(--font-head), serif; font-style: italic; font-size: 16px; letter-spacing: .01em; color: color-mix(in oklab, currentColor 58%, transparent); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+/* the featured slip carries the page's own picture, pasted near the top */
+.wss-tanzaku-feature .wss-tz-paper { padding-top: 40px; }
+.wss-pic { position: relative; display: block; overflow: hidden; aspect-ratio: 4 / 3; background: color-mix(in oklab, var(--wss-ink) 8%, transparent); box-shadow: 0 0 0 4px var(--wss-paper), 0 0 0 5px var(--wss-paper-edge); margin: 0 0 6px; }
+.wss-pic img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.82) sepia(.06); transition: filter .6s, scale 1.2s var(--wss-ease); }
+.wss-pic-blank { display: block; width: 100%; height: 100%; background: var(--ws-seigaiha) center / 40px auto; opacity: .85; }
+/* alive: brushed past it sways (WashiBreeze); hovered it swings once, the dye deepens and the title gets a brush line */
+.wss-hang { position: relative; margin-top: var(--drop, 0); transform-origin: 50% 0; }
+.wss-title { background: linear-gradient(var(--wss-red), var(--wss-red)) 0 96% / 0 2px no-repeat; transition: background-size .5s var(--wss-ease); }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-tanzaku { animation: wss-sway 2.2s var(--wss-ease); }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-tz-paper::before { opacity: 1; translate: 0 6px; }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-title { background-size: 100% 2px; }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-pic img { filter: none; scale: 1.04; }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-sseal { rotate: 3deg; }
+.sc-piece:is(:active, .is-press) .wss-tz-paper { translate: 0 6px; transition-duration: .12s; }
+.sc-piece:is(:active, .is-press) .wss-sseal, .sc-piece:is(:active, .is-press) .wss-ink { scale: .84; transition-duration: .1s; }
+@keyframes wss-sway { 0% { rotate: 0deg; } 18% { rotate: 2.6deg; } 40% { rotate: -1.7deg; } 62% { rotate: .9deg; } 82% { rotate: -.35deg; } 100% { rotate: 0deg; } }
+
+/* ---------- link: a long slip pasted across the scroll (phone) ---------- */
+.wss-strip { position: relative; display: grid; overflow: hidden; color: #221c16; transition: scale .2s var(--wss-ease); }
+.wss-dark .wss-strip { color: #ece4d4; }
+.wss-strip::before, .wss-strip::after { content: ""; position: absolute; left: -4%; right: -4%; height: 40px; pointer-events: none; -webkit-mask: url(/looks/washi/kumo-top.png) center top / 100% 100% no-repeat; mask: url(/looks/washi/kumo-top.png) center top / 100% 100% no-repeat; opacity: .62; transition: opacity .4s; }
+.wss-strip::before { top: 0; background: var(--dye-a, var(--wss-indigo)); }
+.wss-strip::after { bottom: 0; height: 30px; background: var(--dye-b, var(--wss-violet)); -webkit-mask-image: url(/looks/washi/kumo-bottom.png); mask-image: url(/looks/washi/kumo-bottom.png); opacity: .5; }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-strip::before { opacity: .85; }
+.wss-strip-piece:nth-child(3n + 2) .wss-strip { --dye-a: var(--wss-violet); --dye-b: var(--wss-indigo); }
+.wss-strip-piece:nth-child(3n) .wss-strip { --dye-a: var(--wss-sakura); --dye-b: var(--wss-moegi); }
+.wss-strip > * { position: relative; z-index: 1; }
+.wss-strip-row { display: flex; align-items: center; gap: 14px; min-height: 84px; padding: 24px 20px 20px 22px; }
+.wss-strip-sub { font-family: var(--font-head), serif; font-style: italic; font-size: 16px; line-height: 1.3; color: color-mix(in oklab, currentColor 72%, transparent); overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.wss-strip-text { display: grid; gap: 3px; flex: 1; min-width: 0; }
+.wss-strip .wss-title { justify-self: start; font-size: 22px; font-weight: 600; line-height: 1.12; overflow-wrap: anywhere; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.wss-strip[data-len="s"] .wss-title { font-size: 25px; }
+.wss-strip .wss-site { font-family: var(--font-head), serif; font-size: 15px; letter-spacing: .02em; color: color-mix(in oklab, currentColor 60%, transparent); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.wss-strip-feature .wss-pic { aspect-ratio: 2 / 1; margin: 14px 14px 0; box-shadow: 0 0 0 1px var(--wss-paper-edge); }
+.wss-strip-feature .wss-strip-row { padding-top: 14px; }
+.wss-strip-feature .wss-pic { margin-top: 26px; }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-strip .wss-sseal { rotate: 4deg; scale: 1.06; }
+.sc-piece:is(:active, .is-press) .wss-strip { scale: .975; transition-duration: .1s; }
+
+/* ---------- socials: ink stamps ---------- */
+.wss-stamps { display: flex; flex-wrap: wrap; gap: 10px; }
+.wss-ink { display: grid; width: 46px; height: 46px; rotate: var(--r, 0deg); transition: scale .3s var(--wss-bounce), rotate .4s var(--wss-ease); }
+.wss-ink-face { display: grid; place-items: center; background: var(--wss-ink); color: var(--bg); -webkit-mask: url(/looks/washi/ink.png) center / 100% 100%; mask: url(/looks/washi/ink.png) center / 100% 100%; transition: background .25s; }
+.wss-ink-face svg { width: 21px; height: 21px; }
+.wss-ink-face b { font-family: var(--font-head), serif; font-size: 22px; font-weight: 700; }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-ink { rotate: 0deg; scale: 1.08; }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-ink-face { background: var(--wss-red); color: #fbf3e4; }
+
+/* ---------- music: a round fan ---------- */
+.wss-music { position: relative; display: flex; align-items: center; gap: 18px; }
+.wss-uchiwa { position: relative; flex: none; display: grid; justify-items: center; width: 168px; transform-origin: 50% 100%; transition: rotate .6s var(--wss-ease); }
+.wss-uchiwa-face { position: relative; display: block; width: 168px; height: 168px; border-radius: 50%; overflow: hidden; background: var(--wss-paper);
+  box-shadow: 0 0 0 3px #b69560, 0 0 0 4px rgb(80 50 20 / .35), var(--wss-shadow); }
+.wss-uchiwa-face img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.86) sepia(.05); transition: filter .5s, scale 1s var(--wss-ease); }
+.wss-uchiwa-blank { display: block; width: 100%; height: 100%; background: var(--ws-seigaiha) center / 44px auto; }
+/* the bamboo ribs show through the paper, radiating from the handle */
+.wss-ribs { position: absolute; inset: 0; border-radius: 50%; background: repeating-conic-gradient(from 0deg at 50% 100%, rgb(255 250 235 / .16) 0 .6deg, transparent .6deg 7deg); mix-blend-mode: soft-light; }
+.wss-uchiwa-handle { display: block; width: 13px; height: 74px; margin-top: -2px; border-radius: 3px 3px 7px 7px; background: linear-gradient(90deg, #8a6338, #c9a370 45%, #9b7443); box-shadow: 0 8px 12px -8px rgb(0 0 0 / .5); }
+.wss-music-text { display: grid; gap: 4px; min-width: 0; justify-items: start; }
+.wss-music .wss-title { font-size: 25px; font-weight: 600; line-height: 1.1; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.wss-music .wss-site { font-family: var(--font-head), serif; font-style: italic; font-size: 17px; color: var(--wss-muted); overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.wss-play { display: grid; place-items: center; width: 36px; height: 36px; margin-top: 8px; border-radius: 50%; background: var(--wss-red); color: #fbf3e4; -webkit-mask: url(/looks/washi/ink.png) center / 100% 100%; mask: url(/looks/washi/ink.png) center / 100% 100%; border-radius: 50%; transition: scale .3s var(--wss-bounce); }
+.wss-play svg { width: 14px; height: 14px; fill: currentColor; translate: 1px 0; }
+.wss-music-full { width: 290px; }
+.wss-music-full .wss-uchiwa { width: 138px; }
+.wss-music-full .wss-uchiwa-face { width: 138px; height: 138px; }
+.wss-music-full .wss-title { font-size: 23px; }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-uchiwa { animation: wss-fan 1.4s var(--wss-ease); }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-uchiwa-face img { filter: none; }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-play { scale: 1.12; }
+.sc-piece:is(:active, .is-press) .wss-play { scale: .88; }
+@keyframes wss-fan { 0%, 100% { rotate: 0deg; } 20% { rotate: -9deg; } 45% { rotate: 7deg; } 70% { rotate: -3deg; } }
+/* on the phone: a small fan beside the title, on a slip of paper */
+.wss-music-strip { gap: 14px; padding: 16px 18px 16px 16px; color: #221c16; }
+.wss-dark .wss-music-strip { color: #ece4d4; }
+.wss-music-strip .wss-uchiwa { width: 64px; margin: 0 4px; }
+.wss-music-strip .wss-uchiwa-face { width: 64px; height: 64px; box-shadow: 0 0 0 2px #b69560, var(--wss-shadow); }
+.wss-music-strip .wss-uchiwa-handle { width: 7px; height: 24px; }
+.wss-music-strip .wss-music-text { flex: 1; }
+.wss-music-strip .wss-title { font-size: 21px; -webkit-line-clamp: 2; }
+.wss-music-strip .wss-site { font-size: 15px; -webkit-line-clamp: 1; }
+.wss-music-strip .wss-play { position: absolute; right: 16px; top: 50%; translate: 0 -50%; margin: 0; }
+.wss-music-strip .wss-music-text { padding-right: 46px; }
+
+/* ---------- photos and video: prints on a paper mat ---------- */
+.wss-mount { position: relative; display: grid; gap: 10px; margin: 0; padding: 12px 12px 14px; transition: translate .35s var(--wss-ease), rotate .5s var(--wss-ease); color: #221c16; }
+.wss-dark .wss-mount { color: #ece4d4; }
+.wss-mount-pic { position: relative; display: block; overflow: hidden; aspect-ratio: 4 / 3; background: #000; box-shadow: 0 0 0 1px rgb(0 0 0 / .1); }
+.wss-mount-pic > img, .wss-mount-pic button img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.84) sepia(.05); transition: filter .5s, scale 1.1s var(--wss-ease); }
+.wss-mount-pic > * { position: absolute; inset: 0; }
+.wss-video .wss-mount-pic { aspect-ratio: 16 / 9; }
+/* the player's own round button becomes a vermilion seal */
+.wss-video .wss-mount-pic button > span:last-child { width: 54px; height: 54px; background: var(--wss-red); -webkit-backdrop-filter: none; backdrop-filter: none; -webkit-mask: url(/looks/washi/ink.png) center / 100% 100%; mask: url(/looks/washi/ink.png) center / 100% 100%; border-radius: 50%; }
+.wss-video .wss-mount-pic button > span:last-child svg { fill: #fbf3e4; color: #fbf3e4; }
+.wss-caption { display: flex; align-items: baseline; gap: 8px; min-width: 0; padding: 0 2px; font-size: 18px; font-style: italic; line-height: 1.25; }
+.wss-caption > span:last-child { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.wss-play-mark { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--wss-red); translate: 0 -1px; }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-mount { translate: 0 -4px; }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-mount-pic img { filter: none; scale: 1.035; }
+.sc-piece:is(:active, .is-press) .wss-mount { translate: 0 -1px; transition-duration: .12s; }
+
+/* a photo on a folding fan (computer): it opens on load and spreads a touch more on hover */
+@property --wss-open { syntax: "<number>"; inherits: true; initial-value: 1; }
+.wss-ogi { position: relative; width: 320px; margin: 0; --wss-open: 1; transition: --wss-open .8s var(--wss-ease); }
+.wss-ogi-leaf { position: relative; display: block; width: 320px; height: 200px; filter: drop-shadow(0 12px 14px rgb(60 40 20 / .3));
+  clip-path: path("M0.3 85.2A195 195 0 0 1 319.7 85.2L225.5 151.1A80 80 0 0 0 94.5 151.1Z"); transition: clip-path .8s var(--wss-ease); }
+.wss-ogi-leaf img { width: 100%; height: 160px; object-fit: cover; object-position: center 40%; filter: saturate(.86) sepia(.06); transition: filter .5s; }
+.wss-pleats { position: absolute; inset: 0; background: repeating-conic-gradient(from -55deg at 160px 197px, rgb(0 0 0 / .14) 0 5.5deg, rgb(255 255 255 / .14) 5.5deg 11deg); mix-blend-mode: soft-light; }
+.wss-ogi-leaf::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 160px 197px, transparent 0 191px, var(--wss-gold) 191px 195px, transparent 195px); }
+.wss-ogi-sticks { position: absolute; left: 0; top: 0; width: 320px; height: 200px; pointer-events: none; }
+.wss-ogi-sticks i { position: absolute; left: 158.5px; top: 109px; width: 3px; height: 90px; border-radius: 2px; background: linear-gradient(#a37b4a, #6b4a2a); transform-origin: 50% 88px; rotate: calc(var(--k) * 10.5deg * var(--wss-open)); }
+.wss-ogi-sticks i:first-child, .wss-ogi-sticks i:last-child { width: 5px; left: 157.5px; top: 4px; height: 195px; transform-origin: 50% 193px; background: linear-gradient(#5b3d22, #3b2716); }
+.wss-ogi-pin { position: absolute; left: 154px; top: 191px; width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #f1d999, #9a7432); box-shadow: 0 1px 2px rgb(0 0 0 / .4); }
+.wss-ogi .wss-caption { justify-content: center; margin-top: 10px; text-align: center; }
+.posy-motion .wss:not(.wss-editing) .wss-ogi-leaf { animation: wss-ogi-open 1.3s .9s var(--wss-ease) backwards; }
+.posy-motion .wss:not(.wss-editing) .wss-ogi { animation: wss-ogi-sticks 1.3s .9s var(--wss-ease) backwards; }
+@keyframes wss-ogi-open { from { clip-path: path("M146.4 2.5A195 195 0 0 1 173.6 2.5L165.6 117.2A80 80 0 0 0 154.4 117.2Z"); } }
+@keyframes wss-ogi-sticks { from { --wss-open: .08; } }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-ogi-leaf img { filter: none; }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-ogi { translate: 0 -3px; }
+.wss-ogi { transition: --wss-open .8s var(--wss-ease), translate .4s var(--wss-ease); }
+
+/* ---------- note: a poem card with an ink circle ---------- */
+.wss-note { position: relative; display: grid; place-items: center; overflow: hidden; color: #221c16; }
+.wss-note::after { content: ""; position: absolute; inset: 11px; border: 1px solid color-mix(in oklab, var(--wss-gold) 65%, transparent); pointer-events: none; }
+.wss-dark .wss-note { color: #ece4d4; }
+.wss-note-card { width: 250px; aspect-ratio: 1 / 1.08; padding: 30px 26px; }
+.wss-note p { position: relative; z-index: 1; margin: 0; font-size: 24px; font-weight: 500; font-style: italic; line-height: 1.3; text-align: center; overflow-wrap: anywhere; }
+.wss-note[data-len="m"] p { font-size: 20px; }
+.wss-note[data-len="l"] p { font-size: 17px; line-height: 1.38; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 8; }
+.wss-note p strong { font-weight: 700; color: var(--wss-red); }
+.wss-enso { position: absolute; inset: 8%; width: 84%; height: 84%; pointer-events: none; }
+.wss-enso-ink { fill: var(--wss-ink); opacity: .2; transition: opacity .5s; }
+.wss-enso-draw { fill: none; stroke: #fff; stroke-width: 44; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.wss-dark .wss-enso-ink { fill: #ece4d4; opacity: .2; }
+.posy-motion .wss:not(.wss-editing) .wss-enso-draw { animation: wss-draw 1.6s 1.1s var(--wss-ease) backwards; }
+.sc-piece:is(:hover, .is-hover) .wss-enso-draw { animation: wss-draw 1.3s var(--wss-ease); }
+.sc-piece:is(:hover, .is-hover) .wss-enso-ink { opacity: .26; }
+@keyframes wss-draw { from { stroke-dashoffset: 1; } }
+.wss-note-strip { padding: 30px 26px 28px; }
+.wss-note-strip .wss-enso { inset: auto; right: -24px; top: 50%; translate: 0 -50%; width: 170px; height: 170px; }
+.wss-note-strip p { text-align: left; justify-self: start; }
+
+/* ---------- stamp: a red seal pressed into the page ---------- */
+.wss-hanko { position: relative; display: grid; place-items: center; width: 132px; height: 132px; padding: 18px; rotate: -5deg; background: var(--wss-red); color: var(--wss-paper);
+  -webkit-mask: url(/looks/washi/ink.png) center / 100% 100%; mask: url(/looks/washi/ink.png) center / 100% 100%; transition: scale .3s var(--wss-bounce), rotate .5s var(--wss-ease); }
+.wss-hanko::before { content: ""; position: absolute; inset: 7px; border: 2px solid currentColor; opacity: .85; }
+.wss-hanko-ink { position: relative; font-size: 30px; font-weight: 700; line-height: 1; letter-spacing: .02em; text-align: center; text-transform: uppercase; overflow-wrap: anywhere; }
+.wss-hanko[data-len="m"] .wss-hanko-ink { font-size: 21px; line-height: 1.05; }
+.wss-hanko[data-len="l"] .wss-hanko-ink { font-size: 16px; line-height: 1.08; letter-spacing: .03em; }
+.posy-motion .wss:not(.wss-editing) .wss-hanko { animation: wss-press .7s 1.5s var(--wss-ease) backwards; }
+.sc-piece:is(:hover, .is-hover, :focus-visible) .wss-hanko { rotate: -1deg; }
+.sc-piece:is(:active, .is-press) .wss-hanko { scale: .9; }
+@keyframes wss-press { 0% { opacity: 0; scale: 1.35; } 55% { opacity: 1; scale: .94; } 100% { scale: 1; } }
+
+/* ---------- the print with your name, and you ---------- */
+.wss-masthead { position: relative; margin: 0; padding: 12px; box-shadow: inset 0 0 0 1px var(--wss-paper-edge), var(--wss-shadow); }
+.wss-masthead-pic { display: block; overflow: hidden; container-type: inline-size; }
+.wss-masthead-pic img { display: block; width: 100%; aspect-ratio: 1.56; object-fit: cover; box-shadow: 0 0 0 1px rgb(0 0 0 / .1); }
+.wss-name { margin: 0; color: #1d1a16; }
+.wss-name-slip { position: absolute; top: 26px; right: 26px; z-index: 2; writing-mode: vertical-rl; text-orientation: mixed; max-height: calc(100% - 52px);
+  padding: .65em .38em; font-size: clamp(22px, 2.6vw, 40px); font-weight: 600; line-height: 1.1; letter-spacing: .12em; white-space: nowrap;
+  box-shadow: inset 0 0 0 1px #1d1a16, inset 0 0 0 4px var(--wss-paper), inset 0 0 0 5px rgb(29 26 22 / .5), 0 10px 22px -12px rgb(0 0 0 / .55); }
+.wss-name-band { position: relative; z-index: 2; display: block; width: fit-content; max-width: calc(100% + 12px); margin: -34px 0 0 -26px; padding: 12px 24px 14px; font-size: clamp(30px, 3.1vw, 46px); font-weight: 600; line-height: 1.02; letter-spacing: -.005em; overflow-wrap: anywhere;
+  box-shadow: inset 0 0 0 1px #1d1a16, inset 0 0 0 4px var(--wss-paper), inset 0 0 0 5px rgb(29 26 22 / .5), 0 14px 26px -14px rgb(0 0 0 / .55); }
+.wss-dark .wss-name { color: #ece4d4; }
+.wss-dark .wss-name-slip, .wss-dark .wss-name-band { box-shadow: inset 0 0 0 1px #ece4d4, inset 0 0 0 4px var(--wss-paper), inset 0 0 0 5px rgb(236 228 212 / .45), 0 12px 24px -12px rgb(0 0 0 / .8); }
+.wss-name-band textarea { display: block; width: 100%; min-width: 8ch; field-sizing: content; resize: none; font: inherit; color: inherit; background: none; border: 0; outline: none; }
+.wss-about { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 22px 30px; }
+.wss-me { position: relative; width: 104px; }
+.wss-portrait { display: block; padding: 9px 9px 22px; rotate: -2deg; }
+.wss-portrait .posy-avatar, .wss-portrait button { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; border-radius: 0; overflow: hidden; box-shadow: none; }
+.wss-portrait .posy-avatar img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.85) sepia(.05); }
+.wss-portrait .posy-avatar > span { font-family: var(--font-head), serif; font-size: 40px; color: color-mix(in oklab, var(--wss-ink) 45%, transparent); }
+.wss-me .wss-seal { right: -26px; bottom: -14px; }
+.wss-me:not(:has(.wss-portrait)) { width: 62px; height: 62px; }
+.wss-me:not(:has(.wss-portrait)) .wss-seal { position: static; }
+.wss-me-text { display: grid; gap: 8px; min-width: 0; }
+.wss-bio { font-size: 23px; font-weight: 500; line-height: 1.38; color: var(--wss-ink); overflow-wrap: anywhere; }
+.wss-bio textarea, .wss-where input { display: block; width: 100%; field-sizing: content; resize: none; font: inherit; color: inherit; background: none; border: 0; outline: none; }
+.wss-where { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 18px; font-style: italic; color: var(--wss-muted); }
+.wss-where::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--wss-red); }
+.wss-about > .wss-stamps { grid-column: 1 / -1; }
+
+/* ============ the computer: a folding screen standing in a quiet room ============ */
+.wss-room { position: relative; display: grid; justify-items: center; align-items: start; min-height: 100vh; padding: 40px 32px 56px; }
+.wss-screen { position: relative; width: min(1360px, 100%); display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 0 52px; padding: 44px 44px 50px;
+  background: var(--wss-ground) url(/looks/washi/gold-leaf.jpg) center / cover;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--wss-gold) 60%, transparent) inset, 0 0 0 9px var(--wss-lacquer), 0 0 0 10px rgb(255 255 255 / .06), 0 50px 60px -30px rgb(40 25 10 / .55), 0 90px 80px -60px rgb(40 25 10 / .4); }
+.wss-dark .wss-screen { background: #1d1c1b url(/looks/washi/silver-leaf.jpg) center / cover;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / .08) inset, 0 0 0 9px var(--wss-lacquer), 0 0 0 10px rgb(255 255 255 / .05), 0 50px 70px -30px rgb(0 0 0 / .8); }
+/* six panels: each fold catches the light from the left a little differently, with a seam between them */
+.wss-folds { position: absolute; inset: 0; z-index: 1; display: grid; grid-template-columns: repeat(6, 1fr); pointer-events: none; mix-blend-mode: multiply; }
+.wss-folds b { background: linear-gradient(90deg, rgb(255 255 255 / 0), rgb(90 60 20 / .06)); }
+.wss-folds b:nth-child(even) { background: linear-gradient(90deg, rgb(90 60 20 / .11), rgb(90 60 20 / .03)); }
+.wss-folds b + b { box-shadow: inset 1px 0 0 rgb(60 40 15 / .22); }
+.wss-dark .wss-folds { mix-blend-mode: normal; }
+.wss-dark .wss-folds b { background: linear-gradient(90deg, rgb(255 255 255 / .02), rgb(0 0 0 / .1)); }
+.wss-dark .wss-folds b:nth-child(even) { background: linear-gradient(90deg, rgb(0 0 0 / .2), rgb(0 0 0 / .06)); }
+.wss-dark .wss-folds b + b { box-shadow: inset 1px 0 0 rgb(0 0 0 / .5); }
+.wss-zone-a, .wss-zone-b { position: relative; z-index: 2; min-width: 0; }
+.wss-zone-a { display: grid; align-content: start; gap: 38px; }
+.wss-zone-b { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; align-content: flex-start; gap: 44px 34px; }
+.wss-zone-b > .wss-extras-b { display: contents; }
+/* the cord: a silk cord pinned at both ends, sagging; slips hang from it on short threads */
+.wss-line { position: relative; display: grid; grid-template-columns: repeat(var(--n), var(--sw)); gap: var(--gap); padding: 0 var(--pad); align-items: start; max-width: 100%; }
+.wss-cord { position: absolute; left: 0; top: 0; width: 100%; height: 68px; overflow: visible; pointer-events: none; }
+.wss-cord path { fill: none; stroke: var(--wss-cord); stroke-width: 2.2; stroke-linecap: round; }
+.wss-pin { position: absolute; left: 0; top: 0; width: 11px; height: 11px; translate: -1px -3px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #f1d999, #9a7432); box-shadow: 0 1px 2px rgb(0 0 0 / .4); }
+.wss-pin-r { left: auto; right: 0; translate: 1px -3px; }
+.wss-x { flex: none; }
+.wss-extras { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 40px 34px; width: 100%; }
+.wss-extras-a { justify-content: center; }
+.wss-pic:has(.wss-pic-blank) { display: none; }
+.wss-tanzaku-feature .wss-tz-paper:has(.wss-pic-blank) { padding-top: 62px; }
+/* entrance: the screen settles, the print is pasted, the cord is strung, the slips drop in and swing to rest */
+.posy-motion .wss:not(.wss-editing) .wss-screen { animation: wss-stand .9s var(--wss-ease) backwards; }
+.posy-motion .wss:not(.wss-editing) .wss-masthead { animation: wss-paste .8s .25s var(--wss-ease) backwards; }
+.posy-motion .wss:not(.wss-editing) .wss-cord path { stroke-dasharray: 1; animation: wss-draw 1s .45s var(--wss-ease) backwards; }
+.posy-motion .wss:not(.wss-editing) .wss-line .wss-tanzaku { animation: wss-drop 1.6s calc(.6s + var(--wk, 0) * .12s) var(--wss-ease) backwards; }
+.posy-motion .wss:not(.wss-editing) .wss-seal { animation: wss-press .7s 1.2s var(--wss-ease) backwards; }
+.posy-motion .wss:not(.wss-editing) .wss-screen :is(.wss-about, .wss-x) { animation: wss-paste .8s .8s var(--wss-ease) backwards; }
+@keyframes wss-stand { from { opacity: 0; scale: .985; } }
+@keyframes wss-paste { from { opacity: 0; translate: 0 10px; } }
+@keyframes wss-drop { 0% { opacity: 0; translate: 0 -22px; rotate: 6deg; } 30% { opacity: 1; translate: 0 0; rotate: -4deg; } 55% { rotate: 2.2deg; } 78% { rotate: -.8deg; } 100% { rotate: 0deg; } }
+
+/* ============ the phone: a hanging scroll, read top to bottom ============ */
+.wss-scroll { position: relative; max-width: 480px; margin: 0 auto; padding: 10px 12px 34px; }
+.wss-hanger { position: relative; height: 44px; }
+.wss-hanger svg { position: absolute; left: 50%; top: 2px; width: 110px; height: 38px; translate: -50% 0; overflow: visible; }
+.wss-hanger path { fill: none; stroke: var(--wss-cord); stroke-width: 2; }
+.wss-hanger svg::after { content: none; }
+.wss-rod { position: absolute; left: 4px; right: 4px; bottom: 0; height: 10px; border-radius: 3px; background: linear-gradient(#5d3e2a, #2c1c12); box-shadow: 0 3px 6px -2px rgb(0 0 0 / .45); }
+/* the silk mount: a woven brocade around the paper, with the two hanging strips (futai) and gold rules (ichimonji) */
+.wss-silk { position: relative; padding: 50px 11px 46px; overflow: clip;
+  background: #6f7158 url(/looks/washi/brocade.jpg) center top / 220px;
+  box-shadow: 0 1px 0 rgb(255 255 255 / .1) inset, 0 30px 40px -24px rgb(40 25 10 / .5); }
+.posy-preset-sakura .wss-silk { background-color: #9a6a6c; background-blend-mode: luminosity; }
+.posy-preset-yomogi .wss-silk { background-color: #56664c; background-blend-mode: luminosity; }
+.wss-dark .wss-silk { background-color: #2a2d36; background-blend-mode: luminosity; box-shadow: 0 30px 40px -24px rgb(0 0 0 / .7); }
+.wss-futai { position: absolute; left: 27%; top: 0; z-index: 2; width: 16px; height: 62px; background: #4a4a36; box-shadow: inset 0 -4px 0 color-mix(in oklab, var(--wss-gold) 80%, transparent), 0 3px 5px -2px rgb(0 0 0 / .35); }
+.wss-futai-r { left: auto; right: 27%; }
+.posy-preset-sakura .wss-futai { background: color-mix(in oklab, #8a5f62 85%, #000); }
+.posy-preset-yomogi .wss-futai { background: color-mix(in oklab, #4f5d48 85%, #000); }
+.wss-dark .wss-futai { background: #1d1f26; }
+.wss-honshi { position: relative; display: grid; gap: 22px; padding: 16px 14px 24px; box-shadow: 0 -5px 0 color-mix(in oklab, var(--wss-gold) 75%, #6b4f20), 0 5px 0 color-mix(in oklab, var(--wss-gold) 75%, #6b4f20), 0 0 0 1px rgb(0 0 0 / .1); }
+.wss-roller { position: relative; height: 18px; margin: 0 -2px; border-radius: 9px; background: linear-gradient(#6b4a33, #2f1f14 70%); box-shadow: 0 6px 10px -4px rgb(0 0 0 / .5); }
+.wss-roller::before, .wss-roller::after { content: ""; position: absolute; top: -3px; left: -9px; width: 14px; height: 24px; border-radius: 6px; background: linear-gradient(#2a1a10, #120a05); box-shadow: inset 2px 0 0 rgb(255 255 255 / .12); }
+.wss-roller::after { left: auto; right: -9px; }
+.wss-scroll .wss-masthead { padding: 0; box-shadow: none; background: none; }
+.wss-scroll .wss-name-slip { top: 14px; right: 14px; max-height: calc(100% - 28px); font-size: clamp(20px, 7vw, 30px); }
+.wss-scroll .wss-name-band { margin: -26px 0 0 -6px; max-width: calc(100% + 6px); padding: 10px 18px 12px; font-size: clamp(28px, 8.4vw, 38px); }
+.wss-scroll .wss-about { gap: 18px 20px; padding: 4px 4px 0; }
+.wss-scroll .wss-me { width: 78px; }
+.wss-scroll .wss-me .wss-seal { width: 50px; height: 50px; right: -18px; bottom: -12px; }
+.wss-scroll .wss-me .wss-seal span { font-size: 15px; }
+.wss-scroll .wss-bio { font-size: 20px; line-height: 1.36; }
+.wss-scroll .wss-where { font-size: 16.5px; }
+.wss-scroll .wss-stamps { gap: 9px; }
+.wss-scroll .wss-ink { width: 44px; height: 44px; }
+.wss-strips { display: grid; gap: 12px; }
+.wss-m-extras { display: grid; gap: 18px; }
+.wss-m-extras .wss-x-stamp { justify-self: center; }
+.wss-m-extras .wss-x-stamp .wss-hanko { width: 120px; height: 120px; }
+.wss-m-extras .wss-print .wss-mount-pic { aspect-ratio: 4 / 3; }
+/* the scroll unrolls when the page opens; further down, things settle in as you reach them */
+.posy-motion .wss:not(.wss-editing) .wss-silk { animation: wss-unroll 1.5s .15s cubic-bezier(.3, .6, .25, 1) backwards; }
+@keyframes wss-unroll { 0% { max-height: 60px; } 70% { max-height: 1100px; } 100% { max-height: 9000px; } }
+@supports (animation-timeline: view()) {
+  .posy-motion .wss:not(.wss-editing) .wss-honshi :is(.wss-strip-piece, .wss-x) { animation: wss-paste linear both; animation-timeline: view(); animation-range: entry 0% entry 60%; }
+}
+.wss-scroll .sc-piece { -webkit-tap-highlight-color: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wss *, .wss *::before, .wss *::after { animation: none !important; transition-duration: .01s !important; }
+}
+
+/* focus ring that belongs to the page */
+.wss .sc-piece:focus-visible > :first-child { outline: 2px solid color-mix(in oklab, var(--wss-red) 70%, transparent); outline-offset: 6px; }
+.wss-extras .wss-x-video { width: 340px; }
+
+.wss-zone-b .wss-music .wss-site, .wss-zone-a .wss-music .wss-site, .wss-where { color: color-mix(in oklab, var(--wss-ink) 72%, transparent); }
+.wss-dark .wss-seal span { color: #e5583e; }
