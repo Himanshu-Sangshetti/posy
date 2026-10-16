@@ -157,7 +157,7 @@ export function Studio({ init }: { init: StudioInit }) {
       // canvas: arrow keys nudge the selected tile (shift = 10 units)
       const arrow = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
       const theme = useStudio.getState().page?.theme;
-      if (arrow && selected && !mod && theme?.layout === 'canvas' && !sceneFor(theme.style)) {
+      if (arrow && selected && !mod && theme?.layout === 'canvas' && !sceneFor(theme)) {
         e.preventDefault();
         const step = e.shiftKey ? 10 : 1;
         nudgeTile(selected, arrow[0] * step, arrow[1] * step);

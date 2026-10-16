@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export default async function OnboardingPreview({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const user = await requireUser();
   const q = await searchParams;
-  const style = (STYLE_IDS.includes(q.style as StyleId) ? q.style : 'cozy') as StyleId;
+  const style = (STYLE_IDS.includes(q.style as StyleId) ? q.style : 'painted') as StyleId;
   const page = starterPage({
     name: user.name, style,
     layout: (['bento', 'list', 'canvas'] as const).find(l => l === q.layout),

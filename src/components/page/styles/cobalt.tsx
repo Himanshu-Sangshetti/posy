@@ -108,9 +108,107 @@ const Moon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" aria-hidden className={cn('cb-moon', className)}><path d="M15.5 3.2a8.8 8.8 0 1 0 5.3 15.1A9.6 9.6 0 0 1 15.5 3.2Z" /></svg>
 );
 
+/* ---------------- Grid plan ----------------
+ * The shared grid flows tiles in their chosen sizes, which leaves holes: a note alone beside empty cells, a stamp alone
+ * in a row, a half-empty last row. Cobalt and Night lay each section out here instead: the same dense flow, but if it
+ * would leave holes, the fewest tiles change size (photos and links first, stamps last) so every row ends level. A page
+ * with only a few tiles gets bigger pieces, and a section narrower than the grid is centred. The result is a small
+ * stylesheet that places each tile by id, on desktop (4 columns) and on phones (2 columns). */
+type Size = Tile['size'];
+const SIZES: Size[] = ['s', 'w', 't', 'l'];
+const DIMS: Record<Size, [number, number]> = { s: [1, 1], w: [2, 1], t: [1, 2], l: [2, 2] };
+type Cell = { r: number; c: number; w: number; h: number };
+
+/** The same placement as `grid-auto-flow: dense`: each tile takes the first free spot from the top left. */
+function flow(sizes: Size[], cols: number) {
+  const used: boolean[][] = [];
+  const free = (r: number, c: number, w: number, h: number) => {
+    for (let y = r; y < r + h; y++) for (let x = c; x < c + w; x++) if (used[y]?.[x]) return false;
+    return true;
+  };
+  const cells: Cell[] = sizes.map(s => {
+    const w = Math.min(DIMS[s][0], cols), h = DIMS[s][1];
+    for (let r = 0; ; r++) for (let c = 0; c + w <= cols; c++) if (free(r, c, w, h)) {
+      for (let y = r; y < r + h; y++) { used[y] ??= []; for (let x = c; x < c + w; x++) used[y][x] = true; }
+      return { r, c, w, h };
+    }
+  });
+  // a section narrower than the grid is centred, so only holes inside its own width count (and it must centre evenly)
+  const width = Math.max(0, ...cells.map(p => p.c + p.w));
+  let holes = (cols - width) % 2 ? used.length * (cols - width) : 0;
+  for (let y = 0; y < used.length; y++) for (let x = 0; x < width; x++) if (!used[y]?.[x]) holes++;
+  return { cells, holes, width };
+}
+
+/** What it costs to show a tile at another size than the one chosen: photos grow happily, a stamp should stay small. */
+function resizeCost(tile: Tile, from: Size, to: Size) {
+  const area = (s: Size) => DIMS[s][0] * DIMS[s][1];
+  const d = area(to) - area(from);
+  let cost = 10 + Math.abs(d) + (d < 0 ? 4 : 0);
+  if (tile.type === 'text' && tile.look === 'stamp') cost += to === 's' ? 0 : 14;
+  else if (tile.type === 'text' && to === 's') cost += 5;
+  if ((tile.type === 'image' || tile.type === 'video') && d > 0) cost -= 3;
+  if (tile.type === 'music' && to === 't') cost += 4;
+  // a ticket, an uplink or a note has little to show in a big square box
+  if ((tile.type === 'text' || tileMeta(tile).kind === 'newsletter') && (to === 'l' || to === 't')) cost += 4;
+  return cost;
+}
+
+function planSection(tiles: Tile[], cols: number, big: boolean, soloWide: boolean) {
+  const base = tiles.map(t => t.size);
+  if (big && cols > 2) {
+    // a page of one to three tiles: one big piece (the first with something to show) and wide ones beside it
+    const plain = (t: Tile) => t.type === 'text' || tileMeta(t).kind === 'newsletter';
+    const lead = Math.max(0, tiles.findIndex(t => !plain(t)));
+    tiles.forEach((t, i) => { base[i] = i === lead && !(soloWide && tiles.length === 1 && plain(t)) ? 'l' : 'w'; });
+  }
+  let best = { ...flow(base, cols), cost: 0 };
+  if (best.holes) {
+    const n = tiles.length;
+    // try one change, then two, then three; keep the cheapest layout with no holes (or, failing that, the fewest holes)
+    let level: typeof best | null = null, fewest = best;
+    const tryChanges = (depth: number, start: number, sizes: Size[], cost: number) => {
+      if (depth === 0) {
+        const f = flow(sizes, cols);
+        if (!f.holes && (!level || cost < level.cost)) level = { ...f, cost };
+        if (f.holes < fewest.holes) fewest = { ...f, cost };
+        return;
+      }
+      for (let i = start; i < n; i++) for (const s of SIZES) if (s !== base[i]) {
+        const next = [...sizes]; next[i] = s;
+        tryChanges(depth - 1, i + 1, next, cost + resizeCost(tiles[i], base[i], s));
+      }
+    };
+    for (let depth = 1; depth <= Math.min(3, n) && !level; depth++) tryChanges(depth, 0, base, 0);
+    best = level ?? fewest;
+  }
+  // a section narrower than the grid sits in the middle of it
+  const shift = best.width < cols ? Math.floor((cols - best.width) / 2) : 0;
+  return best.cells.map(p => ({ ...p, c: p.c + shift }));
+}
+
+/** The stylesheet that places every grid tile of the page (see above). Tiles are matched by id on the page and in the editor.
+ * `soloWide`: a page whose only tile is a note or a newsletter shows it wide rather than as a big square (Cobalt's ticket). */
+export function gridPlan(page: Page, { soloWide = false } = {}) {
+  const groups: Tile[][] = [[]];
+  for (const t of page.tiles) {
+    if (t.type === 'heading') groups.push([]);
+    else if (t.type !== 'social') groups[groups.length - 1].push(t);
+  }
+  const all = groups.flat();
+  if (!all.length || all.some(t => !/^[\w-]+$/.test(t.id))) return '';
+  const big = all.length <= 3;
+  const rules = (cols: number) => groups.filter(g => g.length).map(g => {
+    const cells = planSection(g, cols, big, soloWide);
+    return g.map((t, i) => { const p = cells[i]; return `.posy-grid>:is([data-tile-id="${t.id}"],[data-tile="${t.id}"]){grid-area:${p.r + 1}/${p.c + 1}/span ${p.h}/span ${p.w}}`; }).join('');
+  }).join('');
+  return `@container grid (min-width:601px){${rules(4)}}@container grid (max-width:600px){${rules(2)}}`;
+}
+
 export function CobaltHeader({ page, slots }: { page: Page; slots: HeaderSlots }) {
   return (
     <>
+      <style dangerouslySetInnerHTML={{ __html: gridPlan(page, { soloWide: true }) }} />
       <Inks preset={page.theme.preset} />
       <PhotoExposure selector=".cb-print img, .cb-portrait .posy-avatar img" />
       {slots.avatar && <div className="cb-portrait">{slots.avatar}</div>}

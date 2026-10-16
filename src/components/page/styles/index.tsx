@@ -3,14 +3,14 @@
 import type { ComponentType } from 'react';
 import type { Page, Tile } from '@/lib/schema';
 import { cn } from '@/lib/utils';
-import { DeskTile, CozyHeader, CozyRow } from '../desk';
-import { WashiHeader, WashiTile, WashiRow } from './washi';
-import { LofiHeader, LofiTile, LofiRow } from './lofi';
-import { LofiScene } from './lofi-scene';
-import { WashiScene } from './washi-scene';
-import { PaintedScene } from './painted-scene';
-import { DeskScene } from './desk-scene';
-import { PaintedHeader, PaintedTile, PaintedRow } from './painted';
+import { CozyRow } from '../desk';
+import { WashiRow } from './washi';
+import { LofiRow } from './lofi';
+import { LofiScene, LofiCanvasTile, LofiCanvasHeaderBase } from './lofi-scene';
+import { WashiScene, WashiCanvasHeader, WashiCanvasTile } from './washi-scene';
+import { PaintedScene, PaintedCanvasHeader, PaintedCanvasTile } from './painted-scene';
+import { DeskScene, DeskCanvasHeader, DeskCanvasTile } from './desk-scene';
+import { PaintedRow } from './painted';
 import { NightHeader, NightTile, NightRow } from './night';
 import { CobaltHeader, CobaltTile, CobaltRow } from './cobalt';
 import type { HeaderSlots } from './types';
@@ -39,10 +39,11 @@ type Renderer = {
 };
 
 const RENDERERS: Partial<Record<StyleId, Renderer>> = {
-  cozy: { Header: ({ slots }) => <CozyHeader slots={slots} />, Tile: DeskTile, Row: CozyRow, Scene: DeskScene },
-  washi: { Header: WashiHeader, Tile: WashiTile, Row: WashiRow, Scene: WashiScene },
-  lofi: { Header: ({ page, slots }) => <LofiHeader name={page.profile.name} slots={slots} />, Tile: LofiTile, Row: LofiRow, Scene: LofiScene },
-  painted: { Header: PaintedHeader, Tile: PaintedTile, Row: PaintedRow, Scene: PaintedScene },
+  // scene looks: Header and Tile are what the Canvas layout draws, in the look's own kit (Grid and List show the Scene)
+  cozy: { Header: ({ slots }) => <DeskCanvasHeader slots={slots} />, Tile: DeskCanvasTile, Row: CozyRow, Scene: DeskScene },
+  washi: { Header: WashiCanvasHeader, Tile: WashiCanvasTile, Row: WashiRow, Scene: WashiScene },
+  lofi: { Header: ({ page, slots }) => <LofiCanvasHeaderBase name={page.profile.name} slots={slots} />, Tile: LofiCanvasTile, Row: LofiRow, Scene: LofiScene },
+  painted: { Header: PaintedCanvasHeader, Tile: PaintedCanvasTile, Row: PaintedRow, Scene: PaintedScene },
   night: { Header: NightHeader, Tile: NightTile, Row: NightRow },
   cobalt: { Header: CobaltHeader, Tile: CobaltTile, Row: CobaltRow },
 };
@@ -50,8 +51,16 @@ const RENDERERS: Partial<Record<StyleId, Renderer>> = {
 /** Every style except Minimal shows social links as a row in the header rather than as tiles. */
 export const socialsInHeader = (page: Page) => page.theme.style !== 'minimal' || page.theme.layout === 'list';
 
-/** The look's own page composition, if it has one. */
-export const sceneFor = (style: StyleId) => RENDERERS[style]?.Scene;
+type Layout = Pick<Page['theme'], 'style' | 'layout'>;
+/**
+ * The look's own page composition, if it has one and the layout uses it. Grid shows the scene (its desktop and phone
+ * arrangements), List shows its phone arrangement at every width, Canvas places the look's tiles freely (no scene).
+ */
+export const sceneFor = (t: Layout) => t.layout === 'canvas' ? undefined : RENDERERS[t.style]?.Scene;
+/** List keeps the scene's phone arrangement on every screen. */
+export const sceneOnly = (t: Layout) => t.layout === 'list' ? 'mobile' as const : undefined;
+/** The look composes its page itself in some layout (so it shows a scene in Grid and List). */
+export const hasScene = (style: StyleId) => !!RENDERERS[style]?.Scene;
 
 export function StyleHeader({ page, slots }: { page: Page; slots: HeaderSlots }) {
   const R = RENDERERS[page.theme.style];

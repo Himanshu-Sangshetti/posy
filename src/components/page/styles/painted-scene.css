@@ -14,16 +14,16 @@
 }
 
 /* ---------- the sky: one painting behind everything, drifting very slowly ---------- */
-.posy-page.posy-style-painted.posy-scene { --pts-sky: url(/looks/painted/sky-day.webp); }
-.posy-page.posy-style-painted.posy-scene.posy-preset-golden-hour { --pts-sky: url(/looks/painted/sky-golden.webp); }
-.posy-page.posy-style-painted.posy-scene.posy-preset-dusk-sky { --pts-sky: url(/looks/painted/sky-dusk.webp); }
-.posy-page.posy-style-painted.posy-scene.posy-preset-starry { --pts-sky: url(/looks/painted/sky-night.webp); }
-.posy-page.posy-style-painted.posy-scene .posy-backdrop { background: #b9d3e6; isolation: isolate; }
-.posy-page.posy-style-painted.posy-scene.posy-preset-starry .posy-backdrop { background: #18264a; }
-.posy-page.posy-style-painted.posy-scene .posy-backdrop::before { inset: -3%; z-index: 0; background: var(--pts-sky) 22% 100% / cover no-repeat; opacity: 1; filter: none; mix-blend-mode: normal; mask: none; animation: pts-sky 90s ease-in-out infinite alternate; }
-.posy-page.posy-style-painted.posy-scene .posy-backdrop::after { display: none; }
+.posy-page.posy-style-painted:is(.posy-scene, .posy-layout-canvas) { --pts-sky: url(/looks/painted/sky-day.webp); }
+.posy-page.posy-style-painted:is(.posy-scene, .posy-layout-canvas).posy-preset-golden-hour { --pts-sky: url(/looks/painted/sky-golden.webp); }
+.posy-page.posy-style-painted:is(.posy-scene, .posy-layout-canvas).posy-preset-dusk-sky { --pts-sky: url(/looks/painted/sky-dusk.webp); }
+.posy-page.posy-style-painted:is(.posy-scene, .posy-layout-canvas).posy-preset-starry { --pts-sky: url(/looks/painted/sky-night.webp); }
+.posy-page.posy-style-painted:is(.posy-scene, .posy-layout-canvas) .posy-backdrop { background: #b9d3e6; isolation: isolate; }
+.posy-page.posy-style-painted:is(.posy-scene, .posy-layout-canvas).posy-preset-starry .posy-backdrop { background: #18264a; }
+.posy-page.posy-style-painted:is(.posy-scene, .posy-layout-canvas) .posy-backdrop::before { inset: -3%; z-index: 0; background: var(--pts-sky) 22% 100% / cover no-repeat; opacity: 1; filter: none; mix-blend-mode: normal; mask: none; animation: pts-sky 90s ease-in-out infinite alternate; }
+.posy-page.posy-style-painted:is(.posy-scene, .posy-layout-canvas) .posy-backdrop::after { display: none; }
 @keyframes pts-sky { from { translate: -1.2% 0; } to { translate: 1.2% -.6%; } }
-.posy-page.posy-style-painted.posy-scene .posy-footer a { color: #fffefb; text-shadow: 0 1px 8px rgb(30 40 70 / .5); }
+.posy-page.posy-style-painted:is(.posy-scene, .posy-layout-canvas) .posy-footer a { color: #fffefb; text-shadow: 0 1px 8px rgb(30 40 70 / .5); }
 
 /* ---------- a card: cream painted paper, a soft hand-cut edge, a warm shadow ---------- */
 .ptc { position: relative; display: block; background: var(--card); border-radius: var(--edge); box-shadow: inset 0 0 0 1px var(--line), var(--shadow); color: var(--ink); transition: translate .5s var(--ease), box-shadow .5s var(--ease), scale .2s; }
@@ -141,18 +141,80 @@
 @keyframes pts-kite { from { translate: 0 0; rotate: -4deg; } to { translate: 8px -10px; rotate: 3deg; } }
 .pts-night .pts-kite img { filter: brightness(.82) drop-shadow(0 12px 14px rgb(0 0 20 / .35)); }
 
-/* ================= the computer: you on the left, your things in two calm columns ================= */
-.pts-desk { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 26px; align-items: start; max-width: 1160px; margin: 0 auto; padding: 72px 40px 56px; }
-.pts-side { position: sticky; top: 48px; display: grid; }
-.pts-side .pts-kite { margin: 46px 0 0 auto; translate: -40px 0; }
-.pts-main { display: grid; gap: 18px; min-width: 0; }
-.pts-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
-.pts-col { display: grid; gap: 18px; min-width: 0; }
-@container page (max-width: 1000px) {
-  .pts-desk { grid-template-columns: 300px minmax(0, 1fr); padding: 56px 28px 48px; }
-  .pts-cols { grid-template-columns: minmax(0, 1fr); }
-  .ptc-has-pic { grid-template-columns: minmax(0, 1fr); }
-  .ptc-has-pic .ptc-pic { min-height: 0; aspect-ratio: 1.9; margin: 10px 10px 0; }
+/* ================= the computer: you and your lead link up top, then even rows on one six-column grid ================= */
+.pts-desk { --g: 20px; position: relative; display: grid; gap: var(--g); align-content: start; max-width: 1180px; margin: 0 auto; padding: 64px 40px 48px; }
+/* with only a few things, the whole composition sits in the middle of the first screen */
+.sc-desktop:not([data-only]) > .pts-desk { min-height: calc(100svh - 48px); align-content: center; }
+.pts-desk.pts-few { max-width: 1080px; }
+.pts-head, .pts-row, .pts-pair { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--g); align-items: stretch; }
+.pts-head > .ptc-me { grid-column: span 2; align-content: center; }
+.pts-beside { grid-column: span 4; display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: var(--g); }
+.pts-beside-solo { grid-template-rows: minmax(0, 1fr); }
+.pts-head-alone { grid-template-columns: minmax(0, 560px); justify-content: center; }
+.pts-head-alone > .ptc-me { grid-column: auto; }
+.pts-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.pts-pair.pts-n-1 { grid-template-columns: minmax(0, 1fr); }
+.pts-group { display: grid; gap: var(--g); margin-top: 10px; }
+.pts-row-small.pts-n-3 > * { grid-column: span 2; }
+.pts-row-small.pts-n-2 > * { grid-column: span 3; }
+.pts-row-small.pts-n-1 > * { grid-column: span 6; }
+.pts-row-feat.pts-n-3 { grid-auto-rows: 300px; }
+.pts-row-feat.pts-n-3 > * { grid-column: span 2; }
+.pts-row-feat.pts-n-2 { grid-auto-rows: 330px; }
+.pts-row-feat.pts-n-2 > * { grid-column: span 3; }
+.pts-row-feat.pts-n-1 { grid-auto-rows: 440px; }
+.pts-row-feat.pts-n-1 > * { grid-column: 2 / span 4; }
+.pts-row-stack { grid-auto-rows: 360px; }
+.pts-row-stack > .pts-feat { grid-column: span 4; }
+.pts-row-stack > .pts-stackcol { grid-column: span 2; display: grid; grid-auto-rows: minmax(0, 1fr); gap: var(--g); }
+.pts-stack-2 > .pts-feat, .pts-stack-1 > .pts-feat { grid-column: span 3; }
+.pts-stack-2 > .pts-stackcol, .pts-stack-1 > .pts-stackcol { grid-column: span 3; }
+.pts-stack-1 { grid-auto-rows: 300px; }
+/* every card fills its cell, so rows end level */
+.pts-desk :is(.pts-head, .pts-row, .pts-pair, .pts-beside, .pts-stackcol) > .sc-piece { height: 100%; min-height: 0; }
+.pts-desk :is(.pts-head, .pts-row, .pts-pair, .pts-beside, .pts-stackcol) > .sc-piece > .ptc { height: 100%; }
+.pts-desk .ptc-link .ptc-body { height: 100%; grid-template-rows: auto 1fr; align-content: start; }
+.pts-desk .ptc-link .ptc-site { align-self: end; }
+.pts-desk .ptc-has-pic .ptc-body { grid-template-rows: 1fr auto; }
+.pts-desk .ptc-has-pic .ptc-pic { min-height: 0; margin: 10px 0 10px 10px; }
+.pts-desk .ptc-note { display: flex; align-items: center; }
+.pts-desk .ptc-music { align-content: center; }
+.pts-desk .pts-feat .ptc-photo, .pts-desk .pts-hero-pic .ptc-photo { display: flex; flex-direction: column; }
+.pts-desk .pts-feat .ptc-mat, .pts-desk .pts-hero-pic .ptc-mat { flex: 1; min-height: 0; }
+.pts-desk .pts-feat .ptc-mat img, .pts-desk .pts-hero-pic .ptc-mat img { height: 100%; aspect-ratio: auto; }
+.pts-desk .pts-feat .ptc-video, .pts-desk .pts-hero-pic .ptc-video { display: flex; flex-direction: column; }
+.pts-desk .pts-feat .ptc-screen, .pts-desk .pts-hero-pic .ptc-screen { flex: 1; min-height: 0; aspect-ratio: auto; }
+/* the lead link, bigger when it has the space */
+.pts-head .ptc-big .ptc-title { font-size: clamp(34px, 3.2vw, 44px); }
+.pts-few .pts-head .ptc-big:not(.ptc-has-pic) .ptc-title { font-size: clamp(44px, 4.6vw, 68px); }
+.pts-few .pts-head .ptc-big:not(.ptc-has-pic) .ptc-fav { width: 56px; height: 56px; }
+.pts-few .pts-head .ptc-big:not(.ptc-has-pic) .ptc-body { grid-template-columns: 56px minmax(0, 1fr); padding: 36px 36px 28px 32px; }
+.pts-head .ptc-big:not(.ptc-has-pic) .ptc-body { padding: 30px 30px 24px 26px; row-gap: 18px; }
+.pts-beside-solo .ptc-big .ptc-title, .pts-few .pts-beside-solo .ptc-big:not(.ptc-has-pic) .ptc-title { font-size: clamp(52px, 6vw, 88px); -webkit-line-clamp: 3; }
+.pts-beside-solo .ptc-big .ptc-sub { font-size: 17px; }
+/* a picture beside you takes your card's height instead of setting it */
+.pts-desk .pts-hero-pic .ptc-mat, .pts-desk .pts-hero-pic .ptc-screen { position: relative; min-height: 260px; }
+.pts-desk .pts-hero-pic .ptc-mat img { position: absolute; inset: 0; width: 100%; }
+.pts-desk .pts-label { margin: 6px 0 -6px 8px; }
+/* the kite, at the edge of the sky, only where there is room for it */
+.pts-kite-d { position: absolute; top: 40px; left: -70px; width: 80px; }
+@container page (max-width: 1340px) { .pts-kite-d { display: none; } }
+@container page (min-width: 1700px) { .pts-desk { max-width: 1280px; --g: 22px; } .pts-desk.pts-few { max-width: 1160px; } }
+@container page (max-width: 1060px) {
+  .pts-desk { padding: 48px 28px 40px; --g: 16px; }
+  .pts-head { grid-template-columns: minmax(0, 1fr); }
+  .pts-head > .ptc-me, .pts-beside { grid-column: auto; }
+  .pts-row, .pts-row-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; }
+  .pts-row > *, .pts-row-stack > .pts-feat, .pts-row-stack > .pts-stackcol, .pts-row-feat.pts-n-1 > * { grid-column: auto !important; }
+  .pts-row-feat, .pts-row-stack { grid-auto-rows: 300px; }
+  .pts-row-small.pts-n-1 > *, .pts-row-feat.pts-n-1 > * { grid-column: 1 / -1 !important; }
+  .pts-row-small.pts-n-3 > :last-child { grid-column: 1 / -1 !important; }
+  .pts-row-feat.pts-n-3 > :last-child { grid-column: 1 / -1 !important; }
+}
+
+/* List on a computer: the phone arrangement, a little wider */
+@container page (min-width: 761px) {
+  .posy-scene-list .pts-phone { max-width: 560px; padding-top: 104px; }
 }
 
 /* ================= the phone: one column under your card ================= */
@@ -166,6 +228,8 @@
 .pts-phone .ptc-seal { width: 80px; }
 .pts-kite-m { position: absolute; top: 6px; left: 24px; width: 58px; }
 .pts-stack { display: grid; gap: 14px; }
+/* a short page sits in the middle of the screen, not at the top of an empty sky */
+.sc-mobile:not([data-only]) > .pts-phone { min-height: calc(100svh - 48px); align-content: center; }
 .pts-phone .ptc-has-pic { grid-template-columns: minmax(0, 1fr); }
 .pts-phone .ptc-has-pic .ptc-pic { min-height: 0; aspect-ratio: 1.9; margin: 10px 10px 0; }
 .pts-phone .ptc-has-pic .ptc-body { padding: 18px 20px 18px; row-gap: 12px; }
@@ -178,7 +242,7 @@
 .pts-photos .ptc-photo figcaption { font-size: 18px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .pts *, .pts, .ptk-lab *, .posy-page.posy-style-painted.posy-scene .posy-backdrop::before { animation: none !important; transition: none !important; }
+  .pts *, .pts, .ptk-lab *, .posy-page.posy-style-painted:is(.posy-scene, .posy-layout-canvas) .posy-backdrop::before { animation: none !important; transition: none !important; }
 }
 
 /* section titles: a handwritten label on a small paper tag */
@@ -192,3 +256,90 @@
 /* several seals don't fit the card's corner: they sit in a row at its foot */
 .ptc-seals-row { position: static; flex-wrap: wrap; justify-content: center; gap: 6px 10px; margin-top: 8px; }
 .ptc-seals-row .ptc-seal, .pts-phone .ptc-seals-row .ptc-seal { width: 70px; }
+
+/* ================= Canvas: the same cards, each filling the box the canvas gives it ================= */
+.posy-preset-starry :is(.ptv, .ptv-head) {
+  --card: #f8f1e4; --paper: #ece3d3; --line: rgb(45 39 35 / .14);
+  --shadow: 0 1px 1px rgb(0 0 20 / .2), 0 4px 8px rgb(0 0 20 / .15), 0 28px 50px -26px rgb(0 0 20 / .7);
+  --shadow-up: 0 1px 1px rgb(0 0 20 / .2), 0 8px 14px rgb(0 0 20 / .18), 0 36px 60px -26px rgb(0 0 20 / .75);
+}
+.ptv { container: ptv / size; width: 100%; height: 100%; }
+.ptv > .ptc { width: 100%; height: 100%; overflow: hidden; }
+.ptv .ptc-fav img, .ptv .ptc-fav svg { width: 20px; height: 20px; object-fit: contain; }
+.ptv .ptc-cover img { width: 100%; height: 100%; }
+.posy-tile:is(:hover, .is-hover) > .ptv > .ptc { translate: 0 -3px; box-shadow: inset 0 0 0 1px var(--line), var(--shadow-up); }
+.posy-tile:is(:hover, .is-hover) .ptv .ptc-go { background: var(--acc); color: #fff; box-shadow: none; translate: 2px -2px; }
+.posy-tile:is(:hover, .is-hover) .ptv :is(.ptc-pic, .ptc-mat) > img { scale: 1.035; }
+.posy-tile:is(:hover, .is-hover) .ptv .ptc-play { background: var(--acc); }
+.posy-tile:is(:hover, .is-hover) .ptv .ptc-seal { rotate: -4deg; }
+.posy-page.posy-style-painted.posy-layout-canvas .posy-tile:has(.ptv) { filter: none; }
+/* links: words at the top, the site at the foot; the picture only where there is room */
+.ptv .ptc-link .ptc-body { height: 100%; grid-template-rows: auto 1fr; }
+.ptv .ptc-link .ptc-site { align-self: end; }
+.ptv .ptc-big:not(.ptc-has-pic) .ptc-title { font-size: clamp(22px, 9cqh, 34px); }
+.ptv .ptc-has-pic .ptc-body { grid-template-rows: 1fr auto; }
+.ptv .ptc-has-pic .ptc-pic { min-height: 0; }
+/* a roomy box: bigger words; a tall box: the picture on top */
+.ptv .ptc-link .ptc-title { font-size: clamp(23px, min(15cqh, 8cqw), 46px); -webkit-line-clamp: 3; }
+.ptv .ptc-link .ptc-sub { -webkit-line-clamp: 3; }
+@container ptv (max-aspect-ratio: 6 / 5) {
+  .ptv .ptc-has-pic { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+  .ptv .ptc-has-pic .ptc-pic { margin: 10px 10px 0; }
+  .ptv .ptc-has-pic .ptc-body { padding: 16px 20px 16px; row-gap: 12px; }
+  .ptv .ptc-has-pic .ptc-title { font-size: clamp(23px, 9cqw, 34px); -webkit-line-clamp: 2; }
+}
+@container ptv (max-height: 210px) or ((max-width: 420px) and (min-aspect-ratio: 6 / 5)) {
+  .ptv .ptc-has-pic { display: block; }
+  .ptv .ptc-has-pic .ptc-pic { display: none; }
+  .ptv .ptc-has-pic .ptc-body, .ptv .ptc-big .ptc-body { grid-template-columns: 40px minmax(0, 1fr); grid-template-areas: "fav words" "fav site"; grid-template-rows: auto 1fr; padding: 14px 16px 13px 14px; row-gap: 5px; }
+  .ptv .ptc-has-pic .ptc-body > .ptc-fav { display: grid; }
+  .ptv .ptc-big .ptc-fav { width: 40px; height: 40px; }
+  .ptv .ptc-big .ptc-title { font-size: 23px; -webkit-line-clamp: 2; }
+  .ptv .ptc-big .ptc-sub { font-size: 13.5px; -webkit-line-clamp: 2; }
+  .ptv .ptc-big .ptc-go { width: 28px; height: 28px; }
+}
+@container ptv (max-height: 130px) { .ptv .ptc-sub { display: none; } }
+/* music, video, photos: the picture takes the room that is left */
+.ptv .ptc-music { align-content: center; grid-template-columns: min(84px, 60cqh) minmax(0, 1fr); }
+.ptv .ptc-cover { width: min(84px, 60cqh); }
+@container ptv (min-height: 260px) and (min-width: 260px) {
+  .ptv .ptc-music { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; align-content: stretch; padding: 12px 12px 16px; gap: 12px; }
+  .ptv .ptc-cover { width: 100%; height: 100%; aspect-ratio: auto; }
+  .ptv .ptc-music .ptc-words { padding: 0 6px; }
+}
+.ptv .ptc-video, .ptv .ptc-photo { display: flex; flex-direction: column; }
+.ptv .ptc-screen, .ptv .ptc-mat { flex: 1; min-height: 0; aspect-ratio: auto; }
+.ptv .ptc-mat img { height: 100%; aspect-ratio: auto; }
+@container ptv (max-height: 170px) { .ptv .ptc-caption { display: none; } .ptv .ptc-video { padding-bottom: 10px; } }
+/* notes and the seal */
+.ptv .ptc-note { display: flex; align-items: center; }
+.ptv .ptc-note p { -webkit-line-clamp: 9; }
+@container ptv (max-height: 170px) { .ptv .ptc-note { padding: 14px 18px; } .ptv .ptc-note p { font-size: 21px; -webkit-line-clamp: 3; } }
+.ptv-seal { display: grid; place-items: center; width: 100%; height: 100%; }
+.ptv-seal .ptc-seal { width: min(80%, 80cqh, 150px); }
+/* a social: its mark, its name, your handle */
+.ptv-social { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 14px 16px; }
+.ptv-social .ptc-title { -webkit-line-clamp: 1; }
+.ptv-social .ptc-sub { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+@container ptv (max-width: 200px) { .ptv-social { grid-template-columns: auto minmax(0, 1fr); } .ptv-social > .ptc-go { display: none; } }
+
+/* the header: you, on one wide card */
+.posy-page.posy-style-painted.posy-layout-canvas .st-head-painted { display: block; }
+.ptv-head { display: block; margin-bottom: 8px; }
+.ptc-me-wide { grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 18px 32px; padding: 28px 32px; }
+.ptc-me-wide .ptc-portrait { margin: 0; width: 124px; }
+.ptc-me-words { display: grid; gap: 10px; min-width: 0; }
+.ptc-me-wide .ptc-name { font-size: clamp(40px, calc(1000px / max(8, var(--nlen, 12))), 62px); }
+.ptc-me-wide .ptc-bio { max-width: 52ch; }
+.ptv-socials { margin: 0; max-width: 240px; justify-content: flex-end; }
+.ptv-socials .posy-social-row { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin: 0; }
+.posy-style-painted .ptv-socials .posy-social-row a { width: 42px; height: 42px; border-radius: 50%; -webkit-mask: none; mask: none; background: var(--paper); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); transform: none; }
+.posy-style-painted .ptv-socials .posy-social-row a:hover { background: var(--ink); color: var(--card); transform: translateY(-2px); }
+@container page (max-width: 760px) {
+  .ptc-me-wide { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; padding: 26px 22px; }
+  .ptv-socials, .ptv-socials .posy-social-row { justify-content: center; max-width: none; }
+}
+/* section titles on the canvas: the same paper tag */
+.posy-page.posy-style-painted.posy-layout-canvas .posy-section { display: inline-block; margin: 0 0 4px 10px; padding: 4px 20px 6px; border-radius: 22px 26px 24px 20px / 24px 20px 26px 22px; background: #fffefb; box-shadow: inset 0 0 0 1px rgb(45 39 35 / .11), 0 3px 6px rgb(60 40 20 / .05), 0 24px 44px -28px rgb(60 40 20 / .5); color: #2d2723; font-family: var(--font-caveat), cursive; font-weight: 600; font-size: 30px; line-height: 1.1; rotate: -1.5deg; }
+.posy-page.posy-style-painted.posy-layout-canvas .posy-section::after { display: none; }
+.posy-page.posy-style-painted.posy-layout-canvas .posy-footer a { color: #fffefb; text-shadow: 0 1px 8px rgb(30 40 70 / .5); }

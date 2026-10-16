@@ -28,7 +28,7 @@ export function template(id: TemplateId, name: string): Page {
     case 'desk':
       return parsePage({
         profile: { ...profile, avatar: art('desk', 'avatar'), bio: 'I make zines, stickers and the odd wobbly cup. Come say hi.', location: 'Kyoto' },
-        theme: { style: 'cozy', preset: 'cream', font: 'editorial', layout: 'canvas', avatar: 'square' },
+        theme: { style: 'cozy', preset: 'cream', font: 'editorial', layout: 'bento', avatar: 'square' },
         tiles: ids([
           { type: 'social', platform: 'instagram', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'substack', handle: 'yourname', size: 's' },
@@ -67,7 +67,7 @@ export function template(id: TemplateId, name: string): Page {
     case 'night':
       return parsePage({
         profile: { ...profile, avatar: art('lofi', 'avatar'), bio: 'Building weird things after dark. Synths, shaders, side projects.', location: 'online now' },
-        theme: { style: 'lofi', preset: 'daydream', font: 'lofi', layout: 'canvas' },
+        theme: { style: 'lofi', preset: 'daydream', font: 'lofi', layout: 'bento' },
         // A collage: windows overlap and lean a little, like a desktop left open.
         tiles: ids([
           { type: 'social', platform: 'github', handle: 'yourname', size: 's' },
@@ -195,7 +195,7 @@ export function template(id: TemplateId, name: string): Page {
       });
     }
     default:
-      return parsePage({ profile, theme: { style: 'cozy', preset: 'cream', font: 'editorial', layout: 'bento' }, tiles: [] });
+      return parsePage({ profile, theme: { style: 'painted', preset: 'morning', font: 'painted', layout: 'bento' }, tiles: [] });
   }
 }
 

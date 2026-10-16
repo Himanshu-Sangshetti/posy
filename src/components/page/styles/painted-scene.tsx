@@ -5,7 +5,7 @@
 // On a computer: you on the left, your things in two calm columns beside you. On a phone: one column under your card.
 import { Fragment, type CSSProperties } from 'react';
 import { ArrowUpRight, Music2, Play } from 'lucide-react';
-import type { Tile } from '@/lib/schema';
+import type { Page, Tile } from '@/lib/schema';
 import { PLATFORMS } from '@/lib/platforms';
 import { cropStyle } from '@/lib/crop';
 import { asset, cn } from '@/lib/utils';
@@ -156,14 +156,41 @@ const Kite = ({ className }: { className?: string }) => <span className={cn('pts
 
 /* ---------------- the scene ---------------- */
 
-/** Rough heights, to share cards between the two desktop columns so they end level. */
-function height(t: Tile) {
-  if (t.type === 'link' || t.type === 'github') return 96;
-  if (t.type === 'music') return 150;
-  if (t.type === 'video') return 270;
-  if (t.type === 'image') return t.caption ? 300 : 270;
-  if (t.type === 'text') return 90 + plain(t.text).length * .9;
-  return 100;
+/** A row of the desktop grid: how many cards share it, and what kind. */
+type Row = { kind: 'small' | 'feat'; items: Tile[] } | { kind: 'stack'; feature: Tile; items: Tile[] };
+
+/** Splits n things into rows of three and two (never a lone one, unless there is only one). */
+function split<T>(xs: T[]): T[][] {
+  const rows: T[][] = [];
+  let i = 0;
+  while (xs.length - i > 0) {
+    const left = xs.length - i;
+    const take = left === 4 ? 2 : left >= 3 ? 3 : left;
+    rows.push(xs.slice(i, i + take)); i += take;
+  }
+  return rows;
+}
+
+/** Photos, videos and long notes are the big pieces; links, music and short notes are the small ones. */
+const isFeature = (t: Tile) => t.type === 'image' || t.type === 'video' || (t.type === 'text' && plain(t.text).length > 110);
+
+/**
+ * The desktop rows for one group: even rows on one six-column grid. Small cards go three or two to a row; big pieces
+ * two or three to a row at one height; an odd big piece sits beside a stack of small cards so no row is left ragged.
+ */
+function rows(tiles: Tile[]): Row[] {
+  const feats = tiles.filter(isFeature), smalls = tiles.filter(t => !isFeature(t));
+  const out: Row[] = [];
+  let stack: Row | undefined;
+  if (feats.length && smalls.length && (feats.length % 2 === 1 || smalls.length === 1)) {
+    const s = smalls.length;
+    const k = s === 1 ? 1 : s === 2 || s === 4 ? 2 : 3;
+    stack = { kind: 'stack', feature: feats.shift()!, items: smalls.splice(0, k) };
+  }
+  for (const r of split(smalls)) out.push({ kind: 'small', items: r });
+  if (stack) out.push(stack);
+  for (const r of split(feats)) out.push({ kind: 'feat', items: r });
+  return out;
 }
 
 export function PaintedScene({ page, slots, piece, only, editing }: SceneProps) {
@@ -183,30 +210,54 @@ export function PaintedScene({ page, slots, piece, only, editing }: SceneProps) 
   const leadCard = (g: Group) => g.links[0] === lead && lead && piece(lead, <LinkCard tile={lead} big />, { key: lead.id, className: 'pts-card pts-lead' });
   const profile = <Profile slots={slots} socials={a.socials} stamps={a.stamps} piece={piece} nlen={page.profile.name.length} />;
 
-  const desktop = () => (
-    <div className={cn('pts pts-desk', night && 'pts-night')}>
-      <aside className="pts-side">
-        {profile}
-        <Kite />
-      </aside>
-      <main className="pts-main">
+  const desktop = () => {
+    // the first row: you, and beside you the link you lead with (one with a picture, if one of your first three has
+    // one) over a pair of your next small cards; or your first picture when there are no links before a heading
+    const first = a.groups[0] && !a.groups[0].heading ? a.groups[0] : undefined;
+    const g0 = first ? [...first.links, ...first.media, ...first.photos, ...first.notes] : [];
+    const firstLinks = first?.links ?? [];
+    const top = firstLinks.slice(0, 3).find(t => t.type === 'link' && t.image) ?? firstLinks[0];
+    let beside: Tile[] = [];
+    let hero: Tile | undefined;
+    if (top) {
+      hero = top;
+      beside = g0.filter(t => t !== top && !isFeature(t)).slice(0, 2);
+    } else {
+      hero = g0.find(t => t.type === 'image' || t.type === 'video');
+    }
+    const used = new Set<Tile>([...(hero ? [hero] : []), ...beside]);
+    const heroNode = hero && (hero === top
+      ? piece(hero, <LinkCard tile={hero as LinkTile} big />, { key: hero.id, className: 'pts-card pts-lead' })
+      : card(hero, 'pts-hero-pic'));
+    const row = (r: Row, i: number) => r.kind === 'stack'
+      ? <div key={i} className={cn('pts-row pts-row-stack', `pts-stack-${r.items.length}`)}>{card(r.feature, 'pts-feat')}<div className="pts-stackcol">{r.items.map(t => card(t))}</div></div>
+      : <div key={i} className={cn('pts-row', r.kind === 'feat' ? 'pts-row-feat' : 'pts-row-small', `pts-n-${r.items.length}`)}>{r.items.map(t => card(t, r.kind === 'feat' ? 'pts-feat' : undefined))}</div>;
+    const few = page.tiles.filter(t => t.type !== 'social' && t.type !== 'heading').length <= 4;
+    return (
+      <div className={cn('pts pts-desk', night && 'pts-night', few && 'pts-few')}>
+        <Kite className="pts-kite-d" />
+        <div className={cn('pts-head', !hero && 'pts-head-alone')}>
+          {profile}
+          {hero && (
+            <div className={cn('pts-beside', beside.length === 0 && 'pts-beside-solo')}>
+              {heroNode}
+              {beside.length > 0 && <div className={cn('pts-pair', `pts-n-${beside.length}`)}>{beside.map(t => card(t))}</div>}
+            </div>
+          )}
+        </div>
         {a.groups.map((g, gi) => {
-          // the cards beside you: links first (they matter most), then music and video, photos, notes; greedy, each card
-          // goes to the shorter column, keeping the page's order within each column
-          const flow: Tile[] = [...g.links.filter(t => t !== lead), ...g.media, ...g.photos, ...g.notes];
-          const cols: Tile[][] = [[], []], h = [0, 0];
-          for (const t of flow) { const k = h[0] <= h[1] ? 0 : 1; cols[k].push(t); h[k] += height(t) + 18; }
+          const rest = [...g.links, ...g.media, ...g.photos, ...g.notes].filter(t => !used.has(t));
+          if (!g.heading && !rest.length) return null;
           return (
-            <Fragment key={g.heading?.id ?? `g${gi}`}>
+            <section key={g.heading?.id ?? `g${gi}`} className="pts-group">
               {heading(g)}
-              {leadCard(g)}
-              {flow.length > 0 && <div className="pts-cols">{cols.map((c, k) => <div key={k} className="pts-col">{c.map(t => card(t))}</div>)}</div>}
-            </Fragment>
+              {rows(rest).map(row)}
+            </section>
           );
         })}
-      </main>
-    </div>
-  );
+      </div>
+    );
+  };
 
   const mobile = () => (
     <div className={cn('pts pts-phone', night && 'pts-night')}>
@@ -232,3 +283,37 @@ export function PaintedScene({ page, slots, piece, only, editing }: SceneProps) 
 
 /** The kit on its own, for the component lab. */
 export { LinkCard as PaintedLink, MusicCard as PaintedMusic, VideoCard as PaintedVideo, PhotoCard as PaintedPhoto, NoteCard as PaintedNote, Seal as PaintedSeal, Social as PaintedSocial, Profile as PaintedProfile };
+
+/* ---------------- canvas: the same kit, one card per box ---------------- */
+
+/** Canvas layout: you, on one wide cream card (the editor passes its inputs in `slots`). */
+export function PaintedCanvasHeader({ page, slots }: { page: Page; slots: HeaderSlots }) {
+  return (
+    <div className={cn('pts ptv-head', page.theme.preset === 'starry' && 'pts-night')} style={{ '--nlen': page.profile.name.length } as CSSProperties}>
+      <div className="ptc ptc-me ptc-me-wide">
+        {slots.avatar && <div className="ptc-portrait">{slots.avatar}</div>}
+        <div className="ptc-me-words">
+          <h1 className="posy-head ptc-name">{slots.name}</h1>
+          {slots.bio && <div className="ptc-bio">{slots.bio}</div>}
+          {slots.caption && <p className="ptc-hand ptc-where">{slots.caption}</p>}
+        </div>
+        {slots.socials && <div className="ptc-socials ptv-socials">{slots.socials}</div>}
+      </div>
+    </div>
+  );
+}
+
+/** Canvas layout: one tile in Painted's kit, filling the box the canvas gives it. */
+export function PaintedCanvasTile({ tile, editing }: { tile: Tile; index: number; editing?: boolean }) {
+  let node: React.ReactNode = null;
+  if (tile.type === 'link' || tile.type === 'github') node = <LinkCard tile={tile} big={tile.type === 'link' && !!tile.image} />;
+  else if (tile.type === 'music') node = <MusicCard tile={tile} />;
+  else if (tile.type === 'video') node = <VideoCard tile={tile} editing={editing} />;
+  else if (tile.type === 'image') node = <PhotoCard tile={tile} />;
+  else if (tile.type === 'text') node = tile.look === 'stamp' ? <span className="ptv-seal"><Seal tile={tile} /></span> : <NoteCard tile={tile} />;
+  else if (tile.type === 'social') {
+    const p = PLATFORMS[tile.platform];
+    node = <div className="ptc ptv-social"><Social tile={tile} /><span className="ptc-words"><b className="ptc-title">{p.label}</b><span className="ptc-sub">{tile.handle}</span></span><Go /></div>;
+  }
+  return <div className={cn('pts ptv', `ptv-${tile.type}`)}>{node}</div>;
+}

@@ -39,7 +39,7 @@ export async function createPage(userId: string, username: string, name: string,
   const row = { id: nanoid(12), userId, username: u, draft: data, published: data, version: 1, publishedAt: new Date() };
   await db.insert(pages).values(row);
   const d = data as { style?: string; layout?: string };
-  track({ type: 'onboarding.completed', userId, look: d.style ?? 'cozy', layout: d.layout ?? 'bento' });
+  track({ type: 'onboarding.completed', userId, look: d.style ?? 'painted', layout: d.layout ?? 'bento' });
   return row;
 }
 

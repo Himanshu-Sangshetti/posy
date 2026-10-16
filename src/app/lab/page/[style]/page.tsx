@@ -1,5 +1,5 @@
 // A real page in any look, with realistic content (development only), for checking how a look arranges a whole page:
-//   /lab/page/<style>?set=starter|rich|sparse|photos&preset=<palette>&layout=bento|list|canvas
+//   /lab/page/<style>?set=starter|rich|sparse|one|photos&preset=<palette>&layout=bento|list|canvas
 // "rich" is what a real person's page tends to hold; "sparse" is a first-day page; "photos" is someone's own pictures.
 import { notFound } from 'next/navigation';
 import { PageView } from '@/components/page/PageView';
@@ -38,6 +38,12 @@ const SETS: Record<string, { bio: string; location?: string; avatar?: string; ti
       { type: 'heading', text: 'Elsewhere' },
       { type: 'link', url: 'https://medium.com/@himanshu/a-very-long-title-about-building-things-slowly-and-carefully-in-public', size: 'w' },
       { type: 'link', url: 'https://linkedin.com/in/himanshu', title: 'LinkedIn', size: 's' },
+    ],
+  },
+  one: {
+    bio: 'Writer. Mostly about trains.', tiles: [
+      { type: 'social', platform: 'instagram', handle: 'ana', size: 's' },
+      { type: 'link', url: 'https://ana.substack.com', title: 'My newsletter', size: 'w' },
     ],
   },
   sparse: {

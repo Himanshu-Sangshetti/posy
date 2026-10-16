@@ -36,7 +36,7 @@ export const LOOKS = [
     ],
   },
   {
-    id: 'painted', slug: 'painted', name: 'Painted', free: false,
+    id: 'painted', slug: 'painted', name: 'Painted', free: true,
     note: 'Watercolour paper under a painted sky.',
     special: 'The closest look to this site: big soft clouds painted behind your page, and tiles on watercolour paper with deckled edges. Four skies, from morning blue to a starry night.',
     layout: 'Bento',

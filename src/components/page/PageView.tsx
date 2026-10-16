@@ -10,7 +10,7 @@ import { MotionProvider, MotionShell, MotionHeader } from './motion';
 import { ShareButton, TileEffects, DraggableWindows, DitherPhotos } from './islands';
 import { TileContent, tileHref, brandHex, RichText, ListItem, BrandIcon } from './tiles';
 import { deskTilt } from './desk';
-import { StyleHeader, StyleTile, StyleRow, headerClass, socialsInHeader, sceneFor, type StyleId } from './styles';
+import { StyleHeader, StyleTile, StyleRow, headerClass, socialsInHeader, sceneFor, sceneOnly, type StyleId } from './styles';
 import type { HeaderSlots } from './styles/types';
 import type { PieceFn } from './styles/scene';
 import { Halftone, LofiMenuBar } from './styles/lofi';
@@ -44,7 +44,7 @@ export function Backdrop() {
 
 export function PageFrame({ page, children, profile, className, interactive = true }: { page: Page; children: ReactNode; profile?: ReactNode; className?: string; interactive?: boolean }) {
   const fx = page.theme.effect === 'tilt' || page.theme.effect === 'glow';
-  const scene = !!sceneFor(page.theme.style);
+  const scene = !!sceneFor(page.theme);
   return (
     <div className={cn(pageClasses(page), className)} style={{ ...pageStyle(page), colorScheme: isDark(page) ? 'dark' : 'light' }}>
       <Backdrop />
@@ -274,10 +274,10 @@ const publicPiece = (_style: StyleId): PieceFn => (tile, node, o) => (
 
 /** The public, read-only page. `contained` renders it inside a box (previews, thumbnails, mockups). */
 export function PageView({ page, contained }: { page: Page; contained?: boolean }) {
-  const Scene = sceneFor(page.theme.style);
+  const Scene = sceneFor(page.theme);
   if (Scene) return (
-    <PageFrame page={page} className={cn('posy-scene', contained && 'posy-contained')} interactive={!contained} profile={<></>}>
-      <Scene page={page} slots={profileSlots(page)} piece={publicPiece(page.theme.style)} />
+    <PageFrame page={page} className={cn('posy-scene', sceneOnly(page.theme) && 'posy-scene-list', contained && 'posy-contained')} interactive={!contained} profile={<></>}>
+      <Scene page={page} slots={profileSlots(page)} piece={publicPiece(page.theme.style)} only={sceneOnly(page.theme)} />
     </PageFrame>
   );
   return (

@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { MapPin, ImagePlus, X } from 'lucide-react';
 import type { Page, Tile } from '@/lib/schema';
 import { PageFrame, TileShell, Avatar, sections, ordinals } from '@/components/page/PageView';
-import { StyleHeader, StyleTile, StyleRow, headerClass, socialsInHeader, sceneFor, type StyleId } from '@/components/page/styles';
+import { StyleHeader, StyleTile, StyleRow, headerClass, socialsInHeader, sceneFor, sceneOnly, type StyleId } from '@/components/page/styles';
 import type { HeaderSlots } from '@/components/page/styles/types';
 import type { Device, PieceFn } from '@/components/page/styles/scene';
 import { TileContent, ListItem, BrandIcon } from '@/components/page/tiles';
@@ -98,9 +98,9 @@ function ScenePiece({ tile, children, className, style }: { tile: Tile; children
 const editPiece: PieceFn = (tile, node, o) => <ScenePiece key={o.key} tile={tile} className={o.className} style={o.style}>{node}</ScenePiece>;
 
 function EditableScene({ page, device }: { page: Page; device: Device }) {
-  const Scene = sceneFor(page.theme.style)!;
+  const Scene = sceneFor(page.theme)!;
   const slots = useEditableSlots(page);
-  return <Scene page={page} slots={slots} piece={editPiece} only={device} editing />;
+  return <Scene page={page} slots={slots} piece={editPiece} only={sceneOnly(page.theme) ?? device} editing />;
 }
 
 function EditableProfile({ page }: { page: Page }) {
@@ -266,8 +266,8 @@ export function EditableCanvas({ page, device = 'desktop' }: { page: Page; devic
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={onStart} onDragEnd={onEnd} onDragCancel={() => setActive(null)}>
       <SortableContext items={page.tiles.map(t => t.id)} strategy={rectSortingStrategy}>
-    {sceneFor(look) ? (
-      <PageFrame page={{ ...page, badge: false }} className="posy-scene" profile={<></>} interactive={false}>
+    {sceneFor(page.theme) ? (
+      <PageFrame page={{ ...page, badge: false }} className={cn('posy-scene', sceneOnly(page.theme) && 'posy-scene-list')} profile={<></>} interactive={false}>
         <div onClick={() => select(null)} className="pb-28"><EditableScene page={page} device={device} /></div>
       </PageFrame>
     ) : (
