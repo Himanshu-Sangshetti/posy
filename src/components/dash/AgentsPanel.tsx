@@ -15,10 +15,12 @@ import { CodeBlock } from './CodeBlock';
 import { Panel } from './ui';
 import { briefPrompt } from '@/lib/brief';
 
-type Key = { id: string; name: string | null; start: string | null; createdAt: Date | string; expiresAt?: Date | string | null };
+type Key = { id: string; name: string | null; start: string | null; createdAt: Date | string; expiresAt?: Date | string | null; permissions?: Record<string, string[]> | null };
 
 const DAY = 24 * 60 * 60;
 const LIFETIMES = [['30', 'Expires in 30 days'], ['90', 'Expires in 90 days'], ['365', 'Expires in a year'], ['never', 'Never expires']] as const;
+const ACCESS = [['write', 'Can read and edit'], ['read', 'Read only']] as const;
+const readOnly = (k: Key) => !!k.permissions && !k.permissions.page?.includes('write');
 
 const PROMPTS = [
   'Add my GitHub repo owner/name as a wide tile under a "Projects" section.',
@@ -33,6 +35,7 @@ export function AgentsPanel({ site, username }: { site: string; username: string
   const [keys, setKeys] = useState<Key[] | null>(null);
   const [name, setName] = useState('My agent');
   const [life, setLife] = useState<string>('90');
+  const [access, setAccess] = useState<string>('write');
   const [fresh, setFresh] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [doomed, setDoomed] = useState<Key | null>(null);
@@ -51,7 +54,11 @@ export function AgentsPanel({ site, username }: { site: string; username: string
 
   async function create() {
     setBusy(true);
-    const r = await authClient.apiKey.create({ name: name.trim() || 'Agent', ...(life === 'never' ? {} : { expiresIn: Number(life) * DAY }) });
+    const r = await authClient.apiKey.create({
+      name: name.trim() || 'Agent',
+      ...(life === 'never' ? {} : { expiresIn: Number(life) * DAY }),
+      ...(access === 'read' ? { metadata: { access: 'read' } } : {}),
+    });
     setBusy(false);
     if (r.data?.key) { setFresh(r.data.key); toast.success('Key created', { description: 'Copy it now. It will not be shown again.' }); load(); }
     else toast.error(r.error?.message ?? 'Could not create a key');
@@ -131,9 +138,13 @@ export function AgentsPanel({ site, username }: { site: string; username: string
         </p>
       </Panel>
 
-      <Panel eyebrow="Advanced" tone="butter" title={<>API <i>keys</i></>} desc="For scripts and tools that cannot sign in with a browser. A key can read, edit and publish your page through the API and MCP. It cannot sign in to your account or change your email, password or sessions. Revoke it any time.">
+      <Panel eyebrow="Advanced" tone="butter" title={<>API <i>keys</i></>} desc="For scripts and tools that cannot sign in with a browser. A key can read, edit and publish your page through the API and MCP, or only read it if you choose Read only. It cannot sign in to your account or change your email, password or sessions. Revoke it any time.">
         <form className="flex flex-wrap gap-2" onSubmit={e => { e.preventDefault(); create(); }}>
           <Input aria-label="Key name" value={name} onChange={e => setName(e.target.value)} className="ac-input max-w-[280px]" />
+          <Select value={access} onValueChange={setAccess}>
+            <SelectTrigger aria-label="Key access" className="ac-input w-[180px]"><SelectValue /></SelectTrigger>
+            <SelectContent>{ACCESS.map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}</SelectContent>
+          </Select>
           <Select value={life} onValueChange={setLife}>
             <SelectTrigger aria-label="Key expires" className="ac-input w-[190px]"><SelectValue /></SelectTrigger>
             <SelectContent>{LIFETIMES.map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}</SelectContent>
@@ -159,7 +170,7 @@ export function AgentsPanel({ site, username }: { site: string; username: string
               {keys?.length === 0 && <TableRow className="hover:bg-transparent"><TableCell colSpan={5} className="px-4 py-8 text-center text-[14px] text-[var(--muted)]">No keys yet. Create one above and it will show up here.</TableCell></TableRow>}
               {keys?.map(k => (
                 <TableRow key={k.id}>
-                  <TableCell className="pl-4 font-medium">{k.name ?? 'Key'}</TableCell>
+                  <TableCell className="pl-4 font-medium">{k.name ?? 'Key'}{readOnly(k) && <span className="ml-2 rounded-full bg-[var(--ac-sky-bg)] px-2 py-0.5 text-[11.5px] font-normal text-[var(--muted)]">Read only</span>}</TableCell>
                   <TableCell className="ac-mono text-[13px] text-[var(--muted)]">{k.start}…</TableCell>
                   <TableCell className="hidden text-[13.5px] text-[var(--muted)] sm:table-cell">{day(k.createdAt)}</TableCell>
                   <TableCell className="hidden text-[13.5px] text-[var(--muted)] sm:table-cell">{k.expiresAt ? day(k.expiresAt) : 'Never'}</TableCell>

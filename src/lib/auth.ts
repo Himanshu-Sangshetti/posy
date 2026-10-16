@@ -53,7 +53,9 @@ export const auth = betterAuth({
     apiKey({
       defaultPrefix: 'posy_',
       enableSessionForAPIKeys: false,
-      permissions: { defaultPermissions: { page: ['read', 'write'] } },
+      // Clients cannot set permissions directly; asking for { metadata: { access: 'read' } } makes a read-only key.
+      enableMetadata: true,
+      permissions: { defaultPermissions: (_, ctx) => ({ page: ctx.body?.metadata?.access === 'read' ? ['read'] : ['read', 'write'] }) },
       keyExpiration: { defaultExpiresIn: null, maxExpiresIn: 365 },
       rateLimit: { enabled: true, timeWindow: 60_000, maxRequests: 120 },
     }),
