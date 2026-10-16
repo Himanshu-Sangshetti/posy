@@ -169,11 +169,13 @@ test('the desk template turns tiles into objects, and a note can become a stamp'
   await expect(page.getByText('Your page is live')).toBeVisible();
   const visitor = await browser.newPage();
   await visitor.goto(`/${u}`);
-  await expect(visitor.locator('.dk-pol').first()).toBeVisible();
-  await expect(visitor.locator('.dk-ring')).toHaveCount(2);
-  await expect(visitor.locator('.dk-vinyl')).toBeVisible();
-  await expect(visitor.locator('.dk-env')).toBeVisible();
-  await expect(visitor.locator('.posy-social-row a')).toHaveCount(4);
+  // the Desk scene: a polaroid, both rubber stamps, a record in its sleeve, an airmail envelope, socials as pins
+  const desk = visitor.locator('.sc-desktop');
+  await expect(desk.locator('.dks-pol-pic').first()).toBeVisible();
+  await expect(desk.locator('.dks-stamp')).toHaveCount(2);
+  await expect(desk.locator('.dks-sleeve').first()).toBeVisible();
+  await expect(desk.locator('.dks-env-body').first()).toBeVisible();
+  await expect(desk.locator('.dks-pins a')).toHaveCount(4);
   await visitor.close();
 });
 
