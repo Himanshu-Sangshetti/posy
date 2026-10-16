@@ -93,4 +93,9 @@ describe('brief: images, stamps and page looks', () => {
     const bad = briefToPage({ name: 'M', photos: 'sepia', font: 'comic', backdrop: 'aurora', links: ['a.com'] }).warnings.join('\n');
     expect(bad).toMatch(/Unknown photos/); expect(bad).toMatch(/Unknown font/); expect(bad).toMatch(/Unknown backdrop/);
   });
+
+  it('keeps a note a note even when it ends like a web address', () => {
+    const { page } = briefToPage({ name: 'Mira', links: [{ text: 'New pages every Sunday.' }] });
+    expect(page.tiles[0]).toMatchObject({ type: 'text', text: 'New pages every Sunday.' });
+  });
 });

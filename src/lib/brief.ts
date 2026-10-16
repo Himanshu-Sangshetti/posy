@@ -82,7 +82,9 @@ function tileFor(entry: Brief['links'][number], i: number, warnings: string[]): 
   let tile: Tile;
   if (image) tile = { id: newId(), type: 'image', src: image, alt: o.title ?? '', size: 's', color: 'auto', ...(o.caption && { caption: o.caption }), ...(o.url && { url: o.url }) };
   else if (o.stamp) tile = { id: newId(), type: 'text', text: o.stamp, look: 'stamp', size: 's', color: 'auto' };
-  else tile = tileFromInput((o.url ?? o.email ?? o.repo ?? o.text)!);
+  // a note is always a note: link detection would read "New pages every Sunday." as a web address
+  else if (o.text) tile = { id: newId(), type: 'text', text: o.text, size: 'w', color: 'auto' };
+  else tile = tileFromInput((o.url ?? o.email ?? o.repo)!);
   if (tile.type === 'link') { if (o.title) tile.title = o.title; if (o.description) tile.description = o.description; }
   if (o.focus || o.zoom !== undefined) {
     if (tile.type === 'image' || tile.type === 'link' || tile.type === 'video' || tile.type === 'music') {
