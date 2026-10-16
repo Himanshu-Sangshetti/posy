@@ -1,68 +1,231 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "almond",
   "name": "Posy",
-  "description": "Documentation for Posy, the open-source link-in-bio page that you and your AI can make and edit.",
-  "colors": { "primary": "#a5683f", "light": "#e0a96d", "dark": "#8a5430" },
-  "background": { "color": { "light": "#f7f1e6", "dark": "#1f2124" } },
-  "logo": { "light": "/logo/light.svg", "dark": "/logo/dark.svg", "href": "https://posy.page" },
+  "description": "Documentation for Posy, the open-source link in bio that looks like you made it by hand. You or your AI can make and edit it.",
+  "colors": {
+    "primary": "#a5683f",
+    "light": "#e6b07a",
+    "dark": "#8a5430"
+  },
+  "background": {
+    "color": {
+      "light": "#efe6d6",
+      "dark": "#131a33"
+    }
+  },
+  "fonts": {
+    "heading": {
+      "family": "Instrument Serif",
+      "weight": 400
+    },
+    "body": {
+      "family": "Geist"
+    }
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg",
+    "href": "/"
+  },
   "favicon": "/favicon.svg",
-  "appearance": { "default": "system" },
+  "appearance": {
+    "default": "system"
+  },
+  "icons": {
+    "library": "lucide"
+  },
+  "styling": {
+    "eyebrows": "section",
+    "codeblocks": {
+      "theme": {
+        "light": "rose-pine-dawn",
+        "dark": "rose-pine-moon"
+      }
+    }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "cursor",
+      "vscode"
+    ]
+  },
   "navigation": {
     "tabs": [
       {
         "tab": "Get started",
         "groups": [
-          { "group": "Get started", "pages": ["index", "quickstart", "first-page", "looks"] }
+          {
+            "group": "Get started",
+            "pages": [
+              "index",
+              "quickstart",
+              "first-page",
+              "looks"
+            ]
+          }
         ]
       },
       {
         "tab": "Agents",
         "groups": [
-          { "group": "Connect", "pages": ["agents/connect", "agents/llms-txt"] },
-          { "group": "Reference", "pages": ["agents/tools", "agents/format", "agents/guide"] }
+          {
+            "group": "Connect",
+            "pages": [
+              "agents/connect",
+              "agents/llms-txt"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "agents/tools",
+              "agents/format",
+              "agents/guide"
+            ]
+          }
         ]
       },
       {
         "tab": "API",
         "groups": [
-          { "group": "REST API", "pages": ["api-reference/introduction"] }
+          {
+            "group": "REST API",
+            "pages": [
+              "api-reference/introduction"
+            ]
+          }
         ],
         "openapi": "api-reference/openapi.json"
       },
       {
         "tab": "Self-host",
         "groups": [
-          { "group": "Run Posy yourself", "pages": ["self-host/guide", "self-host/environment", "self-host/telemetry"] }
+          {
+            "group": "Run Posy yourself",
+            "pages": [
+              "self-host/guide",
+              "self-host/environment",
+              "self-host/telemetry"
+            ]
+          }
         ]
       },
       {
         "tab": "Contribute",
         "groups": [
-          { "group": "Contribute", "pages": ["contribute/guide", "contribute/community"] }
+          {
+            "group": "Contribute",
+            "pages": [
+              "contribute/guide",
+              "contribute/community"
+            ]
+          }
         ]
       },
       {
         "tab": "Changelog",
         "groups": [
-          { "group": "Changelog", "pages": ["changelog"] }
+          {
+            "group": "Changelog",
+            "pages": [
+              "changelog"
+            ]
+          }
         ]
       }
     ]
   },
   "navbar": {
     "links": [
-      { "label": "posy.page", "href": "https://posy.page" },
-      { "label": "GitHub", "href": "https://github.com/Himanshu-Sangshetti/posy" }
+      {
+        "label": "posy.page",
+        "href": "https://posy.page"
+      },
+      {
+        "label": "GitHub",
+        "href": "https://github.com/Himanshu-Sangshetti/posy"
+      }
     ],
-    "primary": { "type": "button", "label": "Get started", "href": "https://posy.page/signup" }
+    "primary": {
+      "type": "button",
+      "label": "Get started",
+      "href": "https://posy.page/signup"
+    }
   },
   "footer": {
-    "socials": { "github": "https://github.com/Himanshu-Sangshetti/posy" },
+    "socials": {
+      "website": "https://posy.page",
+      "github": "https://github.com/Himanshu-Sangshetti/posy"
+    },
     "links": [
-      { "header": "Posy", "items": [{ "label": "posy.page", "href": "https://posy.page" }, { "label": "Source", "href": "https://github.com/Himanshu-Sangshetti/posy" }] },
-      { "header": "For AI", "items": [{ "label": "llms.txt", "href": "https://posy.page/llms.txt" }, { "label": "OpenAPI", "href": "https://posy.page/openapi.json" }] }
+      {
+        "header": "Posy",
+        "items": [
+          {
+            "label": "Make a page",
+            "href": "https://posy.page/signup"
+          },
+          {
+            "label": "Looks gallery",
+            "href": "/looks"
+          },
+          {
+            "label": "Changelog",
+            "href": "/changelog"
+          }
+        ]
+      },
+      {
+        "header": "Build",
+        "items": [
+          {
+            "label": "Connect your AI",
+            "href": "/agents/connect"
+          },
+          {
+            "label": "REST API",
+            "href": "/api-reference/introduction"
+          },
+          {
+            "label": "Self-host",
+            "href": "/self-host/guide"
+          }
+        ]
+      },
+      {
+        "header": "Open source",
+        "items": [
+          {
+            "label": "Source on GitHub",
+            "href": "https://github.com/Himanshu-Sangshetti/posy"
+          },
+          {
+            "label": "Contribute",
+            "href": "/contribute/guide"
+          },
+          {
+            "label": "llms.txt",
+            "href": "https://posy.page/llms.txt"
+          }
+        ]
+      }
     ]
   },
-  "seo": { "indexing": "navigable" }
+  "seo": {
+    "indexing": "navigable",
+    "metatags": {
+      "og:image": "https://raw.githubusercontent.com/Himanshu-Sangshetti/posy/main/docs-site/images/og-docs.png",
+      "og:image:width": "1200",
+      "og:image:height": "630",
+      "og:site_name": "Posy docs",
+      "twitter:card": "summary_large_image",
+      "twitter:image": "https://raw.githubusercontent.com/Himanshu-Sangshetti/posy/main/docs-site/images/og-docs.png",
+      "theme-color": "#a5683f"
+    }
+  }
 }

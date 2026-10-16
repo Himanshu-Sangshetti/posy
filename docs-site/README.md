@@ -19,6 +19,15 @@ npm run docs:sync
 
 It adds frontmatter, rewrites links (`/docs/format` -> `/agents/format`, `/new` -> `https://posy.page/new`), escapes MDX, refreshes the OpenAPI copy (dev server on :3200, else posy.page; set `POSY_OPENAPI_URL` to override) and fails if an MCP tool in `src/app/api/mcp/route.ts` is missing from `agents/tools.mdx`.
 
+## Design
+
+- Theme `almond` (the content sits on a paper sheet), Instrument Serif headings, Geist body, oak `#a5683f` on cream, ink-blue night in dark mode. Colours and fonts are in `docs.json`.
+- `style.css` holds the rest: paper grain, cards, callouts, code blocks, steps, the home page (`.posy-home`) and the looks gallery (`.posy-look`). Mintlify loads every `.css` file in this folder.
+- `snippets/looks.jsx` has the looks (copy, palettes, free/Pro) and the `LooksStrip` and `LookStage` components. A page that uses a component must also import `LOOKS`.
+- `snippets/install.jsx` has the one-click install buttons (`InstallButtons`, and `<InstallButtons compact />` on the home page). Logos are monochrome SVGs in `images/apps/`, from Simple Icons (CC0) and Lucide (ISC, the Goose bird). `agents/connect.mdx` gets the buttons from the `<!-- docs-site: install-buttons -->` marker in `docs/connect.md`; text between `<!-- docs-site: skip -->` markers stays out of the docs site.
+- `images/hero/` is landing art from the Cloud repo (`public/landing/art/`), `images/looks/` are the Cloud repo's look screenshots (`public/landing/shots/`), resized to webp. Keep each image under 300 KB.
+- `images/og-docs.png` is the 1200x630 share image set in `seo.metatags`.
+
 ## Run locally
 
 Mintlify needs an LTS Node (20, 22 or 24; it refuses Node 25).
