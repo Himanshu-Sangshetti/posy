@@ -1,0 +1,60 @@
+# Telemetry
+
+A self-hosted Posy sends a small amount of **anonymous** usage data so we can tell how many instances run, on what,
+and which looks people publish with. It is on by default in production and takes one setting to turn off.
+
+## Turn it off
+
+Any of these, in your environment:
+
+```bash
+POSY_TELEMETRY=0
+DO_NOT_TRACK=1
+```
+
+It is also off automatically in development, in CI and in tests (`NODE_ENV` is not `production`, `CI` is set,
+or `POSY_E2E` is set). Posy prints one line the first time it starts with telemetry on:
+
+```
+Posy sends anonymous usage stats (no content, no personal data). Set POSY_TELEMETRY=0 to turn off. Details: https://docs.posy.page/self-host/telemetry
+```
+
+## What is sent
+
+Three events, to PostHog (`https://us.i.posthog.com`, `/capture/`), with a 2 second timeout. Failures are ignored and never slow the server down.
+
+| Event | When | Properties |
+|---|---|---|
+| `posy.instance.started` | Server start | `version`, `node_version`, `os`, `arch`, `deploy` (`docker`, `vercel` or `node`), `db` (`libsql-file` or `turso`) |
+| `posy.instance.alive` | About once a day | `accounts`, `pages`, `published_pages`, each as a bucket (`0`, `1`, `2-5`, `6-10`, `11-50`, `51-100`, `101-500`, `501-1000`, `1000+`) |
+| `posy.page.published` | Someone publishes a page | `look` (for example `washi`), `layout` (`bento`, `list` or `canvas`), `tiles` (bucket) |
+
+Every event also carries a random **instance id** (a UUID Posy creates in `telemetry.json` inside your data directory;
+on hosts with a read-only disk, a one-way hash of your auth secret) and the PostHog flags `$process_person_profile: false`
+and `$geoip_disable: true`.
+
+Example:
+
+```json
+{
+  "api_key": "phc_…",
+  "event": "posy.page.published",
+  "distinct_id": "6c0f3f0e-3a58-4c0a-9d0e-6a9e0a4f1c11",
+  "timestamp": "2026-10-16T07:24:00.000Z",
+  "properties": { "look": "washi", "layout": "bento", "tiles": "6-10", "$process_person_profile": false, "$geoip_disable": true, "$lib": "posy" }
+}
+```
+
+## What is never sent
+
+Page content, tile text, links or URLs, usernames, emails, your domain, your database address, API keys, page
+view counts or any visitor data. We do not store IP addresses (PostHog's "discard client IP data" setting is on for this project).
+
+## Why
+
+Posy is free and open source. Knowing roughly how many instances are running, on which platforms and with which
+looks tells us what to test, which Node versions to support and which looks are worth the work. Nothing is sold or shared.
+
+The code is in `src/lib/telemetry.ts` and `src/lib/telemetry-runtime.ts`; read it if you'd like to check.
+
+Forks can point it at their own PostHog project with `POSY_TELEMETRY_KEY` and `POSY_TELEMETRY_HOST`.

@@ -8,7 +8,8 @@ import type { Page, Tile } from '@/lib/schema';
 import { THEMES } from '@/lib/themes';
 import { asset, cn } from '@/lib/utils';
 import { hostOf, youtubeId } from '@/lib/url';
-import { VideoPlayer } from '../islands';
+import { VideoPlayer, PhotoExposure } from '../islands';
+import { cropStyle } from '@/lib/crop';
 import { RichText } from '../tiles';
 import { tileMeta, compact, seeded } from './meta';
 import type { HeaderSlots } from './types';
@@ -20,13 +21,13 @@ const mix = (a: number[], b: number[], t: number) => a.map((v, i) => v + (b[i] -
 
 /**
  * The scanner every picture goes through, so a sunny selfie or a pastel album cover comes out as the same kind of object:
- * a hard, five-step scan from the dark of the page up to the signal colour. A second filter tears it into sideways bands
+ * a hard, six-step scan from the dark of the page up to the signal colour. A second filter tears it into sideways bands
  * for the glitch when you point at a panel. Both are drawn for the page's own palette.
  */
 function Scanner({ preset }: { preset: string }) {
   const t = THEMES[preset] ?? THEMES.netrunner;
   const ink = rgb(t.dark ? t.bg : t.text), lit = rgb(t.dark ? t.accent : t.bg), hi = mix(lit, [1, 1, 1], t.dark ? 0.45 : 0.6);
-  const tones = [ink, mix(ink, lit, 0.22), mix(ink, lit, 0.5), lit, hi];
+  const tones = [ink, mix(ink, lit, 0.2), mix(ink, lit, 0.44), mix(ink, lit, 0.72), lit, hi];
   const ch = (i: number) => tones.map(c => c[i].toFixed(3)).join(' ');
   // on dark palettes the brightest parts bleed a thin edge of the alert colour, like a cheap lens
   const fringe = (src: string) => t.dark && <>
@@ -39,8 +40,9 @@ function Scanner({ preset }: { preset: string }) {
   </>;
   const chain = (src: string) => <>
     <feColorMatrix in={src} type="matrix" values="0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0 0 0 1 0" />
-    <feComponentTransfer>{['R', 'G', 'B'].map(c => { const F = `feFunc${c}` as 'feFuncR'; return <F key={c} type="linear" slope="1.3" intercept="-0.12" />; })}</feComponentTransfer>
-    <feComponentTransfer>{['R', 'G', 'B'].map(c => { const F = `feFunc${c}` as 'feFuncR'; return <F key={c} type="discrete" tableValues="0 .25 .5 .75 1" />; })}</feComponentTransfer>
+    <feComponentTransfer>{['R', 'G', 'B'].map(c => { const F = `feFunc${c}` as 'feFuncR'; return <F key={c} type="gamma" exponent="0.72" />; })}</feComponentTransfer>
+    <feComponentTransfer>{['R', 'G', 'B'].map(c => { const F = `feFunc${c}` as 'feFuncR'; return <F key={c} type="linear" slope="1.2" intercept="-0.08" />; })}</feComponentTransfer>
+    <feComponentTransfer>{['R', 'G', 'B'].map(c => { const F = `feFunc${c}` as 'feFuncR'; return <F key={c} type="discrete" tableValues="0 .2 .4 .6 .8 1" />; })}</feComponentTransfer>
     <feComponentTransfer result="scanned"><feFuncR type="table" tableValues={ch(0)} /><feFuncG type="table" tableValues={ch(1)} /><feFuncB type="table" tableValues={ch(2)} /></feComponentTransfer>
     {fringe(src)}
   </>;
@@ -57,14 +59,14 @@ function Scanner({ preset }: { preset: string }) {
   );
 }
 
-const Img = ({ src, alt = '' }: { src: string; alt?: string }) => (
+const Img = ({ src, alt = '', crop }: { src: string; alt?: string; crop?: React.CSSProperties }) => (
   // eslint-disable-next-line @next/next/no-img-element
-  <img src={asset(src)} alt={alt} loading="lazy" draggable={false} />
+  <img src={asset(src)} alt={alt} loading="lazy" draggable={false} style={crop} />
 );
 
 /** A picture through the scanner, with scanlines and the corner brackets of a viewfinder. */
-const Scan = ({ src, alt, className, children }: { src: string; alt?: string; className?: string; children?: React.ReactNode }) => (
-  <span className={cn('nr-scan', className)}><Img src={src} alt={alt} /><i className="nr-brackets" aria-hidden />{children}</span>
+const Scan = ({ src, alt, className, children, crop }: { src: string; alt?: string; className?: string; children?: React.ReactNode; crop?: React.CSSProperties }) => (
+  <span className={cn('nr-scan', className)}><Img src={src} alt={alt} crop={crop} /><i className="nr-brackets" aria-hidden />{children}</span>
 );
 
 const hex = (r: () => number, n = 4) => Array.from({ length: n }, () => Math.floor(r() * 16).toString(16)).join('').toUpperCase();
@@ -151,6 +153,7 @@ export function NightHeader({ page, slots }: { page: Page; slots: HeaderSlots })
   return (
     <>
       <Scanner preset={page.theme.preset} />
+      <PhotoExposure selector=".nr-scan img, .nr-photo .posy-avatar img" />
       <style>{`.posy-preset-${page.theme.preset}{--nr-filter:url(#nr-scan-${page.theme.preset});--nr-glitch:url(#nr-glitch-${page.theme.preset})}`}</style>
       <div className="nr-hud" aria-hidden>
         <span className="nr-hud-tag">POSY//NET</span>
@@ -218,7 +221,7 @@ export function NightTile({ tile, index, editing }: { tile: Tile; index: number;
   if (tile.type === 'image') return (
     <figure className="nr-panel nr-feed">
       <div className="nr-in">
-        <Scan src={tile.src} alt={tile.alt}>
+        <Scan src={tile.src} alt={tile.alt} crop={cropStyle(tile)}>
           <span className="nr-feed-top" aria-hidden><span><i className="nr-rec" />CAM_{String(index + 1).padStart(2, '0')}</span><span>{String(Math.floor(r() * 24)).padStart(2, '0')}:{String(Math.floor(r() * 60)).padStart(2, '0')}:{String(Math.floor(r() * 60)).padStart(2, '0')}</span></span>
           <i className="nr-cross" aria-hidden />
           <span className="nr-lock" aria-hidden><b>Target lock</b></span>
@@ -235,7 +238,7 @@ export function NightTile({ tile, index, editing }: { tile: Tile; index: number;
       <div className="nr-panel nr-feed nr-playback">
         <div className="nr-in">
           <span className="nr-scan nr-screen">
-            {id ? <VideoPlayer id={id} title={tile.title} overlay={false} editing={editing} thumb={tile.image ? asset(tile.image) : undefined} /> : m.image && <Img src={m.image} />}
+            {id ? <VideoPlayer id={id} title={tile.title} overlay={false} editing={editing} thumb={tile.image ? asset(tile.image) : undefined} crop={cropStyle(tile)} /> : m.image && <Img src={m.image} crop={cropStyle(tile)} />}
             <i className="nr-brackets" aria-hidden />
             <span className="nr-feed-top" aria-hidden><span><i className="nr-rec" />PLAYBACK</span><span>▮▮ {hex(r, 4)}</span></span>
           </span>
@@ -251,7 +254,7 @@ export function NightTile({ tile, index, editing }: { tile: Tile; index: number;
         <Strip index={index} kind="Audio" go={false} />
         <div className="nr-tape">
           <span className="nr-tape-label">
-            {m.image && <Scan src={m.image} className="nr-tape-cover" />}
+            {m.image && <Scan src={m.image} className="nr-tape-cover" crop={cropStyle(tile)} />}
             <span className="nr-tape-text"><b className="nr-title">{m.title}</b><span className="nr-sub">{m.sub}</span></span>
             <span className="nr-tape-side" aria-hidden>A</span>
           </span>
@@ -300,7 +303,7 @@ export function NightTile({ tile, index, editing }: { tile: Tile; index: number;
       <div className="nr-in">
         <Strip index={index} kind={shop ? 'Market' : m.kind === 'link' ? host : m.kind} />
         {shop && <span className="nr-stripes" aria-hidden />}
-        {pic ? <Scan src={m.image!} /> : <span className="nr-art"><Readout seed={tile.id} kind={shop ? 'shop' : 'link'} /></span>}
+        {pic ? <Scan src={m.image!} crop={cropStyle(tile)} /> : <span className="nr-art"><Readout seed={tile.id} kind={shop ? 'shop' : 'link'} /></span>}
         <div className="nr-body">
           <b className="nr-title">{m.title}</b>
           {m.sub && m.sub !== m.title && m.sub !== host && <p className="nr-sub">{m.sub}</p>}
@@ -316,13 +319,22 @@ export function NightRow({ tile, index }: { tile: Tile; index: number }) {
   if (tile.type === 'text') return (
     <div className="nr-panel nr-msg nr-row-msg"><div className="nr-in"><blockquote><RichText text={tile.text} /><i className="nr-cursor" aria-hidden /></blockquote></div></div>
   );
+  const nn = String(index + 1).padStart(2, '0');
+  if (tile.type === 'image') return (
+    <figure className="nr-panel nr-row nr-row-photo">
+      <div className="nr-in">
+        <Scan src={tile.src} alt={tile.alt} crop={cropStyle(tile)}><span className="nr-feed-top" aria-hidden><span><i className="nr-rec" />CAM_{nn}</span></span></Scan>
+        <figcaption><span className="nr-node">{nn}</span>{tile.caption && <span className="nr-subtitle">{tile.caption}</span>}</figcaption>
+      </div>
+    </figure>
+  );
   const kind: ArtKind = tile.type === 'github' ? 'repo' : m.kind === 'shop' ? 'shop' : m.kind === 'newsletter' ? 'letter' : 'link';
   return (
     <div className="nr-panel nr-row">
       <div className="nr-in">
         <span className="nr-node">{String(index + 1).padStart(2, '0')}</span>
-        {m.image ? <Scan src={m.image} className="nr-row-pic" /> : <span className="nr-art nr-row-pic"><Readout seed={tile.id} kind={kind} /></span>}
-        <span className="nr-text"><b className="nr-title">{m.title || 'Photo'}</b>{m.sub && m.sub !== m.title && tile.type !== 'image' && <span className="nr-sub">{m.sub}</span>}</span>
+        {m.image ? <Scan src={m.image} className="nr-row-pic" crop={cropStyle(tile)} /> : <span className="nr-art nr-row-pic"><Readout seed={tile.id} kind={kind} /></span>}
+        <span className="nr-text"><b className="nr-title">{m.title}</b>{m.sub && m.sub !== m.title && <span className="nr-sub">{m.sub}</span>}</span>
         <span className="nr-go" aria-hidden><ArrowUpRight /></span>
       </div>
     </div>

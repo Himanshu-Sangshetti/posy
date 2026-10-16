@@ -18,7 +18,7 @@ export type TemplateId = keyof typeof TEMPLATES;
 const ids = (tiles: Record<string, unknown>[]) => tiles.map(t => ({ ...t, id: newId() }));
 /** Painted placeholder art for each look (public/looks/<look>/). */
 const art = (look: string, name: string) => `/looks/${look}/${name}.jpg`;
-const VIDEO = 'https://www.youtube.com/watch?v=jfKfPfyJRdk';
+const VIDEO = 'https://www.youtube.com/watch?v=aqz-KE-bpKQ';
 
 /** Starter pages. Links point to the platforms' home pages until the user edits them. */
 export function template(id: TemplateId, name: string): Page {
@@ -27,21 +27,22 @@ export function template(id: TemplateId, name: string): Page {
   switch (id) {
     case 'desk':
       return parsePage({
-        profile: { ...profile, avatar: art('desk', 'avatar'), bio: 'I make small, soft things on the internet. Say hi.', location: 'hello from home' },
+        profile: { ...profile, avatar: art('desk', 'avatar'), bio: 'I make zines, stickers and the odd wobbly cup. Come say hi.', location: 'Kyoto' },
         theme: { style: 'cozy', preset: 'cream', font: 'editorial', layout: 'canvas', avatar: 'square' },
         tiles: ids([
           { type: 'social', platform: 'instagram', handle: 'yourname', size: 's' },
-          { type: 'social', platform: 'x', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'substack', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'pinterest', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'youtube', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'email', handle: 'you@example.com', size: 's' },
           { type: 'image', src: art('desk', 'photo1'), caption: 'spring, again ✿', size: 'l' },
-          { type: 'text', text: 'Currently working on something new. Updates soon!', size: 's' },
-          { type: 'text', text: 'Open for work', look: 'stamp', color: 'lilac', size: 's' },
-          { type: 'music', url: 'https://open.spotify.com/', title: 'My song of the week', artist: 'Spotify', image: art('desk', 'music'), size: 'w' },
+          { type: 'text', text: 'Making: a little zine about my grandmother\'s garden. Out by spring.', size: 's' },
+          { type: 'text', text: 'Handmade with love', look: 'stamp', color: 'lilac', size: 's' },
+          { type: 'music', url: 'https://open.spotify.com/', title: 'Rain on the window', artist: 'Hollow Pines', image: art('desk', 'music'), size: 'w' },
           { type: 'heading', text: 'things I make' },
-          { type: 'link', url: 'https://substack.com', title: 'My newsletter', description: 'Dear friend, this week I tried something new…', image: art('desk', 'cover'), size: 'w' },
-          { type: 'link', url: 'https://example.com', title: 'My website', description: 'Portfolio, shop and the odd blog post', size: 'w' },
-          { type: 'link', url: 'https://gumroad.com', title: 'Shop', image: art('desk', 'photo2'), size: 's' },
+          { type: 'link', url: 'https://substack.com', title: 'Letters from the studio', description: 'Dear friend, this week I learned to glaze a cup…', image: art('desk', 'cover'), size: 'w' },
+          { type: 'link', url: 'https://example.com', title: 'Portfolio', description: 'Zines, ceramics and the odd blog post', size: 'w' },
+          { type: 'link', url: 'https://gumroad.com', title: 'The little shop', image: art('desk', 'photo2'), size: 's' },
           { type: 'image', src: art('desk', 'video'), caption: 'lately', size: 's' },
         ]),
       });
@@ -52,6 +53,8 @@ export function template(id: TemplateId, name: string): Page {
         tiles: ids([
           { type: 'social', platform: 'substack', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'x', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'bluesky', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'medium', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'email', handle: 'you@example.com', size: 's' },
           { type: 'link', url: 'https://substack.com', title: 'The newsletter', description: 'A letter every other Sunday about the things I noticed.', image: art('washi', 'cover'), size: 'l' },
           { type: 'text', text: 'The best ideas arrive on long walks.', size: 'w' },
@@ -69,11 +72,13 @@ export function template(id: TemplateId, name: string): Page {
         tiles: ids([
           { type: 'social', platform: 'github', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'x', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'bluesky', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'discord', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'youtube', handle: 'yourname', size: 's' },
           { type: 'image', src: art('lofi', 'photo1'), caption: 'render_042.png', size: 'l', pos: { x: 16, y: 40, w: 600, h: 452, r: -1.5, z: 1 } },
           { type: 'text', text: 'Now: shipping a tiny synth in the browser.', size: 's', pos: { x: 560, y: 0, w: 300, h: 232, r: 2.5, z: 3 } },
           { type: 'github', repo: 'vercel/next.js', size: 's', pos: { x: 900, y: 56, w: 284, h: 284, r: -2, z: 2 } },
-          { type: 'music', url: 'https://open.spotify.com/', title: 'Night drive', artist: 'Spotify', image: art('lofi', 'music'), size: 'w', pos: { x: 640, y: 300, w: 544, h: 252, r: 1, z: 4 } },
+          { type: 'music', url: 'https://open.spotify.com/', title: 'Night drive', artist: 'Soft Static', image: art('lofi', 'music'), size: 'w', pos: { x: 640, y: 300, w: 544, h: 252, r: 1, z: 4 } },
           { type: 'link', url: 'https://example.com', title: 'Devlog', description: 'What I built this week', image: art('lofi', 'cover'), size: 'w', pos: { x: 96, y: 520, w: 480, h: 228, r: 1.5, z: 5 } },
         ]),
       });
@@ -124,12 +129,14 @@ export function template(id: TemplateId, name: string): Page {
         theme: { style: 'painted', preset: 'morning', font: 'painted', layout: 'bento', avatar: 'circle' },
         tiles: ids([
           { type: 'social', platform: 'instagram', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'substack', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'pinterest', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'youtube', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'email', handle: 'you@example.com', size: 's' },
           { type: 'image', src: art('painted', 'photo1'), caption: 'the island, again', size: 'l' },
           { type: 'text', text: 'Hello! New pages every Sunday. Thank you for reading.', size: 's' },
-          { type: 'text', text: 'Open for commissions', look: 'stamp', size: 's' },
-          { type: 'music', url: 'https://open.spotify.com/', title: 'Songs for drawing', artist: 'Spotify', image: art('painted', 'music'), size: 'w' },
+          { type: 'text', text: 'Painted by hand', look: 'stamp', size: 's' },
+          { type: 'music', url: 'https://open.spotify.com/', title: 'Songs for drawing', artist: 'The Quiet Mornings', image: art('painted', 'music'), size: 'w' },
           { type: 'heading', text: 'Stories' },
           { type: 'link', url: 'https://example.com/rooftop', title: 'Letters from the rooftop', description: "A picture book I'm making, a page a week.", image: art('painted', 'cover'), size: 'w' },
           { type: 'link', url: 'https://substack.com', title: 'The kite post', description: 'A painted letter every month', size: 's' },
@@ -147,10 +154,11 @@ export function template(id: TemplateId, name: string): Page {
           { type: 'social', platform: 'soundcloud', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'instagram', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'discord', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'x', handle: 'yourname', size: 's' },
           { type: 'image', src: art('night', 'photo1'), caption: 'the walk home, 2 a.m.', size: 'l' },
           { type: 'text', text: 'Live tonight', look: 'stamp', size: 's' },
           { type: 'link', url: 'https://example.com/booking', title: 'Booking', description: 'Clubs, raves, rooftops', size: 's' },
-          { type: 'music', url: 'https://open.spotify.com/', title: 'Midnight mix vol. 3', artist: 'Spotify', image: art('night', 'music'), size: 'w' },
+          { type: 'music', url: 'https://open.spotify.com/', title: 'Midnight mix vol. 3', artist: 'DJ Afterglow', image: art('night', 'music'), size: 'w' },
           { type: 'heading', text: 'This week' },
           { type: 'video', url: VIDEO, title: 'Arcade sessions, ep. 7', image: art('night', 'video'), size: 'w' },
           { type: 'link', url: 'https://example.com/tapes', title: 'Rooftop tapes', description: 'New EP, out now', image: art('night', 'cover'), size: 'w' },
@@ -169,6 +177,8 @@ export function template(id: TemplateId, name: string): Page {
         tiles: ids([
           { type: 'social', platform: 'instagram', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'behance', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'substack', handle: 'yourname', size: 's' },
+          { type: 'social', platform: 'pinterest', handle: 'yourname', size: 's' },
           { type: 'social', platform: 'email', handle: 'you@example.com', size: 's' },
           { type: 'image', src: pic('photo1'), caption: 'Lamp, night print no. 4', size: 'l' },
           { type: 'link', url: 'https://gumroad.com', title: 'The print shop', description: 'Small editions, signed and numbered. New prints on the first Friday of the month.', size: 'w' },
@@ -176,10 +186,10 @@ export function template(id: TemplateId, name: string): Page {
           { type: 'heading', text: 'From the studio' },
           { type: 'image', src: pic('photo2'), caption: 'The long way up', size: 't' },
           { type: 'video', url: VIDEO, title: 'Printing a night sky, start to finish', image: pic('video'), size: 'w' },
-          { type: 'music', url: 'https://open.spotify.com/', title: 'Ink & static', artist: 'What plays while the press runs', image: pic('music'), size: 'w' },
+          { type: 'music', url: 'https://open.spotify.com/', title: 'Press room radio', artist: 'Slow Letters', image: pic('music'), size: 'w' },
           { type: 'link', url: 'https://substack.com', title: 'Notes from the press', description: 'A short letter each month: what I printed, and what went wrong.', size: 'w' },
           { type: 'image', src: pic('photo3'), caption: 'Three riders', size: 'w' },
-          { type: 'text', text: 'Edition of 30', look: 'stamp', size: 's' },
+          { type: 'text', text: 'Hand pulled', look: 'stamp', size: 's' },
           { type: 'link', url: 'https://example.com/commissions', title: 'Commissions', description: 'Book covers, posters and gig prints', size: 's' },
         ]),
       });

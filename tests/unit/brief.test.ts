@@ -71,3 +71,26 @@ describe('brief', () => {
     expect(usernameFromName('  José Ñandú! ')).toBe('jose-nandu');
   });
 });
+
+describe('brief: images, stamps and page looks', () => {
+  it('turns image URLs and paths in links into image tiles', () => {
+    const { page } = briefToPage({ name: 'M', links: ['http://localhost:3200/samples/lemon.jpg', '/samples/tea.jpg', { image: 'https://x.com/a.png', caption: 'Hi' }] });
+    expect(page.tiles.map(t => t.type)).toEqual(['image', 'image', 'image']);
+    expect(page.tiles[2]).toMatchObject({ src: 'https://x.com/a.png', caption: 'Hi' });
+  });
+  it('reads stamps and crops', () => {
+    const { page, warnings } = briefToPage({ name: 'M', links: [{ stamp: 'Say hello' }, { image: '/a.jpg', focus: { x: 30, y: 120 }, zoom: 2, url: 'https://m.so' }, { text: 'n', zoom: 2 }] });
+    expect(page.tiles[0]).toMatchObject({ type: 'text', text: 'Say hello', look: 'stamp' });
+    expect(page.tiles[1]).toMatchObject({ type: 'image', url: 'https://m.so', focus: { x: 30, y: 100 }, zoom: 2 });
+    expect(warnings.join()).toMatch(/link 3: focus and zoom/);
+  });
+  it('sets photos, font and backdrop, with warnings for bad values', () => {
+    const { page, warnings } = briefToPage({ name: 'M', photos: 'mono', font: 'editorial', backdrop: 'dots', links: ['a.com'] });
+    expect(page.theme).toMatchObject({ photos: 'mono', font: 'editorial', background: { style: 'dots' } });
+    expect(warnings).toEqual([]);
+    const img = briefToPage({ name: 'M', backdrop: '/bg.jpg', links: ['a.com'] }).page.theme.background;
+    expect(img).toMatchObject({ style: 'image', image: '/bg.jpg' });
+    const bad = briefToPage({ name: 'M', photos: 'sepia', font: 'comic', backdrop: 'aurora', links: ['a.com'] }).warnings.join('\n');
+    expect(bad).toMatch(/Unknown photos/); expect(bad).toMatch(/Unknown font/); expect(bad).toMatch(/Unknown backdrop/);
+  });
+});

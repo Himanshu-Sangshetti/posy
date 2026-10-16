@@ -7,7 +7,7 @@
       "name": "posy",
       "source": "./plugin",
       "description": "Make a link-in-bio page, add links, change the look and publish, by just asking.",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "category": "productivity",
       "keywords": ["link-in-bio", "linktree", "mcp", "portfolio"]
     }

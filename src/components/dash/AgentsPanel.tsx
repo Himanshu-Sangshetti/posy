@@ -8,17 +8,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { CodeBlock } from './CodeBlock';
 import { Panel } from './ui';
 import { briefPrompt } from '@/lib/brief';
 
-type Key = { id: string; name: string | null; start: string | null; createdAt: Date | string };
+type Key = { id: string; name: string | null; start: string | null; createdAt: Date | string; expiresAt?: Date | string | null };
+
+const DAY = 24 * 60 * 60;
+const LIFETIMES = [['30', 'Expires in 30 days'], ['90', 'Expires in 90 days'], ['365', 'Expires in a year'], ['never', 'Never expires']] as const;
 
 const PROMPTS = [
   'Add my GitHub repo owner/name as a wide tile under a "Projects" section.',
-  'Switch my page to the lavender theme with an aurora backdrop and glass tiles, then publish.',
+  'Switch my page to the Cobalt look in the moonlit palette, then publish.',
   'Add my latest YouTube video and move it to the top.',
   'Rewrite my bio to sound warmer and shorter. Show me before publishing.',
 ];
@@ -28,6 +32,7 @@ const day = (d: Date | string) => new Date(d).toLocaleDateString('en', { month: 
 export function AgentsPanel({ site, username }: { site: string; username: string }) {
   const [keys, setKeys] = useState<Key[] | null>(null);
   const [name, setName] = useState('My agent');
+  const [life, setLife] = useState<string>('90');
   const [fresh, setFresh] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [doomed, setDoomed] = useState<Key | null>(null);
@@ -46,7 +51,7 @@ export function AgentsPanel({ site, username }: { site: string; username: string
 
   async function create() {
     setBusy(true);
-    const r = await authClient.apiKey.create({ name: name.trim() || 'Agent' });
+    const r = await authClient.apiKey.create({ name: name.trim() || 'Agent', ...(life === 'never' ? {} : { expiresIn: Number(life) * DAY }) });
     setBusy(false);
     if (r.data?.key) { setFresh(r.data.key); toast.success('Key created', { description: 'Copy it now. It will not be shown again.' }); load(); }
     else toast.error(r.error?.message ?? 'Could not create a key');
@@ -126,9 +131,13 @@ export function AgentsPanel({ site, username }: { site: string; username: string
         </p>
       </Panel>
 
-      <Panel eyebrow="Advanced" tone="butter" title={<>API <i>keys</i></>} desc="For scripts and tools that cannot sign in with a browser. A key lets them edit your page. You can revoke it any time.">
+      <Panel eyebrow="Advanced" tone="butter" title={<>API <i>keys</i></>} desc="For scripts and tools that cannot sign in with a browser. A key can read, edit and publish your page through the API and MCP. It cannot sign in to your account or change your email, password or sessions. Revoke it any time.">
         <form className="flex flex-wrap gap-2" onSubmit={e => { e.preventDefault(); create(); }}>
           <Input aria-label="Key name" value={name} onChange={e => setName(e.target.value)} className="ac-input max-w-[280px]" />
+          <Select value={life} onValueChange={setLife}>
+            <SelectTrigger aria-label="Key expires" className="ac-input w-[190px]"><SelectValue /></SelectTrigger>
+            <SelectContent>{LIFETIMES.map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}</SelectContent>
+          </Select>
           <Button type="submit" disabled={busy} className="ac-btn ac-btn-primary">
             {busy ? <Loader2 className="size-4 animate-spin" /> : <KeyRound className="size-4" />}Create key
           </Button>
@@ -144,15 +153,16 @@ export function AgentsPanel({ site, username }: { site: string; username: string
         )}
         <div className="mt-5 overflow-hidden rounded-2xl border border-[var(--line)]">
           <Table className="ac-table">
-            <TableHeader><TableRow className="bg-[var(--secondary)]/60 hover:bg-transparent"><TableHead className="pl-4">Name</TableHead><TableHead>Key</TableHead><TableHead className="hidden sm:table-cell">Created</TableHead><TableHead className="pr-4 text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow className="bg-[var(--secondary)]/60 hover:bg-transparent"><TableHead className="pl-4">Name</TableHead><TableHead>Key</TableHead><TableHead className="hidden sm:table-cell">Created</TableHead><TableHead className="hidden sm:table-cell">Expires</TableHead><TableHead className="pr-4 text-right"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
             <TableBody>
-              {keys === null && [0, 1].map(i => <TableRow key={i}><TableCell colSpan={4} className="px-4"><Skeleton className="h-5 w-full bg-[var(--ac-lilac-bg)]" /></TableCell></TableRow>)}
-              {keys?.length === 0 && <TableRow className="hover:bg-transparent"><TableCell colSpan={4} className="px-4 py-8 text-center text-[14px] text-[var(--muted)]">No keys yet. Create one above and it will show up here.</TableCell></TableRow>}
+              {keys === null && [0, 1].map(i => <TableRow key={i}><TableCell colSpan={5} className="px-4"><Skeleton className="h-5 w-full bg-[var(--ac-lilac-bg)]" /></TableCell></TableRow>)}
+              {keys?.length === 0 && <TableRow className="hover:bg-transparent"><TableCell colSpan={5} className="px-4 py-8 text-center text-[14px] text-[var(--muted)]">No keys yet. Create one above and it will show up here.</TableCell></TableRow>}
               {keys?.map(k => (
                 <TableRow key={k.id}>
                   <TableCell className="pl-4 font-medium">{k.name ?? 'Key'}</TableCell>
                   <TableCell className="ac-mono text-[13px] text-[var(--muted)]">{k.start}…</TableCell>
                   <TableCell className="hidden text-[13.5px] text-[var(--muted)] sm:table-cell">{day(k.createdAt)}</TableCell>
+                  <TableCell className="hidden text-[13.5px] text-[var(--muted)] sm:table-cell">{k.expiresAt ? day(k.expiresAt) : 'Never'}</TableCell>
                   <TableCell className="pr-3 text-right">
                     <Button type="button" variant="ghost" size="sm" onClick={() => setDoomed(k)} aria-label={`Revoke ${k.name}`} className="rounded-full text-[var(--muted)] hover:bg-[var(--ac-rose-bg)] hover:text-[#a43f5c]"><Trash2 className="size-4" />Revoke</Button>
                   </TableCell>

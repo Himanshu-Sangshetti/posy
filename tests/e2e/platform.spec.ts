@@ -31,12 +31,10 @@ test('design changes save to the draft', async ({ page }) => {
   await page.getByRole('button', { name: 'Design' }).click();
   await page.getByRole('tab', { name: 'Colour' }).click();
   await page.getByRole('button', { name: 'Moonlit', exact: true }).click();
-  await page.getByRole('tab', { name: 'Backdrop' }).click();
-  await page.getByRole('button', { name: 'Dots' }).click();
   await page.getByRole('tab', { name: 'Type' }).click();
   await page.getByRole('button', { name: 'Modern font' }).click();
   await saved(page);
-  await expect.poll(async () => (await draft(page)).page.theme).toMatchObject({ preset: 'moonlit', background: { style: 'dots' }, font: 'modern' });
+  await expect.poll(async () => (await draft(page)).page.theme).toMatchObject({ preset: 'moonlit', font: 'modern' });
   await expect(page.locator('html')).toHaveClass(/dark/);
 });
 
@@ -159,7 +157,7 @@ test('export your page and delete your account', async ({ page }) => {
 test('the desk template turns tiles into objects, and a note can become a stamp', async ({ page, browser }) => {
   const u = await newUser(page, 'desk');
   expect((await draft(page)).page.theme).toMatchObject({ style: 'cozy', layout: 'canvas' });
-  const note = page.locator('[data-tile]').filter({ hasText: 'Currently working on something new' });
+  const note = page.locator('[data-tile]').filter({ hasText: 'a little zine about my grandmother' });
   await note.click();
   await page.getByRole('button', { name: 'Round stamp' }).click();
   await saved(page);
@@ -174,7 +172,7 @@ test('the desk template turns tiles into objects, and a note can become a stamp'
   await expect(desk.locator('.dks-stamp')).toHaveCount(2);
   await expect(desk.locator('.dks-sleeve').first()).toBeVisible();
   await expect(desk.locator('.dks-env-body').first()).toBeVisible();
-  await expect(desk.locator('.dks-pins a')).toHaveCount(4);
+  await expect(desk.locator('.dks-pins a')).toHaveCount(5);
   await visitor.close();
 });
 

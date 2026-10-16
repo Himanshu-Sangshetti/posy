@@ -1,0 +1,24 @@
+---
+title: "Posy"
+description: "An open-source link-in-bio page you own, made by you or by your AI."
+---
+
+Posy is a link-in-bio page (a Linktree alternative) with six hand-made **looks**. A page is one JSON document, so you can edit it in the studio, hand it to an AI, or script it. It is open source and you can host it yourself.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">Make a page on posy.page in about two minutes.</Card>
+  <Card title="Looks gallery" icon="palette" href="/looks">Desk, Washi, Lofi, Painted, Cobalt and Night.</Card>
+  <Card title="Connect an AI app" icon="plug" href="/agents/connect">Claude, ChatGPT, Cursor, VS Code, Claude Code and Codex.</Card>
+  <Card title="Self-host" icon="server" href="/self-host/guide">Docker, Compose, Vercel with Turso, or any Node host.</Card>
+</CardGroup>
+
+## How it fits together
+
+- **The studio** is the editor at posy.page. You paste a link and Posy picks the right tile.
+- **The page file** is a small JSON file any chat can write. Load it at [`/new`](https://posy.page/new). See [the page file](/agents/format).
+- **The MCP server** lets an AI app edit your page directly. Everything it does lands in your draft until you publish. See [MCP tools](/agents/tools).
+- **The REST API and CLI** do the same from scripts. See the [API reference](/api-reference/introduction).
+
+## For AI agents
+
+This site publishes `llms.txt` and `llms-full.txt` automatically. Posy publishes its own too: see [llms.txt](/agents/llms-txt).

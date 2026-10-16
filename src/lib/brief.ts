@@ -7,8 +7,9 @@
  * Also accepted: the full page JSON that Posy exports. Client-safe (no database, no network).
  */
 import { z } from 'zod';
-import { Page, SIZES, COLORS, LAYOUTS, newId, type Tile } from './schema';
+import { Page, SIZES, COLORS, LAYOUTS, FONTS, PHOTO_LOOKS, newId, type Tile } from './schema';
 import { tileFromInput } from './detect';
+import { isImageRef } from './url';
 import { starterPage } from './templates';
 import { STYLE_IDS, STYLE_INFO, type StyleId } from './styles';
 import { THEME_IDS } from './themes';
@@ -20,10 +21,15 @@ const LinkObject = z.object({
   repo: z.string().optional().describe('A GitHub repo as "owner/name"'),
   heading: z.string().optional().describe('Starts a new section'),
   text: z.string().optional().describe('A short note'),
+  stamp: z.string().optional().describe('A short round badge, e.g. "Say hello" (a note drawn as a stamp)'),
+  image: z.string().optional().describe('A picture: an image URL or /path. Add "url" to make it clickable'),
+  focus: z.object({ x: z.number(), y: z.number() }).optional().describe('Crop: the point of the picture to keep in view, x and y 0–100'),
+  zoom: z.number().optional().describe('Crop: zoom into the picture, 1–3'),
+  caption: z.string().optional().describe('Caption under a picture'),
   title: z.string().optional(), description: z.string().optional(),
   size: z.enum(SIZES).optional().describe('s=1x1, w=2x1, t=1x2, l=2x2'),
   color: z.enum(COLORS).optional(),
-}).describe('One tile. Give exactly one of url, email, repo, heading or text.');
+}).describe('One tile. Give exactly one of url, email, repo, heading, text, stamp or image.');
 
 export const Brief = z.object({
   posy: z.literal(1).optional().describe('Format version'),
@@ -35,6 +41,9 @@ export const Brief = z.object({
   look: z.string().optional().describe(`The look of the page. One of: ${STYLE_IDS.join(', ')}`),
   theme: z.string().optional().describe(`Colours. One of: ${THEME_IDS.join(', ')}`),
   layout: z.enum(LAYOUTS).optional(),
+  photos: z.string().optional().describe(`How photos are printed. One of: ${PHOTO_LOOKS.join(', ')}`),
+  font: z.string().optional().describe(`Typeface. One of: ${FONTS.join(', ')}`),
+  backdrop: z.string().optional().describe('Page backdrop: "solid", "dots", "grid", or an image URL'),
   links: z.array(z.union([z.string(), LinkObject])).max(60).describe('Links in order. Strings are fine: a URL, an email, owner/repo or a note. Use {"heading": "…"} to start a section.'),
 }).describe('A Posy page in brief');
 export type Brief = z.infer<typeof Brief>;
@@ -66,15 +75,27 @@ function tileFor(entry: Brief['links'][number], i: number, warnings: string[]): 
     return tileFromInput(s);
   }
   const o = entry;
-  const given = [o.url, o.email, o.repo, o.heading, o.text].filter(Boolean).length;
-  if (given !== 1) { warnings.push(`${n}: give exactly one of url, email, repo, heading or text. Skipped.`); return null; }
+  const image = o.image?.trim();
+  const given = [o.url && !image ? o.url : '', o.email, o.repo, o.heading, o.text, o.stamp, image].filter(Boolean).length;
+  if (given !== 1) { warnings.push(`${n}: give exactly one of url, email, repo, heading, text, stamp or image. Skipped.`); return null; }
   if (o.heading) return { id: newId(), type: 'heading', text: o.heading, size: 's', color: 'auto' };
-  const tile = tileFromInput((o.url ?? o.email ?? o.repo ?? o.text)!);
+  let tile: Tile;
+  if (image) tile = { id: newId(), type: 'image', src: image, alt: o.title ?? '', size: 's', color: 'auto', ...(o.caption && { caption: o.caption }), ...(o.url && { url: o.url }) };
+  else if (o.stamp) tile = { id: newId(), type: 'text', text: o.stamp, look: 'stamp', size: 's', color: 'auto' };
+  else tile = tileFromInput((o.url ?? o.email ?? o.repo ?? o.text)!);
   if (tile.type === 'link') { if (o.title) tile.title = o.title; if (o.description) tile.description = o.description; }
+  if (o.focus || o.zoom !== undefined) {
+    if (tile.type === 'image' || tile.type === 'link' || tile.type === 'video' || tile.type === 'music') {
+      if (o.focus) tile.focus = { x: clamp(o.focus.x, 0, 100), y: clamp(o.focus.y, 0, 100) };
+      if (o.zoom !== undefined) tile.zoom = clamp(o.zoom, 1, 3);
+    } else warnings.push(`${n}: focus and zoom crop a picture, so they were ignored here.`);
+  }
   if (o.size) tile.size = o.size;
   if (o.color) tile.color = o.color;
   return tile;
 }
+
+const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, Number.isFinite(v) ? v : lo));
 
 /** Turn a brief (or a full page) into a page. Never throws for small mistakes: they come back as warnings. */
 export function briefToPage(input: unknown): BriefResult {
@@ -110,11 +131,30 @@ export function briefToPage(input: unknown): BriefResult {
     if (THEME_IDS.includes(t)) preset = t; else warnings.push(`Unknown theme "${b.theme}", used the look's own colours.`);
   }
 
+  let photos: (typeof PHOTO_LOOKS)[number] | undefined;
+  if (b.photos) {
+    const p = b.photos.toLowerCase().trim();
+    if ((PHOTO_LOOKS as readonly string[]).includes(p)) photos = p as typeof photos; else warnings.push(`Unknown photos "${b.photos}", used the look's own. Options: ${PHOTO_LOOKS.join(', ')}.`);
+  }
+  let font: string | undefined;
+  if (b.font) {
+    const f = b.font.toLowerCase().trim();
+    if (FONTS.includes(f)) font = f; else warnings.push(`Unknown font "${b.font}", used the look's own. Options: ${FONTS.join(', ')}.`);
+  }
+  let background: { style: 'solid' | 'dots' | 'grid' | 'image'; image?: string } | undefined;
+  if (b.backdrop) {
+    const d = b.backdrop.trim();
+    if (['solid', 'dots', 'grid'].includes(d.toLowerCase())) background = { style: d.toLowerCase() as 'solid' | 'dots' | 'grid' };
+    else if (isImageRef(d)) background = { style: 'image', image: d };
+    else warnings.push(`Unknown backdrop "${b.backdrop}". Use solid, dots, grid or an image URL.`);
+  }
+
   const base = starterPage({ name: b.name, style: look, layout: b.layout, preset, empty: true });
   const tiles = b.links.map((e, i) => tileFor(e, i, warnings)).filter((t): t is Tile => !!t);
   if (!tiles.length) warnings.push('No links were added.');
 
-  const page = Page.parse({ ...base, profile: { ...base.profile, name: b.name, bio: b.bio ?? '', ...(b.location ? { location: b.location } : {}), ...(b.avatar ? { avatar: b.avatar } : {}) }, tiles });
+  const theme = { ...base.theme, ...(photos && { photos }), ...(font && { font }), ...(background && { background: { ...base.theme.background, ...background } }) };
+  const page = Page.parse({ ...base, theme, profile: { ...base.profile, name: b.name, bio: b.bio ?? '', ...(b.location ? { location: b.location } : {}), ...(b.avatar ? { avatar: b.avatar } : {}) }, tiles });
   let username = b.username?.trim().toLowerCase();
   if (username && !USERNAME_RE.test(username)) { warnings.push(`"${b.username}" is not a valid username (3–30 letters, numbers, - or _). You can pick one when you sign up.`); username = undefined; }
   return { page, username, warnings };
@@ -126,7 +166,7 @@ export const readBrief = (text: string) => briefToPage(extractJson(text));
 /**
  * The simplest link a chat can write, with no encoding at all:
  *   /new?name=Mira&bio=Illustrator&links=https://github.com/mira,hi@mira.so,mira/atlas
- * `links` may be separated by commas, spaces or newlines, or repeated (`&link=…&link=…`). Also: username, look, theme, layout, avatar, location.
+ * `links` may be separated by commas, spaces or newlines, or repeated (`&link=…&link=…`). Also: username, look, theme, layout, avatar, location, photos, font, backdrop.
  * Returns null when the query holds no page.
  */
 export function briefFromQuery(q: URLSearchParams): object | null {
@@ -134,7 +174,7 @@ export function briefFromQuery(q: URLSearchParams): object | null {
   const name = q.get('name')?.trim();
   if (!name && !links.length) return null;
   const pick = (k: string) => q.get(k)?.trim() || undefined;
-  return { posy: 1, name: name || 'My page', bio: pick('bio'), username: pick('username'), look: pick('look'), theme: pick('theme'), layout: pick('layout'), avatar: pick('avatar'), location: pick('location'), links };
+  return { posy: 1, name: name || 'My page', bio: pick('bio'), username: pick('username'), look: pick('look'), theme: pick('theme'), layout: pick('layout'), avatar: pick('avatar'), location: pick('location'), photos: pick('photos'), font: pick('font'), backdrop: pick('backdrop'), links };
 }
 
 /** A friendly address from a name: "Mira Sol" becomes "mira-sol". */
@@ -159,13 +199,16 @@ export function briefPrompt(site = 'https://posy.page') {
   "bio": "Illustrator making small, soft things",
   "look": "${STYLE_IDS[0]}",       // one of: ${looks}
   "theme": "${THEME_IDS[0]}",     // optional colours, one of: ${THEME_IDS.join(', ')}
+  "photos": "mono",              // optional: ${PHOTO_LOOKS.join(', ')}
   "links": [
     {"heading": "Find me"},
     "https://github.com/mira",     // any URL, email or owner/repo: Posy picks the right tile
     "hi@mira.so",
     {"heading": "Work"},
     {"url": "https://mira.so/portfolio", "title": "Portfolio", "size": "w"},
-    {"text": "Open for commissions"}
+    {"text": "Open for commissions"},
+    {"stamp": "Say hello"},        // a round badge
+    {"image": "https://…/me.jpg", "focus": {"x": 40, "y": 30}, "zoom": 1.5}   // a picture, cropped
   ]
 }
 

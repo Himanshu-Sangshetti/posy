@@ -25,16 +25,16 @@ Cursor, Codex and other MCP clients: add an HTTP server at `https://YOUR-POSY/ap
 | `get_page` | Draft (profile, theme, tiles with ids), public URL, version, unpublished-changes flag |
 | `add_tile` | Add from a link, email, `owner/repo` or note (auto-detected), or a full tile object |
 | `update_tile` / `remove_tile` / `move_tile` | Change fields, delete, reorder by id |
-| `set_theme` | Preset, accent, font, radius, layout (`bento`, `list`, `canvas`), alignment, background, tile style, hover effect, avatar, photos (`natural`, `mono`, `dither`, `ascii`), page colour (`background.color`), ambience on or off |
+| `set_theme` | Look (`style`), palette (`preset`), accent, font, radius, layout (`bento`, `list`, `canvas`), alignment, background, tile style, hover effect, avatar, photos (`natural`, `mono`, `dither`, `ascii`), page colour (`background.color`), ambience on or off |
 | `set_profile` | Name, bio, avatar, location |
 | `publish` | Make the draft live |
-| `list_options` | Allowed values for themes, fonts, backgrounds, sizes, colours and platforms |
+| `list_options` | The six looks (with notes and palettes), and allowed values for themes, fonts, backgrounds, sizes, colours and platforms |
 
 ## Prompts that work
 
 > Add my GitHub repo `owner/name` as a wide tile under "Projects", then publish.
 
-> Switch to the lavender theme with an aurora background and glass tiles.
+> Switch to the Cobalt look in the moonlit palette, with photos printed in mono.
 
 > Make a "Writing" section with links to my three latest posts: …
 
@@ -45,9 +45,12 @@ Cursor, Codex and other MCP clients: add an HTTP server at `https://YOUR-POSY/ap
    On the default **desk** layout every tile is an object: images are polaroids, notes are sticky notes, Spotify is a record,
    YouTube is a ticket, GitHub repos are index cards, newsletter links (Substack, Buttondown, beehiiv…) are envelopes and
    links with a preview image are postcards. Social tiles become stickers under the name.
-   Other looks (`theme.style`) draw the same tiles as their own objects: `press` (headlines, ink-printed photos, pull
-   quotes, a coupon for newsletters, a classified ad for shops), `gallery` (framed works with wall labels), `painted`
-   (watercolour paper, letters, wax seals), `night` (neon signs, jukebox, arcade screen), `washi`, `lofi` and `minimal`.
+   Other looks (`theme.style`) draw the same tiles as their own objects: `washi` (a Japanese print: paper, ink, a red seal),
+   `lofi` (a desktop left open; tiles are windows you can drag), `painted` (watercolour paper, letters, wax seals), `cobalt`
+   (a vintage print in two inks, under a crescent moon) and `night` (a netrunner's HUD: scanned photos, cut-corner panels,
+   one signal colour). `cozy` is the Desk look. Those six are the looks to offer; `list_options` returns each with a short note
+   and its palettes (`theme.preset`). Pages made with the retired `press` and `gallery` looks open as `cobalt` and `painted`.
+   On posy.page, Desk and Cobalt are free; Washi, Lofi, Painted and Night are Pro.
    A `text` tile with `look: "stamp"` is each look's badge (stamp, red dot, wax seal, blinking sign).
 3. Colours: `auto`, `surface`, `accent` or a pastel tint (`peach`, `butter`, `mint`, `sky`, `lilac`, `rose`).
 4. Keep pages calm: a few well-chosen tiles beat many. Ask before deleting things the user added.
@@ -82,9 +85,13 @@ The JSON Schema for a whole page is in `schema/page.schema.json` (`npm run schem
 curl -H "Authorization: Bearer posy_..." https://YOUR-POSY/api/v1/page
 curl -X POST -H "Authorization: Bearer posy_..." -H "Content-Type: application/json" \
   -d '{"input":"https://github.com/owner/repo"}' https://YOUR-POSY/api/v1/page/tiles
+curl -X PATCH -H "Authorization: Bearer posy_..." -H "Content-Type: application/json" \
+  -d '{"style":"night","preset":"redline","photos":"mono"}' https://YOUR-POSY/api/v1/page/theme
 curl -X POST -H "Authorization: Bearer posy_..." https://YOUR-POSY/api/v1/page/publish
 curl https://YOUR-POSY/api/v1/public/USERNAME      # anyone can read a published page
 ```
+
+`PATCH` (or `POST`) `/api/v1/page/theme` is `set_theme` over REST: send only the fields that should change (`style`, `preset`, `accent`, `font`, `radius`, `layout`, `align`, `photos`, `tileStyle`, `effect`, `avatar`, `motion`, `ambient`, `background`) and get the whole theme back.
 
 Each published page also has a plain-text version at `/<username>/llms.txt`.
 
@@ -95,7 +102,7 @@ export POSY_URL=https://YOUR-POSY POSY_API_KEY=posy_...   # your server, or http
 npm run posy -- get
 npm run posy -- add https://github.com/owner/repo --size w
 npm run posy -- add "Open to freelance work" --color mint
-npm run posy -- theme --preset midnight --font soft --tiles glass
+npm run posy -- theme --preset moonlit --layout list
 npm run posy -- profile --bio "Designer and tinkerer"
 npm run posy -- remove t-abc1234
 npm run posy -- publish

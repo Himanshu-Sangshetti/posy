@@ -48,6 +48,11 @@ export function DeskLab({ p }: { p?: string }) {
   const slots = profileSlots(page);
   const long = profileSlots({ ...page, profile: { ...page.profile, name: 'Himanshu Sangshetti', bio: 'Building tools for indie devs. Writing about slow software, film cameras and the long way round. Say hi!' } });
   const bare = profileSlots({ ...page, profile: { ...page.profile, avatar: undefined, location: 'from Lisbon' }, theme: { ...page.theme, avatar: 'hidden' } });
+  const many = { ...page, tiles: [
+    ...SOCIALS.slice(0, 5), LINKS[3][1], LINKS[0][1], LINKS[5][1],
+    ...['Portfolio', 'Shop', 'Book a call', 'Podcast', 'Speaking', 'Reading list', 'Uses', 'Résumé', 'Contact'].map(title => L({ url: `https://${title.toLowerCase().replace(/[^a-z]/g, '')}.example.com`, title })),
+    MEDIA[0][1], PHOTOS[0][1], PHOTOS[1][1], NOTES[1][1], STAMPS[0][1],
+  ] };
   const piece = (state: string, node: React.ReactNode, className?: string) => <div className={cn('sc-piece', state !== 'rest' && `is-${state}`, className)}>{node}</div>;
   const pins = SOCIALS.slice(0, 4).map(t => <div key={t.id} className="sc-piece"><K.DeskPin tile={t} /></div>);
   const stamp = <div className="sc-piece"><K.DeskInkStamp tile={STAMPS[1][1]} uid="lab-letter" /></div>;
@@ -120,7 +125,11 @@ export function DeskLab({ p }: { p?: string }) {
           {STAMPS.map(([name, t]) => (['rest', 'hover'] as const).map(s => <div key={name + s} className="dkl-cell dkl-stamp"><span className="dkl-s">{name} · {s}</span>{piece(s, <K.DeskInkStamp tile={t} uid={`s-${s}-${t.id}`} />)}</div>))}
         </div>
         <h2 className="dkl-h">Props</h2>
-        <div className="dkl-row dkl-props">{['coffee', 'plant', 'sprig'].map(n => <div key={n} className="dkl-cell"><K.DeskProp name={n} /></div>)}</div>
+        <div className="dkl-row dkl-props">{['coffee', 'plant', 'sprig', 'camera', 'pen', 'tapes'].map(n => <div key={n} className="dkl-cell"><K.DeskProp name={n} /></div>)}</div>
+      </div>
+      <div className="dks dkl-whole">
+        <h2 className="dkl-h">The whole desk · a dozen links</h2>
+        <K.DeskScene page={many} slots={long} only="desktop" editing piece={(_, node, o) => <div key={o.key} className={cn('sc-piece', o.className)} style={o.style}>{node}</div>} />
       </div>
     </PageFrame>
   );

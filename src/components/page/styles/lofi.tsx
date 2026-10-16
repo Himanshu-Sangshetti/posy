@@ -3,6 +3,7 @@
 import { ArrowUpRight, Globe, Mail, Play, ShoppingBag, SkipBack, SkipForward } from 'lucide-react';
 import type { Tile } from '@/lib/schema';
 import { PLATFORMS } from '@/lib/platforms';
+import { avatarCrop } from '@/lib/crop';
 import { asset, cn } from '@/lib/utils';
 import { hostOf, youtubeId } from '@/lib/url';
 import { LiveClock, VideoPlayer } from '../islands';
@@ -28,11 +29,11 @@ export function appName(tile: Tile) {
 }
 
 /** A photo, night-graded: real colour, a soft tint of the page's light and a fine print texture over it. */
-export function Halftone({ src, className }: { src: string; className?: string }) {
+export function Halftone({ src, className, profile }: { src: string; className?: string; profile?: Parameters<typeof avatarCrop>[0] }) {
   return (
     <span className={cn('lf-ht', className)}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={asset(src)} alt="" loading="lazy" draggable={false} />
+      <img src={asset(src)} alt="" loading="lazy" draggable={false} style={profile && avatarCrop(profile)} />
     </span>
   );
 }

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Posy",
+  "description": "Documentation for Posy, the open-source link-in-bio page that you and your AI can make and edit.",
+  "colors": { "primary": "#a5683f", "light": "#e0a96d", "dark": "#8a5430" },
+  "background": { "color": { "light": "#f7f1e6", "dark": "#1f2124" } },
+  "logo": { "light": "/logo/light.svg", "dark": "/logo/dark.svg", "href": "https://posy.page" },
+  "favicon": "/favicon.svg",
+  "appearance": { "default": "system" },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Get started",
+        "groups": [
+          { "group": "Get started", "pages": ["index", "quickstart", "first-page", "looks"] }
+        ]
+      },
+      {
+        "tab": "Agents",
+        "groups": [
+          { "group": "Connect", "pages": ["agents/connect", "agents/llms-txt"] },
+          { "group": "Reference", "pages": ["agents/tools", "agents/format", "agents/guide"] }
+        ]
+      },
+      {
+        "tab": "API",
+        "groups": [
+          { "group": "REST API", "pages": ["api-reference/introduction"] }
+        ],
+        "openapi": "api-reference/openapi.json"
+      },
+      {
+        "tab": "Self-host",
+        "groups": [
+          { "group": "Run Posy yourself", "pages": ["self-host/guide", "self-host/environment", "self-host/telemetry"] }
+        ]
+      },
+      {
+        "tab": "Contribute",
+        "groups": [
+          { "group": "Contribute", "pages": ["contribute/guide", "contribute/community"] }
+        ]
+      },
+      {
+        "tab": "Changelog",
+        "groups": [
+          { "group": "Changelog", "pages": ["changelog"] }
+        ]
+      }
+    ]
+  },
+  "navbar": {
+    "links": [
+      { "label": "posy.page", "href": "https://posy.page" },
+      { "label": "GitHub", "href": "https://github.com/Himanshu-Sangshetti/posy" }
+    ],
+    "primary": { "type": "button", "label": "Get started", "href": "https://posy.page/signup" }
+  },
+  "footer": {
+    "socials": { "github": "https://github.com/Himanshu-Sangshetti/posy" },
+    "links": [
+      { "header": "Posy", "items": [{ "label": "posy.page", "href": "https://posy.page" }, { "label": "Source", "href": "https://github.com/Himanshu-Sangshetti/posy" }] },
+      { "header": "For AI", "items": [{ "label": "llms.txt", "href": "https://posy.page/llms.txt" }, { "label": "OpenAPI", "href": "https://posy.page/openapi.json" }] }
+    ]
+  },
+  "seo": { "indexing": "navigable" }
+}

@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import type { Tile } from '@/lib/schema';
 import { PLATFORMS } from '@/lib/platforms';
 import { asset, cn } from '@/lib/utils';
+import { cropStyle } from '@/lib/crop';
 import { cleanTitle, hostOf, siteName, youtubeId } from '@/lib/url';
 import { DeskObjects, Favicon, SafeImg, VideoPlayer } from '../islands';
 import { BrandIcon, RichText } from '../tiles';
@@ -17,9 +18,9 @@ type Of<K extends Tile['type']> = Extract<Tile, { type: K }>;
 type LinkTile = Of<'link'> | Of<'github'>;
 type Media = Of<'music'> | Of<'video'>;
 
-const Img = ({ src, className }: { src: string; className?: string }) => (
+const Img = ({ src, className, crop }: { src: string; className?: string; crop?: CSSProperties }) => (
   // eslint-disable-next-line @next/next/no-img-element
-  <img src={asset(src)} alt="" loading="lazy" draggable={false} className={className} />
+  <img src={asset(src)} alt="" loading="lazy" draggable={false} className={className} style={crop} />
 );
 
 /** A small, stable number per tile, so things look placed by hand but never move between renders. */
@@ -89,6 +90,7 @@ function Letter({ slots, pins, stamp, uid }: { slots: SceneProps['slots']; pins?
   return (
     <div className={cn('dks-letter', !slots.avatar && 'dks-letter-solo')} data-uid={uid}>
       <div className="dks-sheet">
+        <span className="dks-type dks-from" aria-hidden>From the desk of</span>
         <h1 className="posy-head dks-name">{slots.name}</h1>
         {slots.bio && <div className="dks-bio">{slots.bio}</div>}
         {!slots.avatar && slots.caption && <div className="dks-hand dks-sign">{slots.caption}</div>}
@@ -156,7 +158,7 @@ function Postcard({ tile }: { tile: Of<'link'> }) {
   );
   return (
     <div className="dks-obj dks-post">
-      <div className="dks-post-card">{tile.image ? <SafeImg src={asset(tile.image)!} className="dks-post-img" fallback={blank} /> : blank}</div>
+      <div className="dks-post-card">{tile.image ? <SafeImg src={asset(tile.image)!} className="dks-post-img" fallback={blank} crop={cropStyle(tile)} /> : blank}</div>
       <div className="dks-slip">
         <b className="dks-type">{w.title}</b>
         {w.sub && <span className="dks-slip-sub">{w.sub}</span>}
@@ -175,7 +177,7 @@ function Envelope({ tile, uid }: { tile: Of<'link'>; uid: string }) {
     <div className="dks-obj dks-env" style={{ '--paper': paperOf(tile, '#f6efe1') } as CSSProperties}>
       <div className="dks-env-letter" aria-hidden />
       <div className="dks-env-body">
-        <div className="dks-env-stamp">{tile.image ? <SafeImg src={asset(tile.image)!} fallback={fav} /> : fav}</div>
+        <div className="dks-env-stamp">{tile.image ? <SafeImg src={asset(tile.image)!} fallback={fav} crop={cropStyle(tile)} /> : fav}</div>
         <div className="dks-postmark"><Ring text={`${siteName(w.url).toUpperCase()} ✦ AIR MAIL ✦ `} uid={`pm-${uid}`} r={62} size={17} /><span /><svg className="dks-waves" viewBox="0 0 120 40" aria-hidden>{[6, 16, 26, 36].map(y => <path key={y} d={`M0 ${y} q 7.5 -6 15 0 t 15 0 t 15 0 t 15 0 t 15 0 t 15 0 t 15 0 t 15 0`} />)}</svg></div>
         <div className="dks-env-to">
           <b className="dks-type">{w.title}</b>
@@ -217,7 +219,7 @@ function Record({ tile }: { tile: Of<'music'> }) {
   return (
     <div className={cn('dks-obj dks-rec', !m.image && 'dks-rec-plain')} style={{ '--paper': paperOf(tile, '#d9b98c') } as CSSProperties}>
       <span className="dks-vinyl" aria-hidden><i /></span>
-      <span className="dks-sleeve">{m.image ? <Img src={m.image} /> : <span className="dks-sleeve-hole" />}</span>
+      <span className="dks-sleeve">{m.image ? <Img src={m.image} crop={cropStyle(tile)} /> : <span className="dks-sleeve-hole" />}</span>
       <span className="dks-mtape"><b className="dks-hand">{m.title}</b>{tile.artist && <span className="dks-type">{tile.artist}</span>}</span>
     </div>
   );
@@ -230,7 +232,7 @@ function Ticket({ tile, editing }: { tile: Of<'video'>; editing?: boolean }) {
   return (
     <div className="dks-obj dks-ticket" style={{ '--paper': paperOf(tile, '#f1d9c4') } as CSSProperties}>
       <div className="dks-ticket-main">
-        <div className="dks-ticket-pic">{id ? <VideoPlayer id={id} title={tile.title} overlay={false} editing={editing} thumb={tile.image ? asset(tile.image) : undefined} /> : m.image && <Img src={m.image} />}</div>
+        <div className={cn('dks-ticket-pic', id && !tile.image && 'dks-ticket-yt')}>{id ? <VideoPlayer id={id} title={tile.title} overlay={false} editing={editing} thumb={tile.image ? asset(tile.image) : undefined} crop={cropStyle(tile)} /> : m.image && <Img src={m.image} crop={cropStyle(tile)} />}</div>
         <b className="dks-type">{m.title}</b>
       </div>
       <div className="dks-ticket-stub" aria-hidden><i className="dks-punch" /><i className="dks-barcode" /></div>
@@ -248,7 +250,7 @@ function Polaroid({ tile }: { tile: Of<'image'> }) {
   return (
     <div className={cn('dks-obj dks-pol', wide && 'dks-pol-wide')}>
       <i className="dks-tape" aria-hidden />
-      <div className="dks-pol-pic"><Img src={tile.src} /></div>
+      <div className="dks-pol-pic"><Img src={tile.src} crop={cropStyle(tile)} /></div>
       <div className="dks-hand dks-pol-cap">{tile.caption}</div>
     </div>
   );
@@ -261,6 +263,11 @@ function Sticky({ tile }: { tile: Of<'text'> }) {
       <p className="dks-hand"><RichText text={tile.text} /></p>
     </div>
   );
+}
+
+/** A section heading: a strip of masking tape, labelled by hand. */
+function Label({ tile }: { tile: Of<'heading'> }) {
+  return <h2 className="dks-obj dks-label"><span className="dks-hand">{tile.text}</span></h2>;
 }
 
 /** A stamp: a rubber stamp pressed in ink, its words round the edge. */
@@ -280,6 +287,9 @@ function InkStamp({ tile, uid }: { tile: Of<'text'>; uid: string }) {
   );
 }
 
+/** Your initials, as they'd be tooled in gold on a leather desk pad. */
+const monogram = (name: string) => name.split(/\s+/).filter(Boolean).slice(0, 3).map(w => w[0].toUpperCase()).join('·');
+
 /** Things on the desk that aren't yours to click: a coffee, a plant, a pen. */
 function Prop({ name, className }: { name: string; className?: string }) {
   return <Img src={`/looks/desk/${name}.webp`} className={cn('dks-prop', `dks-prop-${name}`, className)} />;
@@ -287,8 +297,10 @@ function Prop({ name, className }: { name: string; className?: string }) {
 
 /* ---------------- the desk ---------------- */
 
-/** Rough heights on the desk, to balance the two sides. */
-const H = { letter: 470, tagRow: 118, card: 230, envelope: 300, postcard: 360, bigTag: 170, record: 270, ticket: 270, photo: 330, wide: 300, note: 230, stamp: 170 };
+/** Rough sizes on the computer's desk (width, height), to lay things out in zones and balance the two sides. */
+const SZ = { record: [420, 280], ticket: [440, 256], photo: [236, 276], wide: [290, 250], note: [210, 230], stamp: [150, 180] } as const;
+const LINK_H = { feat: { card: 200, envelope: 300, postcard: 388, tag: 136 }, rest: { card: 200, envelope: 258, postcard: 92, tag: 92 } };
+const GAP = 64, ZONE_GAP = 30, LETTER_H = 356, MAT_PAD = 54;
 
 export function DeskScene({ page, slots, piece, only, editing }: SceneProps) {
   const a = anatomy(page.tiles);
@@ -304,47 +316,77 @@ export function DeskScene({ page, slots, piece, only, editing }: SceneProps) {
   const smallThing = (t: Tile, uid: string) =>
     t.type === 'image' ? <Polaroid tile={t} /> : t.type === 'text' && t.look === 'stamp' ? <InkStamp tile={t} uid={`${uid}-${t.id}`} /> : t.type === 'text' ? <Sticky tile={t} /> : t.type === 'music' || t.type === 'video' ? <Media tile={t} editing={editing} /> : null;
   const kindOf = (t: Tile) => t.type === 'image' ? ((t.size === 'w' || t.size === 'l') ? 'wide' : 'photo') : t.type === 'text' ? (t.look === 'stamp' ? 'stamp' : 'note') : t.type === 'music' ? 'record' : 'ticket';
-  const others: Tile[] = [...a.media, ...a.photos, ...a.notes, ...moreStamps];
+    const label = (h: Of<'heading'>) => piece(h, <Label tile={h} />, { key: h.id, className: 'dks-p-label', style: at(h, 1.8, -1) });
+  const sections = a.groups.filter((g): g is typeof g & { heading: Of<'heading'> } => !!g.heading);
 
   const desktop = () => {
     n = 0;
-    // the right side is your links; the left side is you, then everything else goes wherever there's room
-    const linkH = featured.reduce((s, t) => s + ({ card: H.card, envelope: H.envelope, postcard: H.postcard, tag: H.bigTag })[linkObject(t, true)], 0) + Math.ceil(rest.length / 2) * H.tagRow;
-    // small things pair up side by side; wide things take a row of their own
-    const rows: Tile[][] = [];
-    for (const t of others) {
-      const k = kindOf(t), last = rows[rows.length - 1];
-      const small = k === 'note' || k === 'stamp' || k === 'photo';
-      if (small && last && last.length === 1 && ['note', 'stamp', 'photo'].includes(kindOf(last[0]))) last.push(t);
-      else rows.push([t]);
+    // Two columns: you on the left, your links on the leather desk pad on the right. Then your things, in reading
+    // order (media, photos, notes), each as one zone, go under whichever side is shorter, so like stays with like.
+    const flowH = (ts: Tile[], w: number) => {
+      let rowW = 0, rowH = 0, total = 0;
+      for (const t of ts) {
+        const [iw, ih] = SZ[kindOf(t) as keyof typeof SZ];
+        if (rowW && rowW + ZONE_GAP + iw > w) { total += rowH + ZONE_GAP; rowW = 0; rowH = 0; }
+        rowW += (rowW ? ZONE_GAP : 0) + iw; rowH = Math.max(rowH, ih);
+      }
+      return total + rowH;
+    };
+    // a long bundle of tags is laid out two abreast
+    const two = rest.length > 8;
+    const restH = rest.reduce((s, t) => { const o = linkObject(t, false); return s + (two && o === 'tag' ? (LINK_H.rest.tag + 14) / 2 : LINK_H.rest[o] + 14); }, 0);
+    // each heading is written on the desk once, just before the first of its things in reading order (links first);
+    // a heading with nothing after it goes at the foot of the desk pad
+    const order = [...a.links, ...a.media, ...a.photos, ...a.notes, ...moreStamps];
+    const labelAt = new Map<string, Of<'heading'>>(), loose: Of<'heading'>[] = [];
+    for (const g of sections) {
+      const mine = new Set([...g.links, ...g.media, ...g.photos, ...g.notes, ...g.stamps].map(t => t.id));
+      const first = order.find(t => mine.has(t.id));
+      if (first) labelAt.set(first.id, g.heading); else loose.push(g.heading);
     }
-    const rowH = (r: Tile[]) => Math.max(...r.map(t => H[kindOf(t) as keyof typeof H]));
-    const left: Tile[][] = [], right: Tile[][] = [];
-    let lh = H.letter + (a.socials.length ? 0 : -40), rh = linkH;
-    for (const r of rows) { if (lh <= rh + 120) { left.push(r); lh += rowH(r); } else { right.push(r); rh += rowH(r); } }
-    const block = (r: Tile[], i: number, side: string) => (
-      <div key={r[0].id} className={cn('dks-row', r.length > 1 && 'dks-row-pair', `dks-row-${side}${i % 3}`)}>
-        {r.map(t => piece(t, smallThing(t, 'd'), { key: t.id, className: `dks-p-${kindOf(t)}`, style: at(t, kindOf(t) === 'note' ? 5 : 3.5) }))}
+    const labelled = (t: Tile, node: ReactNode) => { const h = labelAt.get(t.id); return h ? [label(h), node] : node; };
+    const linkLabels = a.links.filter(t => labelAt.has(t.id)).length + loose.length;
+    const matH = MAT_PAD + featured.reduce((s, t) => s + LINK_H.feat[linkObject(t, true)] + 30, 0) + restH + linkLabels * 64;
+    const zones = ([['media', a.media], ['photos', a.photos], ['notes', [...a.notes, ...moreStamps]]] as const).filter(([, ts]) => ts.length > 0);
+    const left: (typeof zones)[number][] = [], right: (typeof zones)[number][] = [];
+    const bioLines = Math.ceil((page.profile.bio?.length ?? 0) / 28);
+    let lh = Math.max(LETTER_H, 282 + bioLines * 24) + (a.socials.length > 7 ? 60 : 0), rh = matH;
+    for (const z of zones) {
+      if (lh <= rh) { left.push(z); lh += GAP + flowH([...z[1]], 560); } else { right.push(z); rh += GAP + flowH([...z[1]], 592); }
+    }
+    // the camera was put down at the foot of the shorter side
+    const gap = lh < rh ? 'left' : 'right';
+    const zone = ([name, ts]: (typeof zones)[number]) => (
+      <div key={name} className={cn('dks-zone', `dks-zone-${name}`)}>
+        {name === 'photos' && <Prop name="tapes" className="dks-d-tapes" />}
+        {ts.map(t => labelled(t, piece(t, smallThing(t, 'd'), { key: t.id, className: `dks-p-${kindOf(t)}`, style: at(t, kindOf(t) === 'note' ? 4 : 2.6) })))}
       </div>
     );
+    const camera = <Prop name="camera" className="dks-d-camera" />;
     return (
       <div className="dks-desk">
         <Prop name="coffee" className="dks-d-coffee" />
         <Prop name="plant" className="dks-d-plant" />
-        <Prop name="sprig" className="dks-d-sprig" />
         <div className="dks-cols">
           <div className="dks-col dks-col-me">
+            <Prop name="pen" className="dks-d-pen" />
             <Letter slots={slots} uid="d" pins={pins('d')} stamp={stampPiece('d')} />
-            {left.map((r, i) => block(r, i, 'l'))}
+            {left.map(zone)}
+            {gap === 'left' && camera}
           </div>
           <div className="dks-col dks-col-links">
-            {featured.map((t, i) => piece(t, <LinkObject tile={t} featured uid={`d-${t.id}`} />, { key: t.id, className: cn('dks-p-feat', `dks-p-${linkObject(t, true)}`, `dks-feat${i}`), style: at(t, 2.2, i ? 1.2 : -1) }))}
-            {rest.length > 0 && (
-              <div className="dks-tags">
-                {rest.map(t => piece(t, <LinkObject tile={t} uid={`d-${t.id}`} />, { key: t.id, className: cn('dks-p-link', `dks-p-${linkObject(t, false)}`), style: at(t, 2.4) }))}
-              </div>
-            )}
-            {right.map((r, i) => block(r, i, 'r'))}
+            <div className="dks-mat">
+              <span className="dks-mat-mark" aria-hidden>{monogram(page.profile.name)}</span>
+              {featured.map((t, i) => labelled(t, piece(t, <LinkObject tile={t} featured uid={`d-${t.id}`} />, { key: t.id, className: cn('dks-p-feat', `dks-p-${linkObject(t, true)}`, `dks-feat${i}`), style: at(t, 1.6, i ? .8 : -.8) })))}
+              {rest.length > 0 && (
+                <div className={cn('dks-tags', two && 'dks-tags-two')}>
+                  {rest.map(t => labelled(t, piece(t, <LinkObject tile={t} uid={`d-${t.id}`} />, { key: t.id, className: cn('dks-p-link', `dks-p-${linkObject(t, false)}`), style: at(t, 1.4) })))}
+                </div>
+              )}
+              {loose.map(label)}
+            </div>
+            {right.map(zone)}
+            {gap === 'right' && camera}
           </div>
         </div>
         {!editing && <DeskObjects />}
@@ -354,26 +396,40 @@ export function DeskScene({ page, slots, piece, only, editing }: SceneProps) {
 
   const mobile = () => {
     n = 0;
-    const pairs: Tile[][] = [];
-    for (const t of others) {
-      const k = kindOf(t), last = pairs[pairs.length - 1];
-      const small = k === 'note' || k === 'stamp' || k === 'photo';
-      if (small && last && last.length === 1 && ['note', 'stamp', 'photo'].includes(kindOf(last[0]))) last.push(t);
-      else pairs.push([t]);
-    }
+    // one section after another, each as its links and then its things, the way the page was written
+    const feat = new Set(featured.map(t => t.id));
+    const pairsOf = (ts: Tile[]) => {
+      const pairs: Tile[][] = [];
+      for (const t of ts) {
+        const k = kindOf(t), last = pairs[pairs.length - 1];
+        const small = k === 'note' || k === 'stamp' || k === 'photo';
+        if (small && last && last.length === 1 && ['note', 'stamp', 'photo'].includes(kindOf(last[0]))) last.push(t);
+        else pairs.push([t]);
+      }
+      return pairs;
+    };
     return (
       <div className="dks-phone">
         <Prop name="coffee" className="dks-m-coffee" />
         <Letter slots={slots} uid="m" pins={pins('m')} stamp={stampPiece('m')} />
-        <div className="dks-m-links">
-          {featured.map(t => piece(t, <LinkObject tile={t} featured uid={`m-${t.id}`} />, { key: t.id, className: cn('dks-p-feat', `dks-p-${linkObject(t, true)}`), style: at(t, 1.6) }))}
-          {rest.map(t => piece(t, <LinkObject tile={t} featured={false} uid={`m-${t.id}`} />, { key: t.id, className: cn('dks-p-link', `dks-p-${linkObject(t, false)}`), style: at(t, 1.4) }))}
-        </div>
-        {pairs.map(r => (
-          <div key={r[0].id} className={cn('dks-m-row', r.length > 1 && 'dks-row-pair')}>
-            {r.map(t => piece(t, smallThing(t, 'm'), { key: t.id, className: `dks-p-${kindOf(t)}`, style: at(t, kindOf(t) === 'note' ? 4 : 3) }))}
-          </div>
-        ))}
+        {a.groups.map((g, gi) => {
+          const things = [...g.media, ...g.photos, ...g.notes, ...g.stamps.filter(t => t !== stamp)];
+          return [
+            g.heading && label(g.heading),
+            g.links.length > 0 && (
+              <div key={`links-${gi}`} className="dks-m-links">
+                {g.links.map(t => feat.has(t.id)
+                  ? piece(t, <LinkObject tile={t} featured uid={`m-${t.id}`} />, { key: t.id, className: cn('dks-p-feat', `dks-p-${linkObject(t, true)}`), style: at(t, 1.6) })
+                  : piece(t, <LinkObject tile={t} featured={false} uid={`m-${t.id}`} />, { key: t.id, className: cn('dks-p-link', `dks-p-${linkObject(t, false)}`), style: at(t, 1.4) }))}
+              </div>
+            ),
+            ...pairsOf(things).map(r => (
+              <div key={r[0].id} className={cn('dks-m-row', r.length > 1 && 'dks-row-pair')}>
+                {r.map(t => piece(t, smallThing(t, 'm'), { key: t.id, className: `dks-p-${kindOf(t)}`, style: at(t, kindOf(t) === 'note' ? 4 : 3) }))}
+              </div>
+            )),
+          ];
+        })}
         <Prop name="sprig" className="dks-m-sprig" />
       </div>
     );

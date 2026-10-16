@@ -7,7 +7,8 @@ import type { Page, Tile } from '@/lib/schema';
 import { THEMES } from '@/lib/themes';
 import { asset, cn } from '@/lib/utils';
 import { hostOf, youtubeId } from '@/lib/url';
-import { VideoPlayer } from '../islands';
+import { VideoPlayer, PhotoExposure } from '../islands';
+import { cropStyle } from '@/lib/crop';
 import { RichText } from '../tiles';
 import { tileMeta, compact, seeded } from './meta';
 import type { HeaderSlots } from './types';
@@ -33,12 +34,15 @@ function Inks({ preset }: { preset: string }) {
   const a = hex(ink), b = hex(paper);
   const ch = (i: number) => `${a[i]} ${(+a[i] * 0.42 + +b[i] * 0.58).toFixed(3)} ${b[i]}`;
   const lin = (slope: number, icpt: number) => <><feFuncR type="linear" slope={slope} intercept={icpt} /><feFuncG type="linear" slope={slope} intercept={icpt} /><feFuncB type="linear" slope={slope} intercept={icpt} /></>;
+  // shadows are opened before the print, so a dark picture still has shapes in it
+  const gamma = <><feFuncR type="gamma" exponent="0.72" /><feFuncG type="gamma" exponent="0.72" /><feFuncB type="gamma" exponent="0.72" /></>;
   const steps = <><feFuncR type="discrete" tableValues="0 .5 1" /><feFuncG type="discrete" tableValues="0 .5 1" /><feFuncB type="discrete" tableValues="0 .5 1" /></>;
   return (
     <svg aria-hidden width="0" height="0" style={{ position: 'absolute', width: 0, height: 0 }}>
       <filter id={`cb-duo-${OWN.has(preset) ? preset : 'cobalt'}`} x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
         <feColorMatrix type="matrix" values="0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0 0 0 1 0" result="light" />
-        <feComponentTransfer in="light" result="bold">{lin(1.45, -0.2)}</feComponentTransfer>
+        <feComponentTransfer in="light" result="lift">{gamma}</feComponentTransfer>
+        <feComponentTransfer in="lift" result="bold">{lin(1.3, -0.12)}</feComponentTransfer>
         <feTurbulence type="fractalNoise" baseFrequency="0.62" numOctaves="2" seed="7" result="noise" />
         <feColorMatrix in="noise" type="matrix" values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 0 1" result="grain" />
         <feComposite in="bold" in2="grain" operator="arithmetic" k1="0" k2="1" k3="0.62" k4="-0.31" result="dither" />
@@ -49,14 +53,14 @@ function Inks({ preset }: { preset: string }) {
   );
 }
 
-const Img = ({ src, alt = '' }: { src: string; alt?: string }) => (
+const Img = ({ src, alt = '', crop }: { src: string; alt?: string; crop?: React.CSSProperties }) => (
   // eslint-disable-next-line @next/next/no-img-element
-  <img src={asset(src)} alt={alt} loading="lazy" draggable={false} />
+  <img src={asset(src)} alt={alt} loading="lazy" draggable={false} style={crop} />
 );
 
 /** A photo, reprinted in the two inks with a fine halftone over it. */
-const Print = ({ src, alt, className }: { src: string; alt?: string; className?: string }) => (
-  <span className={cn('cb-print', className)}><Img src={src} alt={alt} /></span>
+const Print = ({ src, alt, className, crop }: { src: string; alt?: string; className?: string; crop?: React.CSSProperties }) => (
+  <span className={cn('cb-print', className)}><Img src={src} alt={alt} crop={crop} /></span>
 );
 
 const ROMAN: [number, string][] = [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
@@ -108,6 +112,7 @@ export function CobaltHeader({ page, slots }: { page: Page; slots: HeaderSlots }
   return (
     <>
       <Inks preset={page.theme.preset} />
+      <PhotoExposure selector=".cb-print img, .cb-portrait .posy-avatar img" />
       {slots.avatar && <div className="cb-portrait">{slots.avatar}</div>}
       <h1 className="posy-head posy-name cb-name">{slots.name}</h1>
       {slots.bio && <div className="posy-bio cb-bio">{slots.bio}</div>}
@@ -150,7 +155,7 @@ export function CobaltTile({ tile, index, editing }: { tile: Tile; index: number
 
   if (tile.type === 'image') return (
     <figure className="cb-plate cb-photo">
-      <Print src={tile.src} alt={tile.alt} />
+      <Print src={tile.src} alt={tile.alt} crop={cropStyle(tile)} />
       <figcaption><No index={index} />{tile.caption && <span>{tile.caption}</span>}</figcaption>
     </figure>
   );
@@ -160,7 +165,7 @@ export function CobaltTile({ tile, index, editing }: { tile: Tile; index: number
     return (
       <div className="cb-plate cb-photo cb-video">
         <span className="cb-print cb-screen">
-          {id ? <VideoPlayer id={id} title={tile.title} overlay={false} editing={editing} thumb={tile.image ? asset(tile.image) : undefined} /> : m.image && <Img src={m.image} />}
+          {id ? <VideoPlayer id={id} title={tile.title} overlay={false} editing={editing} thumb={tile.image ? asset(tile.image) : undefined} crop={cropStyle(tile)} /> : m.image && <Img src={m.image} crop={cropStyle(tile)} />}
         </span>
         <p className="cb-cap"><Play aria-hidden className="cb-play" /><span>{m.title}</span></p>
       </div>
@@ -169,7 +174,7 @@ export function CobaltTile({ tile, index, editing }: { tile: Tile; index: number
 
   if (tile.type === 'music') return (
     <div className="cb-plate cb-music">
-      <span className="cb-record" aria-hidden>{m.image && <Print src={m.image} />}</span>
+      <span className="cb-record" aria-hidden>{m.image && <Print src={m.image} crop={cropStyle(tile)} />}</span>
       <div className="cb-text">
         <No index={index} />
         <b className="cb-title">{m.title}</b>
@@ -211,7 +216,7 @@ export function CobaltTile({ tile, index, editing }: { tile: Tile; index: number
     <article className={cn('cb-plate cb-card', pic ? 'cb-card-pic' : 'cb-card-art', m.kind === 'shop' && 'cb-shop')}>
       {!pic && <span className="cb-art"><Burst seed={tile.id} kind={m.kind === 'shop' ? 'shop' : 'link'} /></span>}
       <div className="cb-top"><No index={index} /><span className="cb-kind">{m.kind === 'shop' ? 'Editions' : m.kind === 'link' ? host : m.kind}</span></div>
-      {pic && <Print src={m.image!} />}
+      {pic && <Print src={m.image!} crop={cropStyle(tile)} />}
       <div className="cb-body">
         <b className="cb-title">{m.title}</b>
         {m.sub && m.sub !== m.title && m.sub !== host && <p className="cb-sub">{m.sub}</p>}
@@ -224,11 +229,17 @@ export function CobaltTile({ tile, index, editing }: { tile: Tile; index: number
 export function CobaltRow({ tile, index }: { tile: Tile; index: number }) {
   const m = tileMeta(tile);
   if (tile.type === 'text') return <figure className="cb-verse cb-row-verse"><Moon /><blockquote><RichText text={tile.text} /></blockquote></figure>;
+  if (tile.type === 'image') return (
+    <figure className="cb-plate cb-photo cb-row-photo">
+      <Print src={tile.src} alt={tile.alt} crop={cropStyle(tile)} />
+      <figcaption><span className="cb-row-no">{roman(index + 1)}</span>{tile.caption && <span>{tile.caption}</span>}</figcaption>
+    </figure>
+  );
   return (
     <div className="cb-plate cb-row">
       <span className="cb-row-no">{roman(index + 1)}</span>
-      {m.image ? <Print src={m.image} className="cb-row-pic" /> : <span className="cb-art cb-row-pic"><Burst seed={tile.id} kind={tile.type === 'github' ? 'repo' : 'link'} /></span>}
-      <span className="cb-text"><b className="cb-title">{m.title || 'Photo'}</b>{m.sub && m.sub !== m.title && tile.type !== 'image' && <span className="cb-sub">{m.sub}</span>}</span>
+      {m.image ? <Print src={m.image} className="cb-row-pic" crop={cropStyle(tile)} /> : <span className="cb-art cb-row-pic"><Burst seed={tile.id} kind={tile.type === 'github' ? 'repo' : 'link'} /></span>}
+      <span className="cb-text"><b className="cb-title">{m.title}</b>{m.sub && m.sub !== m.title && <span className="cb-sub">{m.sub}</span>}</span>
       <span className="cb-go" aria-hidden><ArrowUpRight /></span>
     </div>
   );

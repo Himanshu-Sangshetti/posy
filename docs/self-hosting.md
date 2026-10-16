@@ -52,18 +52,27 @@ Node 20.9 or newer. Set `NEXT_PUBLIC_SITE_URL` before `npm run build`, since it 
 
 ## Environment
 
+Posy checks its environment when the server starts. In production it refuses to boot, and tells you what to fix,
+if a required variable is missing, if `BETTER_AUTH_SECRET` is shorter than 32 characters, the built-in development
+secret or the placeholder from `docker-compose.yml` (`change-me-to-a-long-random-string`), or if the two URLs
+disagree. In development everything has a default. `.env.example` has every variable with comments.
+
 | Variable | Default | Notes |
 |---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` | Public URL. Used for share links and images. |
-| `BETTER_AUTH_URL` | | Same URL. Required in production. |
-| `BETTER_AUTH_SECRET` | | Required in production. `openssl rand -base64 32`. |
+| `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` | **Required in production.** Public URL, used for share links and images. Set before `npm run build`. |
+| `BETTER_AUTH_URL` | | **Required in production.** Same scheme and host as `NEXT_PUBLIC_SITE_URL`. |
+| `BETTER_AUTH_SECRET` | | **Required in production.** 32+ characters: `openssl rand -base64 32`. |
 | `POSY_SIGNUP` | `first-user` | `open`, `closed` or `first-user`. |
 | `POSY_DATA_DIR` | `.data` (`/data` in Docker) | SQLite file and uploads. |
-| `DATABASE_URL`, `DATABASE_AUTH_TOKEN` | local file | Turso / libSQL. |
-| `BLOB_READ_WRITE_TOKEN` | | Vercel Blob for uploads. |
-| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | | GitHub sign-in. |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | | Google sign-in. |
+| `DATABASE_URL` | local file | Turso / libSQL URL. **Required on Vercel.** |
+| `DATABASE_AUTH_TOKEN` | | Required with a remote `DATABASE_URL`. |
+| `BLOB_READ_WRITE_TOKEN` | | Vercel Blob for uploads (needed on Vercel). |
+| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | | GitHub sign-in (set both). |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | | Google sign-in (set both). |
 | `GITHUB_TOKEN` | | Higher API limit for repo tiles. |
+| `POSY_TELEMETRY` | on in production | Set `0` to turn off anonymous usage stats. `DO_NOT_TRACK=1` works too. See [telemetry](telemetry.md). |
+| `POSY_TELEMETRY_KEY`, `POSY_TELEMETRY_HOST` | Posy's PostHog | Only for forks that want their own PostHog project. |
+| `POSY_URL`, `POSY_API_KEY` | | Used by `npm run posy` and agents, not by the server. |
 
 ## Your own domain
 

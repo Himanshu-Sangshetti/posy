@@ -1,0 +1,35 @@
+name: Look submission
+description: Propose a new look (a way to draw a page)
+labels: [look]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A look draws the same tiles its own way (Desk, Washi, Lofi and so on). Read "Adding a look" in CONTRIBUTING.md first.
+        Posy offers six looks, so new ones need to be clearly different and finished.
+  - type: input
+    id: name
+    attributes: { label: Name of the look }
+    validations: { required: true }
+  - type: textarea
+    id: concept
+    attributes:
+      label: The idea
+      description: One paragraph. What does a page feel like? What is the header, the tile, the motion?
+    validations: { required: true }
+  - type: textarea
+    id: refs
+    attributes: { label: References and mockups, description: Links or images. }
+  - type: textarea
+    id: art
+    attributes:
+      label: Art and licences
+      description: Where does the art come from? Only public domain, CC0 or art you made can ship.
+    validations: { required: true }
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: It works with light and dark palettes, on a phone, and with reduced motion
+        - label: I can contribute it under the MIT licence

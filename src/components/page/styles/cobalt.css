@@ -40,7 +40,7 @@
 .cb-portrait { position: relative; width: clamp(112px, 13vw, 148px); margin-bottom: 6px; }
 .cb-portrait .posy-avatar { position: relative; width: 100%; height: auto; aspect-ratio: 1; border-radius: 50%; overflow: hidden;
   box-shadow: 0 0 0 1.5px var(--cb-sky-ink), 0 0 0 9px color-mix(in oklab, var(--cb-sky-ink) 12%, transparent), 0 0 0 10px color-mix(in oklab, var(--cb-sky-ink) 55%, transparent), 0 26px 60px -24px rgb(4 12 50 / .7); }
-.cb-portrait .posy-avatar img { filter: var(--cb-duo); }
+.cb-portrait .posy-avatar img { filter: brightness(var(--px-b, 1)) contrast(var(--px-c, 1)) var(--cb-duo); }
 /* a halo of printed rays behind the moon, turning very slowly */
 .cb-portrait::before { content: ""; position: absolute; inset: -46%; z-index: -1; border-radius: 50%;
   background: repeating-conic-gradient(from 0deg, color-mix(in oklab, var(--cb-sky-ink) 55%, transparent) 0 .6deg, transparent .6deg 4.5deg);
@@ -49,7 +49,15 @@
 @keyframes cb-turn { to { rotate: 360deg; } }
 .cb-name { margin: 0; max-width: 14ch; font-size: clamp(50px, calc(100cqw / max(7, var(--nlen, 10)) * 1.3), 128px); line-height: .9; letter-spacing: -.035em; color: var(--cb-sky-ink); text-wrap: balance; overflow-wrap: anywhere;
   text-shadow: 0 1px 0 rgb(0 0 0 / .14), 0 10px 50px rgb(6 16 70 / .55); }
-.cb-bio { margin: 0; max-width: 40ch; font-family: var(--font-head); font-style: italic; font-weight: 400; font-size: clamp(17px, 1.6vw, 20px); line-height: 1.45; color: color-mix(in oklab, var(--cb-sky-ink) 92%, transparent); text-wrap: pretty; text-shadow: 0 1px 2px rgb(6 16 70 / .55), 0 2px 18px rgb(6 16 70 / .55); }
+.cb-bio { margin: 0; max-width: 40ch; font-family: var(--font-head); font-style: italic; font-weight: 400; font-size: clamp(17px, 1.6vw, 20px); line-height: 1.45; color: color-mix(in oklab, var(--cb-sky-ink) 92%, transparent); text-wrap: pretty; text-shadow: 0 1px 2px rgb(6 16 70 / .7), 0 0 14px rgb(6 16 70 / .75), 0 2px 26px rgb(6 16 70 / .6); }
+/* the vermilion sky is brightest at its centre, right where the name sits on a phone: print the name on a dark ink band */
+@container page (max-width: 640px) {
+  .posy-preset-vermilion .cb-name { position: relative; isolation: isolate; padding: 4px 10px; text-shadow: 0 1px 0 rgb(0 0 0 / .3), 0 2px 14px rgb(70 10 0 / .85), 0 0 34px rgb(70 10 0 / .7); }
+  .posy-preset-vermilion .cb-name::before { content: ""; position: absolute; z-index: -1; inset: 2px -6px; border-radius: 18px; background: radial-gradient(closest-side, rgb(74 12 4 / .72), rgb(74 12 4 / .5) 70%, transparent); filter: blur(8px); scale: 1.1 1.15; }
+}
+/* on phones the bio sits over the bright sunburst: a soft ink band behind the words keeps them readable */
+@container page (max-width: 640px) { .cb-bio { position: relative; isolation: isolate; padding: 8px 14px; font-weight: 500; color: var(--cb-sky-ink); }
+  .cb-bio::before { content: ""; position: absolute; z-index: -1; inset: 0; border-radius: 14px; background: radial-gradient(closest-side, rgb(6 16 70 / .62), rgb(6 16 70 / .42) 70%, transparent); filter: blur(6px); scale: 1.12 1.2; } }
 .cb-caption { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-size: 12.5px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: color-mix(in oklab, var(--cb-sky-ink) 82%, transparent); }
 .cb-moon { width: 1.1em; height: 1.1em; fill: currentColor; flex: none; }
 .cb-socials .posy-social-row { justify-content: center; gap: 10px; margin: 6px 0 0; }
@@ -101,7 +109,7 @@ figure.cb-plate { margin: 0; }
 .cb-body { display: grid; gap: 6px; min-width: 0; }
 .cb-card-art { justify-content: flex-start; gap: 0; padding: 12px 12px 14px; }
 .cb-art { position: relative; display: block; flex: 1; min-height: 38%; overflow: hidden; }
-.cb-burst { position: absolute; inset: 0; display: block; width: 100%; height: 100%; transition: scale 1.2s var(--cb-ease); }
+.cb-burst { position: absolute; inset: 0; display: block; width: 100%; height: 100%; transition: scale 1.2s var(--cb-ease), opacity .25s; }
 .cb-b-sky { fill: var(--cb-b-sky); }
 .cb-b-rays { fill: none; stroke: var(--cb-b-ray); stroke-width: .5; stroke-linecap: round; opacity: .92; }
 .cb-b-moon, .cb-b-star { fill: var(--cb-b-ray); }
@@ -126,7 +134,9 @@ figure.cb-plate { margin: 0; }
 /* ---- photos: reprinted in the two inks, with a fine halftone ---- */
 .cb-print { position: relative; display: block; flex: 1; min-height: 0; overflow: hidden; background: var(--cb-ink); }
 .cb-print img, .cb-print > div { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
-.cb-print img { filter: var(--cb-duo); transition: scale 1.2s var(--cb-ease); }
+.cb-print img { filter: brightness(var(--px-b, 1)) contrast(var(--px-c, 1)) var(--cb-duo); transition: scale 1.2s var(--cb-ease); }
+/* photos: "Colour" chosen on purpose shows the picture as it is; unset (or mono, dither, ascii) keeps the print */
+.posy-photos-set.posy-photos-natural :is(.cb-print img, .cb-portrait .posy-avatar img) { filter: none; }
 .cb-print::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--cb-ink) 30%, transparent); } /* the plate mark */
 .posy-tile:hover .cb-print img { scale: 1.04; }
 .cb-photo { padding: 10px 10px 8px; }
@@ -195,7 +205,11 @@ figure.cb-plate { margin: 0; }
 .cb-row-no { flex: none; width: 2.6em; font-family: var(--font-head); font-style: italic; font-size: 17px; color: var(--cb-soft); }
 .cb-row-pic { flex: none; width: 54px; height: 54px; }
 .cb-row .cb-art.cb-row-pic { min-height: 0; }
-.cb-row .cb-title { padding: 0; font-size: 20px; -webkit-line-clamp: 1; }
+.cb-row .cb-title { padding: 0; font-size: 18px; -webkit-line-clamp: 2; }
+.cb-row-photo { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px 10px 8px; min-height: 0; }
+.cb-row-photo .cb-print { flex: none; aspect-ratio: 16 / 10; }
+.cb-row-photo figcaption { align-items: center; }
+.cb-row-photo .cb-row-no { width: auto; font-size: 14px; }
 .cb-row .cb-sub { padding: 0; -webkit-line-clamp: 1; }
 .cb-row .cb-go { top: 50%; margin-top: -18px; right: 14px; }
 .cb-row-verse { height: auto; padding: 22px 26px; }
@@ -209,3 +223,6 @@ figure.cb-plate { margin: 0; }
 
 /* small plates keep only their number up top; the arrow needs the corner */
 @container tile (max-width: 300px) { .cb-card .cb-kind { display: none; } }
+
+/* a picture waits for its exposure to be measured (see PhotoExposure), then fades in */
+.posy-px :is(.cb-print img, .cb-portrait .posy-avatar img):not([data-px]) { opacity: 0; }

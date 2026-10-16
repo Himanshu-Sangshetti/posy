@@ -1,0 +1,24 @@
+---
+title: "Environment variables"
+description: "Every setting a Posy server reads."
+---
+
+Copy `.env.example` to `.env.local` for development. Everything is optional locally. In production you must set `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` and `NEXT_PUBLIC_SITE_URL`.
+
+| Variable | Default | Notes |
+|---|---|---|
+| `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` | Public URL, used for share links, OG images and auth callbacks. Baked in at build time, so set it before `npm run build`. |
+| `BETTER_AUTH_URL` | | The same URL. Required in production. |
+| `BETTER_AUTH_SECRET` | | Required in production. Generate with `openssl rand -base64 32`. |
+| `POSY_SIGNUP` | `first-user` | Who can sign up: `first-user` (the first account owns the instance), `open` or `closed`. |
+| `POSY_DATA_DIR` | `.data` (`/data` in Docker) | Where the SQLite file and uploads live. |
+| `DATABASE_URL` | local SQLite file | Turso / libSQL URL such as `libsql://your-db.turso.io`. |
+| `DATABASE_AUTH_TOKEN` | | Turso auth token. |
+| `BLOB_READ_WRITE_TOKEN` | | Vercel Blob token for image uploads in production. Locally, uploads go to `public/uploads`. |
+| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | | Optional GitHub sign-in. |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | | Optional Google sign-in. |
+| `GITHUB_TOKEN` | | Optional. Raises the GitHub API limit for repo tiles. |
+
+<Note>
+  Telemetry settings are described on the [Telemetry](/self-host/telemetry) page.
+</Note>

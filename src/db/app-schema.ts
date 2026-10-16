@@ -24,3 +24,17 @@ export const events = sqliteTable('events', {
   country: text('country'),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
 }, t => [index('events_page_time').on(t.pageId, t.createdAt)]);
+
+/** Public GitHub repo stats, cached so page views never call GitHub. `data` is null for missing or private repos. */
+export const githubRepos = sqliteTable('github_repos', {
+  repo: text('repo').primaryKey(),
+  data: text('data', { mode: 'json' }).$type<{ description?: string; stars: number; language?: string } | null>(),
+  fetchedAt: integer('fetched_at', { mode: 'timestamp_ms' }).notNull(),
+});
+
+/** Fixed-window request counters shared by every server instance. */
+export const rateLimits = sqliteTable('rate_limits', {
+  key: text('key').primaryKey(),
+  count: integer('count').notNull(),
+  resetAt: integer('reset_at').notNull(),
+});

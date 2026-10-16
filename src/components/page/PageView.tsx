@@ -1,6 +1,7 @@
 // Server-rendered by default; animation, effects and sharing are small client islands.
 import { MapPin } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { avatarCrop } from '@/lib/crop';
 import type { Page, Tile } from '@/lib/schema';
 import { PLATFORMS, profileUrl } from '@/lib/platforms';
 import { pageStyle, pageClasses, tileBackground, isDark, photoLook } from '@/lib/style';
@@ -78,7 +79,7 @@ export function Avatar({ page, className }: { page: Page; className?: string }) 
     <div className={cn('posy-avatar', className)}>
       {avatar
         // eslint-disable-next-line @next/next/no-img-element
-        ? <img src={asset(avatar)} alt={name} className="size-full object-cover" />
+        ? <img src={asset(avatar)} alt={name} className="size-full object-cover" style={avatarCrop(page.profile)} />
         : <span className="posy-head grid size-full place-items-center text-[40px]">{initials}</span>}
     </div>
   );
@@ -117,7 +118,7 @@ export function profileSlots(page: Page): HeaderSlots {
   const { name, bio, location, avatar } = page.profile;
   const style = page.theme.style;
   return {
-    avatar: page.theme.avatar === 'hidden' ? null : style === 'lofi' && avatar ? <Halftone src={avatar} className="posy-avatar" /> : <Avatar page={page} />,
+    avatar: page.theme.avatar === 'hidden' ? null : style === 'lofi' && avatar ? <Halftone src={avatar} profile={page.profile} className="posy-avatar" /> : <Avatar page={page} />,
     name: style === 'cozy' ? <DeskName name={name} /> : name,
     bio: bio ? <RichText text={bio} /> : null,
     caption: location || null,

@@ -7,6 +7,7 @@ import * as m from 'motion/react-m';
 // Animation features load after the page is interactive, so they never block first paint.
 const features = () => import('./motion-features').then(r => r.default);
 import type { ReactNode } from 'react';
+import { safeHref } from '@/lib/url';
 
 export const spring = { type: 'spring', stiffness: 380, damping: 30, mass: 0.8 } as const;
 
@@ -20,7 +21,8 @@ export function MotionProvider({ enabled, children }: { enabled: boolean; childr
 
 type ShellProps = { href?: string | null; index: number; className?: string; style?: React.CSSProperties; label?: string; children?: ReactNode; lift?: boolean; tileId?: string };
 
-export function MotionShell({ href, index, className, style, label, children, lift = true, tileId }: ShellProps) {
+export function MotionShell({ href: raw, index, className, style, label, children, lift = true, tileId }: ShellProps) {
+  const href = safeHref(raw);
   // Entrance is CSS (.posy-rise) so tiles are visible even before any JavaScript runs.
   const anim = { className: `${className ?? ''} posy-rise`, style: { ...style, '--i': index } as React.CSSProperties, initial: false as const, 'data-tile-id': tileId };
   if (href) {

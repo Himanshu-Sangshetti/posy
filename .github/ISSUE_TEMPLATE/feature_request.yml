@@ -1,0 +1,22 @@
+name: Feature request
+description: A tile type, setting or improvement
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: Posy stays small on purpose. Tell us the problem first, then the idea.
+  - type: textarea
+    id: problem
+    attributes: { label: The problem, description: What are you trying to do that you can't? }
+    validations: { required: true }
+  - type: textarea
+    id: idea
+    attributes: { label: Your idea, description: How could Posy do it? Sketches welcome. }
+  - type: textarea
+    id: alternatives
+    attributes: { label: What you do today instead }
+  - type: dropdown
+    id: help
+    attributes:
+      label: Would you like to build it?
+      options: ["No, just suggesting", "Yes, with some guidance", "Yes, I will send a PR"]

@@ -8,6 +8,12 @@ export type Entitlements = {
   customDomain: boolean;
 };
 
+/** Things worth counting. Editions decide what to do with them (the open-source edition ignores all but page.published, see lib/telemetry-events.ts). */
+export type ProductEvent =
+  | { type: 'account.created'; userId: string }
+  | { type: 'onboarding.completed'; userId: string; look: string; layout: string }
+  | { type: 'page.published'; userId: string; page: unknown };
+
 export type Edition = {
   id: string;
   /** "first-user": the first sign-up owns the instance, then sign-ups close. "open": anyone can sign up. */
@@ -19,6 +25,8 @@ export type Edition = {
   nav?: { href: string; label: string }[];
   /** The public site's top bar and footer (sign up, log in, marketing pages). */
   site?: SiteLinks;
+  /** Product analytics hook. Optional; must be fire-and-forget. */
+  track?: (e: ProductEvent) => void;
 };
 
 export type SiteLinks = {

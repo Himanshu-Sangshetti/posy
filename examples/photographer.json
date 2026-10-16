@@ -1,0 +1,13 @@
+{
+  "$schema": "../schema/page.schema.json",
+  "version": 2,
+  "profile": { "name": "Noor Haddad", "bio": "Photographer. Mostly film, mostly mornings." },
+  "theme": { "style": "washi", "preset": "kinari", "font": "washi", "radius": "sharp", "layout": "bento", "align": "center", "motion": true },
+  "seo": {},
+  "tiles": [
+    { "id": "m-ig", "type": "social", "platform": "instagram", "handle": "noorhaddad", "size": "s" },
+    { "id": "m-mail", "type": "social", "platform": "email", "handle": "hello@example.com", "size": "s" },
+    { "id": "m-shop", "type": "link", "url": "https://example.com/prints", "title": "Prints", "description": "Small runs, signed.", "size": "w" }
+  ],
+  "badge": true
+}

@@ -1,0 +1,559 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Posy API",
+    "version": "1",
+    "description": "Make and edit a Posy link-in-bio page. Everything edits the draft until you call publish."
+  },
+  "servers": [
+    {
+      "url": "https://posy.page",
+      "description": "posy.page (or your own server)"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "A \"posy_…\" API key from the dashboard"
+      },
+      "oauth": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://posy.page/api/auth/oauth2/authorize",
+            "tokenUrl": "https://posy.page/api/auth/oauth2/token",
+            "scopes": {
+              "page:write": "Read and edit your page"
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/page": {
+      "get": {
+        "summary": "Get your page",
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "oauth": [
+              "page:write"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The page"
+          }
+        },
+        "description": "Your page: draft, version, publish state",
+        "operationId": "get-your-page"
+      },
+      "put": {
+        "summary": "Replace the draft",
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "oauth": [
+              "page:write"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "page": {
+                    "type": "object",
+                    "description": "A full Posy page. JSON Schema: https://posy.page/schema/page.schema.json"
+                  },
+                  "baseVersion": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "page"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Saved"
+          },
+          "409": {
+            "description": "The page changed since baseVersion"
+          }
+        },
+        "description": "Replace the draft (send baseVersion to avoid overwriting newer changes)",
+        "operationId": "replace-the-draft"
+      }
+    },
+    "/api/v1/claim": {
+      "post": {
+        "summary": "Claim a username",
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "oauth": [
+              "page:write"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "style": {
+                    "type": "string"
+                  },
+                  "layout": {
+                    "type": "string"
+                  },
+                  "preset": {
+                    "type": "string"
+                  },
+                  "empty": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "username"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "409": {
+            "description": "You already have a page"
+          }
+        },
+        "description": "Create your page (claim a username)",
+        "operationId": "claim-a-username"
+      }
+    },
+    "/api/v1/page/import": {
+      "post": {
+        "summary": "Import a page file",
+        "description": "Load a Posy page file (brief or full page JSON)\n\nFormat: https://posy.page/docs/format",
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "oauth": [
+              "page:write"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "description": "The brief as an object, or the raw text a chat produced"
+                  },
+                  "username": {
+                    "type": "string"
+                  },
+                  "replace": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Loaded"
+          },
+          "400": {
+            "description": "The file could not be read; the message says why"
+          }
+        },
+        "operationId": "import-a-page-file"
+      }
+    },
+    "/api/v1/page/tiles": {
+      "post": {
+        "summary": "Add a tile",
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "oauth": [
+              "page:write"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "string"
+                  },
+                  "tile": {
+                    "type": "object"
+                  },
+                  "after": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "string"
+                  },
+                  "color": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Added"
+          }
+        },
+        "description": "Add a tile from a link, email, owner/repo or note (auto-detected), or a full tile object",
+        "operationId": "add-a-tile"
+      }
+    },
+    "/api/v1/page/theme": {
+      "patch": {
+        "summary": "Change the theme",
+        "description": "Change theme settings (same fields as the MCP set_theme tool); send only what should change\n\nLooks (style): cozy, washi, lofi, painted, cobalt, night. Returns the whole theme.",
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "oauth": [
+              "page:write"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "style": {
+                    "type": "string",
+                    "enum": [
+                      "cozy",
+                      "washi",
+                      "lofi",
+                      "painted",
+                      "cobalt",
+                      "night"
+                    ]
+                  },
+                  "preset": {
+                    "type": "string"
+                  },
+                  "accent": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
+                  "font": {
+                    "type": "string"
+                  },
+                  "radius": {
+                    "type": "string"
+                  },
+                  "layout": {
+                    "type": "string",
+                    "enum": [
+                      "bento",
+                      "list",
+                      "canvas"
+                    ]
+                  },
+                  "align": {
+                    "type": "string"
+                  },
+                  "tileStyle": {
+                    "type": "string"
+                  },
+                  "effect": {
+                    "type": "string"
+                  },
+                  "avatar": {
+                    "type": "string"
+                  },
+                  "photos": {
+                    "type": "string",
+                    "enum": [
+                      "natural",
+                      "mono",
+                      "dither",
+                      "ascii"
+                    ]
+                  },
+                  "motion": {
+                    "type": "boolean"
+                  },
+                  "ambient": {
+                    "type": "boolean"
+                  },
+                  "background": {
+                    "type": "object",
+                    "properties": {
+                      "style": {
+                        "type": "string"
+                      },
+                      "image": {
+                        "type": "string"
+                      },
+                      "dim": {
+                        "type": "number"
+                      },
+                      "blur": {
+                        "type": "number"
+                      },
+                      "grain": {
+                        "type": "boolean"
+                      },
+                      "color": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "{ theme }"
+          },
+          "400": {
+            "description": "Invalid input; the message says why"
+          }
+        },
+        "operationId": "change-the-theme"
+      },
+      "post": {
+        "summary": "Change the theme (POST)",
+        "description": "Change theme settings (same fields as the MCP set_theme tool); send only what should change\n\nLooks (style): cozy, washi, lofi, painted, cobalt, night. Returns the whole theme.",
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "oauth": [
+              "page:write"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "style": {
+                    "type": "string",
+                    "enum": [
+                      "cozy",
+                      "washi",
+                      "lofi",
+                      "painted",
+                      "cobalt",
+                      "night"
+                    ]
+                  },
+                  "preset": {
+                    "type": "string"
+                  },
+                  "accent": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
+                  "font": {
+                    "type": "string"
+                  },
+                  "radius": {
+                    "type": "string"
+                  },
+                  "layout": {
+                    "type": "string",
+                    "enum": [
+                      "bento",
+                      "list",
+                      "canvas"
+                    ]
+                  },
+                  "align": {
+                    "type": "string"
+                  },
+                  "tileStyle": {
+                    "type": "string"
+                  },
+                  "effect": {
+                    "type": "string"
+                  },
+                  "avatar": {
+                    "type": "string"
+                  },
+                  "photos": {
+                    "type": "string",
+                    "enum": [
+                      "natural",
+                      "mono",
+                      "dither",
+                      "ascii"
+                    ]
+                  },
+                  "motion": {
+                    "type": "boolean"
+                  },
+                  "ambient": {
+                    "type": "boolean"
+                  },
+                  "background": {
+                    "type": "object",
+                    "properties": {
+                      "style": {
+                        "type": "string"
+                      },
+                      "image": {
+                        "type": "string"
+                      },
+                      "dim": {
+                        "type": "number"
+                      },
+                      "blur": {
+                        "type": "number"
+                      },
+                      "grain": {
+                        "type": "boolean"
+                      },
+                      "color": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "{ theme }"
+          },
+          "400": {
+            "description": "Invalid input; the message says why"
+          }
+        },
+        "operationId": "change-the-theme-post"
+      }
+    },
+    "/api/v1/page/publish": {
+      "post": {
+        "summary": "Publish",
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "oauth": [
+              "page:write"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Published"
+          }
+        },
+        "description": "Make the draft live",
+        "operationId": "publish"
+      }
+    },
+    "/api/v1/public/{username}": {
+      "get": {
+        "summary": "Read a published page",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The published page"
+          }
+        },
+        "description": "Read any published page as JSON",
+        "operationId": "read-a-published-page"
+      }
+    },
+    "/api/v1/username": {
+      "get": {
+        "summary": "Check a username",
+        "parameters": [
+          {
+            "name": "check",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{ ok: boolean, reason?: string }"
+          }
+        },
+        "description": "Check if a username is available",
+        "operationId": "check-a-username"
+      }
+    }
+  }
+}

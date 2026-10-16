@@ -1,4 +1,5 @@
 import { PLATFORMS, type PlatformId } from './platforms';
+import { isImageRef } from './url';
 import { newId, type Tile } from './schema';
 
 const RESERVED: Record<string, string[]> = {
@@ -11,6 +12,7 @@ export function tileFromInput(input: string): Tile {
   const raw = input.trim();
   const id = newId();
   if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) return { id, type: 'social', platform: 'email', handle: raw, size: 's', color: 'auto' };
+  if (isImageRef(raw)) return { id, type: 'image', src: raw, alt: '', size: 's', color: 'auto' };
   // owner/repo (owners never contain dots; repo names can, e.g. vercel/next.js)
   if (/^[\w-]+\/[\w.-]+$/.test(raw) && !/^[\w-]+\.[a-z]{2,}\//i.test(raw)) return { id, type: 'github', repo: raw.replace(/\.git$/, ''), size: 'w', color: 'auto' };
 
@@ -45,4 +47,4 @@ export function tileFromInput(input: string): Tile {
   return { id, type: 'link', url: href, size: 's', color: 'auto' };
 }
 
-export { hostOf, youtubeId, spotifyEmbed } from './url';
+export { hostOf, youtubeId, spotifyEmbed, isImageRef } from './url';

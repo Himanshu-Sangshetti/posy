@@ -26,7 +26,7 @@ export function NavMenu({ username, site, current }: { username: string; site: s
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button type="button" aria-label="Menu" className="group flex h-9 items-center gap-1.5 rounded-[10px] pl-1 pr-2 transition-colors hover:bg-[var(--secondary)] data-[state=open]:bg-[var(--secondary)]">
+        <button type="button" aria-label="Menu" title="Menu: Editor, Analytics, Agents, Settings" className="group flex h-9 items-center gap-1.5 rounded-[10px] pl-1 pr-2 transition-colors hover:bg-[var(--secondary)] data-[state=open]:bg-[var(--secondary)]">
           <PosyMark className="size-6" /><ChevronDown className="size-3.5 text-[var(--muted)] transition-transform group-data-[state=open]:rotate-180" />
         </button>
       </PopoverTrigger>
@@ -95,7 +95,7 @@ export function TopBar({ username, site, saveState, unpublished, publishing, onP
         </span>
         <span className="flex md:hidden" role="status" aria-label={status}><span className={cn('sc-dot mx-1', dot)} /></span>
         <Button type="button" variant="outline" size="sm" aria-label="Share" onClick={onShare} className="h-9 gap-1.5 rounded-[10px] border-[var(--line)] bg-[var(--surface)] px-3 text-[13.5px] shadow-none hover:bg-[var(--secondary)]">
-          <Send className="size-3.5" /><span className="hidden sm:inline">Share</span>
+          <Send className="size-3.5" />Share
         </Button>
         <Button type="button" data-publish onClick={onPublish} disabled={!unpublished || publishing || saveState !== 'saved'}
           className={cn('sc-publish h-9 gap-1.5 rounded-full px-4 text-[13.5px] disabled:opacity-100', unpublished && 'is-ready')}>

@@ -3,10 +3,11 @@
 // painted-paper cards, all of one family: links with their favicon, a clean title and the site; a calm player for
 // music and video; photos in a simple mat; notes in a serif hand; the stamp note as a small vermilion seal.
 // On a computer: you on the left, your things in two calm columns beside you. On a phone: one column under your card.
-import type { CSSProperties } from 'react';
+import { Fragment, type CSSProperties } from 'react';
 import { ArrowUpRight, Music2, Play } from 'lucide-react';
 import type { Tile } from '@/lib/schema';
 import { PLATFORMS } from '@/lib/platforms';
+import { cropStyle } from '@/lib/crop';
 import { asset, cn } from '@/lib/utils';
 import { cleanTitle, hostOf, siteName, youtubeId } from '@/lib/url';
 import { Favicon, SafeImg, VideoPlayer } from '../islands';
@@ -19,9 +20,9 @@ type Of<T extends Tile['type']> = Extract<Tile, { type: T }>;
 type LinkTile = Of<'link'> | Of<'github'>;
 type MediaTile = Of<'music'> | Of<'video'>;
 
-const Img = ({ src, className }: { src: string; className?: string }) => (
+const Img = ({ src, className, crop }: { src: string; className?: string; crop?: CSSProperties }) => (
   // eslint-disable-next-line @next/next/no-img-element
-  <img src={asset(src)} alt="" loading="lazy" draggable={false} className={className} />
+  <img src={asset(src)} alt="" loading="lazy" draggable={false} className={className} style={crop} />
 );
 const plain = (s: string) => s.replace(/\*\*?|\[([^\]]+)\]\([^)]+\)/g, '$1');
 
@@ -46,7 +47,7 @@ function LinkCard({ tile, big }: { tile: LinkTile; big?: boolean }) {
   const fav = <span className="ptc-fav"><Favicon url={l.url} /></span>;
   return (
     <div className={cn('ptc ptc-link', big && 'ptc-big', big && l.image && 'ptc-has-pic', !l.sub && 'ptc-nosub')}>
-      {big && l.image && <span className="ptc-pic"><SafeImg src={asset(l.image)!} fallback={<span className="ptc-pic-blank">{fav}</span>} /></span>}
+      {big && l.image && <span className="ptc-pic"><SafeImg src={asset(l.image)!} fallback={<span className="ptc-pic-blank">{fav}</span>} crop={cropStyle(tile)} /></span>}
       <div className="ptc-body">
         {fav}
         <div className="ptc-words">
@@ -65,7 +66,7 @@ function MusicCard({ tile }: { tile: Of<'music'> }) {
   const m = tileMeta(tile);
   return (
     <div className="ptc ptc-music">
-      <span className="ptc-cover">{m.image ? <Img src={m.image} /> : <Music2 aria-hidden />}</span>
+      <span className="ptc-cover">{m.image ? <Img src={m.image} crop={cropStyle(tile)} /> : <Music2 aria-hidden />}</span>
       <div className="ptc-words">
         <b className="ptc-title">{m.title}</b>
         <span className="ptc-sub">{m.sub}</span>
@@ -81,7 +82,7 @@ function VideoCard({ tile, editing }: { tile: Of<'video'>; editing?: boolean }) 
   const id = youtubeId(tile.url);
   return (
     <div className="ptc ptc-video">
-      <span className="ptc-screen">{id ? <VideoPlayer id={id} title={tile.title} overlay={false} editing={editing} thumb={tile.image ? asset(tile.image) : undefined} /> : m.image && <Img src={m.image} />}</span>
+      <span className="ptc-screen">{id ? <VideoPlayer id={id} title={tile.title} overlay={false} editing={editing} thumb={tile.image ? asset(tile.image) : undefined} crop={cropStyle(tile)} /> : m.image && <Img src={m.image} crop={cropStyle(tile)} />}</span>
       <span className="ptc-caption"><b className="ptc-title">{m.title}</b><span className="ptc-sub">YouTube</span></span>
     </div>
   );
@@ -95,7 +96,7 @@ function MediaCard({ tile, editing }: { tile: MediaTile; editing?: boolean }) {
 function PhotoCard({ tile, tall }: { tile: Of<'image'>; tall?: boolean }) {
   return (
     <figure className={cn('ptc ptc-photo', tall && 'ptc-photo-tall')}>
-      <span className="ptc-mat"><Img src={tile.src} /></span>
+      <span className="ptc-mat"><Img src={tile.src} crop={cropStyle(tile)} /></span>
       {tile.caption && <figcaption className="ptc-hand">{tile.caption}</figcaption>}
     </figure>
   );
@@ -143,10 +144,13 @@ function Profile({ slots, socials, stamps, piece, nlen = 12 }: { slots: HeaderSl
       {slots.bio && <div className="ptc-bio">{slots.bio}</div>}
       {slots.caption && <p className="ptc-hand ptc-where">{slots.caption}</p>}
       {socials.length > 0 && <div className="ptc-socials">{socials.map(t => piece(t, <Social tile={t} />, { key: t.id, className: 'ptc-social-piece' }))}</div>}
-      {stamps.length > 0 && <div className="ptc-seals">{stamps.map(t => piece(t, <Seal tile={t} />, { key: t.id, className: 'ptc-seal-piece' }))}</div>}
+      {stamps.length > 0 && <div className={cn('ptc-seals', stamps.length > 1 && 'ptc-seals-row')}>{stamps.map(t => piece(t, <Seal tile={t} />, { key: t.id, className: 'ptc-seal-piece' }))}</div>}
     </div>
   );
 }
+
+/** A section title: a handwritten label on a small paper tag, set between groups of cards. */
+function Label({ text }: { text: string }) { return <h2 className="ptc-tag ptc-hand"><span>{text}</span></h2>; }
 
 const Kite = ({ className }: { className?: string }) => <span className={cn('pts-kite', className)} aria-hidden><Img src="/looks/painted/kite.webp" /></span>;
 
@@ -164,10 +168,9 @@ function height(t: Tile) {
 
 export function PaintedScene({ page, slots, piece, only, editing }: SceneProps) {
   const a = anatomy(page.tiles);
+  type Group = (typeof a.groups)[number];
   const night = page.theme.preset === 'starry';
-  const lead = a.links[0], rest = a.links.slice(1);
-  // the cards beside you: links first (they matter most), then music and video, photos, notes
-  const flow: Tile[] = [...rest, ...a.media, ...a.photos, ...a.notes];
+  const lead = a.links[0];
 
   const card = (t: Tile, cls?: string) => {
     const node = t.type === 'link' || t.type === 'github' ? <LinkCard tile={t} />
@@ -176,36 +179,50 @@ export function PaintedScene({ page, slots, piece, only, editing }: SceneProps) 
       : t.type === 'text' ? <NoteCard tile={t} /> : null;
     return piece(t, node, { key: t.id, className: cn('pts-card', `pts-card-${t.type}`, cls) });
   };
+  const heading = (g: Group, cls?: string) => g.heading && piece(g.heading, <Label text={g.heading.text} />, { key: g.heading.id, className: cn('pts-label', cls) });
+  const leadCard = (g: Group) => g.links[0] === lead && lead && piece(lead, <LinkCard tile={lead} big />, { key: lead.id, className: 'pts-card pts-lead' });
   const profile = <Profile slots={slots} socials={a.socials} stamps={a.stamps} piece={piece} nlen={page.profile.name.length} />;
 
-  const desktop = () => {
-    // greedy: each card goes to the shorter column, keeping the page's order within each column
-    const cols: Tile[][] = [[], []], h = [0, 0];
-    for (const t of flow) { const k = h[0] <= h[1] ? 0 : 1; cols[k].push(t); h[k] += height(t) + 18; }
-    return (
-      <div className={cn('pts pts-desk', night && 'pts-night')}>
-        <aside className="pts-side">
-          {profile}
-          <Kite />
-        </aside>
-        <main className="pts-main">
-          {lead && piece(lead, <LinkCard tile={lead} big />, { key: lead.id, className: 'pts-card pts-lead' })}
-          {flow.length > 0 && <div className="pts-cols">{cols.map((c, k) => <div key={k} className="pts-col">{c.map(t => card(t))}</div>)}</div>}
-        </main>
-      </div>
-    );
-  };
+  const desktop = () => (
+    <div className={cn('pts pts-desk', night && 'pts-night')}>
+      <aside className="pts-side">
+        {profile}
+        <Kite />
+      </aside>
+      <main className="pts-main">
+        {a.groups.map((g, gi) => {
+          // the cards beside you: links first (they matter most), then music and video, photos, notes; greedy, each card
+          // goes to the shorter column, keeping the page's order within each column
+          const flow: Tile[] = [...g.links.filter(t => t !== lead), ...g.media, ...g.photos, ...g.notes];
+          const cols: Tile[][] = [[], []], h = [0, 0];
+          for (const t of flow) { const k = h[0] <= h[1] ? 0 : 1; cols[k].push(t); h[k] += height(t) + 18; }
+          return (
+            <Fragment key={g.heading?.id ?? `g${gi}`}>
+              {heading(g)}
+              {leadCard(g)}
+              {flow.length > 0 && <div className="pts-cols">{cols.map((c, k) => <div key={k} className="pts-col">{c.map(t => card(t))}</div>)}</div>}
+            </Fragment>
+          );
+        })}
+      </main>
+    </div>
+  );
 
   const mobile = () => (
     <div className={cn('pts pts-phone', night && 'pts-night')}>
       <Kite className="pts-kite-m" />
       {profile}
       <div className="pts-stack">
-        {lead && piece(lead, <LinkCard tile={lead} big />, { key: lead.id, className: 'pts-card pts-lead' })}
-        {rest.map(t => card(t))}
-        {a.media.map(t => card(t))}
-        {a.photos.length > 0 && <div className={cn('pts-photos', a.photos.length === 1 && 'pts-photos-one')}>{a.photos.map(t => card(t))}</div>}
-        {a.notes.map(t => card(t))}
+        {a.groups.map((g, gi) => (
+          <Fragment key={g.heading?.id ?? `g${gi}`}>
+            {heading(g)}
+            {leadCard(g)}
+            {g.links.filter(t => t !== lead).map(t => card(t))}
+            {g.media.map(t => card(t))}
+            {g.photos.length > 0 && <div className={cn('pts-photos', g.photos.length === 1 && 'pts-photos-one')}>{g.photos.map(t => card(t))}</div>}
+            {g.notes.map(t => card(t))}
+          </Fragment>
+        ))}
       </div>
     </div>
   );

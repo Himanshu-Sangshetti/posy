@@ -13,6 +13,8 @@ import { STYLE_PALETTES, type StyleId } from '@/lib/styles';
 
 type StyleOpt = { id: string; label: string; note: string; preset: string; layout: Layout; locked: boolean; preview: ReactNode };
 type Layout = 'bento' | 'list' | 'canvas';
+/** The looks that follow the layout choice; the others are scenes that arrange tiles themselves (see sceneFor in page/styles). Listed here so the picker does not pull every look into its bundle. */
+const LAYOUT_LOOKS = ['cobalt', 'night'];
 type ThemeOpt = { id: string; name: string; bg: string; accent: string; text: string; dark: boolean; locked: boolean };
 // Starter ids kept as data attributes so the choice is easy to script (the style's sample content).
 const STARTER: Record<string, string> = { cozy: 'desk', minimal: 'creator', washi: 'writer', lofi: 'night', painted: 'painted', night: 'neon', cobalt: 'cobalt' };
@@ -105,7 +107,7 @@ export function Onboarding({ initialUsername, initialStyle = 'cozy', styles, the
             </div>
           </section>
 
-          <section className="grid gap-4">
+          {LAYOUT_LOOKS.includes(style) && <section className="grid gap-4">
             <div><h2 className="ac-display ac-h2">How tiles <i>sit</i></h2></div>
             <div role="radiogroup" aria-label="Layout" className="grid grid-cols-3 gap-3">
               {([['bento', 'Grid', 'A mosaic of tiles of different sizes.'], ['list', 'List', 'One clean column, like a link in bio.'], ['canvas', 'Canvas', 'Place anything anywhere, overlap and tilt.']] as const).map(([id, label, note]) => (
@@ -121,7 +123,7 @@ export function Onboarding({ initialUsername, initialStyle = 'cozy', styles, the
                 </button>
               ))}
             </div>
-          </section>
+          </section>}
 
           <section className="grid gap-4">
             <div><h2 className="ac-display ac-h2">Pick a <i>palette</i></h2></div>
@@ -164,7 +166,7 @@ export function Onboarding({ initialUsername, initialStyle = 'cozy', styles, the
 
       <div className="ac-card sticky bottom-4 z-20 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 bg-[rgb(255_253_250/.92)] p-3 pl-5 backdrop-blur-md">
         <p className="ac-mono min-w-0 max-w-full flex-1 basis-60 truncate text-[12.5px] text-[var(--muted)]">
-          <span className="text-[var(--text)]">{host}/{name || 'yourname'}</span> · {styleLabel} · {layout === 'bento' ? 'Grid' : layout === 'list' ? 'List' : 'Canvas'} · {themeName}
+          <span className="text-[var(--text)]">{host}/{name || 'yourname'}</span> · {styleLabel} {LAYOUT_LOOKS.includes(style) && <> · {layout === 'bento' ? 'Grid' : layout === 'list' ? 'List' : 'Canvas'}</>} · {themeName}
         </p>
         <div className="flex items-center gap-3">
           {error && <p role="alert" className="text-[13.5px] text-[#b23a1c]">{error}</p>}

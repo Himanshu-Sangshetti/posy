@@ -67,6 +67,7 @@ export function pageClasses(page: Page): string {
     `posy-fx-${t.effect}`,
     `posy-avatar-${t.avatar}`,
     `posy-photos-${photoLook(page)}`,
+    t.photos && 'posy-photos-set',
     t.motion && 'posy-motion',
     isDark(page) && 'dark',
   ].filter(Boolean).join(' ');

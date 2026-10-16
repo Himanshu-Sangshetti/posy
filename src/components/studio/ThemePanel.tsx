@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import type { Page } from '@/lib/schema';
 import { FONTS, RADII, BACKGROUNDS, TILE_STYLES, EFFECTS, AVATARS, PHOTO_LOOKS } from '@/lib/schema';
 import { THEMES, THEME_IDS, PREMIUM_THEMES, type ThemeId } from '@/lib/themes';
-import { ALL_FONT_PAIRS as FONT_PAIRS, FONT_VARS, PREMIUM_FONTS, photoLook } from '@/lib/style';
+import { ALL_FONT_PAIRS as FONT_PAIRS, FONT_VARS, PREMIUM_FONTS, photoLook, isDark } from '@/lib/style';
 import { useEntitlements } from './entitlements';
 import { STYLE_IDS, STYLE_INFO, STYLE_PALETTES, PREMIUM_STYLES, type StyleId } from '@/lib/styles';
 import { sceneFor } from '@/components/page/styles';
@@ -82,6 +82,9 @@ const PHOTO_LABEL: Record<(typeof PHOTO_LOOKS)[number], string> = { natural: 'Co
 export type DesignTab = 'style' | 'colour' | 'type' | 'layout' | 'background';
 const TAB_LABEL: Record<DesignTab, string> = { style: 'Style', colour: 'Colour', type: 'Type', layout: 'Layout', background: 'Backdrop' };
 
+/** Looks paint their own backdrop (scenes, paper, grid), so patterns, photos and grain only apply to Minimal; Desk's one setting is the sunlight. */
+const hasPageColour = (style: string) => style === 'minimal' || style === 'washi' || style === 'cobalt' || style === 'night';
+
 export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: DesignTab; onTab?: (t: DesignTab) => void }) {
   const { updateTheme, setBadge } = useStudio();
   const ent = useEntitlements();
@@ -91,12 +94,16 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
   const setBg = (patch: Partial<typeof bg>) => updateTheme({ background: { ...bg, ...patch } });
   const file = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const minimal = t.style === 'minimal';
+  const sunlight = t.style === 'cozy' && !isDark(page);
+  const tabs = (Object.keys(TAB_LABEL) as DesignTab[]).filter(k => k !== 'background' || minimal || sunlight);
+  const current = tabs.includes(tab) ? tab : 'style';
 
   return (
-    <Tabs value={tab} onValueChange={v => onTab?.(v as DesignTab)} className="min-h-0 flex-1 gap-0">
-      <TabsList className="mx-5 mb-4 grid h-10 w-auto shrink-0 grid-cols-5 rounded-full bg-[var(--secondary)] p-1">
-        {(Object.keys(TAB_LABEL) as DesignTab[]).map(k => (
-          <TabsTrigger key={k} value={k} className="rounded-full px-1 text-[12.5px] text-[var(--muted)] data-[state=active]:bg-[var(--surface)] data-[state=active]:text-[var(--text)] data-[state=active]:shadow-[0_1px_3px_rgb(22_20_15/.18)]">{TAB_LABEL[k]}</TabsTrigger>
+    <Tabs value={current} onValueChange={v => onTab?.(v as DesignTab)} className="min-h-0 flex-1 gap-0">
+      <TabsList className={cn('mx-5 mb-4 grid h-10 w-auto shrink-0 rounded-full bg-[var(--secondary)] p-1', tabs.length === 5 ? 'grid-cols-5' : 'grid-cols-4')}>
+        {tabs.map(k => (
+          <TabsTrigger key={k} value={k} className="rounded-full px-1 text-[12.5px] text-[var(--muted)] data-[state=active]:bg-[var(--surface)] data-[state=active]:text-[var(--text)] data-[state=active]:shadow-[0_1px_3px_rgb(22_20_15/.18)]">{k === 'background' && !minimal ? 'Ambience' : TAB_LABEL[k]}</TabsTrigger>
         ))}
       </TabsList>
 
@@ -189,7 +196,7 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
             </label>
           </div>
         </div>
-        <div className="grid gap-2.5">
+        {hasPageColour(t.style) && <div className="grid gap-2.5">
           <Label hint="Under the textures and art">Page colour</Label>
           <div className="flex flex-wrap items-center gap-2">
             <button type="button" onClick={() => setBg({ color: undefined })} aria-pressed={!bg.color}
@@ -202,10 +209,11 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
               <input type="color" value={bg.color ?? THEMES[t.preset as ThemeId].bg} onChange={e => setBg({ color: e.target.value })} className="absolute inset-0 cursor-pointer opacity-0" />
             </label>
           </div>
-        </div>
+        </div>}
       </TabsContent>
 
       <TabsContent value="background" className="grid min-h-0 content-start gap-6 overflow-y-auto px-5 pb-8 pt-1">
+        {minimal && <>
         <div className="grid gap-2.5"><Label>Backdrop</Label>
         <div className="grid grid-cols-4 gap-2">
           {BACKGROUNDS.map(b => (
@@ -231,7 +239,8 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
           </div>
         )}
         <SwitchRow title="Film grain" note="A faint paper texture over the backdrop" checked={bg.grain} onChange={v => setBg({ grain: v })} />
-        <SwitchRow title="Ambience" note="Light through leaves on Desk, clouds and rain on Lofi" checked={t.ambient} onChange={v => updateTheme({ ambient: v })} />
+        </>}
+        {sunlight && <SwitchRow title="Sunlight" note="Light through leaves, drifting across the desk" checked={t.ambient} onChange={v => updateTheme({ ambient: v })} />}
       </TabsContent>
 
       <TabsContent value="type" className="grid min-h-0 grid-cols-2 content-start gap-2 overflow-y-auto px-5 pb-8 pt-1">

@@ -1,5 +1,6 @@
 {
   "title": "Posy page",
+  "$id": "https://posy.page/schema/page.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "properties": {
@@ -33,6 +34,34 @@
         "avatar": {
           "description": "Image URL or /path in public/",
           "type": "string"
+        },
+        "avatarFocus": {
+          "description": "Crop: the point of the avatar to keep in frame (default is the centre)",
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Horizontal focal point, 0 (left) to 100 (right); 50 is the centre"
+            },
+            "y": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Vertical focal point, 0 (top) to 100 (bottom); 50 is the centre"
+            }
+          },
+          "required": [
+            "x",
+            "y"
+          ]
+        },
+        "avatarZoom": {
+          "description": "Crop: zoom into the avatar around `avatarFocus`, 1 (default) to 3",
+          "type": "number",
+          "minimum": 1,
+          "maximum": 3
         },
         "location": {
           "type": "string"
@@ -93,6 +122,14 @@
             "golden-hour",
             "dusk-sky",
             "starry",
+            "cobalt",
+            "vermilion",
+            "moonlit",
+            "verdigris",
+            "netrunner",
+            "ice",
+            "redline",
+            "daylight",
             "neon",
             "cyan-rain",
             "sodium",
@@ -117,6 +154,7 @@
             "gallery",
             "painted",
             "night",
+            "cobalt",
             "classic",
             "elegant",
             "rounded",
@@ -144,17 +182,16 @@
         },
         "style": {
           "default": "cozy",
-          "description": "cozy = Desk: tiles as objects on a desk (polaroids, sticky notes, records); minimal = an editorial page, paper and ink, hairlines and big type; washi = a Japanese print (woodblock print header, paper, ink, red seal); lofi = a desktop left open (tiles as little app windows with pinstriped title bars, clay clouds by day, painted anime rooms at night); press = a weekend newspaper (masthead, headlines, halftone photos, pull quotes, coupon and classified ads); gallery = a small gallery (framed works with wall labels, wall text, red dot stickers); painted = a watercolour sky (deckled paper cards, painted edges, wax seals); night = a neon street after rain (lit signs, posters, jukebox, arcade screen)",
+          "description": "cozy = Desk: tiles as objects on a desk (polaroids, sticky notes, records); minimal = a plain fallback (not offered: pick one of the other six); washi = a Japanese print (woodblock print header, paper, ink, red seal); lofi = a desktop left open (tiles as little app windows with pinstriped title bars, clay clouds by day, painted anime rooms at night); painted = a watercolour sky (deckled paper cards, painted edges, wax seals); night = a netrunner heads-up display (an ID badge header, cut-corner HUD panels with node numbers, photos scanned in one signal colour, circuit and commit-graph readouts, decrypted-message notes, a cassette, a hazard-label stamp); cobalt = a vintage print in two inks (a cobalt night sky over a cream plain, numbered plates, photos reprinted in two inks, verse on cobalt, a sun-burst seal)",
           "type": "string",
           "enum": [
             "cozy",
             "minimal",
-            "press",
-            "gallery",
             "washi",
             "lofi",
             "painted",
-            "night"
+            "night",
+            "cobalt"
           ]
         },
         "layout": {
@@ -399,6 +436,34 @@
               "image": {
                 "description": "Preview image shown on wide/large tiles",
                 "type": "string"
+              },
+              "focus": {
+                "description": "Crop: the point of the tile's picture to keep in frame (default is the centre). Applies to `src` on image tiles and to `image` on link, video and music tiles",
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Horizontal focal point, 0 (left) to 100 (right); 50 is the centre"
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Vertical focal point, 0 (top) to 100 (bottom); 50 is the centre"
+                  }
+                },
+                "required": [
+                  "x",
+                  "y"
+                ]
+              },
+              "zoom": {
+                "description": "Crop: zoom into the picture around `focus`, 1 (no zoom, default) to 3",
+                "type": "number",
+                "minimum": 1,
+                "maximum": 3
               }
             },
             "required": [
@@ -856,6 +921,34 @@
               },
               "caption": {
                 "type": "string"
+              },
+              "focus": {
+                "description": "Crop: the point of the tile's picture to keep in frame (default is the centre). Applies to `src` on image tiles and to `image` on link, video and music tiles",
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Horizontal focal point, 0 (left) to 100 (right); 50 is the centre"
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Vertical focal point, 0 (top) to 100 (bottom); 50 is the centre"
+                  }
+                },
+                "required": [
+                  "x",
+                  "y"
+                ]
+              },
+              "zoom": {
+                "description": "Crop: zoom into the picture around `focus`, 1 (no zoom, default) to 3",
+                "type": "number",
+                "minimum": 1,
+                "maximum": 3
               }
             },
             "required": [
@@ -962,6 +1055,34 @@
               "image": {
                 "description": "Custom thumbnail; defaults to the YouTube one",
                 "type": "string"
+              },
+              "focus": {
+                "description": "Crop: the point of the tile's picture to keep in frame (default is the centre). Applies to `src` on image tiles and to `image` on link, video and music tiles",
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Horizontal focal point, 0 (left) to 100 (right); 50 is the centre"
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Vertical focal point, 0 (top) to 100 (bottom); 50 is the centre"
+                  }
+                },
+                "required": [
+                  "x",
+                  "y"
+                ]
+              },
+              "zoom": {
+                "description": "Crop: zoom into the picture around `focus`, 1 (no zoom, default) to 3",
+                "type": "number",
+                "minimum": 1,
+                "maximum": 3
               }
             },
             "required": [
@@ -1072,6 +1193,34 @@
               "image": {
                 "description": "Cover art, filled automatically from Spotify",
                 "type": "string"
+              },
+              "focus": {
+                "description": "Crop: the point of the tile's picture to keep in frame (default is the centre). Applies to `src` on image tiles and to `image` on link, video and music tiles",
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Horizontal focal point, 0 (left) to 100 (right); 50 is the centre"
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Vertical focal point, 0 (top) to 100 (bottom); 50 is the centre"
+                  }
+                },
+                "required": [
+                  "x",
+                  "y"
+                ]
+              },
+              "zoom": {
+                "description": "Crop: zoom into the picture around `focus`, 1 (no zoom, default) to 3",
+                "type": "number",
+                "minimum": 1,
+                "maximum": 3
               }
             },
             "required": [

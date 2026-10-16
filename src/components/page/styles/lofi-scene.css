@@ -40,7 +40,7 @@
 .sc-piece:is(:hover, .is-hover) .lfs-win { box-shadow: inset 0 0 0 1px var(--lfs-line), 0 1px 2px rgb(50 30 80 / .1), 0 36px 70px -26px rgb(60 40 100 / .55); }
 
 /* ---------- the computer ---------- */
-.lfs-desk { position: relative; min-height: 100vh; padding-bottom: 40px; }
+.lfs-desk { position: relative; display: flex; flex-direction: column; min-height: 100vh; padding-bottom: 28px; }
 .lfs-menubar { position: sticky; top: 0; z-index: 60; display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 18px; font-size: 13.5px;
   background: rgb(255 255 255 / .55); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: 0 1px 0 var(--lfs-line); color: var(--lfs-ink); }
 .lfs-night .lfs-menubar { background: rgb(20 16 40 / .55); }
@@ -48,21 +48,29 @@
 .lfs-menubar b { font-weight: 600; }
 .lfs-menu-gap { flex: 1; }
 .lfs-clock { font-family: var(--font-vt323), monospace; font-size: 19px; letter-spacing: .04em; }
-.lfs-area { position: relative; max-width: 1200px; margin: 32px auto 0; padding: 0 150px 0 48px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: repeat(13, 54px); grid-auto-rows: 54px; }
-.lfs-area > * { position: relative; min-width: 0; align-self: start; animation: lfs-open .55s var(--lfs-pop) both; }
+.lfs-stage { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 0 36px; width: 100%; box-sizing: border-box; max-width: 1360px; margin: 28px auto 40px; padding: 0 28px; }
+.lfs-stage:not(:has(.lfs-side)) { grid-template-columns: minmax(0, 1fr); max-width: 1160px; }
+/* the windows sit on a 12-column grid with one gap everywhere; nothing overlaps, so nothing important is covered */
+.lfs-area { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: auto; gap: 24px; }
+.lfs-area > * { position: relative; min-width: 0; animation: lfs-open .55s var(--lfs-pop) both; }
 .lfs-area > :nth-child(2) { animation-delay: .08s; } .lfs-area > :nth-child(3) { animation-delay: .16s; } .lfs-area > :nth-child(4) { animation-delay: .24s; }
 .lfs-area > :nth-child(5) { animation-delay: .32s; } .lfs-area > :nth-child(6) { animation-delay: .4s; } .lfs-area > :nth-child(7) { animation-delay: .48s; }
 @keyframes lfs-open { from { opacity: 0; scale: .9; translate: 0 14px; } }
-/* windows take their own height; they're placed so overlaps only ever touch edges, never what's inside */
-.lfs-area > .lfs-a-about { grid-column: 1 / 7; grid-row: 1; z-index: 3; height: auto; }
-.lfs-area > .lfs-a-feat1 { grid-column: 7 / 12; grid-row: 2; z-index: 4; height: 292px; }
-.lfs-area > .lfs-a-media { grid-column: 1 / 6; grid-row: 5; z-index: 5; }
-.lfs-area > .lfs-a-photo { grid-column: 9 / 13; grid-row: 8; z-index: 5; height: 264px; }
-.lfs-area > .lfs-a-feat2 { grid-column: 4 / 9; grid-row: 8; z-index: 6; height: 286px; }
-.lfs-area > .lfs-a-note { grid-column: 1 / 4; grid-row: 10; z-index: 7; height: 176px; }
-.lfs-area > .lfs-a-stamp { grid-column: 12 / 13; grid-row: 1; z-index: 8; }
+.lfs-area > .lfs-a-music { grid-column: span 5; }
+.lfs-area > :is(.lfs-a-tab, .lfs-a-video, .lfs-a-photo, .lfs-a-note) { height: 312px; }
 .lfs-area > .sc-piece > :first-child { height: 100%; }
-.lfs-area > .lfs-a-about > .lfs-body, .lfs-area > .lfs-a-media .lfs-body { flex: none; }
+.lfs-area > .lfs-a-note { height: auto; align-self: center; justify-self: center; width: min(100%, 320px); }
+.lfs-area > .lfs-a-note > .lfs-sticky { height: 232px; }
+.lfs-area > .lfs-a-about { display: flex; }
+.lfs-area > .lfs-a-music .lfs-body { flex: 1; }
+.lfs-area > .lfs-a-about > .lfs-body { flex: 1; }
+/* the desktop's right edge: the sticker on top, then the icons, in columns that fill from the right */
+.lfs-side { display: grid; justify-items: end; gap: 22px; width: 264px; padding-top: 4px; }
+.lfs-a-stamp { justify-self: end; margin-right: 8px; }
+.lfs-a-stamp .lfs-sticker { width: 100px; margin: 0; }
+.lfs-desk-icons { display: grid; grid-template-columns: repeat(2, 124px); gap: 16px 8px; justify-content: end; }
+.lfs-desk-icons:has(> :nth-child(13)) { grid-template-columns: repeat(3, 124px); }
+.lfs-side:has(.lfs-desk-icons > :nth-child(13)) { width: 396px; }
 
 /* about me */
 .lfs-about .lfs-body { flex-direction: row; align-items: center; gap: 22px; padding: 22px 26px; }
@@ -179,9 +187,7 @@
 .sc-piece:is(:hover, .is-hover) .lfs-sticker { rotate: -6deg; }
 
 /* desktop icons */
-.lfs-desk-icons { position: absolute; top: 72px; right: 22px; z-index: 2; display: grid; grid-auto-flow: column; grid-template-rows: repeat(6, auto); gap: 14px 4px; direction: rtl; }
-.lfs-desk-icons > * { direction: ltr; }
-.lfs-desk-icon { display: grid; justify-items: center; align-content: start; gap: 6px; width: 96px; padding: 6px 2px; border-radius: 12px; text-align: center; transition: background .2s; }
+.lfs-desk-icon { display: grid; justify-items: center; align-content: start; gap: 6px; width: 124px; padding: 6px 2px; border-radius: 12px; text-align: center; transition: background .2s; }
 .lfs-desk-icon:is(:hover, .is-hover) { background: rgb(255 255 255 / .22); }
 .lfs-label { max-width: 100%; padding: 1px 6px; border-radius: 6px; font-size: 12px; font-weight: 600; line-height: 1.25; color: var(--lfs-label); text-shadow: var(--lfs-label-glow); overflow-wrap: anywhere; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .lfs-desk-icon:is(:hover, .is-hover) .lfs-label { background: var(--accent); color: #fff; text-shadow: none; }
@@ -193,7 +199,7 @@
 .lfs-desk-icon:is(:hover, .is-hover) .lfs-icon { scale: 1.08; translate: 0 -2px; }
 
 /* the dock */
-.lfs-dock { position: relative; z-index: 50; display: flex; align-items: flex-end; gap: 10px; width: max-content; max-width: calc(100% - 32px); margin: 28px auto 0; padding: 9px 12px;
+.lfs-dock { flex: none; position: relative; z-index: 50; display: flex; align-items: flex-end; gap: 10px; width: max-content; max-width: calc(100% - 32px); margin: auto auto 0; padding: 9px 12px;
   border-radius: 24px; background: rgb(255 255 255 / .45); -webkit-backdrop-filter: blur(20px) saturate(1.4); backdrop-filter: blur(20px) saturate(1.4); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .5), 0 20px 40px -20px rgb(40 20 80 / .45); }
 .lfs-night .lfs-dock { background: rgb(30 24 60 / .5); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .12), 0 20px 40px -20px rgb(0 0 0 / .6); }
 .lfs-dock-item { transform-origin: bottom center; transition: scale .3s var(--lfs-pop), translate .3s var(--lfs-pop); }
@@ -261,3 +267,42 @@
 
 /* icons: a press sinks the icon a little, like tapping a real one */
 .sc-piece:is(:active, .is-press) .lfs-icon { scale: .92; translate: 0 1px; transition-duration: .12s; }
+
+/* section titles: a folder label across the desktop's grid, or above its run of widgets on the phone */
+.lfs-section { display: inline-flex; align-items: center; gap: 9px; max-width: 100%; margin: 0; font-family: var(--font-vt323), monospace; font-size: 26px; font-weight: 400; line-height: 1; letter-spacing: .04em; color: var(--lfs-label); text-shadow: var(--lfs-label-glow); }
+.lfs-section svg { flex: none; width: 22px; height: 22px; fill: color-mix(in oklab, var(--accent) 55%, #fff); stroke: var(--lfs-label); stroke-width: 1.6; filter: drop-shadow(0 1px 3px rgb(0 0 0 / .25)); }
+.lfs-section span { overflow-wrap: anywhere; }
+.lfs-area > .lfs-a-label { grid-column: 1 / -1; height: auto; padding: 6px 0 4px; position: relative; z-index: 2; }
+.lfs-section { padding: 4px 12px 4px 9px; border-radius: 10px; background: color-mix(in oklab, var(--lfs-glass, #000) 55%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.lfs-area > .lfs-a-label > .lfs-section { height: auto; }
+.lfs-side-group { display: grid; justify-items: end; gap: 18px; width: 100%; }
+.lfs-side-group > .lfs-a-label { justify-self: end; }
+.lfs-m-label { padding: 6px 4px 0; }
+.lfs-m-label .lfs-section { font-size: 24px; }
+
+/* a photo as an icon is the photo itself in a white mat; on the phone the extra photos sit in a roll of thumbnails */
+.lfs-icon-photo { width: 104px; height: 104px; padding: 5px; box-sizing: border-box; border-radius: 14px; background: #fff; rotate: -3deg; box-shadow: 0 8px 16px -8px rgb(40 20 80 / .5); }
+.lfs-desk-icon:nth-child(even) .lfs-icon-photo { rotate: 3deg; }
+.lfs-icon-photo > img { border-radius: 11px; box-shadow: none; }
+.lfs-roll { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.lfs-m-thumb > .lfs-widget { aspect-ratio: 1; border-radius: 20px; }
+.lfs-m-thumb .lfs-w-cap { left: 6px; right: 6px; bottom: 6px; padding: 2px 8px; font-size: 11px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.lfs-widgets > .lfs-m-wide > .lfs-widget { aspect-ratio: 16 / 10; }
+.lfs-w-music { min-width: 0; }
+.lfs-w-music b { overflow-wrap: anywhere; word-break: break-word; max-width: 100%; }
+.lfs-m-wide > .lfs-w-music { grid-template-columns: auto 1fr; align-items: center; justify-items: stretch; column-gap: 16px; aspect-ratio: auto; }
+.lfs-m-wide > .lfs-w-music .lfs-disc { width: 96px; grid-row: span 2; }
+.lfs-m-wide > .lfs-w-music .lfs-eq { align-self: start; }
+.lfs-widgets > .lfs-m-wide > .lfs-w-music { aspect-ratio: auto; }
+.lfs-app .lfs-label { padding: 1px 7px; background: color-mix(in oklab, var(--lfs-glass) 70%, transparent); text-shadow: none; }
+.lfs-m-stamps { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; }
+.lfs-m-stamps .lfs-m-stamp .lfs-sticker { margin: 0; }
+.lfs-w-note p { overflow-wrap: anywhere; }
+
+/* the phone's video: a wide screen with its title on a shaded strip underneath, two lines at most, and a small play badge */
+.lfs-w-video { padding: 0; }
+.lfs-w-video > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.lfs-w-video .lfs-w-play { inset: auto; left: 12px; top: 12px; margin: 0; width: 34px; height: 34px; background: rgb(255 255 255 / .8); }
+.lfs-w-video .lfs-w-play svg { width: 14px; height: 14px; }
+.lfs-w-vcap { position: absolute; inset: auto 0 0 0; padding: 26px 14px 11px; background: linear-gradient(180deg, transparent, rgb(8 6 20 / .82)); color: #fff; font-size: 14px; font-weight: 600; line-height: 1.25; text-shadow: 0 1px 3px rgb(0 0 0 / .6);
+  overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; }

@@ -1,16 +1,18 @@
 {
   "$schema": "../schema/page.schema.json",
-  "version": 1,
+  "version": 2,
   "profile": {
     "name": "Alex Rivera",
     "bio": "Designer and indie maker. I build small, calm software and write about the process.",
     "location": "Lisbon"
   },
   "theme": {
+    "style": "cozy",
     "preset": "cream",
     "font": "editorial",
     "radius": "round",
-    "layout": "split",
+    "layout": "bento",
+    "align": "side",
     "motion": true
   },
   "seo": {},

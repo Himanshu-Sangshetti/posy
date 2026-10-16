@@ -102,9 +102,11 @@ figure.nr-panel { margin: 0; }
 /* ---- pictures: through the scanner, with scanlines and a viewfinder ---- */
 .nr-scan { position: relative; display: block; flex: 1; min-height: 0; overflow: hidden; background: var(--nr-bg); }
 .nr-scan img, .nr-scan > div, .nr-scan > button { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
-.nr-scan img { filter: var(--nr-filter, grayscale(1) contrast(1.2)); }
+.nr-scan img { filter: brightness(var(--px-b, 1)) contrast(var(--px-c, 1)) var(--nr-filter, grayscale(1) contrast(1.2)); }
 .posy-tile:hover .nr-scan img { animation: nr-glitch .55s steps(1) 1; }
-@keyframes nr-glitch { 0% { filter: var(--nr-glitch); translate: 4px 0; } 18% { filter: var(--nr-filter); translate: 0; } 36% { filter: var(--nr-glitch); translate: -3px 0; } 54%, 100% { filter: var(--nr-filter); translate: 0; } }
+@keyframes nr-glitch { 0% { filter: brightness(var(--px-b, 1)) contrast(var(--px-c, 1)) var(--nr-glitch); translate: 4px 0; } 18% { filter: brightness(var(--px-b, 1)) contrast(var(--px-c, 1)) var(--nr-filter); translate: 0; } 36% { filter: brightness(var(--px-b, 1)) contrast(var(--px-c, 1)) var(--nr-glitch); translate: -3px 0; } 54%, 100% { filter: brightness(var(--px-b, 1)) contrast(var(--px-c, 1)) var(--nr-filter); translate: 0; } }
+/* photos: "Colour" chosen on purpose shows the picture as it is; unset (or mono, dither, ascii) keeps the scanner */
+.posy-photos-set.posy-photos-natural :is(.nr-scan img, .nr-photo .posy-avatar img) { filter: none; animation: none; }
 .nr-scan::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(transparent 0 2px, var(--nr-scanline) 2px 3px); }
 .nr-brackets { position: absolute; z-index: 1; inset: 8px; pointer-events: none; --b: var(--nr-sig);
   background: linear-gradient(var(--b), var(--b)) top left / 14px 1.5px, linear-gradient(var(--b), var(--b)) top left / 1.5px 14px,
@@ -196,7 +198,7 @@ figcaption.nr-subtitle::before { content: "▸ "; color: var(--nr-sig); }
 .nr-badge-bare { grid-template-columns: minmax(0, 1fr); }
 .nr-photo { position: relative; display: grid; gap: 8px; justify-items: start; width: clamp(132px, 17vw, 200px); }
 .nr-photo .posy-avatar { position: relative; width: 100%; height: auto; aspect-ratio: 1; border-radius: 0; overflow: hidden; background: var(--nr-bg); box-shadow: none; }
-.nr-photo .posy-avatar img { filter: var(--nr-filter, grayscale(1) contrast(1.2)); }
+.nr-photo .posy-avatar img { filter: brightness(var(--px-b, 1)) contrast(var(--px-c, 1)) var(--nr-filter, grayscale(1) contrast(1.2)); }
 .nr-photo .posy-avatar::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(transparent 0 2px, var(--nr-scanline) 2px 3px); }
 .nr-photo > .nr-brackets { inset: -6px; bottom: auto; aspect-ratio: 1; height: auto; width: calc(100% + 12px); }
 .nr-sweep { position: absolute; left: 0; top: 0; width: 100%; aspect-ratio: 1; pointer-events: none; overflow: hidden; }
@@ -268,7 +270,11 @@ figcaption.nr-subtitle::before { content: "▸ "; color: var(--nr-sig); }
 .nr-row .nr-node { width: 2em; font-size: 12px; }
 .nr-row-pic { flex: none; width: 52px; height: 52px; min-height: 0; }
 .nr-row .nr-text { flex: 1; gap: 2px; }
-.nr-row .nr-title { font-size: 18px; -webkit-line-clamp: 1; }
+.nr-row .nr-title { font-size: 18px; -webkit-line-clamp: 2; }
+.nr-row-photo { margin: 0; }
+.nr-row-photo > .nr-in { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px; }
+.nr-row-photo .nr-scan { flex: none; aspect-ratio: 16 / 10; }
+.nr-row-photo figcaption { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
 .nr-row .nr-sub { -webkit-line-clamp: 1; }
 .nr-row .nr-brackets { inset: 3px; --b: transparent; }
 .nr-row-msg { height: auto; }
@@ -310,3 +316,7 @@ figcaption.nr-subtitle::before { content: "▸ "; color: var(--nr-sig); }
 .posy-preset-daylight .posy-backdrop .posy-noise { opacity: .09; }
 @keyframes nr-rain { to { translate: 0 480px; } }
 @media (prefers-reduced-motion: reduce) { .nr-ticker > span, .nr-holo, .posy-style-night .posy-backdrop .posy-noise { animation: none; } .nr-msg blockquote { animation: none !important; } }
+
+/* a picture waits for its exposure to be measured (see PhotoExposure), then fades in */
+.posy-px :is(.nr-scan img, .nr-photo .posy-avatar img):not([data-px]) { opacity: 0; }
+:is(.nr-scan img, .nr-photo .posy-avatar img) { transition: opacity .25s; }

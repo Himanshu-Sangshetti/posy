@@ -38,6 +38,16 @@ export const TilePos = z.object({
   z: z.number().int().default(0).describe('Layer: higher sits on top'),
 }).describe('Canvas layout only: where the tile sits. Tiles without it are placed automatically, flowing like the grid');
 
+/** Where a picture is cropped and how far it is zoomed. Shared by every tile that shows an image. */
+export const Focus = z.object({
+  x: z.number().min(0).max(100).describe('Horizontal focal point, 0 (left) to 100 (right); 50 is the centre'),
+  y: z.number().min(0).max(100).describe('Vertical focal point, 0 (top) to 100 (bottom); 50 is the centre'),
+}).describe('The part of the picture that must stay in view when it is cropped to the tile');
+const crop = {
+  focus: Focus.optional().describe('Crop: the point of the tile\'s picture to keep in frame (default is the centre). Applies to `src` on image tiles and to `image` on link, video and music tiles'),
+  zoom: z.number().min(1).max(3).optional().describe('Crop: zoom into the picture around `focus`, 1 (no zoom, default) to 3'),
+};
+
 const base = {
   id,
   size: z.enum(SIZES).default('s').describe('s = 1x1, w = 2x1, t = 1x2, l = 2x2'),
@@ -52,6 +62,7 @@ export const LinkTile = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
   image: z.string().optional().describe('Preview image shown on wide/large tiles'),
+  ...crop,
 }).describe('Any link, shown with its favicon and title');
 
 export const SocialTile = z.object({
@@ -82,6 +93,7 @@ export const ImageTile = z.object({
   alt: z.string().default(''),
   url: z.string().optional().describe('Optional link when the image is clicked'),
   caption: z.string().optional(),
+  ...crop,
 });
 
 export const VideoTile = z.object({
@@ -90,6 +102,7 @@ export const VideoTile = z.object({
   url: url.describe('YouTube URL'),
   title: z.string().optional(),
   image: z.string().optional().describe('Custom thumbnail; defaults to the YouTube one'),
+  ...crop,
 });
 
 export const MusicTile = z.object({
@@ -99,6 +112,7 @@ export const MusicTile = z.object({
   title: z.string().optional().describe('Filled automatically from Spotify'),
   artist: z.string().optional(),
   image: z.string().optional().describe('Cover art, filled automatically from Spotify'),
+  ...crop,
 });
 
 export const GithubTile = z.object({
@@ -162,6 +176,8 @@ export const Page = z.object({
     name: z.string().min(1),
     bio: z.string().default(''),
     avatar: z.string().optional().describe('Image URL or /path in public/'),
+    avatarFocus: Focus.optional().describe('Crop: the point of the avatar to keep in frame (default is the centre)'),
+    avatarZoom: z.number().min(1).max(3).optional().describe('Crop: zoom into the avatar around `avatarFocus`, 1 (default) to 3'),
     location: z.string().optional(),
   }),
   theme: z.preprocess(migrateTheme, Theme).default(Theme.parse({})),
@@ -181,6 +197,7 @@ export type Tile = z.infer<typeof Tile>;
 export type TileType = Tile['type'];
 export type Size = (typeof SIZES)[number];
 export type Color = (typeof COLORS)[number];
+export type FocusPoint = z.infer<typeof Focus>;
 export type TilePos = z.infer<typeof TilePos>;
 export type Layout = (typeof LAYOUTS)[number];
 

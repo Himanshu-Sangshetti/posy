@@ -16,7 +16,7 @@ import { brandHex } from '@/components/page/tiles';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { useStudio } from './store';
-import { TileToolbar, ImagePicker } from './TileControls';
+import { TileToolbar, ImagePicker, AvatarCrop, POP_FIT } from './TileControls';
 import { PLATFORMS } from '@/lib/platforms';
 import { MotionShell } from '@/components/page/motion';
 import { CanvasEditor } from './CanvasEditor';
@@ -40,10 +40,13 @@ function AvatarPicker({ page, className }: { page: Page; className?: string }) {
           <span className="absolute inset-0 grid place-items-center bg-black/0 text-white opacity-0 transition-all group-hover:bg-black/25 group-hover:opacity-100"><ImagePlus className="size-6" /></span>
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto" align="start">
-        <div className="flex gap-2">
-          <ImagePicker label="Upload photo" onPick={src => update({ avatar: src })} />
-          {page.profile.avatar && <button type="button" onClick={() => update({ avatar: undefined })} className="inline-flex h-9 items-center gap-1.5 rounded-[10px] px-3 text-[13.5px] text-[var(--muted)] hover:bg-[var(--secondary)]"><X className="size-4" />Remove</button>}
+      <PopoverContent {...POP_FIT} className="max-h-[var(--radix-popover-content-available-height)] w-auto overflow-y-auto" align="start">
+        <div className="grid w-60 gap-3">
+          <div className="flex gap-2">
+            <ImagePicker label="Upload photo" onPick={src => update({ avatar: src, avatarFocus: undefined, avatarZoom: undefined })} />
+            {page.profile.avatar && <button type="button" onClick={() => update({ avatar: undefined })} className="inline-flex h-9 items-center gap-1.5 rounded-[10px] px-3 text-[13.5px] text-[var(--muted)] hover:bg-[var(--secondary)]"><X className="size-4" />Remove</button>}
+          </div>
+          <AvatarCrop />
         </div>
       </PopoverContent>
     </Popover>
@@ -113,10 +116,13 @@ function EditableProfile({ page }: { page: Page }) {
             <span className="absolute inset-0 grid place-items-center rounded-[36%] bg-black/0 text-white opacity-0 transition-all group-hover:bg-black/25 group-hover:opacity-100"><ImagePlus className="size-6" /></span>
           </button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto" align="start">
-          <div className="flex gap-2">
-            <ImagePicker label="Upload photo" onPick={src => update({ avatar: src })} />
-            {avatar && <button type="button" onClick={() => update({ avatar: undefined })} className="inline-flex h-9 items-center gap-1.5 rounded-[10px] px-3 text-[13.5px] text-[var(--muted)] hover:bg-[var(--secondary)]"><X className="size-4" />Remove</button>}
+        <PopoverContent {...POP_FIT} className="max-h-[var(--radix-popover-content-available-height)] w-auto overflow-y-auto" align="start">
+          <div className="grid w-60 gap-3">
+            <div className="flex gap-2">
+              <ImagePicker label="Upload photo" onPick={src => update({ avatar: src, avatarFocus: undefined, avatarZoom: undefined })} />
+              {avatar && <button type="button" onClick={() => update({ avatar: undefined })} className="inline-flex h-9 items-center gap-1.5 rounded-[10px] px-3 text-[13.5px] text-[var(--muted)] hover:bg-[var(--secondary)]"><X className="size-4" />Remove</button>}
+            </div>
+            <AvatarCrop />
           </div>
         </PopoverContent>
       </Popover>
@@ -262,7 +268,7 @@ export function EditableCanvas({ page, device = 'desktop' }: { page: Page; devic
       <SortableContext items={page.tiles.map(t => t.id)} strategy={rectSortingStrategy}>
     {sceneFor(look) ? (
       <PageFrame page={{ ...page, badge: false }} className="posy-scene" profile={<></>} interactive={false}>
-        <div onClick={() => select(null)}><EditableScene page={page} device={device} /></div>
+        <div onClick={() => select(null)} className="pb-28"><EditableScene page={page} device={device} /></div>
       </PageFrame>
     ) : (
     <PageFrame page={{ ...page, badge: false }} profile={<EditableProfile page={page} />} interactive={false}>

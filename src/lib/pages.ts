@@ -6,6 +6,7 @@ import { db } from '@/db';
 import { pages } from '@/db/app-schema';
 import { parsePage, Page, type Page as PageData } from './schema';
 import { template, type TemplateId } from './templates';
+import { track } from './telemetry-events';
 import { entitlementsFor, assertAllowed, applyEntitlements } from './entitlements';
 
 import { USERNAME_RE } from './username';
@@ -37,6 +38,8 @@ export async function createPage(userId: string, username: string, name: string,
   const data = page ?? template(tpl, name);
   const row = { id: nanoid(12), userId, username: u, draft: data, published: data, version: 1, publishedAt: new Date() };
   await db.insert(pages).values(row);
+  const d = data as { style?: string; layout?: string };
+  track({ type: 'onboarding.completed', userId, look: d.style ?? 'cozy', layout: d.layout ?? 'bento' });
   return row;
 }
 
@@ -63,6 +66,7 @@ export async function publish(userId: string) {
   if (!row) throw new Error('No page yet');
   await db.update(pages).set({ published: row.draft, publishedAt: new Date() }).where(eq(pages.id, row.id));
   revalidatePath(`/${row.username}`);
+  track({ type: 'page.published', userId, page: row.draft });
   return { username: row.username };
 }
 

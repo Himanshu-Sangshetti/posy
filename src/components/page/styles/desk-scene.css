@@ -19,9 +19,9 @@
 .dks-pen { color: var(--dks-pen); }
 
 /* ---------- the desk itself: real wood, lit from a window ---------- */
-.posy-page.posy-style-cozy.posy-scene { background: #e7d6bb url(/looks/desk/oak.jpg) center top / 1100px; }
-.posy-page.posy-style-cozy.posy-scene.posy-preset-cream { background: #efe4d2 linear-gradient(rgb(250 244 233 / .5), rgb(250 244 233 / .5)), url(/looks/desk/oak.jpg) center top / 1100px; }
-.posy-page.posy-style-cozy.posy-scene.posy-preset-sage { background: #a9b79d url(/looks/desk/oak.jpg) center top / 1100px; background-blend-mode: luminosity; }
+.posy-page.posy-style-cozy.posy-scene { background: #c99a62 url(/looks/desk/wood.webp) center top / 1600px; }
+.posy-page.posy-style-cozy.posy-scene.posy-preset-cream { background: #d9b588 linear-gradient(rgb(252 240 222 / .2), rgb(252 240 222 / .2)), url(/looks/desk/wood.webp) center top / 1600px; }
+.posy-page.posy-style-cozy.posy-scene.posy-preset-sage { background: #a9b79d url(/looks/desk/wood.webp) center top / 1600px; background-blend-mode: luminosity; }
 .posy-page.posy-style-cozy.posy-scene.posy-preset-slate { background: #2a1d16 url(/looks/desk/walnut.jpg) center top / 1000px; }
 .posy-page.posy-style-cozy.posy-scene .posy-backdrop { background: none; }
 .posy-page.posy-style-cozy.posy-scene .posy-backdrop::before { background: radial-gradient(70vw 60vh at 8% -6%, rgb(255 238 205 / .38), transparent 70%); mix-blend-mode: soft-light; opacity: 1; mask: none; filter: none; }
@@ -30,7 +30,7 @@
 .posy-page.posy-style-cozy.posy-scene.dark .posy-backdrop::before { background: none; }
 .posy-page.posy-style-cozy.posy-scene.dark .posy-backdrop::after { background: radial-gradient(60vw 70vh at 26% 18%, transparent 20%, rgb(8 4 2 / .5) 80%, rgb(8 4 2 / .7)); mix-blend-mode: normal; }
 /* light through the leaves falls over everything, softly */
-.posy-style-cozy.posy-scene .dk-sun i { opacity: .42; }
+.posy-style-cozy.posy-scene .dk-sun i { opacity: .5; background-image: url(/looks/desk/window.webp); background-position: 30% 20%; }
 .posy-style-cozy.posy-scene .dk-sun::before { background: radial-gradient(70% 60% at 10% 0%, rgb(255 236 205 / 0), rgb(255 226 190 / .1) 70%, rgb(238 214 186 / .16)); }
 /* at night it's a desk lamp: a warm pool of light, the rest of the room dark */
 .dks-lamp { display: none; }
@@ -59,11 +59,12 @@
 
 /* ================= you: a letter with your polaroid clipped to it ================= */
 .dks-letter { position: relative; z-index: 2; }
-.dks-sheet { position: relative; padding: 46px 44px 64px 262px; min-height: 300px; rotate: -.8deg;
+.dks-sheet { position: relative; padding: 38px 44px 64px 262px; min-height: 300px; rotate: -.8deg;
   background: var(--dks-white) url(/looks/desk/grain.jpg) center / 520px; background-blend-mode: multiply; color: var(--dks-ink);
   filter: var(--dks-sh); }
 .dks-sheet::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(100deg, rgb(255 255 255 / .35), transparent 30% 70%, rgb(80 50 20 / .05)); }
 .dks-letter-solo .dks-sheet { padding-left: 52px; }
+.dks-from { position: relative; display: block; margin-bottom: 12px; font-size: 11px; line-height: 1; letter-spacing: .22em; text-transform: uppercase; color: #8a7a68; }
 .dks-name { position: relative; margin: 0; font-family: var(--dks-serif); font-weight: 400; font-size: 66px; line-height: .92; letter-spacing: -.025em; color: #231d18; overflow-wrap: anywhere; }
 .dks-name i { font-style: italic; color: color-mix(in oklab, var(--accent) 78%, #231d18); }
 .dks-bio { position: relative; margin-top: 18px; max-width: 36ch; font-family: var(--dks-type); font-size: 16px; line-height: 1.5; color: #3d342d; }
@@ -84,7 +85,7 @@
 /* the stamp, pressed onto the corner of the letter */
 .dks-letter-stamp { position: absolute; right: -34px; bottom: -44px; z-index: 4; }
 /* pins pushed into the bottom edge of the letter */
-.dks-pins { position: absolute; left: 40px; right: 170px; bottom: -26px; z-index: 5; display: flex; flex-wrap: wrap; gap: 10px; }
+.dks-pins { position: absolute; left: 40px; right: 140px; bottom: -26px; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; }
 .dks-letter-solo .dks-pins { left: 46px; }
 
 /* ================= socials: enamel pins ================= */
@@ -255,6 +256,17 @@
 .dks-sticky a { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
 .sc-piece:is(:hover, .is-hover) > .dks-sticky { rotate: calc(var(--r, 0deg) * .3); translate: -2px -6px; }
 
+/* ================= headings: a strip of masking tape, labelled by hand ================= */
+.dks-label { display: inline-block; max-width: 100%; margin: 0; padding: 7px 26px 9px 22px; filter: drop-shadow(0 1px .5px rgb(var(--dks-sh-c) / .25)) drop-shadow(2px 4px 4px rgb(var(--dks-sh-c) / .14));
+  background: rgb(238 226 196 / .94) url(/looks/desk/grain.jpg) center / 220px; background-blend-mode: multiply;
+  clip-path: polygon(0 4%, 100% 0, calc(100% - 5px) 18%, 100% 36%, calc(100% - 4px) 54%, 100% 72%, calc(100% - 5px) 88%, 100% 100%, 0 96%, 5px 80%, 0 62%, 4px 44%, 0 26%, 5px 12%); }
+.dks-label span { display: block; font-size: 27px; line-height: 1; color: #2b2520; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.dks .sc-piece.dks-p-label { flex: 0 0 100%; grid-column: 1 / -1; justify-self: start; align-self: flex-start; }
+.dks-mat > .dks-p-label, .dks-tags > .dks-p-label { margin: 4px 0 -12px -6px; }
+.dks-zone > .dks-p-label { margin-bottom: -14px; }
+.sc-piece:is(:hover, .is-hover) > .dks-label { translate: -2px -4px; }
+.dks-phone > .dks-p-label { margin: 10px 0 -8px 2px; }
+
 /* ================= stamps: a rubber stamp in ink ================= */
 .dks-stamp { --ink-c: color-mix(in oklab, #b3392c 82%, var(--accent)); width: 150px; aspect-ratio: 1; filter: none; mix-blend-mode: multiply; }
 .dark .dks-stamp { mix-blend-mode: normal; }
@@ -269,40 +281,66 @@
 
 /* ================= props ================= */
 .dks-prop { position: absolute; z-index: 0; pointer-events: none; user-select: none; filter: drop-shadow(3px 6px 4px rgb(var(--dks-sh-c) / .3)) drop-shadow(14px 26px 22px rgb(var(--dks-sh-c) / .22)); }
+/* props load lazily, so they hold their shape before they arrive */
+.dks-prop-coffee { aspect-ratio: 640 / 632; } .dks-prop-plant { aspect-ratio: 652 / 691; } .dks-prop-sprig { aspect-ratio: 521 / 720; }
+.dks-prop-camera { aspect-ratio: 554 / 620; } .dks-prop-pen { aspect-ratio: 520 / 111; } .dks-prop-tapes { aspect-ratio: 420 / 368; }
 
 /* ================= the computer: the whole desk at once ================= */
-.dks-desk { position: relative; isolation: isolate; width: 1240px; margin: 0 auto; padding: 96px 0 90px; zoom: 1; }
-.dks-cols { position: relative; z-index: 1; display: grid; grid-template-columns: 540px 1fr; gap: 72px; align-items: start; }
-.dks-col { display: flex; flex-direction: column; min-width: 0; }
-.dks-col-me { gap: 56px; padding-top: 18px; }
-.dks-col-me > .dks-letter { margin-bottom: 18px; }
-.dks-col-links { gap: 34px; }
-/* featured links: big, offset against each other like things set down one after the other */
-.dks-col-links > .dks-p-feat { width: 520px; }
-.dks-col-links > .dks-feat1 { align-self: flex-end; margin-top: -6px; }
-.dks-col-links > .dks-p-tag.dks-p-feat { width: 500px; }
-.dks-col-links > .dks-p-card.dks-p-feat { width: 440px; }
-.dks-col-links > .dks-p-envelope.dks-p-feat { width: 500px; }
-/* the rest: tags in two loose columns */
-.dks-tags { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 26px; padding-top: 6px; }
-.dks-tags > :nth-child(even) { translate: 0 22px; }
-.dks-tags > .dks-p-envelope, .dks-tags > .dks-p-card { align-self: start; }
-.dks-row { display: flex; align-items: flex-start; gap: 34px; }
-.dks-row > .sc-piece { flex: none; }
-.dks-row-l1, .dks-row-r0 { padding-left: 46px; }
-.dks-row-l2 { justify-content: flex-end; padding-right: 10px; }
-.dks-row-r1 { justify-content: flex-end; }
-.dks-row > .dks-p-record { width: 420px; }
-.dks-row > .dks-p-ticket { width: 440px; }
-.dks-row > .dks-p-photo { width: 250px; }
-.dks-row > .dks-p-wide { width: 340px; }
-.dks-row > .dks-p-note { width: 210px; }
-.dks-row-pair > .dks-p-note { margin-top: 34px; }
-.dks-row > .dks-p-stamp { width: 150px; margin-top: 30px; }
-/* props sit on the desk around your things */
-.dks-d-coffee { right: -150px; top: -40px; width: 300px; rotate: 18deg; }
-.dks-d-plant { left: -300px; bottom: -150px; width: 400px; }
-.dks-d-sprig { left: 500px; bottom: 30px; width: 210px; rotate: 32deg; z-index: 0; }
+.dks-desk { position: relative; isolation: isolate; width: 1240px; margin: 0 auto; padding: 92px 0 130px; overflow-y: clip; zoom: 1; }
+.dks-cols { position: relative; z-index: 1; display: grid; grid-template-columns: 560px 616px; gap: 64px; align-items: start; }
+.dks-col { position: relative; display: flex; flex-direction: column; gap: 64px; min-width: 0; }
+.dks-col-me { padding-top: 26px; }
+.dks-col-me > .dks-letter { margin-bottom: 0; }
+.dks-col-me:has(.dks-pins > :nth-child(8)) > .dks-letter { margin-bottom: 60px; }
+
+/* your links lie on a leather desk pad: stitched edge, a gold tooled line, worn a little where the sun falls */
+.dks-mat { position: relative; display: flex; flex-direction: column; gap: 30px; padding: 44px 32px 40px; border-radius: 12px; color: #f3e6cc;
+  background: radial-gradient(120% 70% at 12% 0%, rgb(255 230 180 / .16), transparent 60%), linear-gradient(170deg, #35503f, #2a4134 55%, #233629), url(/looks/desk/grain.jpg) center / 300px;
+  background-blend-mode: normal, normal, multiply;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .1), inset 0 0 0 1px rgb(0 0 0 / .2), inset 0 0 36px rgb(0 0 0 / .26), 0 1px 1px rgb(var(--dks-sh-c) / .3), 3px 8px 8px rgb(var(--dks-sh-c) / .18), 14px 28px 34px -6px rgb(var(--dks-sh-c) / .3); }
+.dks-mat::before { content: ""; position: absolute; inset: 10px; border-radius: 7px; pointer-events: none; border: 1.5px dashed rgb(232 214 176 / .34); }
+.dks-mat::after { content: ""; position: absolute; inset: 20px; border-radius: 4px; pointer-events: none; border: 1px solid rgb(214 176 104 / .32); box-shadow: 0 1px 0 rgb(0 0 0 / .25); }
+.dks-mat > * { position: relative; z-index: 1; }
+.dks-mat > .dks-mat-mark { position: absolute; left: 50%; bottom: 12px; z-index: 0; translate: -50% 0; padding: 0 12px; background: #243729;
+  font: italic 400 15px/16px var(--dks-serif); letter-spacing: .08em; color: rgb(222 186 116 / .75); text-shadow: 0 -1px 0 rgb(0 0 0 / .45), 0 1px 0 rgb(255 230 170 / .12); }
+.dks-mat .dks-p-feat { width: 500px; }
+.dks-mat .dks-feat1 { align-self: flex-end; }
+.dks-mat .dks-p-card.dks-p-feat { width: 440px; }
+/* the rest: luggage tags in one neat bundle, every other one set down a little to the right */
+.dks-tags { display: grid; gap: 14px; }
+.dks-tags > .sc-piece { width: 492px; }
+.dks-tags > :nth-child(even) { justify-self: end; }
+.dks-tags > .dks-p-card, .dks-tags > .dks-p-envelope { width: 420px; }
+.dks-tags-two { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; }
+.dks-tags-two > .sc-piece { width: auto; }
+.dks-tags-two > :nth-child(even) { justify-self: stretch; }
+.dks-tags-two > :is(.dks-p-card, .dks-p-envelope) { grid-column: 1 / -1; width: 420px; }
+.dks-tags-two .dks-tag { padding-left: 20px; }
+.dks-tags-two .dks-tag-paper { gap: 8px; padding: 12px 14px 12px 52px; }
+.dks-tags-two .dks-tag-text b { font-size: 18px; }
+.dks-tags-two .dks-tag-text .dks-pen { font-size: 17px; }
+.dks-tags-two .dks-fav { display: none; }
+/* everything else, in zones of like things */
+.dks-zone { position: relative; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 30px; }
+.dks-zone > .sc-piece { flex: none; }
+.dks-zone > .dks-p-record { width: 420px; }
+.dks-zone > .dks-p-ticket { width: 440px; }
+.dks-zone-media > :nth-child(even) { margin-left: auto; }
+.dks-zone > .dks-p-photo { width: 236px; }
+.dks-zone > .dks-p-wide { width: 290px; }
+.dks-zone > .dks-p-note { width: 210px; }
+.dks-zone > .dks-p-stamp { width: 150px; margin-top: 30px; }
+.dks-zone-photos > .dks-p-photo:nth-of-type(even) { margin-top: 26px; }
+.dks-zone-notes > .dks-p-note:nth-of-type(even) { margin-top: 20px; }
+.dks-col-links > .dks-zone { padding-left: 24px; }
+/* things on the desk around yours: none of them is ever over something you'd want to read */
+.dks-d-coffee { right: -250px; top: -46px; width: 300px; rotate: 18deg; }
+.dks-d-plant { left: -330px; bottom: -70px; width: 350px; }
+/* the pen lies in the gutter between you and the desk pad */
+.dks-d-pen { left: 442px; top: 540px; width: 300px; rotate: 97deg; }
+.dks-d-tapes { right: -18px; top: -40px; width: 150px; rotate: -12deg; }
+.dks-d-camera { position: relative; align-self: center; width: 250px; margin-top: -10px; rotate: -9deg; }
+.dks-col-links > .dks-d-camera { rotate: 8deg; }
 /* narrower screens see the same desk from a little higher up */
 @container page (max-width: 1360px) { .dks-desk { zoom: .92; } }
 @container page (max-width: 1240px) { .dks-desk { zoom: .84; } }
@@ -370,6 +408,7 @@
 .dkl-note { width: 210px; } .dkl-stamp { width: 150px; }
 .dkl-props .dks-prop { position: static; width: 220px; }
 .dkl .dks-letter { margin-top: 34px; }
+.dkl-whole > .dkl-h { margin: 0; padding: 0 48px; }
 
 /* ---- refinements after the first lab pass ---- */
 /* the back of a postcard, when there's no picture: a divider, address lines, the site's icon as the stamp */
@@ -413,3 +452,9 @@
 .dks-phone .dks-pins { gap: 6px; }
 .dks-phone .dks-letter:has(.dks-pins > :nth-child(7)) { margin-bottom: 70px; }
 .dks-punch, .dks-barcode { display: block; }
+
+/* a YouTube video with no still at all: the screen before the film starts, a countdown leader */
+.dks-ticket-yt { background:
+  radial-gradient(circle closest-side, transparent 0 70%, rgb(255 236 200 / .5) 71% 72.5%, transparent 73.5% 86%, rgb(255 236 200 / .3) 87% 88%, transparent 89%),
+  linear-gradient(transparent calc(50% - .5px), rgb(255 236 200 / .3) 0 calc(50% + .5px), transparent 0), linear-gradient(90deg, transparent calc(50% - .5px), rgb(255 236 200 / .3) 0 calc(50% + .5px), transparent 0),
+  radial-gradient(90% 120% at 50% 40%, #6b5236, #2c2117 70%, #1a130d); }

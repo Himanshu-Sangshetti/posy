@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 
 const L = (o: Partial<Extract<Tile, { type: 'link' }>> & { url: string }): Tile => ({ id: 'l' + Math.random().toString(36).slice(2, 7), type: 'link', size: 'w', color: 'auto', ...o } as Tile);
 const LINKS: [string, Tile][] = [
-  ['rich', L({ url: 'https://himanshu.substack.com/p/by-hand', title: 'Why I write everything by hand first', description: 'On slow drafts, fast coffee and the joy of crossing things out.', image: '/looks/press/cover.jpg' })],
+  ['rich', L({ url: 'https://himanshu.substack.com/p/by-hand', title: 'Why I write everything by hand first', description: 'On slow drafts, fast coffee and the joy of crossing things out.', image: '/samples/tea.jpg' })],
   ['long scraped title, no image', L({ url: 'https://himanshu.dev', title: 'Himanshu Kumar | Experienced Full Stack Software Engineer | Portfolio website built with React.js and Next', description: 'Himanshu Kumar | Experienced Full Stack Software Engineer | Portfolio' })],
   ['very short', L({ url: 'https://shop.example.com', title: 'Shop' })],
   ['newsletter', L({ url: 'https://buttondown.email/mira', title: 'Studio letters', description: 'New work, once a month' })],

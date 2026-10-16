@@ -1,0 +1,32 @@
+---
+title: "REST API"
+description: "The same operations as the MCP server, over plain HTTP."
+---
+
+Base URL: `https://posy.page` (or your own server). Everything edits the **draft** until you call publish.
+
+## Authentication
+
+Create an API key on the **Agents** page of the dashboard (it is shown once) and send it as a bearer token:
+
+```bash
+curl -H "Authorization: Bearer posy_..." https://posy.page/api/v1/page
+```
+
+OAuth 2 with the `page:write` scope also works; MCP clients use it automatically.
+
+## Reading a published page
+
+No key needed:
+
+```bash
+curl https://posy.page/api/v1/public/USERNAME
+```
+
+## Concurrency
+
+`PUT /api/v1/page` takes a `baseVersion`. If the page changed since, you get `409` instead of overwriting newer edits.
+
+## Spec
+
+The endpoints below are generated from [`/openapi.json`](https://posy.page/openapi.json). A copy lives in the repo at `docs-site/api-reference/openapi.json`; `npm run docs:sync` refreshes it. The full-page JSON Schema is at [`/schema/page.schema.json`](https://posy.page/schema/page.schema.json). The [agent guide](/agents/guide) has curl examples and a CLI.

@@ -29,7 +29,7 @@
 
 /* ---------- materials ---------- */
 /* paper: long fibres, a little warmth, gold leaf flecks (kirihaku) */
-.wss-paperlike, .wss-tz-paper, .wss-strip, .wss-masthead, .wss-portrait, .wss-mount, .wss-note, .wss-honshi, .wss-name-slip, .wss-name-band, .wss-music-strip {
+.wss-paperlike, .wss-tz-paper, .wss-strip, .wss-masthead, .wss-portrait, .wss-mount, .wss-note, .wss-honshi, .wss-name-slip, .wss-name-band, .wss-music-strip, .wss-head {
   background-color: var(--wss-paper);
   background-image: radial-gradient(circle at 18% 22%, var(--wss-gold) 0 1.1px, transparent 1.5px), radial-gradient(circle at 76% 38%, var(--wss-gold) 0 .9px, transparent 1.3px),
     radial-gradient(circle at 42% 71%, var(--wss-gold) 0 1.2px, transparent 1.6px), radial-gradient(circle at 88% 84%, var(--wss-gold) 0 .8px, transparent 1.2px),
@@ -37,11 +37,11 @@
   background-size: 190px 230px, 230px 190px, 260px 250px, 170px 210px, auto, 420px;
   background-blend-mode: normal, normal, normal, normal, normal, multiply;
 }
-.wss-dark :is(.wss-tz-paper, .wss-strip, .wss-masthead, .wss-portrait, .wss-mount, .wss-note, .wss-honshi, .wss-name-slip, .wss-name-band, .wss-music-strip) { background-blend-mode: normal, normal, normal, normal, normal, soft-light; }
+.wss-dark :is(.wss-tz-paper, .wss-strip, .wss-masthead, .wss-portrait, .wss-mount, .wss-note, .wss-honshi, .wss-name-slip, .wss-name-band, .wss-music-strip, .wss-head) { background-blend-mode: normal, normal, normal, normal, normal, soft-light; }
 /* handmade edges: torn, fibrous deckle instead of a cut rectangle; the shadow follows the torn edge */
-.wss-tz-paper, .wss-strip, .wss-note, .wss-mount, .wss-music-strip, .wss-portrait { -webkit-mask-box-image: url(/looks/washi/deckle.png) 60 fill / 14px stretch; }
-.wss-tanzaku, .wss-strip-piece, .wss-x, .wss-me { filter: drop-shadow(0 1px 1px rgb(60 40 20 / .14)) drop-shadow(0 10px 12px rgb(60 40 20 / .2)); transition: filter .35s; }
-.wss-dark :is(.wss-tanzaku, .wss-strip-piece, .wss-x, .wss-me) { filter: drop-shadow(0 1px 1px rgb(0 0 0 / .5)) drop-shadow(0 12px 14px rgb(0 0 0 / .55)); }
+.wss-tz-paper, .wss-strip, .wss-note, .wss-mount, .wss-music-strip, .wss-portrait, .wss-head { -webkit-mask-box-image: url(/looks/washi/deckle.png) 60 fill / 14px stretch; }
+.wss-tanzaku, .wss-strip-piece, .wss-x, .wss-me, .wss-head-piece { filter: drop-shadow(0 1px 1px rgb(60 40 20 / .14)) drop-shadow(0 10px 12px rgb(60 40 20 / .2)); transition: filter .35s; }
+.wss-dark :is(.wss-tanzaku, .wss-strip-piece, .wss-x, .wss-me, .wss-head-piece) { filter: drop-shadow(0 1px 1px rgb(0 0 0 / .5)) drop-shadow(0 12px 14px rgb(0 0 0 / .55)); }
 .sc-piece:is(:hover, .is-hover, :focus-visible) :is(.wss-tanzaku), .wss-strip-piece:is(:hover, .is-hover, :focus-visible), .wss-x:is(:hover, .is-hover, :focus-visible) { filter: drop-shadow(0 1px 1px rgb(60 40 20 / .14)) drop-shadow(0 18px 18px rgb(60 40 20 / .28)); }
 .wss-x-stamp, .wss-x-photo:has(.wss-ogi) { filter: none; }
 /* dyed clouds (uchigumori): masks cut from a rendered cloud-dyed tanzaku, coloured per slip */
@@ -61,7 +61,7 @@
 .wss-tanzaku { position: relative; padding-top: 24px; transform-origin: 50% 0; }
 .wss-tanzaku::before { content: ""; position: absolute; left: 50%; top: 0; width: 1.5px; height: 26px; translate: -50% 0; background: var(--wss-cord); }
 .wss-tanzaku::after { content: ""; position: absolute; left: 50%; top: -3px; width: 7px; height: 7px; translate: -50% 0; border-radius: 50%; background: var(--wss-cord); box-shadow: inset 0 -1px 1px rgb(0 0 0 / .3); }
-.wss-tz-paper { position: relative; display: flex; flex-direction: column; gap: 10px; min-height: 290px; padding: 62px 20px 18px; overflow: hidden; color: #221c16; transition: translate .35s var(--wss-ease); }
+.wss-tz-paper { position: relative; display: flex; flex-direction: column; gap: 10px; min-height: 330px; padding: 62px 20px 18px; overflow: hidden; color: #221c16; transition: translate .35s var(--wss-ease); }
 .wss-tanzaku:not(.wss-tanzaku-feature) .wss-tz-paper { justify-content: center; }
 .wss-tanzaku:not(.wss-tanzaku-feature) .wss-sign { margin-top: auto; }
 .wss-tanzaku:not(.wss-tanzaku-feature) .wss-title { margin-top: auto; }
@@ -87,7 +87,9 @@
 .wss-pic img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.82) sepia(.06); transition: filter .6s, scale 1.2s var(--wss-ease); }
 .wss-pic-blank { display: block; width: 100%; height: 100%; background: var(--ws-seigaiha) center / 40px auto; opacity: .85; }
 /* alive: brushed past it sways (WashiBreeze); hovered it swings once, the dye deepens and the title gets a brush line */
-.wss-hang { position: relative; margin-top: var(--drop, 0); transform-origin: 50% 0; }
+.wss-hang { position: relative; display: flex; flex-direction: column; margin-top: var(--drop, 0); transform-origin: 50% 0; }
+.wss-hang > .wss-tanzaku { flex: 1; display: flex; flex-direction: column; }
+.wss-hang .wss-tz-paper { flex: 1; }
 .wss-title { background: linear-gradient(var(--wss-red), var(--wss-red)) 0 96% / 0 2px no-repeat; transition: background-size .5s var(--wss-ease); }
 .sc-piece:is(:hover, .is-hover, :focus-visible) .wss-tanzaku { animation: wss-sway 2.2s var(--wss-ease); }
 .sc-piece:is(:hover, .is-hover, :focus-visible) .wss-tz-paper::before { opacity: 1; translate: 0 6px; }
@@ -267,7 +269,7 @@
 
 /* ============ the computer: a folding screen standing in a quiet room ============ */
 .wss-room { position: relative; display: grid; justify-items: center; align-items: start; min-height: 100vh; padding: 40px 32px 56px; }
-.wss-screen { position: relative; width: min(1360px, 100%); display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 0 52px; padding: 44px 44px 50px;
+.wss-screen { position: relative; width: min(1360px, 100%); display: grid; gap: 56px; padding: 48px 44px 56px;
   background: var(--wss-ground) url(/looks/washi/gold-leaf.jpg) center / cover;
   box-shadow: 0 0 0 1px color-mix(in oklab, var(--wss-gold) 60%, transparent) inset, 0 0 0 9px var(--wss-lacquer), 0 0 0 10px rgb(255 255 255 / .06), 0 50px 60px -30px rgb(40 25 10 / .55), 0 90px 80px -60px rgb(40 25 10 / .4); }
 .wss-dark .wss-screen { background: #1d1c1b url(/looks/washi/silver-leaf.jpg) center / cover;
@@ -281,19 +283,24 @@
 .wss-dark .wss-folds b { background: linear-gradient(90deg, rgb(255 255 255 / .02), rgb(0 0 0 / .1)); }
 .wss-dark .wss-folds b:nth-child(even) { background: linear-gradient(90deg, rgb(0 0 0 / .2), rgb(0 0 0 / .06)); }
 .wss-dark .wss-folds b + b { box-shadow: inset 1px 0 0 rgb(0 0 0 / .5); }
-.wss-zone-a, .wss-zone-b { position: relative; z-index: 2; min-width: 0; }
-.wss-zone-a { display: grid; align-content: start; gap: 38px; }
-.wss-zone-b { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; align-content: flex-start; gap: 44px 34px; }
-.wss-zone-b > .wss-extras-b { display: contents; }
+.wss-top, .wss-lines, .wss-extras { position: relative; z-index: 2; min-width: 0; }
+/* the top two folds' worth: the print on the left half, you on the right, split on the screen's centre seam */
+.wss-top { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 56px; align-items: center; }
+.wss-top .wss-about { align-content: center; }
+/* the cords: every row the same slip, centred on the screen */
+.wss-lines { display: grid; justify-items: center; gap: 36px; }
 /* the cord: a silk cord pinned at both ends, sagging; slips hang from it on short threads */
-.wss-line { position: relative; display: grid; grid-template-columns: repeat(var(--n), var(--sw)); gap: var(--gap); padding: 0 var(--pad); align-items: start; max-width: 100%; }
+.wss-line { position: relative; display: grid; grid-template-columns: repeat(var(--n), var(--sw)); gap: var(--gap); padding: 0 var(--pad); align-items: stretch; max-width: 100%; }
 .wss-cord { position: absolute; left: 0; top: 0; width: 100%; height: 68px; overflow: visible; pointer-events: none; }
 .wss-cord path { fill: none; stroke: var(--wss-cord); stroke-width: 2.2; stroke-linecap: round; }
 .wss-pin { position: absolute; left: 0; top: 0; width: 11px; height: 11px; translate: -1px -3px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #f1d999, #9a7432); box-shadow: 0 1px 2px rgb(0 0 0 / .4); }
 .wss-pin-r { left: auto; right: 0; translate: 1px -3px; }
 .wss-x { flex: none; }
-.wss-extras { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 40px 34px; width: 100%; }
-.wss-extras-a { justify-content: center; }
+/* the lower folds: things stand in thirds of the screen, a short last row stays centred */
+.wss-extras { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 28px 44px; width: 100%; }
+.wss-cell { flex: 0 1 auto; display: flex; justify-content: center; align-items: center; min-width: 0; }
+.wss-cell-stamps { flex-wrap: wrap; gap: 20px; }
+.wss-cell > .sc-piece, .wss-cell > .wss-x { max-width: 100%; }
 .wss-pic:has(.wss-pic-blank) { display: none; }
 .wss-tanzaku-feature .wss-tz-paper:has(.wss-pic-blank) { padding-top: 62px; }
 /* entrance: the screen settles, the print is pasted, the cord is strung, the slips drop in and swing to rest */
@@ -364,3 +371,26 @@
 
 .wss-zone-b .wss-music .wss-site, .wss-zone-a .wss-music .wss-site, .wss-where { color: color-mix(in oklab, var(--wss-ink) 72%, transparent); }
 .wss-dark .wss-seal span { color: #e5583e; }
+
+/* on the computer, your half of the screen is roomy: a bigger portrait and a bigger voice */
+.wss-top .wss-me { width: 132px; }
+.wss-top .wss-bio { font-size: 26px; }
+.wss-top .wss-where { font-size: 19px; }
+.wss-top .wss-ink { width: 50px; height: 50px; }
+
+/* section titles: a brushed slip, centred over its group on the screen, running across the scroll on a phone */
+.wss-head-piece { position: relative; z-index: 2; justify-self: center; max-width: 100%; }
+.wss-head { position: relative; display: block; margin: 0; padding: 12px 34px 14px 46px; max-width: 100%; color: #221c16; font-size: 28px; font-weight: 600; line-height: 1.15; letter-spacing: .04em; text-align: center; overflow-wrap: anywhere; }
+.wss-head::before { content: ""; position: absolute; left: 20px; top: 50%; width: 11px; height: 11px; translate: 0 -50%; border-radius: 50%; background: var(--wss-red); }
+.wss-dark .wss-head { color: #ece4d4; }
+.wss-scroll .wss-head-piece { justify-self: stretch; }
+.wss-scroll .wss-head { font-size: 22px; padding: 9px 20px 11px 38px; text-align: left; }
+.wss-scroll .wss-head::before { left: 16px; width: 9px; height: 9px; }
+.posy-motion .wss:not(.wss-editing) .wss-screen .wss-head-piece { animation: wss-paste .8s .8s var(--wss-ease) backwards; }
+
+/* a section title on the computer: a dark lacquered slip hanging on the cord, its words in gold-white */
+.wss-tanzaku-head .wss-tz-paper { justify-content: center; align-items: center; text-align: center; background-image: none; background-color: var(--wss-lacquer); color: #f3e7c9; }
+.wss-tanzaku-head .wss-tz-paper::before { height: 18px; background: var(--wss-red); }
+.wss-tanzaku-head .wss-tz-paper::after { content: none; }
+.wss-tanzaku.wss-tanzaku-head .wss-title { margin: 0; color: inherit; font-size: 28px; line-height: 1.12; }
+.wss-lines > .wss-extras:first-child { margin-bottom: 8px; }

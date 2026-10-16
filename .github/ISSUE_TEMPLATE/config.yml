@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://docs.posy.page
+    about: Setup, self-hosting, the page file, the API and MCP.
+  - name: Questions and ideas
+    url: https://github.com/Himanshu-Sangshetti/posy/discussions
+    about: Ask a question or talk through an idea before opening an issue.
+  - name: Report a security problem
+    url: https://github.com/Himanshu-Sangshetti/posy/security/advisories/new
+    about: Please report vulnerabilities privately. Do not open a public issue.

@@ -3,11 +3,13 @@ import { createMcpHandler, withMcpAuth } from 'mcp-handler';
 import { z } from 'zod';
 import { createLocalJWKSet, jwtVerify } from 'jose';
 import { auth } from '@/lib/auth';
+import { keyAllows } from '@/lib/session';
 import { siteUrl } from '@/lib/site';
 import { getState, importBrief, createPageFor, addTiles, addTile, updateTile, removeTile, moveTile, setTheme, setProfile, publishPage } from '@/lib/page-ops';
+import type { Page } from '@/lib/schema';
 import { SIZES, COLORS, FONTS, RADII, LAYOUTS, ALIGNS, BACKGROUNDS, TILE_STYLES, EFFECTS, AVATARS, PHOTO_LOOKS } from '@/lib/schema';
 import { THEME_IDS } from '@/lib/themes';
-import { STYLE_IDS } from '@/lib/styles';
+import { STYLE_IDS, STYLE_INFO, STYLE_PALETTES } from '@/lib/styles';
 import { TEMPLATES } from '@/lib/templates';
 import { PLATFORM_IDS } from '@/lib/platforms';
 
@@ -51,10 +53,10 @@ const handler = createMcpHandler(server => {
 
   server.registerTool('create_page', {
     title: 'Create page',
-    description: 'Claim a username and create the user\'s page (one per account). Do this once, when get_page says there is no page. Then add tiles and publish.',
+    description: 'Claim a username and create the user\'s page (one per account). Do this once, when get_page says there is no page. Pass `style` to pick a look (see list_options for the looks and what each is like); omit it for a starter template. Then add tiles and publish.',
     inputSchema: z.object({
       username: z.string().describe('3–30 letters, numbers, - or _. This becomes the public URL.'),
-      style: z.enum(STYLE_IDS).optional().describe('The look of the page. Omit to use a starter template.'),
+      style: z.enum(STYLE_IDS).optional().describe('The look of the page: cozy (Desk), washi, lofi, painted, cobalt or night. Omit to use a starter template.'),
       layout: z.enum(LAYOUTS).optional(),
       preset: z.enum(THEME_IDS).optional().describe('Colour theme'),
       template: z.enum(Object.keys(TEMPLATES) as [keyof typeof TEMPLATES, ...(keyof typeof TEMPLATES)[]]).optional(),
@@ -94,7 +96,7 @@ const handler = createMcpHandler(server => {
 
   server.registerTool('update_tile', {
     title: 'Update tile',
-    description: 'Change fields of a tile, e.g. {"size":"l"}, {"title":"New title"}, {"color":"mint"}, {"text":"…"}.',
+    description: 'Change fields of a tile, e.g. {"size":"l"}, {"title":"New title"}, {"color":"mint"}, {"text":"…"}. Crop the picture of a tile with {"focus":{"x":30,"y":20},"zoom":1.6} (focus 0–100 is the point to keep in view, zoom 1–3).',
     inputSchema: z.object({ id: z.string(), patch: z.record(z.string(), z.unknown()) }),
     annotations: SET,
   }, run(async (userId, a: { id: string; patch: Record<string, unknown> }) => ({ updated: await updateTile(userId, a.id, a.patch) })));
@@ -109,8 +111,9 @@ const handler = createMcpHandler(server => {
 
   server.registerTool('set_theme', {
     title: 'Set theme',
-    description: 'Change the look. Only pass what should change.',
+    description: 'Change colours, fonts, layout and other theme settings. Only pass what should change. `style` switches the look (cozy = Desk, washi, lofi, painted, cobalt, night); `preset` picks a palette (list_options shows which palettes each look offers).',
     inputSchema: z.object({
+      style: z.enum(STYLE_IDS).optional().describe('The look: cozy (Desk), washi, lofi, painted, cobalt or night'),
       preset: z.enum(THEME_IDS).optional(), accent: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
       font: z.enum(FONTS).optional(), radius: z.enum(RADII).optional(), layout: z.enum(LAYOUTS).optional(), align: z.enum(ALIGNS).optional(),
       tileStyle: z.enum(TILE_STYLES).optional(), effect: z.enum(EFFECTS).optional(), avatar: z.enum(AVATARS).optional(), photos: z.enum(PHOTO_LOOKS).optional(), motion: z.boolean().optional(), ambient: z.boolean().optional(),
@@ -120,18 +123,18 @@ const handler = createMcpHandler(server => {
   }, run(async (userId, a: Record<string, unknown>) => ({ theme: await setTheme(userId, a) })));
 
   server.registerTool('set_profile', {
-    title: 'Set profile', description: 'Change name, bio, avatar URL or location.',
-    inputSchema: z.object({ name: z.string().optional(), bio: z.string().optional(), avatar: z.string().optional(), location: z.string().optional() }),
+    title: 'Set profile', description: 'Change name, bio, avatar URL or location. avatarFocus {x,y} (0–100) and avatarZoom (1–3) crop the avatar.',
+    inputSchema: z.object({ name: z.string().optional(), bio: z.string().optional(), avatar: z.string().optional(), location: z.string().optional(), avatarFocus: z.object({ x: z.number().min(0).max(100), y: z.number().min(0).max(100) }).optional(), avatarZoom: z.number().min(1).max(3).optional() }),
     annotations: SET,
-  }, run(async (userId, a: Record<string, string>) => ({ profile: await setProfile(userId, a) })));
+  }, run(async (userId, a: Partial<Page['profile']>) => ({ profile: await setProfile(userId, a) })));
 
   server.registerTool('publish', {
     title: 'Publish', description: 'Make the draft live at the public URL.', inputSchema: z.object({}), annotations: PUBLISH,
   }, run(async userId => publishPage(userId)));
 
   server.registerTool('list_options', {
-    title: 'List options', description: 'Allowed values for themes, fonts, backgrounds, tile styles, sizes, colours and social platforms.', inputSchema: z.object({}), annotations: READ,
-  }, run(async () => ({ themes: THEME_IDS, fonts: FONTS, radius: RADII, layouts: LAYOUTS, align: ALIGNS, backgrounds: BACKGROUNDS, tileStyles: TILE_STYLES, effects: EFFECTS, avatars: AVATARS, photos: PHOTO_LOOKS, sizes: SIZES, colors: COLORS, platforms: PLATFORM_IDS })));
+    title: 'List options', description: 'Allowed values for looks (with a note and the palettes each offers), themes, fonts, backgrounds, tile styles, sizes, colours and social platforms.', inputSchema: z.object({}), annotations: READ,
+  }, run(async () => ({ styles: STYLE_IDS.map(id => ({ id, label: STYLE_INFO[id].label, note: STYLE_INFO[id].note, palettes: STYLE_PALETTES[id] })), themes: THEME_IDS, fonts: FONTS, radius: RADII, layouts: LAYOUTS, align: ALIGNS, backgrounds: BACKGROUNDS, tileStyles: TILE_STYLES, effects: EFFECTS, avatars: AVATARS, photos: PHOTO_LOOKS, sizes: SIZES, colors: COLORS, platforms: PLATFORM_IDS })));
 }, { serverInfo: { name: 'posy', version: '2.0.0' }, instructions: INSTRUCTIONS });
 
 const RESOURCE = () => `${siteUrl()}/api/mcp`;
@@ -142,7 +145,8 @@ const verify = async (_req: Request, token?: string) => {
   if (token.startsWith('posy_')) {
     const r = await auth.api.verifyApiKey({ body: { key: token } }).catch(() => null);
     if (!r?.valid || !r.key) return undefined;
-    return { token, clientId: r.key.id, scopes: ['page:write'], extra: { userId: r.key.referenceId } };
+    const scopes = keyAllows(r.key.permissions, 'write') ? ['page:write'] : [];
+    return { token, clientId: r.key.id, scopes, extra: { userId: r.key.referenceId } };
   }
   try {
     const { baseURL } = await auth.$context;
@@ -154,5 +158,5 @@ const verify = async (_req: Request, token?: string) => {
   } catch { return undefined; }
 };
 
-const authed = withMcpAuth(handler, verify, { required: true, resourceUrl: siteUrl() });
+const authed = withMcpAuth(handler, verify, { required: true, requiredScopes: ['page:write'], resourceUrl: siteUrl() });
 export { authed as GET, authed as POST, authed as DELETE };

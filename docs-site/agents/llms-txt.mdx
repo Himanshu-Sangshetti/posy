@@ -1,0 +1,28 @@
+---
+title: "llms.txt"
+description: "Plain-text entry points for AI agents."
+---
+
+Posy publishes machine-readable files so an agent can use it without a connector.
+
+| URL | What it is |
+|---|---|
+| [`posy.page/llms.txt`](https://posy.page/llms.txt) | Short guide: the one-link `/new` flow, the page file, MCP and REST entry points. |
+| [`posy.page/llms-full.txt`](https://posy.page/llms-full.txt) | The connect guide and the page file format in one request. |
+| `posy.page/<username>/llms.txt` | A Markdown version of any published page. |
+| [`posy.page/api/v1/public/<username>`](https://posy.page/api/v1/public/example) | Any published page as JSON. |
+| [`posy.page/openapi.json`](https://posy.page/openapi.json) | OpenAPI 3.1 description of the REST API. |
+| [`posy.page/schema/page.schema.json`](https://posy.page/schema/page.schema.json) | JSON Schema of the full page. |
+| [`posy.page/schema/brief.schema.json`](https://posy.page/schema/brief.schema.json) | JSON Schema of the short [page file](/agents/format). |
+
+These docs also serve their own `/llms.txt` and `/llms-full.txt`. On a self-hosted instance the Posy files use your own address.
+
+## The one-link flow
+
+An agent that can only write text can give the user a normal link:
+
+```
+https://posy.page/new?name=Mira%20Sol&bio=Illustrator&links=https://github.com/mira,hi@mira.so,mira/atlas
+```
+
+It opens a live preview and one button makes the page theirs.

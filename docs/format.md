@@ -17,7 +17,7 @@ An agent that can only write text can hand over a normal link. No JSON, no encod
 /new?name=Mira%20Sol&bio=Illustrator&links=https://github.com/mira,hi@mira.so,mira/atlas
 ```
 
-It opens a live preview, and one button makes the page yours. Fields: `name`, `bio`, `links` (comma-separated URLs, emails or `owner/repo`), `username`, `look`, `theme`, `layout`, `location`, `avatar`.
+It opens a live preview, and one button makes the page yours. Fields: `name`, `bio`, `links` (comma-separated URLs, emails or `owner/repo`), `username`, `look`, `theme`, `layout`, `location`, `avatar`, `photos`, `font`, `backdrop`.
 
 ## The brief
 
@@ -28,8 +28,9 @@ It opens a live preview, and one button makes the page yours. Fields: `name`, `b
   "name": "Mira Sol",
   "bio": "Illustrator making small, soft things",
   "location": "Lisbon",
-  "look": "minimal",
-  "theme": "paper",
+  "look": "washi",
+  "theme": "kinari",
+  "photos": "mono",
   "links": [
     { "heading": "Find me" },
     "https://github.com/mira",
@@ -37,7 +38,9 @@ It opens a live preview, and one button makes the page yours. Fields: `name`, `b
     { "heading": "Work" },
     { "url": "https://mira.so/portfolio", "title": "Portfolio", "size": "w" },
     "mira/atlas",
-    { "text": "Open for commissions" }
+    { "text": "Open for commissions" },
+    { "stamp": "Say hello" },
+    { "image": "/samples/tea.jpg", "focus": { "x": 40, "y": 30 }, "zoom": 1.5 }
   ]
 }
 ```
@@ -48,11 +51,18 @@ It opens a live preview, and one button makes the page yours. Fields: `name`, `b
 | `links` | Required. In order. A string is a URL, an email, `owner/repo` or a short note: Posy picks the right tile (GitHub repo, YouTube, Spotify, social profile, link). |
 | `username` | Optional. The address, `/<username>`. 3–30 letters, numbers, `-` or `_`. You can choose it when you load the file. |
 | `bio`, `location`, `avatar` | Optional. `avatar` is an image URL. |
-| `look` | Optional. The look of the page. The current options are listed in `/schema/brief.schema.json` and in the copied prompt. |
-| `theme` | Optional. Colours. Same: see the schema. |
-| `layout` | Optional. `bento`, `list` or `canvas`. |
+| `look` | Optional. The look of the page: `cozy` (Desk), `washi`, `lofi`, `painted`, `cobalt` or `night`. Default `cozy`. On posy.page, Desk and Cobalt are free and the others are Pro. |
+| `theme` | Optional. Colours. Each look has four palettes, listed in `/schema/brief.schema.json`. The first is the default (`washi`: `kinari`, `sakura`, `yomogi`, `sumi`). |
+| `layout` | Optional. `bento`, `list` or `canvas`. Cobalt and Night follow it; the Desk, Washi, Lofi and Painted scenes lay tiles out themselves. |
+| `photos` | Optional. How photos are printed: `natural`, `mono`, `dither` or `ascii`. |
+| `font` | Optional. A typeface id (the allowed values are in `/schema/brief.schema.json`). |
+| `backdrop` | Optional. `solid`, `dots`, `grid`, or an image URL or `/path`. |
 
-A link can also be an object: `{"heading": "…"}` starts a section, `{"text": "…"}` is a note, and `{"url": "…", "title": "…", "description": "…", "size": "w", "color": "…"}` overrides how one tile looks. Give each object exactly one of `url`, `email`, `repo`, `heading` or `text`. `size` is `s` (small), `w` (wide), `t` (tall) or `l` (large).
+A link can also be an object: `{"heading": "…"}` starts a section, `{"text": "…"}` is a note, and `{"url": "…", "title": "…", "description": "…", "size": "w", "color": "…"}` overrides how one tile looks. Give each object exactly one of `url`, `email`, `repo`, `heading`, `text`, `stamp` or `image`.
+
+- `{"stamp": "Say hello"}` is a short round badge (a note with `look: "stamp"`).
+- `{"image": "https://…/me.jpg", "caption": "…", "url": "https://…"}` is a picture; `url` (optional) makes it clickable. A bare image address in `links` (`"/samples/tea.jpg"`, `"http://localhost:3000/a.png"`, anything ending in jpg, png, webp, gif, avif or svg) becomes a picture too.
+- `focus` (`{"x": 0–100, "y": 0–100}`, the point to keep in view) and `zoom` (1–3) crop a picture. They work on `image` and on links, videos and music with a preview image. `size` is `s` (small), `w` (wide), `t` (tall) or `l` (large).
 
 Posy is forgiving. It accepts the JSON wrapped in prose or a code fence, smart quotes and trailing commas. Unknown fields and small mistakes become
 warnings, not errors. If something is really wrong, the message says what to ask your chat to fix.
@@ -67,4 +77,5 @@ Its format is [`/schema/page.schema.json`](/schema/page.schema.json). Use the br
 - Schema: [`/schema/brief.schema.json`](/schema/brief.schema.json)
 - REST: `POST /api/v1/page/import` with `{ "file": <brief or text>, "username": "mira", "replace": false }`. Creates the page, or with `replace: true` overwrites the draft.
 - MCP: the `import_page` tool takes the same arguments.
+- Theme only: `PATCH /api/v1/page/theme` (see [ai-agents](ai-agents.md#rest-and-public-json)).
 - A link that opens a ready-made preview: `/new#p=<base64url of the brief>`. Handing a user this link means they never need to copy anything.

@@ -1,7 +1,8 @@
 'use client';
 
 // Small interactive bits of the public page.
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { zoomOf } from '@/lib/crop';
 import { Link2, Play, Share2, Check } from 'lucide-react';
 import { hostOf, faviconHost } from '@/lib/url';
 
@@ -22,14 +23,25 @@ export function Favicon({ url }: { url: string }) {
   return <img ref={ref} src={`https://icons.duckduckgo.com/ip3/${host}.ico`} alt="" width={20} height={20} className="size-5 rounded-[5px]" onError={() => setFailed(true)} loading="lazy" />;
 }
 
-export function VideoPlayer({ id, title, editing, thumb, overlay = true }: { id: string; title?: string; editing?: boolean; thumb?: string; overlay?: boolean }) {
+const YT_SIZES = ['maxresdefault', 'hqdefault', 'mqdefault', '0'] as const;
+
+export function VideoPlayer({ id, title, editing, thumb, overlay = true, crop }: { id: string; title?: string; editing?: boolean; thumb?: string; overlay?: boolean; crop?: CSSProperties }) {
   const [playing, setPlaying] = useState(false);
+  const [step, setStep] = useState(0);
+  const [customFailed, setCustomFailed] = useState(false);
+  const custom = thumb && !customFailed ? thumb : undefined;
+  const size = YT_SIZES[step];
+  const src = custom ?? (size ? `https://i.ytimg.com/vi/${id}/${size === '0' ? '0.jpg' : `${size}.jpg`}` : undefined);
+  const next = () => { if (custom) setCustomFailed(true); else setStep(s => s + 1); };
   if (playing && !editing)
     return <iframe className="size-full" src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`} title={title || 'Video'} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />;
   return (
     <button type="button" onClick={e => { if (editing) return; e.preventDefault(); setPlaying(true); }} className="relative block size-full text-left" aria-label={`Play ${title || 'video'}`} tabIndex={editing ? -1 : 0}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={thumb || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" style={thumb ? undefined : { transform: 'scale(1.34)' }} loading="lazy" />
+      {src
+        // YouTube answers a missing maxres/hq size with a 120px grey stand-in, so a tiny image counts as a miss too.
+        // eslint-disable-next-line @next/next/no-img-element
+        ? <img key={src} src={src} alt="" className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" style={custom || size === 'maxresdefault' ? crop : { ...crop, transform: `scale(${1.34 * zoomOf(crop)})` }} loading="lazy" onError={next} onLoad={e => { if (!custom && e.currentTarget.naturalWidth <= 120) next(); }} />
+        : <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,#3a3a44,#14141a)]" />}
       <span className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
       <span className="absolute left-1/2 top-1/2 grid size-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white/90 shadow-lg backdrop-blur transition-transform duration-300 group-hover:scale-110">
         <Play className="ml-0.5 size-5 fill-[#1b1b1b] text-[#1b1b1b]" />
@@ -295,12 +307,12 @@ export function LofiWindows() {
 }
 
 /** A picture from someone else's site (link previews): if it fails to load, show the fallback instead of a broken image. */
-export function SafeImg({ src, className, fallback }: { src: string; className?: string; fallback: React.ReactNode }) {
+export function SafeImg({ src, className, fallback, crop }: { src: string; className?: string; fallback: React.ReactNode; crop?: CSSProperties }) {
   const [failed, setFailed] = useState(false);
   const ref = useRef<HTMLImageElement>(null);
   useEffect(() => { const i = ref.current; if (i && i.complete && i.naturalWidth === 0) setFailed(true); }, []);
   // eslint-disable-next-line @next/next/no-img-element
-  return failed ? <>{fallback}</> : <img ref={ref} src={src} alt="" loading="lazy" draggable={false} className={className} onError={() => setFailed(true)} />;
+  return failed ? <>{fallback}</> : <img ref={ref} src={src} alt="" loading="lazy" draggable={false} className={className} style={crop} onError={() => setFailed(true)} />;
 }
 
 /** Washi scene on a computer: the poem slips hang from a cord, so a pointer brushing past sets them swinging like
@@ -372,5 +384,68 @@ export function DeskObjects() {
       document.removeEventListener('click', click, true); document.removeEventListener('dragstart', nativeDrag);
     };
   }, []);
+  return null;
+}
+
+/** Exposure of one picture: [brightness, contrast] that bring it to a readable range, from a 24px sample of its pixels. */
+const exposures = new Map<string, Promise<[number, number] | null>>();
+function measure(src: string): Promise<[number, number] | null> {
+  let hit = exposures.get(src);
+  if (!hit) {
+    hit = new Promise(done => {
+      const im = new Image(); im.crossOrigin = 'anonymous';
+      im.onerror = () => done(null);
+      im.onload = () => {
+        try {
+          const N = 24, c = document.createElement('canvas'); c.width = c.height = N;
+          const x = c.getContext('2d', { willReadFrequently: true })!; x.drawImage(im, 0, 0, N, N);
+          const d = x.getImageData(0, 0, N, N).data, L: number[] = [];
+          for (let i = 0; i < d.length; i += 4) L.push((d[i] * .299 + d[i + 1] * .587 + d[i + 2] * .114) / 255);
+          L.sort((a, b) => a - b);
+          const at = (q: number) => L[Math.floor(q * (L.length - 1))];
+          const lo = at(.05), mid = at(.5), hi = at(.95);
+          // lift the middle of a dark picture towards the middle of the range (and ease a blown-out one), never past 5x
+          // and a picture whose brightest parts are still dim gets enough to reach the light tones
+          const b = Math.min(5, Math.max(.8, Math.pow(.3 / Math.max(mid, .03), .6), hi < .45 ? .65 / Math.max(hi, .05) : 0));
+          const spread = (hi - lo) * b;
+          done([b, spread < .5 ? Math.min(1.6, .8 / Math.max(spread, .15)) : 1]);
+        } catch { done(null); }
+      };
+      im.src = src;
+    });
+    exposures.set(src, hit);
+  }
+  return hit;
+}
+
+/**
+ * Looks that rebuild every photo from its light (Cobalt, Night) can't see how dark or flat a picture is, so a dark
+ * photo came out black. This measures each picture once and sets --px-b / --px-c on it; the look's CSS applies them as
+ * brightness() and contrast() just before its own filter. Without JS, or when an image host refuses CORS, the look's
+ * shadow-lifting filter still applies.
+ */
+export function PhotoExposure({ selector }: { selector: string }) {
+  useEffect(() => {
+    const seen = new WeakMap<HTMLImageElement, string>();
+    const fix = (img: HTMLImageElement) => {
+      const src = img.currentSrc || img.src;
+      if (!src || seen.get(img) === src) return;
+      seen.set(img, src);
+      const show = () => { if (seen.get(img) === src) img.dataset.px = ''; };
+      const late = setTimeout(show, 1200);
+      measure(src).then(e => {
+        clearTimeout(late);
+        if (e && seen.get(img) === src) { img.style.setProperty('--px-b', e[0].toFixed(2)); img.style.setProperty('--px-c', e[1].toFixed(2)); }
+        show();
+      });
+    };
+    // hide each picture for the moment it takes to measure it, so a correction never shows up as a jump
+    document.documentElement.classList.add('posy-px');
+    const scan = () => document.querySelectorAll<HTMLImageElement>(selector).forEach(img => { if (img.complete) fix(img); else img.addEventListener('load', () => fix(img), { once: true }); });
+    scan();
+    const mo = new MutationObserver(scan);
+    mo.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['src'] });
+    return () => { mo.disconnect(); document.documentElement.classList.remove('posy-px'); };
+  }, [selector]);
   return null;
 }

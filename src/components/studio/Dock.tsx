@@ -107,8 +107,8 @@ function AddPanel({ add, close }: { add: (t: Tile) => void; close: () => void })
 }
 
 /* ---------- Dock ---------- */
-export function Dock({ device, setDevice, add, designOpen, onDesign, addOpen, setAddOpen }: {
-  page: Page; device: Device; setDevice: (d: Device) => void; add: (t: Tile) => void;
+export function Dock({ device, narrow, setDevice, add, designOpen, onDesign, addOpen, setAddOpen }: {
+  page: Page; device: Device; narrow?: boolean; setDevice: (d: Device) => void; add: (t: Tile) => void;
   designOpen: boolean; onDesign: () => void; addOpen: boolean; setAddOpen: (o: boolean) => void;
 }) {
   const canUndo = useHistory(s => s.pastStates.length > 0);
@@ -126,9 +126,10 @@ export function Dock({ device, setDevice, add, designOpen, onDesign, addOpen, se
         </Popover>
         <Hint label="Design" keys="D">
           <Button type="button" variant="ghost" aria-label="Design" aria-pressed={designOpen} onClick={onDesign} className={cn('h-10 gap-1.5 rounded-[12px] px-3 text-[14px] hover:bg-[var(--secondary)]', designOpen && 'bg-[var(--sc-on)] text-[var(--sc-deep)] hover:bg-[var(--sc-on)]')}>
-            <Palette className="size-[18px]" /><span className="hidden sm:inline">Design</span>
+            <Palette className="size-[18px]" /><span>Design</span>
           </Button>
         </Hint>
+        {!narrow && <>
         <span className="mx-1 h-5 w-px bg-[var(--line)]" />
         <ToggleGroup type="single" value={device} onValueChange={v => v && setDevice(v as Device)} aria-label="Preview size" className="gap-0.5 rounded-[12px] bg-[var(--secondary)] p-0.5">
           {([['desktop', 'Desktop', Monitor], ['mobile', 'Mobile', Smartphone]] as const).map(([id, label, Icon]) => (
@@ -139,6 +140,7 @@ export function Dock({ device, setDevice, add, designOpen, onDesign, addOpen, se
             </Hint>
           ))}
         </ToggleGroup>
+        </>}
         <span className="mx-1 h-5 w-px bg-[var(--line)]" />
         <Hint label="Undo" keys="⌘Z"><Button type="button" variant="ghost" size="icon" aria-label="Undo" onClick={undo} disabled={!canUndo} className={iconBtn}><Undo2 /></Button></Hint>
         <Hint label="Redo" keys="⇧⌘Z"><Button type="button" variant="ghost" size="icon" aria-label="Redo" onClick={redo} disabled={!canRedo} className={iconBtn}><Redo2 /></Button></Hint>

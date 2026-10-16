@@ -1,0 +1,127 @@
+---
+title: "MCP tools"
+description: "Every tool the Posy MCP server offers, with its inputs."
+---
+
+The server is Streamable HTTP at `https://posy.page/api/mcp` (or `https://YOUR-POSY/api/mcp` on your own server). Sign in with OAuth, or send an API key as `Authorization: Bearer posy_...`. See [Connect an AI app](/agents/connect).
+
+All edits go to your **draft**. Only `publish` makes anything public. Start every session with `get_page`.
+
+<Info>
+  Descriptions below come from the server (`src/app/api/mcp/route.ts`). `npm run docs:sync` fails if a tool is added there without being listed here.
+</Info>
+
+## Read
+
+<ResponseField name="get_page" type="tool">
+  The current draft (profile, theme, tiles with ids), public URL, version, whether there are unpublished changes, and a `next` hint. Read-only. **Inputs:** none.
+</ResponseField>
+
+<ResponseField name="list_options" type="tool">
+  Allowed values for looks (with a note and the palettes each offers), themes, fonts, backgrounds, tile styles, sizes, colours and social platforms. Read-only. **Inputs:** none.
+</ResponseField>
+
+## Create
+
+<ResponseField name="create_page" type="tool">
+  Claim a username and create the page (one per account). Do this once, when `get_page` says there is no page.
+
+  | Input | Type | Notes |
+  |---|---|---|
+  | `username` | string, required | 3 to 30 letters, numbers, `-` or `_`. Becomes the public URL. |
+  | `style` | enum | The look: `cozy` (Desk), `washi`, `lofi`, `painted`, `cobalt`, `night`. Omit for a starter template. |
+  | `layout` | enum | `bento`, `list` or `canvas`. |
+  | `preset` | enum | Colour theme (palette). |
+  | `template` | enum | A starter template. |
+  | `empty` | boolean | Start blank instead of with sample tiles. Recommended when you will add the user's own links. |
+</ResponseField>
+
+<ResponseField name="import_page" type="tool">
+  Load a whole page at once from a [page file](/agents/format) (a brief or the full page JSON). Creates the page if there is none (pass `username`). With an existing page it replaces the draft only when `replace` is true. Marked destructive.
+
+  | Input | Type | Notes |
+  |---|---|---|
+  | `file` | object or string, required | The brief or page JSON, as an object or text. |
+  | `username` | string | Needed when there is no page yet. |
+  | `replace` | boolean | Overwrite an existing draft. Ask the user first. |
+</ResponseField>
+
+## Tiles
+
+<ResponseField name="add_tile" type="tool">
+  Add tiles. Pass `inputs` for several, `input` for one, or a full `tile` object. Posy auto-detects links, emails, `owner/repo` and notes.
+
+  | Input | Type | Notes |
+  |---|---|---|
+  | `input` | string | For example `https://github.com/user`, `owner/repo`, `hi@me.com`, `Open to work`. |
+  | `inputs` | string[] (max 30) | Several inputs, added in order. Prefer this for a list of links. |
+  | `tile` | object | A full tile, for example `{"type":"heading","text":"Projects"}`. |
+  | `after` | string | Insert after this tile id. Default: the end. |
+  | `size` | enum | `s`, `w`, `t` or `l`. |
+  | `color` | enum | `auto`, `surface`, `accent`, `peach`, `butter`, `mint`, `sky`, `lilac` or `rose`. |
+</ResponseField>
+
+<ResponseField name="update_tile" type="tool">
+  Change fields of a tile, for example `{"size":"l"}`, `{"title":"New title"}`, `{"color":"mint"}`, `{"text":"..."}`. Crop a tile's picture with `{"focus":{"x":30,"y":20},"zoom":1.6}` (`focus` 0 to 100 is the point to keep in view, `zoom` 1 to 3).
+
+  | Input | Type | Notes |
+  |---|---|---|
+  | `id` | string, required | The tile id from `get_page`. |
+  | `patch` | object, required | The fields to change. |
+</ResponseField>
+
+<ResponseField name="move_tile" type="tool">
+  Move a tile to a 0-based position in the tile list.
+
+  | Input | Type | Notes |
+  |---|---|---|
+  | `id` | string, required | The tile id. |
+  | `position` | integer, required | 0 or more. |
+</ResponseField>
+
+<ResponseField name="remove_tile" type="tool">
+  Delete a tile by id. Marked destructive. **Input:** `id` (string, required).
+</ResponseField>
+
+## Look and profile
+
+<ResponseField name="set_theme" type="tool">
+  Change colours, fonts, layout and other theme settings. Only pass what should change.
+
+  | Input | Type | Notes |
+  |---|---|---|
+  | `style` | enum | The look: `cozy`, `washi`, `lofi`, `painted`, `cobalt`, `night`. |
+  | `preset` | enum | A palette. `list_options` shows which palettes each look offers. |
+  | `accent` | string | A hex colour such as `#a5683f`. |
+  | `font`, `radius`, `align` | enum | Typeface, corner radius, alignment. |
+  | `layout` | enum | `bento`, `list` or `canvas`. |
+  | `tileStyle`, `effect`, `avatar` | enum | Tile style, hover effect, avatar shape. |
+  | `photos` | enum | `natural`, `mono`, `dither` or `ascii`. |
+  | `motion`, `ambient` | boolean | Animation and ambience on or off. |
+  | `background` | object | `style`, `image`, `dim`, `blur`, `grain`, and `color` (hex). |
+</ResponseField>
+
+<ResponseField name="set_profile" type="tool">
+  Change name, bio, avatar URL or location.
+
+  | Input | Type | Notes |
+  |---|---|---|
+  | `name`, `bio`, `avatar`, `location` | string | All optional. |
+  | `avatarFocus` | `{x, y}` | 0 to 100 each. The point to keep in view. |
+  | `avatarZoom` | number | 1 to 3. |
+</ResponseField>
+
+## Go live
+
+<ResponseField name="publish" type="tool">
+  Make the draft live at the public URL. **Inputs:** none.
+</ResponseField>
+
+## Typical session
+
+<Steps>
+  <Step title="Look">`get_page`. If there is no page, ask for a username.</Step>
+  <Step title="Create">`create_page` with `empty: true`, or `import_page` with a whole brief.</Step>
+  <Step title="Fill">`add_tile` with `inputs[]`, then `set_theme` and `set_profile`.</Step>
+  <Step title="Publish">`publish` when the user is happy, then share the URL.</Step>
+</Steps>

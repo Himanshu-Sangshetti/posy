@@ -4,8 +4,9 @@ import { ArrowUpRight, Star, Mail, Play, Music2 } from 'lucide-react';
 import { Favicon, VideoPlayer } from './islands';
 import type { Tile } from '@/lib/schema';
 import { PLATFORMS, profileUrl } from '@/lib/platforms';
-import { hostOf, youtubeId } from '@/lib/url';
+import { hostOf, safeHref, youtubeId } from '@/lib/url';
 import { asset, cn } from '@/lib/utils';
+import { cropStyle } from '@/lib/crop';
 import { isColourful } from '@/lib/style';
 
 type Props<T extends Tile['type']> = { tile: Extract<Tile, { type: T }>; editing?: boolean };
@@ -41,7 +42,9 @@ export function RichText({ text }: { text: string }) {
         if (/^\*\*[^*]+\*\*$/.test(p)) return <strong key={i} className="font-semibold">{p.slice(2, -2)}</strong>;
         if (/^\*[^*]+\*$/.test(p)) return <em key={i}>{p.slice(1, -1)}</em>;
         const m = p.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
-        if (m) return <a key={i} href={m[2]} target="_blank" rel="noopener" className="underline decoration-[var(--accent)] decoration-2 underline-offset-4 hover:text-[var(--accent)]">{m[1]}</a>;
+        const href = m && safeHref(m[2]);
+        if (m && !href) return <span key={i}>{m[1]}</span>;
+        if (m) return <a key={i} href={href!} target="_blank" rel="noopener" className="underline decoration-[var(--accent)] decoration-2 underline-offset-4 hover:text-[var(--accent)]">{m[1]}</a>;
         return <span key={i}>{p}</span>;
       })}
     </>
@@ -64,7 +67,7 @@ export function LinkTileView({ tile }: Props<'link'>) {
       {showImage && (
         <div className="sf-media">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={asset(tile.image)} alt="" loading="lazy" />
+          <img src={asset(tile.image)} alt="" loading="lazy" style={cropStyle(tile)} />
         </div>
       )}
       <Corner />
@@ -108,7 +111,7 @@ export function ImageTileView({ tile }: Props<'image'>) {
   return (
     <div className="sf-photo">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={asset(tile.src)} alt={tile.alt} loading="lazy" />
+      <img src={asset(tile.src)} alt={tile.alt} loading="lazy" style={cropStyle(tile)} />
       {tile.caption && <span className="sf-cap">{tile.caption}</span>}
     </div>
   );
@@ -117,7 +120,7 @@ export function ImageTileView({ tile }: Props<'image'>) {
 export function VideoTileView({ tile, editing }: Props<'video'>) {
   const id = youtubeId(tile.url);
   if (!id) return <LinkTileView tile={{ ...tile, type: 'link' }} />;
-  return <div className="sf-photo"><VideoPlayer id={id} title={tile.title} editing={editing} thumb={tile.image && asset(tile.image)} /></div>;
+  return <div className="sf-photo"><VideoPlayer id={id} title={tile.title} editing={editing} thumb={tile.image && asset(tile.image)} crop={cropStyle(tile)} /></div>;
 }
 
 /** A native-looking music card: cover art, title, artist and a play button that opens the track. */
@@ -129,7 +132,7 @@ export function MusicTileView({ tile }: Props<'music'>) {
   if (tile.size === 's') {
     return (
       <div className="sf-music sf-music-s">
-        <span className="sf-cover">{cover ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={cover} alt="" loading="lazy" /> : <Music2 className="size-7" />}</span>
+        <span className="sf-cover">{cover ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={cover} alt="" loading="lazy" style={cropStyle(tile)} /> : <Music2 className="size-7" />}</span>
         <span className="sf-play"><Play className="size-3.5 fill-current" /></span>
         <Corner />
       </div>
@@ -141,7 +144,7 @@ export function MusicTileView({ tile }: Props<'music'>) {
         // eslint-disable-next-line @next/next/no-img-element
         <img src={cover} alt="" aria-hidden className="sf-music-glow" loading="lazy" />
       )}
-      <span className="sf-cover">{cover ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={cover} alt="" loading="lazy" /> : <Music2 className="size-8" />}</span>
+      <span className="sf-cover">{cover ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={cover} alt="" loading="lazy" style={cropStyle(tile)} /> : <Music2 className="size-8" />}</span>
       <div className="sf-music-body">
         <span className="sf-music-kind"><BrandIcon path={sp.path} size={13} />Now playing</span>
         <p className="sf-title">{title}</p>
@@ -182,11 +185,11 @@ export function GithubTileView({ tile }: Props<'github'>) {
 /** Where a tile links to (null = not a link). */
 export function tileHref(tile: Tile, _desk = false): string | null {
   switch (tile.type) {
-    case 'link': return tile.url;
-    case 'social': return profileUrl(tile.platform, tile.handle, tile.url);
+    case 'link': return safeHref(tile.url);
+    case 'social': return safeHref(profileUrl(tile.platform, tile.handle, tile.url));
     case 'github': return `https://github.com/${tile.repo}`;
-    case 'image': return tile.url ?? null;
-    case 'music': return tile.url;
+    case 'image': return safeHref(tile.url);
+    case 'music': return safeHref(tile.url);
     default: return null;
   }
 }
@@ -226,7 +229,7 @@ export function ListItem({ tile }: { tile: Tile }) {
         <div className="posy-row-inner">
           {tile.image && tile.size !== 's'
             // eslint-disable-next-line @next/next/no-img-element
-            ? <img src={asset(tile.image)} alt="" className="sf-row-thumb" loading="lazy" />
+            ? <img src={asset(tile.image)} alt="" className="sf-row-thumb" loading="lazy" style={cropStyle(tile)} />
             : <Badge><Favicon url={tile.url} /></Badge>}
           <RowText title={tile.title || hostOf(tile.url)} sub={tile.description || hostOf(tile.url)} />
           <RowArrow />
@@ -246,7 +249,7 @@ export function ListItem({ tile }: { tile: Tile }) {
       const cover = tile.image ? asset(tile.image) : undefined;
       return (
         <div className="posy-row-inner sf-music-row">
-          <span className="sf-cover">{cover ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={cover} alt="" loading="lazy" /> : <Music2 className="size-5" />}</span>
+          <span className="sf-cover">{cover ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={cover} alt="" loading="lazy" style={cropStyle(tile)} /> : <Music2 className="size-5" />}</span>
           <RowText title={tile.title || 'Listen on Spotify'} sub={tile.artist || 'Spotify'} />
           <span className="sf-play" aria-hidden><Play className="size-3.5 fill-current" /></span>
         </div>

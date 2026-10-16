@@ -5,14 +5,15 @@ import { readBrief, briefToPage } from './brief';
 import { db } from '@/db';
 import { user } from '@/db/auth-schema';
 import { pageForUser, saveDraft, publish, hasUnpublished, createPage } from './pages';
-import { TEMPLATES, starterPage, type TemplateId } from './templates';
+import { TEMPLATES, starterPage, template, type TemplateId } from './templates';
 import { STYLE_IDS, type StyleId } from './styles';
 import { THEMES } from './themes';
 import { assertAllowed, entitlementsFor } from './entitlements';
 import { parsePage, Tile, Theme, newId, type Page } from './schema';
 import { tileFromInput } from './detect';
 import { siteUrl } from './site';
-import { enrichTile } from './enrich';
+import { enrichTile, githubRepo } from './enrich';
+import { enforce } from './rate-limit';
 
 /** Operations shared by the REST API and the MCP server. Each one edits the draft. */
 async function edit(userId: string, fn: (p: Page) => Page) {
@@ -37,6 +38,7 @@ export async function getState(userId: string) {
 
 /** Claim a username and create the user's page. Shared by REST `POST /api/v1/claim` and the MCP `create_page` tool. */
 export async function createPageFor(userId: string, b: { username?: unknown; template?: unknown; style?: unknown; layout?: unknown; preset?: unknown; empty?: unknown }) {
+  await enforce(`claim:${userId}`, 10, 3600);
   if (await pageForUser(userId)) throw new PageExistsError();
   const u = await db.select({ name: user.name }).from(user).where(eq(user.id, userId)).get();
   const name = u?.name ?? '';
@@ -48,9 +50,10 @@ export async function createPageFor(userId: string, b: { username?: unknown; tem
       preset: typeof b.preset === 'string' && b.preset in THEMES ? b.preset : undefined,
       empty: b.empty === true,
     });
-    assertAllowed(page, await entitlementsFor(userId));
   }
   const tpl = (typeof b.template === 'string' && b.template in TEMPLATES ? b.template : 'blank') as TemplateId;
+  page ??= template(tpl, name);
+  assertAllowed(page, await entitlementsFor(userId));
   const row = await createPage(userId, String(b.username ?? ''), name, tpl, page);
   return { username: row.username, url: `${siteUrl()}/${row.username}` };
 }
@@ -60,6 +63,7 @@ export async function createPageFor(userId: string, b: { username?: unknown; tem
  * with an existing page it replaces the draft, but only when `replace` is true.
  */
 export async function importBrief(userId: string, input: unknown, opts: { username?: string; replace?: boolean } = {}) {
+  await enforce(`import:${userId}`, 20, 3600);
   const { page: parsed, username: fromFile, warnings } = typeof input === 'string' ? readBrief(input) : briefToPage(input);
   const tiles = await Promise.all(parsed.tiles.map(t => enrichTile(t).catch(() => t)));
   const page = { ...parsed, tiles };
@@ -149,6 +153,9 @@ export async function setProfile(userId: string, patch: Partial<Page['profile']>
 }
 
 export async function publishPage(userId: string) {
+  const row = await pageForUser(userId);
+  // Publishing is when GitHub stats refresh (cached for an hour), so visitors' page views never call GitHub.
+  if (row) await Promise.all(parsePage(row.draft).tiles.flatMap(t => (t.type === 'github' ? [githubRepo(t.repo)] : [])).slice(0, 20));
   const { username } = await publish(userId);
   return { url: `${siteUrl()}/${username}` };
 }

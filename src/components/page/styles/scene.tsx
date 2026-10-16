@@ -13,8 +13,8 @@ export type SceneProps = { page: Page; slots: HeaderSlots; piece: PieceFn; only?
 
 type Of<T extends Tile['type']> = Extract<Tile, { type: T }>;
 
-/** What's on a page, sorted into the parts a scene arranges. Order within each part is the page's own order. */
-export function anatomy(tiles: Tile[]) {
+/** Sorts tiles into the parts a scene arranges. */
+function sort(tiles: Tile[]) {
   const is = <T extends Tile['type']>(t: Tile, type: T): t is Of<T> => t.type === type;
   return {
     socials: tiles.filter((t): t is Of<'social'> => is(t, 'social')),
@@ -24,6 +24,22 @@ export function anatomy(tiles: Tile[]) {
     notes: tiles.filter((t): t is Of<'text'> => is(t, 'text') && t.look !== 'stamp'),
     stamps: tiles.filter((t): t is Of<'text'> => is(t, 'text') && t.look === 'stamp'),
   };
+}
+
+/**
+ * What's on a page, sorted into the parts a scene arranges. Order within each part is the page's own order.
+ * `groups` is the same split once per section: the tiles before the first heading (no `heading`), then one group per
+ * heading holding the tiles up to the next one. The flat parts are unchanged, so a scene that ignores headings still works.
+ */
+export function anatomy(tiles: Tile[]) {
+  const groups: ({ heading?: Of<'heading'> } & ReturnType<typeof sort>)[] = [];
+  let heading: Of<'heading'> | undefined, run: Tile[] = [];
+  const flush = () => { if (heading || run.length) groups.push({ heading, ...sort(run) }); };
+  for (const t of tiles) {
+    if (t.type === 'heading') { flush(); heading = t; run = []; } else run.push(t);
+  }
+  flush();
+  return { ...sort(tiles), headings: tiles.filter((t): t is Of<'heading'> => t.type === 'heading'), groups };
 }
 
 /** Both arrangements on the public page (CSS shows the one that fits); just one in the editor. */

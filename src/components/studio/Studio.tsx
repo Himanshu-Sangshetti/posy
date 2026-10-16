@@ -11,6 +11,7 @@ import { tileFromInput } from '@/lib/detect';
 import { pageStyle, isDark } from '@/lib/style';
 import { cn } from '@/lib/utils';
 import { nudgeTile } from './canvas-ops';
+import { sceneFor } from '@/components/page/styles';
 import { useStudio, undo, redo, useHistory } from './store';
 import { save, fetchRemote, enrich, storeImage, publish, Conflict } from './storage';
 import { EditableCanvas } from './EditableCanvas';
@@ -32,11 +33,25 @@ const typing = () => {
 
 export type StudioInit = { page: Page; version: number; username: string; hasUnpublished: boolean; site: string; entitlements: Entitlements; nav?: { href: string; label: string }[] };
 
+const useNarrow = () => {
+  const [narrow, setNarrow] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)');
+    const on = () => setNarrow(mq.matches);
+    on(); mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
+  return narrow;
+};
+
 export function Studio({ init }: { init: StudioInit }) {
   const router = useRouter();
   const params = useSearchParams();
   const page = useStudio(s => s.page);
-  const [device, setDevice] = useState<Device>('desktop');
+  const [picked, setDevice] = useState<Device>('desktop');
+  const narrow = useNarrow();
+  // A phone can't show the desktop arrangement, so it previews the phone one.
+  const device: Device = narrow ? 'mobile' : picked;
   const [saveState, setSaveState] = useState<SaveState>('saved');
   const [unpublished, setUnpublished] = useState(init.hasUnpublished);
   const [publishing, setPublishing] = useState(false);
@@ -141,7 +156,8 @@ export function Studio({ init }: { init: StudioInit }) {
       if ((e.key === 'Backspace' || e.key === 'Delete') && selected) { e.preventDefault(); removeTile(selected); }
       // canvas: arrow keys nudge the selected tile (shift = 10 units)
       const arrow = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
-      if (arrow && selected && !mod && useStudio.getState().page?.theme.layout === 'canvas') {
+      const theme = useStudio.getState().page?.theme;
+      if (arrow && selected && !mod && theme?.layout === 'canvas' && !sceneFor(theme.style)) {
         e.preventDefault();
         const step = e.shiftKey ? 10 : 1;
         nudgeTile(selected, arrow[0] * step, arrow[1] * step);
@@ -178,24 +194,25 @@ export function Studio({ init }: { init: StudioInit }) {
     <EntitlementsProvider value={init.entitlements}>
     <TooltipProvider delayDuration={300}>
       <div onClick={() => useStudio.getState().select(null)} className={cn('min-h-dvh', isDark(page) && 'dark')}
-        style={{ ...pageStyle(page), background: device === 'mobile' ? 'color-mix(in oklab, var(--bg) 82%, var(--text))' : undefined }}>
+        style={{ ...pageStyle(page), background: device === 'mobile' && !narrow ? 'color-mix(in oklab, var(--bg) 82%, var(--text))' : undefined }}>
         <TopBar extra={init.nav} username={init.username} site={init.site} saveState={saveState} unpublished={unpublished} publishing={publishing}
           onPublish={doPublish} onShare={() => setShareOpen(true)} onCommand={() => setCmdOpen(true)} />
         <div className={cn('transition-[padding] duration-300', designOpen && 'sm:pr-[380px]')}>
-          {device === 'desktop' ? <div className="pt-14">{canvas}</div> : (
-            <div className="flex justify-center px-4 pb-32 pt-24">
-              <div className="h-[844px] w-[390px] overflow-y-auto overflow-x-hidden rounded-[44px] border-[10px] border-[var(--text)] shadow-[0_40px_90px_-40px_rgb(0_0_0/.55)] [scrollbar-width:none]">
+          {device === 'desktop' || narrow ? <div className="pt-14">{canvas}</div> : (
+            <div className="flex justify-center px-4 pt-[4.5rem]">
+              <div className="h-[min(844px,calc(100dvh-11.5rem))] w-[390px] overflow-y-auto overflow-x-hidden rounded-[44px] border-[10px] border-[var(--text)] shadow-[0_40px_90px_-40px_rgb(0_0_0/.55)] [scrollbar-width:none]">
                 {canvas}
               </div>
             </div>
           )}
         </div>
-        <Dock page={page} device={device} setDevice={setDevice} add={addTile} designOpen={designOpen} onDesign={() => setDesignOpen(o => !o)} addOpen={addOpen} setAddOpen={setAddOpen} />
+        <Dock page={page} device={device} narrow={narrow} setDevice={setDevice} add={addTile} designOpen={designOpen} onDesign={() => setDesignOpen(o => !o)} addOpen={addOpen} setAddOpen={setAddOpen} />
         <DesignSheet open={designOpen} onOpenChange={setDesignOpen} page={page} tab={designTab} onTab={setDesignTab} />
         <ShareDialog open={shareOpen} onOpenChange={setShareOpen} url={url} live={!unpublished} />
         <CommandPalette open={cmdOpen} onOpenChange={setCmdOpen} add={addTile} url={url} canPublish={canPublish} onPublish={doPublish}
           onShare={() => setShareOpen(true)} setDevice={setDevice} openDesign={openDesign} />
-        <Toaster position="top-center" offset={68} className={CHROME} toastOptions={{ classNames: { toast: 'sc-toast' } }} />
+        <Toaster position="bottom-right" offset={{ bottom: 24, right: 24 }} mobileOffset={{ bottom: 96, left: 12, right: 12 }} className={CHROME}
+          toastOptions={{ duration: 3500, classNames: { toast: 'sc-toast pointer-events-none [&_[data-button]]:pointer-events-auto' } }} />
       </div>
     </TooltipProvider>
     </EntitlementsProvider>

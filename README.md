@@ -1,15 +1,90 @@
 <p align="center">
-  <img src="docs/media/hero.webp" alt="A Posy desk page: a polaroid, a sticky note, a stamp and a record on a soft pastel desk" width="900">
+  <img src="public/brand/readme-banner.png" alt="Posy: a link-in-bio page you own" width="900">
 </p>
 
 <h1 align="center">Posy</h1>
 
-<p align="center">A beautiful link-in-bio page you actually own.<br>Pastel themes, soft motion, one JSON file. Free and open source.</p>
+<p align="center">A beautiful link-in-bio page you own.<br>Six hand-made looks, soft motion, one JSON file. Free and open source.</p>
+
+<p align="center">
+  <a href="https://github.com/Himanshu-Sangshetti/posy/actions/workflows/ci.yml"><img src="https://github.com/Himanshu-Sangshetti/posy/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT license"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-2.0.0-blue" alt="Version 2.0.0"></a>
+  <a href="docs/ai-agents.md"><img src="https://img.shields.io/badge/MCP-server-8A63D2" alt="MCP server"></a>
+</p>
+
+<p align="center">
+  <a href="https://posy.page">posy.page</a> ·
+  <a href="https://docs.posy.page">Docs</a> ·
+  <a href="docs/self-hosting.md">Self-host</a> ·
+  <a href="CONTRIBUTING.md">Contribute</a>
+</p>
+
+<p align="center">
+  <img src="public/brand/looks-strip.png" alt="The six looks: Desk, Washi, Lofi, Painted, Cobalt and Night" width="900">
+</p>
 
 ---
 
-Posy makes a link-in-bio page that looks like a desk: polaroids, sticky notes, a record that spins.
-It is open source, and there are two ways to use it.
+Posy makes a link-in-bio page that feels like a place: a desk with polaroids and a spinning record,
+a Japanese print, a desktop left open, a watercolour sky. You edit it in a calm studio, or ask your AI agent to.
+It is open source, and your page is one JSON file you can take anywhere.
+
+- **Six looks**, each with four palettes: Desk, Washi, Lofi, Painted, Cobalt and Night.
+- **An editor** you can use on a phone: paste a link to add a tile, drag to arrange, undo anything.
+- **Built for agents**: a hosted MCP server, a REST API, a CLI, `llms.txt` and a JSON Schema.
+- **Yours**: self-host with Docker, or use [posy.page](https://posy.page). Move between them in two clicks.
+
+## Quickstart
+
+**Use posy.page.** Sign up at [posy.page](https://posy.page) and your page is live in a minute.
+
+**Self-host with Docker.**
+
+```bash
+git clone https://github.com/Himanshu-Sangshetti/posy.git && cd posy
+docker build -t posy . && docker run -p 3000:3000 -v posy-data:/data \
+  -e NEXT_PUBLIC_SITE_URL=http://localhost:3000 -e BETTER_AUTH_URL=http://localhost:3000 \
+  -e BETTER_AUTH_SECRET=$(openssl rand -base64 32) posy
+```
+
+Open http://localhost:3000 and sign up. The first account owns the instance. More options are in [Run it yourself](#run-it-yourself).
+
+**From source.** Node 22 or newer.
+
+```bash
+npm install
+npm run dev        # http://localhost:3000
+```
+
+## Agents
+
+Make an API key on the **Agents** page, then connect your agent to the MCP server:
+
+| | |
+|---|---|
+| MCP URL | `https://posy.page/api/mcp` (or `https://YOUR-POSY/api/mcp`) |
+| Page file | One JSON file with a [JSON Schema](schema/page.schema.json). See [docs/format.md](docs/format.md). |
+| `llms.txt` | `https://posy.page/llms.txt` for the app, and `/<username>/llms.txt` for any page |
+| Plugin | Claude Code and Cursor: see [`plugin/`](plugin) |
+
+```bash
+claude mcp add --transport http posy https://posy.page/api/mcp \
+  --header "Authorization: Bearer posy_..."
+```
+
+Ask it, for example, *"add my repo owner/name as a wide tile, switch to the Washi look, then publish"*.
+If the studio is open, the change appears within seconds. Agents edit your draft; nothing goes live until `publish`.
+There is also a REST API (`/api/v1/page`), a public JSON view of every page (`/api/v1/public/<username>`) and a CLI:
+
+```bash
+export POSY_URL=https://posy.page POSY_API_KEY=posy_...
+npm run posy -- add https://x.com/you
+npm run posy -- theme --preset midnight --tiles glass
+npm run posy -- publish
+```
+
+Full guide: [docs/ai-agents.md](docs/ai-agents.md). Working in this repo with a coding agent? Read [AGENTS.md](AGENTS.md).
 
 ## Two ways to use Posy
 
@@ -30,10 +105,6 @@ install, update or back up. There is a free plan, and Pro ($5/month or $48/year)
 | Setup and upkeep | You | None | None |
 | Support | GitHub issues | GitHub issues | Priority |
 
-<p align="center">
-  <img src="docs/media/studio.webp" alt="The Posy studio with the Design panel open" width="900">
-</p>
-
 ### Moving between them
 
 Your page is one JSON file, and it works the same on both. In **Settings**, press **Download page.json**
@@ -50,7 +121,7 @@ POSY_URL=https://my.server POSY_API_KEY=posy_... npm run posy -- import page.jso
 
 ## Run it yourself
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FHimanshu-Sangshetti%2Fposy&env=BETTER_AUTH_SECRET,NEXT_PUBLIC_SITE_URL,BETTER_AUTH_URL,DATABASE_URL,DATABASE_AUTH_TOKEN,BLOB_READ_WRITE_TOKEN&envDescription=Secret%20(openssl%20rand%20-base64%2032)%2C%20your%20public%20URL%2C%20a%20Turso%20database%20and%20a%20Vercel%20Blob%20token&envLink=https%3A%2F%2Fgithub.com%2FHimanshu-Sangshetti%2Fposy%2Fblob%2Fv2%2Fdocs%2Fself-hosting.md)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FHimanshu-Sangshetti%2Fposy&env=BETTER_AUTH_SECRET,NEXT_PUBLIC_SITE_URL,BETTER_AUTH_URL,DATABASE_URL,DATABASE_AUTH_TOKEN,BLOB_READ_WRITE_TOKEN&envDescription=Secret%20(openssl%20rand%20-base64%2032)%2C%20your%20public%20URL%2C%20a%20Turso%20database%20and%20a%20Vercel%20Blob%20token&envLink=https%3A%2F%2Fgithub.com%2FHimanshu-Sangshetti%2Fposy%2Fblob%2Fmain%2Fdocs%2Fself-hosting.md)
 
 ### Docker
 
@@ -77,7 +148,12 @@ npm install
 npm run dev        # http://localhost:3000
 ```
 
+Node 22 or 24 is recommended (some dependencies list them in their `engines`).
+
 Everything is optional locally; see [.env.example](.env.example).
+
+In development your data (the SQLite file and uploads) lives in `~/.posy`, outside the repo, so saving it doesn't reload the dev server.
+To keep it somewhere else, set `POSY_DATA_DIR`, for example `POSY_DATA_DIR=./.data npm run dev`.
 
 ### Configuration
 
@@ -112,7 +188,9 @@ Dashboard pages: **Analytics** (views and clicks per tile), **Agents** (API keys
   <img src="docs/media/add.webp" alt="Adding a tile by pasting a link" width="900">
 </p>
 
-## Themes
+## Looks and themes
+
+Six looks: Desk, Washi, Lofi, Painted, Cobalt and Night. Each one draws the same tiles its own way and has four palettes. On top of that you get these colour themes:
 
 Cream · Lavender · Mint · Sky · Peach · Paper · Blush · Sage · Midnight · Mocha · Dusk · Ocean, plus any accent colour, backgrounds, tile styles, hover effects and font pairs.
 
@@ -133,32 +211,19 @@ Cream · Lavender · Mint · Sky · Peach · Paper · Blush · Sage · Midnight 
 | Music | Spotify embed |
 | GitHub | A repo with live stars and language, refreshed daily |
 
-## Edit with your AI agent
+## Self-hosting
 
-Create an API key on the **Agents** page, then connect your agent to the hosted MCP server:
+Docker, Docker Compose, Vercel with Turso and Blob, custom domains, backups and upgrades are in
+[docs/self-hosting.md](docs/self-hosting.md). `package.json` is marked `private` on purpose: Posy is an app, not an npm package.
 
-```bash
-claude mcp add --transport http posy http://localhost:3000/api/mcp \
-  --header "Authorization: Bearer posy_..."
-```
+## Telemetry
 
-Ask it, for example, *"add my repo owner/name as a wide tile and switch to the lavender theme, then
-publish"*. If the studio is open, the change appears within seconds. There's also a REST API
-(`/api/v1/page`), a public JSON view of any page (`/api/v1/public/<username>`), `llms.txt` pages,
-and a CLI:
+A self-hosted Posy sends a few anonymous usage counts (no content, no URLs, no usernames) so we know how it is used. Exactly what is sent, and how to turn it off with `POSY_TELEMETRY=0`, is in [docs/telemetry.md](docs/telemetry.md).
 
-```bash
-export POSY_URL=http://localhost:3000 POSY_API_KEY=posy_...
-npm run posy -- add https://x.com/you
-npm run posy -- theme --preset midnight --tiles glass
-npm run posy -- publish
-```
+## Documentation
 
-See [docs/ai-agents.md](docs/ai-agents.md).
-
-## Deploying
-
-Docker, Docker Compose, Vercel or any Node host. Step by step in [docs/self-hosting.md](docs/self-hosting.md).
+[docs.posy.page](https://docs.posy.page) has the quickstart, self-hosting, the page file, the API and MCP.
+The Markdown sources are in [`docs/`](docs).
 
 ## Built with
 
@@ -167,8 +232,12 @@ Drizzle + libSQL · Zod · MCP
 
 ## Contributing
 
-Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Issues and pull requests are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md), including how to add a look.
+Please follow the [Code of Conduct](CODE_OF_CONDUCT.md). To report a vulnerability, see [SECURITY.md](SECURITY.md).
 
-## License
+## Licence and art credits
 
-[MIT](LICENSE)
+Posy is [MIT](LICENSE) licensed. The art that ships with the looks is public domain, CC0, or made for Posy.
+Every file and its source is in [public/looks/CREDITS.md](public/looks/CREDITS.md).
+Some of the art was generated with Krea 2. Its community licence allows commercial use of those images only while your company
+makes under US$1M a year; read the note in the credits file before you use them in a commercial product.

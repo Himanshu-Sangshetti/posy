@@ -3,6 +3,7 @@ import {
   siSpotify, siTwitch, siDiscord, siSubstack, siMedium, siReddit, siPinterest, siProducthunt, siPeerlist,
   siDevdotto, siHashnode, siItchdotio, siKofi, siBuymeacoffee, siPatreon, siSoundcloud, siFacebook, siTelegram,
 } from 'simple-icons';
+import { safeHref } from './url';
 
 type Icon = { path: string; hex: string };
 export type Platform = {
@@ -52,5 +53,5 @@ export type PlatformId = keyof typeof PLATFORMS;
 export const PLATFORM_IDS = Object.keys(PLATFORMS) as [PlatformId, ...PlatformId[]];
 
 export function profileUrl(platform: PlatformId, handle: string, override?: string) {
-  return override || PLATFORMS[platform].url(handle.replace(/^@/, ''));
+  return safeHref(override) ?? PLATFORMS[platform].url(handle.replace(/^@/, ''));
 }

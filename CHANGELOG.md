@@ -1,18 +1,40 @@
 # Changelog
 
-## 2.0.0 — 2026-10-14
+All notable changes to Posy are in this file.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and Posy uses [Semantic Versioning](https://semver.org/).
+
+## [Unreleased]
+
+## [2.0.0] - 2026-10-16
 
 Posy is now a product you can sign up for or host yourself.
 
-- Accounts (email + password, GitHub/Google when configured), claim `/<username>`, draft then Publish.
-- Per-user OG image, favicon, `llms.txt` and public JSON.
-- Cloud studio with a rebuilt design panel: backgrounds, tile styles, hover effects, more font pairs, list layout.
-- Agents: API keys, REST API, hosted MCP server at `/api/mcp`, live sync into the open studio.
-- Dashboard: analytics (views and clicks per tile), Agents, Settings (rename, export JSON, delete account).
-- Self-hosting: Docker image, migrations on start, `POSY_SIGNUP` (first user owns the instance by default).
-- Static-export and `content/page.json` mode is gone; export your page as JSON from Settings instead.
+### Added
 
-## 1.0.0 — 2026-10-14
+- Six looks: Desk, Washi, Lofi, Painted, Cobalt and Night. Each draws the same tiles its own way and has four palettes, with scenes, photo styles (including dark photos, natural colour, crop and zoom) and a starter page.
+- Accounts (email and password, GitHub and Google when configured), claim `/<username>`, draft then Publish.
+- The editor at `/edit`: paste a link to add a tile, drag to reorder, undo and redo, autosave, a phone editor, a Design panel with looks, palettes, backgrounds, fonts and layouts (bento, list and canvas), and a QR code.
+- The page file: one JSON file (`page.json`) with a JSON Schema, a CLI (`npm run posy`), and Download and Import in Settings to move between posy.page and your own server.
+- A REST API (`/api/v1`) with an OpenAPI document and a public JSON view of every page.
+- A hosted MCP server at `/api/mcp` with API keys, live sync into the open editor, and a Claude Code and Cursor plugin.
+- Agent files: per-page `llms.txt` and `llms-full.txt`, and an `AGENTS.md` for coding agents.
+- Tiles: link, social (29 platforms and email), note, section, image, YouTube, Spotify and GitHub repo, with automatic link unfurling.
+- Per-user share image (OG), favicon and sitemap.
+- Dashboard: analytics (views and clicks per tile), Agents and Settings (rename, export, delete account).
+- Self-hosting: Docker image and Compose file, Vercel with Turso and Blob, migrations on start, and `POSY_SIGNUP` (the first user owns the instance by default).
+- Community files: code of conduct, security policy, issue and pull request templates, CodeQL and Dependabot.
+
+### Changed
+
+- The static export and `content/page.json` mode are gone. Export your page as JSON from Settings instead.
+- The Minimal look is no longer offered. It stays as a hidden fallback for old pages.
+
+### Removed
+
+- Retired looks (Press, Gallery and others) and their art. Old pages map to the closest current look.
+- Unused UI components and leftover assets.
+
+## [1.0.0] - 2026-10-14
 
 First release.
 
@@ -23,3 +45,7 @@ First release.
 - Live sync: edits to `content/page.json` (by you or an AI agent) appear in the open studio.
 - JSON Schema and a CLI (`npm run posy`) for agents and scripts.
 - Static export that works with JavaScript disabled; GitHub Pages workflow with daily refresh; playground build.
+
+[Unreleased]: https://github.com/Himanshu-Sangshetti/posy/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/Himanshu-Sangshetti/posy/compare/v1.0.0...v2.0.0
+[1.0.0]: https://github.com/Himanshu-Sangshetti/posy/releases/tag/v1.0.0

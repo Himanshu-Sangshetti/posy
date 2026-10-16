@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { UPLOAD_DIR } from '@/lib/uploads';
 import { siteUrl } from '@/lib/site';
+import { safeFetch } from '@/lib/safe-fetch';
 
 type Sharp = typeof import('sharp').default;
 let sharpP: Promise<Sharp | null> | null = null;
@@ -29,11 +30,8 @@ async function readSource(src: string): Promise<Buffer | null> {
     src = siteUrl() + src;
   }
   if (!/^https?:\/\//.test(src)) return null;
-  const res = await fetch(src, { signal: AbortSignal.timeout(5000), headers: { Accept: 'image/png,image/jpeg,image/*' } }).catch(() => null);
-  if (!res?.ok) return null;
-  const len = Number(res.headers.get('content-length') ?? 0);
-  if (len > 12 * 1024 * 1024) return null;
-  return Buffer.from(await res.arrayBuffer());
+  const res = await safeFetch(src, { maxBytes: 12 * 1024 * 1024, timeoutMs: 5000, accept: 'image/png,image/jpeg,image/*' }).catch(() => null);
+  return res?.ok ? res.body : null;
 }
 
 /**

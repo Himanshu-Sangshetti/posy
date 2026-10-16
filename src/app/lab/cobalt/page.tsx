@@ -85,7 +85,7 @@ export default function CobaltLab() {
       <h2 className="lab-h">Their own pictures: the look has to survive them</h2>
       {['cobalt', 'moonlit'].map(preset => (
         <div key={preset}><p className="lab-k">{THEMES[preset].name}</p>
-          <div className="lab-row"><Frame w={1200} p={page('Mira Sol', preset, THEIRS, 'With a selfie and photos that are nothing like the sample art.', '/looks/press/avatar.jpg')} /><Frame w={390} p={page('Mira Sol', preset, THEIRS, 'With a selfie and photos that are nothing like the sample art.', '/looks/press/avatar.jpg')} /></div>
+          <div className="lab-row"><Frame w={1200} p={page('Mira Sol', preset, THEIRS, 'With a selfie and photos that are nothing like the sample art.', '/samples/flowers.jpg')} /><Frame w={390} p={page('Mira Sol', preset, THEIRS, 'With a selfie and photos that are nothing like the sample art.', '/samples/flowers.jpg')} /></div>
         </div>
       ))}
       <h2 className="lab-h">The starter page in every palette</h2>

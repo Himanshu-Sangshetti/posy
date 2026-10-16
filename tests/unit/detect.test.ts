@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { tileFromInput, youtubeId, spotifyEmbed } from '@/lib/detect';
+import { tileFromInput, youtubeId, spotifyEmbed, isImageRef } from '@/lib/detect';
 
 const t = (s: string) => tileFromInput(s);
 describe('pasting a link picks the right tile', () => {
@@ -32,5 +32,21 @@ describe('pasting a link picks the right tile', () => {
   it('helpers', () => {
     expect(youtubeId('https://youtube.com/shorts/abcDEF123')).toBe('abcDEF123');
     expect(spotifyEmbed('https://open.spotify.com/intl-de/album/XyZ')).toBe('https://open.spotify.com/embed/album/XyZ');
+  });
+});
+
+describe('pasting a picture address makes an image tile', () => {
+  it('on any host, even without a dot, and for bare paths', () => {
+    expect(t('http://localhost:3200/samples/lemon.jpg')).toMatchObject({ type: 'image', src: 'http://localhost:3200/samples/lemon.jpg' });
+    expect(t('/samples/tea.jpg')).toMatchObject({ type: 'image', src: '/samples/tea.jpg' });
+    expect(t('samples/tea.png')).toMatchObject({ type: 'image' });
+    expect(t('https://cdn.site.com/a/b.AVIF?w=400')).toMatchObject({ type: 'image' });
+    for (const ext of ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif', 'svg']) expect(t(`/x/pic.${ext}`)).toMatchObject({ type: 'image' });
+  });
+  it('leaves everything else alone', () => {
+    expect(isImageRef('a photo of tea.jpg')).toBe(false);
+    expect(isImageRef('tea.jpg')).toBe(false);
+    expect(t('/samples/tea.pdf')).toMatchObject({ type: 'text' });
+    expect(t('vercel/next.js')).toMatchObject({ type: 'github' });
   });
 });

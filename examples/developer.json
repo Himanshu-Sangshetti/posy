@@ -1,8 +1,8 @@
 {
   "$schema": "../schema/page.schema.json",
-  "version": 1,
+  "version": 2,
   "profile": { "name": "Kai Morgan", "bio": "I build developer tools and write about shipping small things. Open source on weekends.", "location": "Berlin" },
-  "theme": { "preset": "midnight", "font": "soft", "radius": "soft", "layout": "split", "motion": true },
+  "theme": { "style": "night", "preset": "netrunner", "font": "night", "radius": "soft", "layout": "bento", "align": "side", "motion": true },
   "seo": {},
   "tiles": [
     { "id": "d-gh", "type": "social", "platform": "github", "handle": "kaimorgan", "size": "s" },

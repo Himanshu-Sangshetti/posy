@@ -1,7 +1,24 @@
 // Dependency-free URL helpers (safe to ship to the browser).
 
+/** A link we are willing to render: http(s), mailto: or tel:, or a same-site path. Anything else (javascript:, data:, //host) is null. */
+export function safeHref(raw: string | null | undefined): string | null {
+  const s = raw?.trim();
+  if (!s) return null;
+  if (s.startsWith('/') && !s.startsWith('//') && !s.startsWith('/\\')) return s;
+  return /^(https?:\/\/|mailto:|tel:)/i.test(s) ? s : null;
+}
+
 export function hostOf(url: string) {
   try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url; }
+}
+
+/** A picture by its address: an http(s) URL on any host (even without a dot, like localhost) or a "/path" or "folder/file", ending in an image extension. */
+export function isImageRef(raw: string): boolean {
+  const s = raw.trim();
+  if (!s || /\s/.test(s)) return false;
+  const path = s.replace(/[?#].*$/, '');
+  if (!/\.(png|jpe?g|gif|webp|avif|svg)$/i.test(path)) return false;
+  return /^https?:\/\/[^/]+\//i.test(s) || s.startsWith('/') || /^[\w.-]+\/[\w./-]+$/.test(path);
 }
 
 export function youtubeId(url: string): string | null {

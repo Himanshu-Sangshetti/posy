@@ -1,13 +1,15 @@
 import type { Page } from './schema';
 
-import { githubRepo } from './enrich';
+import { cachedRepos } from './enrich';
 
-/** Refresh GitHub tiles (stars, description, language) on render; falls back to stored values. */
+/** GitHub tiles with the latest cached stats (refreshed when the page is edited or published); falls back to stored values. */
 export async function withLiveData(page: Page): Promise<Page> {
-  const tiles = await Promise.all(page.tiles.map(async t => {
-    if (t.type !== 'github') return t;
-    const r = await githubRepo(t.repo);
-    return r ? { ...t, description: t.description || r.description, stars: r.stars, language: r.language || t.language } : t;
-  }));
+  const repos = page.tiles.flatMap(t => (t.type === 'github' ? [t.repo] : []));
+  if (!repos.length) return page;
+  const cache = await cachedRepos(repos);
+  const tiles = page.tiles.map(t => {
+    const r = t.type === 'github' ? cache.get(t.repo.toLowerCase()) : undefined;
+    return t.type === 'github' && r ? { ...t, description: t.description || r.description, stars: r.stars, language: r.language || t.language } : t;
+  });
   return { ...page, tiles };
 }

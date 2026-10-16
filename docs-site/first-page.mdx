@@ -1,0 +1,41 @@
+---
+title: "Your first page"
+description: "Three ways to build a page: by hand, with an AI, or from a file."
+---
+
+<Tabs>
+  <Tab title="In the studio">
+    Paste links one after another. Drag tiles to reorder them. Use a `heading` tile to start a new section. Tiles come in four sizes: `s` (1×1), `w` (2×1), `t` (1×2) and `l` (2×2).
+  </Tab>
+  <Tab title="With an AI">
+    Connect Posy to your AI app ([guide](/agents/connect)) and say: "Make me a link in bio page. My GitHub is `owner/name` and my newsletter is …". The AI works on your draft and asks before it publishes.
+  </Tab>
+  <Tab title="From a file or a link">
+    Any chat can write a [page file](/agents/format). Open [`/new`](https://posy.page/new) and paste it, or hand over one link:
+
+    ```
+    https://posy.page/new?name=Mira%20Sol&bio=Illustrator&links=https://github.com/mira,hi@mira.so,mira/atlas
+    ```
+
+    It opens a live preview, and one button makes the page yours.
+  </Tab>
+</Tabs>
+
+## Tile types
+
+| Type | What you give it | What you get |
+|---|---|---|
+| `link` | A URL | A link tile with title, description and preview image. |
+| `social` | A platform and handle | A sticker or button for the profile. |
+| `text` | A note | A note. `**bold**`, `*italic*` and `[links](https://example.com)` work. |
+| `heading` | A title | A full-width section title. |
+| `image` | An image URL or upload | A picture. |
+| `video` | A YouTube URL | A video tile. |
+| `music` | A Spotify URL | A track, album, playlist, artist or show. |
+| `github` | `owner/name` | Stars, description and language are filled in. |
+
+Colours are `auto`, `surface`, `accent` or a pastel tint: `peach`, `butter`, `mint`, `sky`, `lilac`, `rose`.
+
+## Layouts
+
+`bento` is the grid, `list` is one column of links, and `canvas` places every tile freely. Cobalt and Night follow your layout choice. The Desk, Washi, Lofi and Painted scenes lay tiles out themselves.

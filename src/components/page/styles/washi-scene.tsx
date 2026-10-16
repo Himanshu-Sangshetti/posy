@@ -3,9 +3,10 @@
 // as poem slips (tanzaku); on a phone it is a hanging scroll (kakejiku) you read top to bottom.
 // Materials, not boxes: dyed slip paper, a carved seal, ink stamps, a round fan for music, a folding fan for photos.
 import { Mail, Play } from 'lucide-react';
-import type { CSSProperties, ReactNode } from 'react';
+import { Fragment, type CSSProperties, type ReactNode } from 'react';
 import type { Page, Tile } from '@/lib/schema';
 import { PLATFORMS, type PlatformId } from '@/lib/platforms';
+import { cropStyle } from '@/lib/crop';
 import { asset, cn } from '@/lib/utils';
 import { isDark } from '@/lib/style';
 import { cleanTitle, hostOf, siteName, youtubeId } from '@/lib/url';
@@ -22,9 +23,9 @@ type Photo = Extract<Tile, { type: 'image' }>;
 type Text = Extract<Tile, { type: 'text' }>;
 type Social = Extract<Tile, { type: 'social' }>;
 
-const Img = ({ src, className, alt = '' }: { src: string; className?: string; alt?: string }) => (
+const Img = ({ src, className, alt = '', crop }: { src: string; className?: string; alt?: string; crop?: CSSProperties }) => (
   // eslint-disable-next-line @next/next/no-img-element
-  <img src={asset(src)} alt={alt} loading="lazy" draggable={false} className={className} />
+  <img src={asset(src)} alt={alt} loading="lazy" draggable={false} className={className} style={crop} />
 );
 const initials = (name: string) => name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() || 'P';
 const plain = (s: string) => s.replace(/\*\*?([^*]+)\*\*?/g, '$1').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
@@ -67,7 +68,7 @@ export function Slip({ tile, form, feature }: { tile: Link; form: 'tanzaku' | 's
   const fallback = <span className="wss-pic-blank" aria-hidden />;
   if (form === 'strip') return (
     <div className={cn('wss-strip', pic && 'wss-strip-feature')} data-len={lenClass(s.title)}>
-      {pic && <span className="wss-pic"><SafeImg src={asset(s.image)!} fallback={fallback} /></span>}
+      {pic && <span className="wss-pic"><SafeImg src={asset(s.image)!} fallback={fallback} crop={cropStyle(tile)} /></span>}
       <div className="wss-strip-row">
         <span className="wss-strip-text">
           <b className="wss-title">{s.title}</b>
@@ -81,7 +82,7 @@ export function Slip({ tile, form, feature }: { tile: Link; form: 'tanzaku' | 's
   return (
     <div className={cn('wss-tanzaku', pic && 'wss-tanzaku-feature')} data-len={lenClass(s.title)}>
       <div className="wss-tz-paper">
-        {pic && <span className="wss-pic"><SafeImg src={asset(s.image)!} fallback={fallback} /></span>}
+        {pic && <span className="wss-pic"><SafeImg src={asset(s.image)!} fallback={fallback} crop={cropStyle(tile)} /></span>}
         <b className="wss-title">{s.title}</b>
         {s.sub && <span className="wss-sub">{s.sub}</span>}
         {s.meta && <span className="wss-meta">{s.meta}</span>}
@@ -109,7 +110,7 @@ export function Uchiwa({ tile, form = 'full' }: { tile: Extract<Tile, { type: 'm
   return (
     <div className={cn('wss-music', `wss-music-${form}`)}>
       <span className="wss-uchiwa" aria-hidden>
-        <span className="wss-uchiwa-face">{m.image ? <Img src={m.image} /> : <span className="wss-uchiwa-blank" />}<i className="wss-ribs" /></span>
+        <span className="wss-uchiwa-face">{m.image ? <Img src={m.image} crop={cropStyle(tile)} /> : <span className="wss-uchiwa-blank" />}<i className="wss-ribs" /></span>
         <span className="wss-uchiwa-handle" />
       </span>
       <span className="wss-music-text">
@@ -127,7 +128,7 @@ export function Screen({ tile, editing }: { tile: Extract<Tile, { type: 'video' 
   const id = youtubeId(tile.url);
   return (
     <figure className="wss-mount wss-video">
-      <span className="wss-mount-pic">{id ? <VideoPlayer id={id} title={tile.title} overlay={false} editing={editing} thumb={tile.image ? asset(tile.image) : undefined} /> : m.image && <Img src={m.image} />}</span>
+      <span className="wss-mount-pic">{id ? <VideoPlayer id={id} title={tile.title} overlay={false} editing={editing} thumb={tile.image ? asset(tile.image) : undefined} crop={cropStyle(tile)} /> : m.image && <Img src={m.image} crop={cropStyle(tile)} />}</span>
       <figcaption className="wss-caption"><span className="wss-play-mark" aria-hidden /><span>{m.title}</span></figcaption>
     </figure>
   );
@@ -141,7 +142,7 @@ export function MediaPiece({ tile, editing, form = 'full' }: { tile: Media; edit
 export function Print({ tile }: { tile: Photo }) {
   return (
     <figure className="wss-mount wss-print">
-      <span className="wss-mount-pic"><Img src={tile.src} alt={tile.alt} /></span>
+      <span className="wss-mount-pic"><Img src={tile.src} alt={tile.alt} crop={cropStyle(tile)} /></span>
       {tile.caption && <figcaption className="wss-caption"><span>{tile.caption}</span></figcaption>}
     </figure>
   );
@@ -152,7 +153,7 @@ export function Ogi({ tile }: { tile: Photo }) {
   return (
     <figure className="wss-ogi">
       <span className="wss-ogi-sticks" aria-hidden>{Array.from({ length: 11 }, (_, i) => <i key={i} style={{ '--k': i - 5 } as CSSProperties} />)}</span>
-      <span className="wss-ogi-leaf"><Img src={tile.src} alt={tile.alt} /><i className="wss-pleats" /></span>
+      <span className="wss-ogi-leaf"><Img src={tile.src} alt={tile.alt} crop={cropStyle(tile)} /><i className="wss-pleats" /></span>
       <i className="wss-ogi-pin" aria-hidden />
       {tile.caption && <figcaption className="wss-caption"><span>{tile.caption}</span></figcaption>}
     </figure>
@@ -200,6 +201,20 @@ export function Hanko({ tile }: { tile: Text }) {
   );
 }
 
+/** A section title: a long slip of paper with the words brushed on, a vermilion dot at its head. */
+export function TitleSlip({ text }: { text: string }) {
+  return <h2 className="posy-head wss-head"><span>{text}</span></h2>;
+}
+
+/** A section title on the desktop: a dark lacquered slip that hangs from the cord as the first slip of its group. */
+export function TitleTanzaku({ text }: { text: string }) {
+  return (
+    <div className="wss-tanzaku wss-tanzaku-head" data-len={lenClass(text)}>
+      <div className="wss-tz-paper"><b className="wss-title posy-head">{text}</b></div>
+    </div>
+  );
+}
+
 /** Your seal: your initials carved in vermilion, the frame from a real Edo publisher's seal. */
 const Seal = ({ name }: { name: string }) => <span className="wss-seal" aria-hidden><span>{initials(name)}</span></span>;
 
@@ -237,42 +252,13 @@ function About({ page, slots, socials }: { page: Page; slots: HeaderSlots; socia
   );
 }
 
-/** How far the cord sags at a slip, so slips hang on a gentle curve instead of a ruler line. */
-const SLIP_W = (n: number) => (n === 1 ? 250 : n === 2 ? 214 : 168);
-const GAP = 22, PAD = 22, SAG = 34;
-/** The right half's usable width at a 1280px window (it is a little wider at 1440). */
-const B_W = 620;
-
-function chunks<T>(xs: T[], max: number) {
+/** Slips hang from a cord in rows of at most five, as even as can be; a short page gets wider slips. */
+const SAG = 34, GAP = 22, PAD = 22, PER_ROW = 5;
+function rows<T>(xs: T[]) {
   if (!xs.length) return [];
-  const rows = Math.ceil(xs.length / max), per = Math.ceil(xs.length / rows);
-  return Array.from({ length: rows }, (_, r) => xs.slice(r * per, r * per + per));
-}
-
-/** Each extra's size on the screen (width, height), roughly, to keep both halves of the screen even. */
-const SIZE = (t: Tile): [number, number] => t.type === 'music' ? [290, 240] : t.type === 'video' ? [340, 270] : t.type === 'image' ? [320, 260]
-  : t.type === 'text' && t.look === 'stamp' ? [132, 160] : [250, 300];
-/** Share the extras between the left half (under you) and the right half (under the cord), rows of two on the right,
- *  so neither half runs on while the other stands empty. */
-function balance(extras: Tile[], hA: number, hB: number, open?: [number, number]) {
-  const a: Tile[] = [], b: Tile[] = [];
-  // the right half's last row: a short cord leaves room beside it, so the first extras can stand next to the slips
-  let [rowW, rowH] = open ?? [9999, 0];
-  let aRowW = 9999, aRowH = 0;
-  for (const t of extras) {
-    const [w, h] = SIZE(t);
-    const fitsB = rowW + w + 34 <= B_W, fitsA = aRowW + w + 30 <= 480;
-    const costB = fitsB ? Math.max(0, h - rowH) : h + 40;
-    const costA = fitsA ? Math.max(0, h - aRowH) : h + 40;
-    if (Math.max(hA, hB + costB) <= Math.max(hA + costA, hB)) {
-      b.push(t); hB += costB;
-      if (fitsB) { rowW += w + 34; rowH = Math.max(rowH, h); } else { rowW = w; rowH = h; }
-    } else {
-      a.push(t); hA += costA;
-      if (fitsA) { aRowW += w + 30; aRowH = Math.max(aRowH, h); } else { aRowW = w; aRowH = h; }
-    }
-  }
-  return { a, b };
+  const n = Math.ceil(xs.length / PER_ROW), base = Math.floor(xs.length / n), extra = xs.length % n;
+  let at = 0;
+  return Array.from({ length: n }, (_, r) => { const k = base + (r < extra ? 1 : 0); const row = xs.slice(at, at + k); at += k; return row; });
 }
 
 export function WashiScene({ page, slots, piece, only, editing }: SceneProps) {
@@ -280,26 +266,34 @@ export function WashiScene({ page, slots, piece, only, editing }: SceneProps) {
   const dark = isDark(page);
   const firstPic = a.links.findIndex(t => t.type === 'link' && t.image);
   const featured = firstPic >= 0 ? a.links[firstPic] : undefined;
-  const extras: Tile[] = [...a.media, ...a.photos, ...a.notes, ...a.stamps];
-  const lines = chunks(a.links, 3);
-  const lineH = (r: Link[]) => 350 + (r.includes(featured as Link) ? 80 : 0);
-  const last = lines[lines.length - 1];
-  const lastW = last ? last.length * SLIP_W(last.length) + (last.length - 1) * GAP + PAD * 2 : 9999;
-  const split = balance(extras, 380 + (page.profile.bio ? 190 : 110), lines.reduce((h, r) => h + lineH(r) + 44, 0), last ? [lastW, lineH(last)] : undefined);
+  const extrasOf = (g: (typeof a.groups)[number]): Tile[] => [...g.media, ...g.photos, ...g.notes];
   const stamps = (where: string) => a.socials.length ? a.socials.map((t, i) => piece(t, <InkStamp tile={t} i={i} />, { key: `${where}${t.id}`, className: 'wss-stamp-piece' })) : null;
 
-  const line = (row: Link[], r: number) => {
-    const n = row.length, w = SLIP_W(n), W = n * w + (n - 1) * GAP + PAD * 2;
+  // every group's slips (its title slip first) hang from the same cords, so rows stay full across groups; a group's
+  // extras (music, video, photos, notes, stamps) follow the cord row its last slip hangs on
+  type Hung = Link | Extract<Tile, { type: 'heading' }>;
+  const hung: { t: Hung; g: number }[] = a.groups.flatMap((g, gi) => [...(g.heading ? [g.heading] : []), ...g.links].map(t => ({ t: t as Hung, g: gi })));
+  const lines = rows(hung);
+  const slipW = hung.length <= 3 ? 236 : 192;
+  const anchor: number[] = [];
+  a.groups.forEach((_, gi) => {
+    let at = anchor[gi - 1] ?? -1;
+    lines.forEach((row, r) => { if (row.some(h => h.g === gi)) at = r; });
+    anchor.push(at);
+  });
+
+  const line = (row: { t: Hung; g: number }[], r: number) => {
+    const n = row.length, w = slipW, W = n * w + (n - 1) * GAP + PAD * 2;
     return (
       <div key={r} className="wss-line" style={{ '--n': n, '--sw': `${w}px`, '--gap': `${GAP}px`, '--pad': `${PAD}px`, width: W } as CSSProperties}>
         <svg className="wss-cord" viewBox={`0 0 ${W} ${SAG * 2}`} preserveAspectRatio="none" aria-hidden>
           <path d={`M4 4Q${W / 2} ${SAG * 2 - 4} ${W - 4} 4`} vectorEffect="non-scaling-stroke" pathLength={1} />
         </svg>
         <i className="wss-pin" aria-hidden /><i className="wss-pin wss-pin-r" aria-hidden />
-        {row.map((t, i) => {
+        {row.map(({ t }, i) => {
           const f = (PAD + i * (w + GAP) + w / 2) / W;
           const drop = (SAG * 2 - 8) * 2 * f * (1 - f) + 4; // the quadratic's height at f (control point at twice the sag)
-          return piece(t, <Slip tile={t} form="tanzaku" feature={t === featured} />, {
+          return piece(t, t.type === 'heading' ? <TitleTanzaku text={t.text} /> : <Slip tile={t} form="tanzaku" feature={t === featured} />, {
             key: t.id, className: 'wss-hang', style: { '--drop': `${drop.toFixed(1)}px`, '--wk': r * 4 + i } as CSSProperties,
           });
         })}
@@ -316,19 +310,32 @@ export function WashiScene({ page, slots, piece, only, editing }: SceneProps) {
     return null;
   };
 
+  const block = (r: number) => {
+    const gs = a.groups.filter((_, gi) => anchor[gi] === r);
+    const extras = gs.flatMap(extrasOf), stamps = gs.flatMap(g => g.stamps);
+    if (!extras.length && !stamps.length) return null;
+    return (
+      <div key={`x${r}`} className="wss-extras">
+        {extras.map(t => <div key={t.id} className="wss-cell">{extra(t, 'desk')}</div>)}
+        {stamps.length > 0 && <div className="wss-cell wss-cell-stamps">{stamps.map(t => extra(t, 'desk'))}</div>}
+      </div>
+    );
+  };
+
   const desktop = () => (
     <div className="wss-room">
       <div className="wss-screen">
         <i className="wss-folds" aria-hidden>{Array.from({ length: 6 }, (_, i) => <b key={i} />)}</i>
-        <div className="wss-zone-a">
+        <div className="wss-top">
           <Masthead page={page} slots={slots} />
           <About page={page} slots={slots} socials={stamps('d')} />
-          {split.a.length > 0 && <div className="wss-extras wss-extras-a">{split.a.map(t => extra(t, 'desk'))}</div>}
         </div>
-        <div className="wss-zone-b">
-          {lines.map(line)}
-          {split.b.length > 0 && <div className="wss-extras wss-extras-b">{split.b.map(t => extra(t, 'desk'))}</div>}
-        </div>
+        {(lines.length > 0 || a.groups.some(g => extrasOf(g).length || g.stamps.length)) && (
+          <div className="wss-lines">
+            {block(-1)}
+            {lines.map((row, r) => [line(row, r), block(r)])}
+          </div>
+        )}
       </div>
       {!editing && <WashiBreeze />}
     </div>
@@ -342,12 +349,20 @@ export function WashiScene({ page, slots, piece, only, editing }: SceneProps) {
         <div className="wss-honshi">
           <Masthead page={page} slots={slots} />
           <About page={page} slots={slots} socials={stamps('m')} />
-          {a.links.length > 0 && (
-            <div className="wss-strips">
-              {a.links.map(t => piece(t, <Slip tile={t} form="strip" feature={t === featured} />, { key: 'm' + t.id, className: 'wss-strip-piece' }))}
-            </div>
-          )}
-          {extras.length > 0 && <div className="wss-m-extras">{extras.map(t => extra(t, 'phone'))}</div>}
+          {a.groups.map((g, gi) => {
+            const extras = [...extrasOf(g), ...g.stamps];
+            return (
+              <Fragment key={g.heading?.id ?? `g${gi}`}>
+                {g.heading && piece(g.heading, <TitleSlip text={g.heading.text} />, { key: 'm' + g.heading.id, className: 'wss-head-piece' })}
+                {g.links.length > 0 && (
+                  <div className="wss-strips">
+                    {g.links.map(t => piece(t, <Slip tile={t} form="strip" feature={t === featured} />, { key: 'm' + t.id, className: 'wss-strip-piece' }))}
+                  </div>
+                )}
+                {extras.length > 0 && <div className="wss-m-extras">{extras.map(t => extra(t, 'phone'))}</div>}
+              </Fragment>
+            );
+          })}
         </div>
       </div>
       <div className="wss-roller" aria-hidden><i /></div>

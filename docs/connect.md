@@ -28,9 +28,29 @@ Then run `/mcp` inside Claude Code and choose **Authenticate**. Or install the p
 
 ## Cursor, VS Code, Codex
 
-- **Cursor:** Settings → MCP → add a server with the URL (or use the install button on the Agents page).
+- **Cursor:** use the one-click install link, or add the config below by hand.
 - **VS Code:** `code --add-mcp '{"name":"posy","type":"http","url":"https://YOUR-POSY/api/mcp"}'`
 - **Codex:** `codex mcp add posy --url https://YOUR-POSY/api/mcp`
+
+### Cursor: one click
+
+[Add Posy to Cursor](cursor://anysphere.cursor-deeplink/mcp/install?name=posy&config=eyJ1cmwiOiJodHRwczovL3Bvc3kucGFnZS9hcGkvbWNwIn0=)
+
+That link installs `https://posy.page/api/mcp`. Cursor then asks you to sign in to Posy. For your own server, use the config below.
+
+### A config file
+
+Cursor reads `~/.cursor/mcp.json` (or `.cursor/mcp.json` in a project). Other tools use `.mcp.json` in the project folder. Add this:
+
+```json
+{
+  "mcpServers": {
+    "posy": { "url": "https://posy.page/api/mcp" }
+  }
+}
+```
+
+In Claude Code's `.mcp.json`, add `"type": "http"` next to `url`. On your own server, change the URL to `https://YOUR-POSY/api/mcp`.
 
 ## An API key instead
 
