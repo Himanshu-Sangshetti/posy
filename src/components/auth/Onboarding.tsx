@@ -37,9 +37,13 @@ export function Onboarding({ initialUsername, initialStyle = 'painted', styles, 
 
   async function create() {
     setBusy(true); setError('');
-    const res = await fetch('/api/v1/claim', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: name, style, layout, preset, empty }) });
+    // a Pro look can be tried but not kept on a free plan: start on the first free look, and open the editor trying the Pro one
+    const pro = styles.find(x => x.id === style)?.locked;
+    const free = styles.find(x => !x.locked);
+    const body = pro && free ? { username: name, style: free.id, layout, preset: free.preset, empty } : { username: name, style, layout, preset, empty };
+    const res = await fetch('/api/v1/claim', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     if (!res.ok) { const m = (await res.json().catch(() => ({}))).error ?? 'Could not create your page'; setError(m); toast.error(m); setBusy(false); return; }
-    router.push('/edit?welcome=1');
+    router.push(pro && free ? `/edit?welcome=1&try=${style}` : '/edit?welcome=1');
   }
 
   function pickStyle(id: string, focus = false) {

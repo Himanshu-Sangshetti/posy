@@ -24,7 +24,7 @@ export const LOOKS = [
     ],
   },
   {
-    id: 'lofi', slug: 'lofi', name: 'Lofi', free: false,
+    id: 'lofi', slug: 'lofi', name: 'Lofi', free: true,
     note: 'A desktop left open, with windows you can drag.',
     special: 'Your page is a little computer desktop. Every tile is a window with a title bar, and visitors can drag them around. Thick outlines and flat colour make it feel like a late-night playlist.',
     layout: 'Canvas',
@@ -48,7 +48,7 @@ export const LOOKS = [
     ],
   },
   {
-    id: 'cobalt', slug: 'cobalt', name: 'Cobalt', free: true,
+    id: 'cobalt', slug: 'cobalt', name: 'Cobalt', free: false,
     note: 'A vintage print in two inks, under a crescent moon.',
     special: 'Everything is printed in two inks on cream stock, like an old travel poster. Photos turn into halftone duotones that match the palette, and a crescent moon hangs over your name.',
     layout: 'Bento',

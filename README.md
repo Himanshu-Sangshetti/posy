@@ -74,7 +74,7 @@ Each look has four palettes, and you can switch any time.
   </tr>
 </table>
 
-On posy.page, Painted, Desk and Cobalt are free, and the others come with Pro. Self-hosted, every look is unlocked.
+On posy.page, Painted, Desk and Lofi are free, and the others come with Pro. Self-hosted, every look is unlocked.
 See them live in the [looks gallery](https://docs.posy.page/looks).
 
 <details>
@@ -133,7 +133,7 @@ On top of each look's palettes: Cream, Lavender, Mint, Sky, Peach, Paper, Blush,
 | | posy.page Free | posy.page Pro | Self-hosted |
 |---|---|---|---|
 | Tiles, editor, API, MCP, CLI | All | All | All |
-| Looks | Painted, Desk, Cobalt | All | All |
+| Looks | Painted, Desk, Lofi | All | All |
 | Your own domain | No | Yes, HTTPS set up for you | Yes, point it at your server |
 | Analytics | Basic | 12 months + CSV | 12 months + CSV |
 | "Made with Posy" footer | Shown | Hide it | Hide it |

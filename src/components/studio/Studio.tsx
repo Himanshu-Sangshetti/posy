@@ -24,6 +24,8 @@ import { CHROME } from './chrome';
 import type { DesignTab } from './ThemePanel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EntitlementsProvider } from './entitlements';
+import { PreviewBar } from './PreviewBar';
+import { STYLE_INFO, PREMIUM_STYLES, type StyleId } from '@/lib/styles';
 import type { Entitlements } from '@/edition/types';
 
 const typing = () => {
@@ -48,6 +50,7 @@ export function Studio({ init }: { init: StudioInit }) {
   const router = useRouter();
   const params = useSearchParams();
   const page = useStudio(s => s.page);
+  const preview = useStudio(s => s.preview);
   const [picked, setDevice] = useState<Device>('desktop');
   const narrow = useNarrow();
   // A phone can't show the desktop arrangement, so it previews the phone one.
@@ -69,8 +72,13 @@ export function Studio({ init }: { init: StudioInit }) {
     skipSave.current = true;
     useStudio.getState().setPage(init.page);
     useStudio.temporal.getState().clear();
+    // a Pro look picked during onboarding: the page starts on a free look and the editor opens trying the one they chose
+    const tried = params.get('try') as StyleId | null;
+    if (tried && STYLE_INFO[tried] && PREMIUM_STYLES.has(tried) && !init.entitlements.premium) {
+      useStudio.getState().setPreview({ style: tried, preset: STYLE_INFO[tried].preset, font: STYLE_INFO[tried].font, accent: undefined });
+    }
     if (params.get('welcome')) {
-      toast('Your page is ready', { description: 'Paste a link anywhere to add it. Publish when you like it.' });
+      if (!tried) toast('Your page is ready', { description: 'Paste a link anywhere to add it. Publish when you like it.' });
       router.replace('/edit');
     }
     for (const t of init.page.tiles) if (t.type === 'github' && t.stars === undefined)
@@ -186,15 +194,18 @@ export function Studio({ init }: { init: StudioInit }) {
     </div>
   );
 
-  const canvas = <EditableCanvas page={page} device={device} />;
+  // trying a look the plan doesn't include: the editor shows it on your page, the saved page stays as it is
+  const shown = preview ? { ...page, theme: { ...page.theme, ...preview } } : page;
+  const upgrade = init.nav?.find(n => /billing|plan|pro/i.test(`${n.href} ${n.label}`))?.href;
+  const canvas = <EditableCanvas page={shown} device={device} />;
   const url = `${init.site}/${init.username}`;
   const canPublish = unpublished && !publishing && saveState === 'saved';
   const openDesign = (tab: DesignTab) => { setDesignTab(tab); setDesignOpen(true); };
   return (
     <EntitlementsProvider value={init.entitlements}>
     <TooltipProvider delayDuration={300}>
-      <div onClick={() => useStudio.getState().select(null)} className={cn('min-h-dvh', isDark(page) && 'dark')}
-        style={{ ...pageStyle(page), background: device === 'mobile' && !narrow ? 'color-mix(in oklab, var(--bg) 82%, var(--text))' : undefined }}>
+      <div onClick={() => useStudio.getState().select(null)} className={cn('min-h-dvh', isDark(shown) && 'dark')}
+        style={{ ...pageStyle(shown), background: device === 'mobile' && !narrow ? 'color-mix(in oklab, var(--bg) 82%, var(--text))' : undefined }}>
         <TopBar extra={init.nav} username={init.username} site={init.site} saveState={saveState} unpublished={unpublished} publishing={publishing}
           onPublish={doPublish} onShare={() => setShareOpen(true)} onCommand={() => setCmdOpen(true)} />
         <div className={cn('transition-[padding] duration-300', designOpen && 'sm:pr-[380px]')}>
@@ -206,8 +217,9 @@ export function Studio({ init }: { init: StudioInit }) {
             </div>
           )}
         </div>
-        <Dock page={page} device={device} narrow={narrow} setDevice={setDevice} add={addTile} designOpen={designOpen} onDesign={() => setDesignOpen(o => !o)} addOpen={addOpen} setAddOpen={setAddOpen} />
-        <DesignSheet open={designOpen} onOpenChange={setDesignOpen} page={page} tab={designTab} onTab={setDesignTab} />
+        {preview && <PreviewBar look={STYLE_INFO[shown.theme.style]?.label ?? 'This look'} styleOnly={!!preview.style} back={STYLE_INFO[page.theme.style]?.label} upgrade={upgrade} />}
+        <Dock page={shown} device={device} narrow={narrow} setDevice={setDevice} add={addTile} designOpen={designOpen} onDesign={() => setDesignOpen(o => !o)} addOpen={addOpen} setAddOpen={setAddOpen} />
+        <DesignSheet open={designOpen} onOpenChange={setDesignOpen} page={shown} tab={designTab} onTab={setDesignTab} />
         <ShareDialog open={shareOpen} onOpenChange={setShareOpen} url={url} live={!unpublished} />
         <CommandPalette open={cmdOpen} onOpenChange={setCmdOpen} add={addTile} url={url} canPublish={canPublish} onPublish={doPublish}
           onShare={() => setShareOpen(true)} setDevice={setDevice} openDesign={openDesign} />

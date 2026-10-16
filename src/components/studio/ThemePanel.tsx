@@ -74,7 +74,6 @@ function SwitchRow({ title, note, checked, onChange, disabled }: { title: string
   );
 }
 
-const proNote = () => toast('Part of Posy Pro', { description: 'Upgrade from Settings to use premium themes, fonts and more.' });
 
 const PHOTO_LABEL: Record<(typeof PHOTO_LOOKS)[number], string> = { natural: 'Colour', mono: 'B&W', dither: 'Dither', ascii: 'ASCII' };
 
@@ -85,9 +84,13 @@ const TAB_LABEL: Record<DesignTab, string> = { style: 'Style', colour: 'Colour',
 const hasPageColour = (style: string) => style === 'minimal' || style === 'washi' || style === 'cobalt' || style === 'night';
 
 export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: DesignTab; onTab?: (t: DesignTab) => void }) {
-  const { updateTheme, setBadge } = useStudio();
+  const { updateTheme, setBadge, setPreview } = useStudio();
+  const preview = useStudio(s => s.preview);
   const ent = useEntitlements();
   const locked = (premium: boolean) => premium && !ent.premium;
+  // A look, palette or font the plan doesn't include can still be tried: the editor shows it, nothing is saved.
+  // While trying something, palette and font picks stay part of the trial; a free look ends it.
+  const pick = (patch: Partial<Page['theme']>, premium: boolean) => (premium && !ent.premium) || preview ? setPreview({ ...preview, ...patch }) : updateTheme(patch);
   const t = page.theme;
   const bg = t.background;
   const setBg = (patch: Partial<typeof bg>) => updateTheme({ background: { ...bg, ...patch } });
@@ -113,7 +116,7 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
             const lock = locked(PREMIUM_STYLES.has(id));
             return (
               <button key={id} type="button" aria-pressed={t.style === id} aria-label={`${info.label} style`}
-                onClick={() => (lock ? proNote() : t.style !== id && updateTheme({ style: id, preset: info.preset, font: info.font, accent: undefined }))}
+                onClick={() => { const look = { style: id, preset: info.preset, font: info.font, accent: undefined }; if (lock) setPreview(look); else { setPreview(null); if (t.style !== id || preview) updateTheme(look); } }}
                 className={cn('relative grid content-start gap-2 p-2 text-left', choice(t.style === id))}>
                 {lock && <Lock className="absolute right-3 top-3 z-10 size-3.5 text-white mix-blend-difference" />}
                 <StyleSwatch id={id} />
@@ -171,7 +174,7 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
             {(STYLE_PALETTES[t.style] ?? THEME_IDS).map(id => {
               const th = THEMES[id];
               return (
-                <button key={id} type="button" onClick={() => (locked(PREMIUM_THEMES.has(id)) ? proNote() : updateTheme({ preset: id, accent: undefined }))} aria-pressed={t.preset === id} aria-label={th.name}
+                <button key={id} type="button" onClick={() => pick({ preset: id, accent: undefined }, PREMIUM_THEMES.has(id))} aria-pressed={t.preset === id} aria-label={th.name}
                   className="group relative grid gap-1.5 text-center text-[12px] text-[var(--muted)]">
                   {locked(PREMIUM_THEMES.has(id)) && <Lock className="absolute right-1.5 top-1.5 z-10 size-3.5 text-[var(--muted)]" />}
                   <span className={cn('grid h-14 place-items-center overflow-hidden rounded-[13px] border transition-transform group-hover:scale-[1.04]', t.preset === id ? 'border-[var(--sc-deep)] ring-1 ring-[var(--sc-deep)]' : 'border-[var(--line)]')} style={{ background: th.bg }}>
@@ -245,7 +248,7 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
       <TabsContent value="type" className="grid min-h-0 grid-cols-2 content-start gap-2 overflow-y-auto px-5 pb-8 pt-1">
         <div className="col-span-2"><Label hint="Headings and body">Typeface pairs</Label></div>
         {FONTS.map(f => (
-          <button key={f} type="button" aria-pressed={t.font === f} aria-label={`${FONT_PAIRS[f].label} font`} onClick={() => (locked(PREMIUM_FONTS.has(f)) ? proNote() : updateTheme({ font: f }))}
+          <button key={f} type="button" aria-pressed={t.font === f} aria-label={`${FONT_PAIRS[f].label} font`} onClick={() => pick({ font: f }, PREMIUM_FONTS.has(f))}
             className={cn('relative grid gap-1 px-3 py-3 text-left', choice(t.font === f))} style={FONT_VARS[f] as React.CSSProperties}>
             {locked(PREMIUM_FONTS.has(f)) && <Lock className="absolute right-2.5 top-2.5 size-3.5 text-[var(--muted)]" />}
             <span className="posy-head text-[24px] leading-none">Aa Bb</span>

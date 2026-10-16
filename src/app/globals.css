@@ -196,6 +196,13 @@
 .posy-layout-list .posy-section { margin: 14px 0 2px; font-size: 20px; text-align: center; }
 .posy-footer { position: relative; z-index: 1; padding-bottom: 40px; text-align: center; font-size: 13px; color: var(--muted); }
 .posy-footer a:hover { color: var(--text); }
+/* the "Made with Posy" badge looks the same in every look: a paper pill with the cat */
+.posy-footer a.posy-badge { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px 7px 8px; border-radius: 999px; font: 500 13.5px/1 var(--font-geist), system-ui, sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; color: #2b241d !important;
+  background: #fffaf2; border: 1px solid rgb(43 36 29 / .1); box-shadow: 0 1px 2px rgb(43 36 29 / .08), 0 8px 22px -12px rgb(43 36 29 / .35); text-shadow: none; transition: transform .2s ease, box-shadow .2s ease; }
+.posy-footer a.posy-badge::before { content: none !important; }
+.posy-footer a.posy-badge img { width: 22px; height: 22px; border-radius: 50%; }
+.posy-footer a.posy-badge b { font-weight: 650; }
+.posy-footer a.posy-badge:hover { color: #2b241d !important; transform: translateY(-1px); box-shadow: 0 1px 2px rgb(43 36 29 / .1), 0 12px 26px -12px rgb(43 36 29 / .45); }
 
 /* ---- social icon row (list layout) ---- */
 .posy-social-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 6px; }

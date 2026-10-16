@@ -46,7 +46,7 @@ test.describe('MCP with an API key', () => {
 
     const before = await tool(request, key, 'get_page');
     expect(before.text).toContain('create_page');
-    const made = await tool(request, key, 'create_page', { username: id, style: 'cobalt', empty: true });
+    const made = await tool(request, key, 'create_page', { username: id, style: 'painted', empty: true });
     expect(made.isError).toBe(false);
     const added = await tool(request, key, 'add_tile', { inputs: ['https://github.com/octocat', 'octocat/Hello-World', 'hi@example.com', 'Open to work'] });
     expect(added.data.added).toHaveLength(4);

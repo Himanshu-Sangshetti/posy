@@ -30,11 +30,11 @@ test('design changes save to the draft', async ({ page }) => {
   await newUser(page);
   await page.getByRole('button', { name: 'Design' }).click();
   await page.getByRole('tab', { name: 'Colour' }).click();
-  await page.getByRole('button', { name: 'Moonlit', exact: true }).click();
+  await page.getByRole('button', { name: 'Starry', exact: true }).click();
   await page.getByRole('tab', { name: 'Type' }).click();
   await page.getByRole('button', { name: 'Modern font' }).click();
   await saved(page);
-  await expect.poll(async () => (await draft(page)).page.theme).toMatchObject({ preset: 'moonlit', font: 'modern' });
+  await expect.poll(async () => (await draft(page)).page.theme).toMatchObject({ preset: 'starry', font: 'modern' });
   await expect(page.locator('html')).toHaveClass(/dark/);
 });
 
@@ -177,7 +177,7 @@ test('the desk template turns tiles into objects, and a note can become a stamp'
 });
 
 test('export page.json, then import it back into the draft', async ({ page }) => {
-  await newUser(page, 'cobalt');
+  await newUser(page, 'painted');
   const before = (await draft(page)).page;
   await page.goto('/settings');
   const dl = page.waitForEvent('download');
@@ -207,16 +207,16 @@ test('onboarding lets you choose style, layout and colours separately', async ({
   await page.click('button[type=submit]');
   await page.waitForURL(/onboarding/);
   await expect(page.getByRole('status').filter({ hasText: 'Available' })).toBeVisible();
-  await page.click('[data-style="cobalt"]');
+  await page.click('[data-style="painted"]');
   await page.click('[data-layout="list"]');
-  await page.click('[data-preset="verdigris"]');
+  await page.click('[data-preset="dusk-sky"]');
   await expect(page.frameLocator('iframe[title="Live preview of your page"]').getByRole('heading', { name: 'Test Person' }).first()).toBeVisible({ timeout: 15_000 });
   await page.getByRole('button', { name: 'Create my page' }).click();
   await page.waitForURL(/\/edit/);
   const { page: d } = await page.request.get('/api/v1/page').then(r => r.json());
-  expect(d.theme.style).toBe('cobalt');
+  expect(d.theme.style).toBe('painted');
   expect(d.theme.layout).toBe('list');
-  expect(d.theme.preset).toBe('verdigris');
+  expect(d.theme.preset).toBe('dusk-sky');
 });
 
 test('canvas layout: drag a tile anywhere and the position saves', async ({ page }) => {

@@ -31,9 +31,9 @@ ORANGE = (228, 87, 46)
 LOOKS = [
     ("desk", "Desk", "cozy", "free", "A wooden desk with polaroids, a record and letters."),
     ("washi", "Washi", "washi", "pro", "A Japanese print: rice paper, ink and a red seal."),
-    ("lofi", "Lofi", "lofi", "pro", "A desktop left open. Every tile is a window."),
-    ("painted", "Painted", "painted", "pro", "Watercolour paper, letters and wax seals."),
-    ("cobalt", "Cobalt", "cobalt", "free", "A vintage print in two inks, under a crescent moon."),
+    ("lofi", "Lofi", "lofi", "free", "A desktop left open. Every tile is a window."),
+    ("painted", "Painted", "painted", "free", "Watercolour paper, letters and wax seals."),
+    ("cobalt", "Cobalt", "cobalt", "pro", "A vintage print in two inks, under a crescent moon."),
     ("night", "Night", "night", "pro", "A netrunner's screen with one signal colour."),
 ]
 

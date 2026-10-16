@@ -61,7 +61,11 @@ export function PageFrame({ page, children, profile, className, interactive = tr
         </div>
         {page.badge && (
           <footer className="posy-footer">
-            <a href="https://posy.page" target="_blank" rel="noopener">Made with Posy</a>
+            <a href="https://posy.page" target="_blank" rel="noopener" className="posy-badge">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/brand/posy-cat-192.png" alt="" width={22} height={22} />
+              <span>Made with <b>Posy</b></span>
+            </a>
           </footer>
         )}
       </MotionProvider>

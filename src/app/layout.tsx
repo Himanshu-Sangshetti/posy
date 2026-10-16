@@ -1,3 +1,4 @@
+import { EditionScripts } from '@/edition/scripts';
 import type { Metadata } from 'next';
 import { fontVariables } from '@/lib/fonts';
 import { siteUrl } from '@/lib/site';
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={fontVariables}>
-      <body>{children}</body>
+      <body>{children}<EditionScripts /></body>
     </html>
   );
 }

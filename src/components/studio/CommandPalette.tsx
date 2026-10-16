@@ -23,9 +23,15 @@ type Props = {
 export function CommandPalette({ open, onOpenChange, add, url, canPublish, onPublish, onShare, setDevice, openDesign }: Props) {
   const router = useRouter();
   const ent = useEntitlements();
-  const { updateTheme } = useStudio();
+  const { updateTheme, setPreview } = useStudio();
   const run = (fn: () => void) => () => { onOpenChange(false); setTimeout(fn, 60); };
-  const pro = () => toast('Part of Posy Pro', { description: 'Upgrade from Settings to use premium themes, fonts and more.' });
+  // a look or palette the plan doesn't include is tried in the editor (nothing saved); a free one is applied
+  const look = (patch: Parameters<typeof updateTheme>[0], premium: boolean) => {
+    const preview = useStudio.getState().preview;
+    if (premium && !ent.premium) setPreview(patch.style ? patch : { ...preview, ...patch });
+    else if (preview && !patch.style) setPreview({ ...preview, ...patch });
+    else { setPreview(null); updateTheme(patch); }
+  };
   const item = 'gap-3 rounded-[10px] px-2.5 py-2 text-[14px] data-[selected=true]:bg-[var(--sc-on)] data-[selected=true]:text-[var(--text)]';
   const chip = (bg: string, Icon: React.ElementType) => <span className="grid size-6 shrink-0 place-items-center rounded-[8px]" style={{ background: bg }}><Icon className="size-3.5" /></span>;
   return (
@@ -49,7 +55,7 @@ export function CommandPalette({ open, onOpenChange, add, url, canPublish, onPub
         <CommandGroup heading="Style">
           {STYLE_IDS.map(id => (
             <CommandItem key={id} className={item} value={`style ${STYLE_INFO[id].label}`}
-              onSelect={run(() => PREMIUM_STYLES.has(id) && !ent.premium ? pro() : updateTheme({ style: id, preset: STYLE_INFO[id].preset, font: STYLE_INFO[id].font, accent: undefined }))}>
+              onSelect={run(() => look({ style: id, preset: STYLE_INFO[id].preset, font: STYLE_INFO[id].font, accent: undefined }, PREMIUM_STYLES.has(id)))}>
               {chip('var(--brand-lilac)', Palette)}{STYLE_INFO[id].label}<span className="ml-auto text-[12px] text-[var(--muted)]">{STYLE_INFO[id].note}</span>
             </CommandItem>
           ))}
@@ -57,7 +63,7 @@ export function CommandPalette({ open, onOpenChange, add, url, canPublish, onPub
         <CommandGroup heading="Colours">
           {THEME_IDS.map(id => (
             <CommandItem key={id} className={item} value={`colour ${THEMES[id].name}`}
-              onSelect={run(() => PREMIUM_THEMES.has(id) && !ent.premium ? pro() : updateTheme({ preset: id, accent: undefined }))}>
+              onSelect={run(() => look({ preset: id, accent: undefined }, PREMIUM_THEMES.has(id)))}>
               <span className="flex size-6 shrink-0 items-center justify-center rounded-[8px] border border-[var(--line)]" style={{ background: THEMES[id].bg }}><span className="size-2.5 rounded-full" style={{ background: THEMES[id].accent }} /></span>{THEMES[id].name}
             </CommandItem>
           ))}

@@ -51,7 +51,7 @@ It opens a live preview, and one button makes the page yours. Fields: `name`, `b
 | `links` | Required. In order. A string is a URL, an email, `owner/repo` or a short note: Posy picks the right tile (GitHub repo, YouTube, Spotify, social profile, link). |
 | `username` | Optional. The address, `/<username>`. 3–30 letters, numbers, `-` or `_`. You can choose it when you load the file. |
 | `bio`, `location`, `avatar` | Optional. `avatar` is an image URL. |
-| `look` | Optional. The look of the page: `painted`, `cozy` (Desk), `washi`, `lofi`, `cobalt` or `night`. Default `painted`. On posy.page, Painted, Desk and Cobalt are free and the others are Pro. |
+| `look` | Optional. The look of the page: `painted`, `cozy` (Desk), `washi`, `lofi`, `cobalt` or `night`. Default `painted`. On posy.page, Painted, Desk and Lofi are free and the others are Pro. |
 | `theme` | Optional. Colours. Each look has four palettes, listed in `/schema/brief.schema.json`. The first is the default (`washi`: `kinari`, `sakura`, `yomogi`, `sumi`). |
 | `layout` | Optional. `bento` (Grid, the default: the look's own arrangement), `list` (one column, the phone arrangement on every screen) or `canvas` (free placement). Every look follows it. |
 | `photos` | Optional. How photos are printed: `natural`, `mono`, `dither` or `ascii`. |

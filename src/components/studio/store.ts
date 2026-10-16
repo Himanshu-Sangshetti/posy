@@ -9,6 +9,9 @@ type Patch<T> = Partial<T>;
 export type StudioState = {
   page: Page | null;
   selected: string | null;
+  /** Trying a look (or palette, font) the plan doesn't include: the editor shows it, nothing is saved. */
+  preview: Partial<Page['theme']> | null;
+  setPreview: (t: Partial<Page['theme']> | null) => void;
   setPage: (page: Page) => void;
   select: (id: string | null) => void;
   updateProfile: (p: Patch<Page['profile']>) => void;
@@ -40,6 +43,8 @@ export const useStudio = create<StudioState>()(
     set => ({
       page: null,
       selected: null,
+      preview: null,
+      setPreview: preview => set({ preview }),
       setPage: page => set({ page }),
       select: selected => set({ selected }),
       updateProfile: p => set(s => withPage(s, page => ({ ...page, profile: { ...page.profile, ...p } }))),
