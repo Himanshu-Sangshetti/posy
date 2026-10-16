@@ -40,6 +40,15 @@ const nextStep = (s: { hasUnpublishedChanges: boolean; page: { tiles: unknown[] 
   : s.hasUnpublishedChanges ? 'There are unpublished changes. Call publish when the user is happy, then share the URL.'
   : 'Everything is published. Share the URL.';
 
+/** How the server introduces itself to AI apps (title and icon show in their connector lists). mcp-handler's type only names `name` and `version`, but passes the whole object to the MCP server. */
+const SERVER_INFO = {
+  name: 'posy', title: 'Posy', version: '2.0.0', websiteUrl: 'https://posy.page',
+  icons: [
+    { src: 'https://posy.page/brand/posy-app-512.png', mimeType: 'image/png', sizes: ['512x512'] },
+    { src: 'https://posy.page/icon.svg', mimeType: 'image/svg+xml', sizes: ['any'] },
+  ],
+} as { name: string; version: string };
+
 const handler = createMcpHandler(server => {
   server.registerTool('get_page', {
     title: 'Get page',
@@ -135,7 +144,7 @@ const handler = createMcpHandler(server => {
   server.registerTool('list_options', {
     title: 'List options', description: 'Allowed values for looks (with a note and the palettes each offers), themes, fonts, backgrounds, tile styles, sizes, colours and social platforms.', inputSchema: z.object({}), annotations: READ,
   }, run(async () => ({ styles: STYLE_IDS.map(id => ({ id, label: STYLE_INFO[id].label, note: STYLE_INFO[id].note, palettes: STYLE_PALETTES[id] })), themes: THEME_IDS, fonts: FONTS, radius: RADII, layouts: LAYOUTS, align: ALIGNS, backgrounds: BACKGROUNDS, tileStyles: TILE_STYLES, effects: EFFECTS, avatars: AVATARS, photos: PHOTO_LOOKS, sizes: SIZES, colors: COLORS, platforms: PLATFORM_IDS })));
-}, { serverInfo: { name: 'posy', version: '2.0.0' }, instructions: INSTRUCTIONS });
+}, { serverInfo: SERVER_INFO, instructions: INSTRUCTIONS });
 
 const RESOURCE = () => `${siteUrl()}/api/mcp`;
 

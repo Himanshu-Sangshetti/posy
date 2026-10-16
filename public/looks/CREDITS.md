@@ -33,6 +33,9 @@ Made for Posy with Krea 2 Turbo (open weights, Krea 2 Community License; Krea cl
 | {desk,washi,lofi,painted,night}/{avatar,photo1,photo2,cover,music,video}.jpg | Placeholder pictures for each look's starter page, painted in that look's style |
 | desk/{coffee,plant,sprig}.webp, desk/grain.jpg | Props and grain for the Desk scene: a latte, a pilea plant, a eucalyptus sprig, wood grain (generated for Posy) |
 | lofi/wall-{day,night}-{desk,phone}.jpg, lofi/icons/*.png | Lofi wallpapers (afternoon sky, rainy window) and the clay app icons (generated for Posy) |
+| desk/{wood,window,camera,pen,tapes}.webp | Desk surface, window light and props: honey oak, window-pane shadow, an instant camera, a fountain pen, washi tape rolls (generated for Posy) |
+| cobalt/*.jpg | Cobalt's two-ink skies (cobalt, vermilion, verdigris) and starter pictures (generated for Posy, re-inked) |
+| ../brand/*.png, ../../.github/assets/* | Brand and README art: the painted sky, the floating island with the girl at her desk, the kite, petals and the meadow footer (from the posy.page landing art, generated for Posy) |
 
 ## Fonts
 
