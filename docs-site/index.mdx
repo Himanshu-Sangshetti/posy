@@ -1,110 +1,40 @@
 ---
-title: "Posy docs"
-sidebarTitle: "Posy"
-description: "An open-source link in bio that looks like you made it by hand. Make it yourself, hand it to your AI, or host it."
-mode: "custom"
+title: "Introduction"
+sidebarTitle: "Introduction"
+description: "Posy is a link-in-bio page that looks hand-made. Pick a look, add your links, publish. Edit it yourself or let your AI do it."
 ---
 
-import { LOOKS, LooksStrip } from '/snippets/looks.jsx';
-import { INSTALL_LINKS, INSTALL_COPIES, InstallButtons } from '/snippets/install.jsx';
+Posy is free and open source. Use it at [posy.page](https://posy.page), or run it on your own server. Your whole page is one small JSON file, so the studio, your AI and your scripts all edit the same thing.
 
-<div className="posy-home">
-  <section className="posy-hero">
-    <div className="posy-hero-sky" aria-hidden="true" />
-    <img className="posy-hero-cloud posy-hero-cloud-a" src="/images/hero/cloud.webp" alt="" aria-hidden="true" noZoom />
-    <img className="posy-hero-cloud posy-hero-cloud-b" src="/images/hero/cloud.webp" alt="" aria-hidden="true" noZoom />
-    <img className="posy-hero-kite" src="/images/hero/kite.webp" alt="" aria-hidden="true" noZoom />
-    <img className="posy-hero-petal posy-hero-petal-a" src="/images/hero/petal-a.webp" alt="" aria-hidden="true" noZoom />
-    <img className="posy-hero-petal posy-hero-petal-b" src="/images/hero/petal-b.webp" alt="" aria-hidden="true" noZoom />
-    <img className="posy-hero-petal posy-hero-petal-c" src="/images/hero/petal-c.webp" alt="" aria-hidden="true" noZoom />
-    <div className="posy-hero-inner">
-      <div className="posy-hero-copy">
-        <p className="posy-hero-eyebrow">Posy docs</p>
-        <h1 className="posy-hero-title">A link in bio that looks like you <em>made it by hand.</em></h1>
-        <p className="posy-hero-lede">Posy is a link-in-bio page that looks hand-made. Pick a look, add your links, publish. Edit it yourself or let your AI do it. Free and open source.</p>
-        <div className="posy-hero-actions">
-          <a className="posy-btn posy-btn-primary" href="https://posy.page/signup">Make your page</a>
-          <a className="posy-btn posy-btn-ghost" href="/quickstart">Read the quickstart</a>
-        </div>
-      </div>
-      <img className="posy-hero-island" src="/images/hero/island.webp" alt="A girl at a desk on a floating island, a cat asleep under the table" noZoom />
-    </div>
-  </section>
+<Frame>
+  <img src="/images/looks/desk-desktop.webp" alt="A Posy page in the Desk look: a letter, a polaroid, luggage-tag links on a leather desk pad" />
+</Frame>
 
-  <section className="posy-paths">
-    <a className="posy-path" href="/quickstart">
-      <span className="posy-path-icon"><Icon icon="sparkles" size={20} /></span>
-      <span className="posy-path-kicker">Two minutes</span>
-      <span className="posy-path-title">Start on posy.page</span>
-      <span className="posy-path-text">Claim your name, paste your links, pick a look. Posy picks the right tile for each link.</span>
-      <span className="posy-path-cta">Quickstart <Icon icon="arrow-right" size={14} /></span>
-    </a>
-    <a className="posy-path" href="/self-host/guide">
-      <span className="posy-path-icon"><Icon icon="house" size={20} /></span>
-      <span className="posy-path-kicker">Your server</span>
-      <span className="posy-path-title">Self-host</span>
-      <span className="posy-path-text">Docker, Compose, Vercel with Turso, or any Node host. Every look is unlocked.</span>
-      <span className="posy-path-cta">Self-hosting guide <Icon icon="arrow-right" size={14} /></span>
-    </a>
-    <div className="posy-path posy-path-install">
-      <span className="posy-path-icon"><Icon icon="plug" size={20} /></span>
-      <span className="posy-path-kicker">Claude, ChatGPT, Cursor</span>
-      <a className="posy-path-title" href="/agents/connect">Connect your AI</a>
-      <span className="posy-path-text">Add Posy in one click, then ask for a page. Every change lands in your draft until you publish.</span>
-      <InstallButtons compact />
-      <a className="posy-path-cta" href="/agents/connect">Every app <Icon icon="arrow-right" size={14} /></a>
-    </div>
-  </section>
+## Start here
 
-  <section className="posy-section">
-    <div className="posy-section-head">
-      <h2 className="posy-section-title">Pick a <em>look</em></h2>
-      <p className="posy-section-text">Desk, Washi, Lofi, Painted, Cobalt and Night. Each one draws your tiles in its own way. Switch any time and nothing is lost.</p>
-    </div>
-    <LooksStrip />
-    <p className="posy-section-more"><a href="/looks">See every look, palette and phone view <Icon icon="arrow-right" size={14} /></a></p>
-  </section>
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Make a page on posy.page in about two minutes.
+  </Card>
+  <Card title="Your first page" icon="pen-nib" href="/first-page">
+    Add links, photos and notes, then publish.
+  </Card>
+  <Card title="Connect an AI app" icon="plug" href="/agents/connect">
+    Claude, ChatGPT, Cursor, VS Code, Claude Code and Codex.
+  </Card>
+  <Card title="Self-host" icon="server" href="/self-host/guide">
+    Docker, Compose, Vercel with Turso, or any Node host.
+  </Card>
+</CardGroup>
 
-  <section className="posy-section">
-    <div className="posy-section-head">
-      <h2 className="posy-section-title">How it <em>fits together</em></h2>
-      <p className="posy-section-text">One page, four ways to edit it. They all write the same JSON document.</p>
-    </div>
-    <div className="posy-parts">
-      <a className="posy-part" href="/first-page">
-        <Icon icon="pen-line" size={18} />
-        <span><strong>The studio</strong> is the editor at posy.page. Paste a link and Posy picks the right tile.</span>
-      </a>
-      <a className="posy-part" href="/agents/format">
-        <Icon icon="braces" size={18} />
-        <span><strong>The page file</strong> is a small JSON file any chat can write. Load it at posy.page/new.</span>
-      </a>
-      <a className="posy-part" href="/agents/tools">
-        <Icon icon="bot" size={18} />
-        <span><strong>The MCP server</strong> lets an AI app edit your page directly, always into your draft.</span>
-      </a>
-      <a className="posy-part" href="/api-reference/introduction">
-        <Icon icon="terminal" size={18} />
-        <span><strong>The REST API and CLI</strong> do the same from scripts and CI.</span>
-      </a>
-    </div>
-  </section>
+## How it fits together
 
-  <section className="posy-agents">
-    <img className="posy-agents-cat" src="/logo/posy-cat-512.png" alt="" aria-hidden="true" noZoom />
-    <div>
-      <h3 className="posy-agents-title">Written for <em>people and agents</em></h3>
-      <p className="posy-agents-text">These docs publish <code>llms.txt</code> and <code>llms-full.txt</code>, and every page has a copy-for-AI menu. Posy serves its own too: see <a href="/agents/llms-txt">llms.txt</a>.</p>
-    </div>
-  </section>
+- **The studio** at posy.page is the editor. Paste a link and Posy picks the right tile for it.
+- **Looks** decide how the page is drawn: Desk, Washi, Lofi, Painted, Cobalt and Night. See the [looks gallery](/looks).
+- **The page file** is the JSON behind every page. Any chat app can write one, and you can open it at [posy.page/new](https://posy.page/new). See [the page file](/agents/format).
+- **The MCP server** at `https://posy.page/api/mcp` lets AI apps edit and publish your page. See [MCP tools](/agents/tools).
+- **The REST API** does the same over HTTP with an API key. See the [API reference](/api-reference/introduction).
 
-  <section className="posy-meadow">
-    <div className="posy-meadow-links">
-      <a href="https://posy.page">posy.page</a>
-      <a href="https://github.com/Himanshu-Sangshetti/posy">GitHub</a>
-      <a href="/changelog">Changelog</a>
-      <a href="/contribute/guide">Contribute</a>
-    </div>
-    <p className="posy-meadow-note">Free and open source. Made with care, and a cat asleep under the desk.</p>
-  </section>
-</div>
+<Tip>
+  For AI assistants, the whole documentation is in one file at [posy.page/llms-full.txt](https://posy.page/llms-full.txt).
+</Tip>

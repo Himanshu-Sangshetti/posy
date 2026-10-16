@@ -25,7 +25,7 @@ It adds frontmatter, rewrites links (`/docs/format` -> `/agents/format`, `/new` 
 - `style.css` holds the rest: paper grain, cards, callouts, code blocks, steps, the home page (`.posy-home`) and the looks gallery (`.posy-look`). Mintlify loads every `.css` file in this folder.
 - `snippets/looks.jsx` has the looks (copy, palettes, free/Pro) and the `LooksStrip` and `LookStage` components. A page that uses a component must also import `LOOKS`.
 - `snippets/install.jsx` has the one-click install buttons (`InstallButtons`, and `<InstallButtons compact />` on the home page). Logos are monochrome SVGs in `images/apps/`, from Simple Icons (CC0) and Lucide (ISC, the Goose bird). `agents/connect.mdx` gets the buttons from the `<!-- docs-site: install-buttons -->` marker in `docs/connect.md`; text between `<!-- docs-site: skip -->` markers stays out of the docs site.
-- `images/hero/` is landing art from the Cloud repo (`public/landing/art/`), `images/looks/` are the Cloud repo's look screenshots (`public/landing/shots/`), resized to webp. Keep each image under 300 KB.
+- `images/looks/` are the Cloud repo's look screenshots (`public/landing/shots/`), resized to webp. Keep each image under 300 KB.
 - `images/og-docs.png` is the 1200x630 share image set in `seo.metatags`.
 
 ## Run locally
