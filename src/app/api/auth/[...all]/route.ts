@@ -4,10 +4,11 @@ import { clientIp, limit } from '@/lib/rate-limit';
 
 const handler = toNextJsHandler(auth);
 
-// [path suffix, max, window seconds] per client address, shared across instances.
+// [path suffix, max, window seconds] per client address, shared across instances. Generous on purpose: mobile carriers put
+// many people behind one address. Social sign-in is left to the provider (Google checks the password, not us).
 const LIMITS: [RegExp, number, number][] = [
-  [/\/sign-in\//, 10, 60],
-  [/\/sign-up\//, 5, 600],
+  [/\/sign-in\/(email|username)$/, 30, 60],
+  [/\/sign-up\//, 30, 600],
   [/\/oauth2\/register$/, 10, 3600],
   [/\/(change-password|change-email|request-password-reset)$/, 5, 600],
 ];
