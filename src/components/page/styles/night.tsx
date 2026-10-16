@@ -13,6 +13,8 @@ import { RichText } from '../tiles';
 import { tileMeta, compact, seeded } from './meta';
 import type { HeaderSlots } from './types';
 
+/** The alert colour of each palette (also in night.css). */
+const WARN: Record<string, string> = { netrunner: '#ff2b4e', ice: '#ff3d81', redline: '#f3e600', daylight: '#e3102f' };
 const rgb = (h: string) => { const n = parseInt(h.replace('#', '').padEnd(6, '0').slice(0, 6), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => v / 255); };
 const mix = (a: number[], b: number[], t: number) => a.map((v, i) => v + (b[i] - v) * t);
 
@@ -26,11 +28,21 @@ function Scanner({ preset }: { preset: string }) {
   const ink = rgb(t.dark ? t.bg : t.text), lit = rgb(t.dark ? t.accent : t.bg), hi = mix(lit, [1, 1, 1], t.dark ? 0.45 : 0.6);
   const tones = [ink, mix(ink, lit, 0.22), mix(ink, lit, 0.5), lit, hi];
   const ch = (i: number) => tones.map(c => c[i].toFixed(3)).join(' ');
+  // on dark palettes the brightest parts bleed a thin edge of the alert colour, like a cheap lens
+  const fringe = (src: string) => t.dark && <>
+    <feColorMatrix in={src} type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.299 0.587 0.114 0 0" />
+    <feComponentTransfer><feFuncA type="discrete" tableValues="0 0 0 .85" /></feComponentTransfer>
+    <feOffset dx="2.5" result="edge" />
+    <feFlood floodColor={WARN[preset] ?? WARN.netrunner} />
+    <feComposite in2="edge" operator="in" result="fringe" />
+    <feBlend in="scanned" in2="fringe" mode="lighten" />
+  </>;
   const chain = (src: string) => <>
     <feColorMatrix in={src} type="matrix" values="0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0 0 0 1 0" />
     <feComponentTransfer>{['R', 'G', 'B'].map(c => { const F = `feFunc${c}` as 'feFuncR'; return <F key={c} type="linear" slope="1.3" intercept="-0.12" />; })}</feComponentTransfer>
     <feComponentTransfer>{['R', 'G', 'B'].map(c => { const F = `feFunc${c}` as 'feFuncR'; return <F key={c} type="discrete" tableValues="0 .25 .5 .75 1" />; })}</feComponentTransfer>
-    <feComponentTransfer><feFuncR type="table" tableValues={ch(0)} /><feFuncG type="table" tableValues={ch(1)} /><feFuncB type="table" tableValues={ch(2)} /></feComponentTransfer>
+    <feComponentTransfer result="scanned"><feFuncR type="table" tableValues={ch(0)} /><feFuncG type="table" tableValues={ch(1)} /><feFuncB type="table" tableValues={ch(2)} /></feComponentTransfer>
+    {fringe(src)}
   </>;
   return (
     <svg aria-hidden width="0" height="0" style={{ position: 'absolute', width: 0, height: 0 }}>
@@ -134,6 +146,8 @@ function Readout({ seed, kind }: { seed: string; kind: ArtKind }) {
 export function NightHeader({ page, slots }: { page: Page; slots: HeaderSlots }) {
   const r = seeded(page.profile.name || 'posy');
   const id = `${hex(r, 2)}-${hex(r, 2)}-${hex(r, 2)}`;
+  const nodes = page.tiles.filter(t => t.type !== 'social' && t.type !== 'heading').length;
+  const ticker = [page.profile.name, page.profile.location, `${nodes} nodes online`, 'uplink stable', `id ${id}`, 'encryption on', `ping ${8 + Math.floor(r() * 30)}ms`].filter(Boolean).map(x => String(x).toUpperCase());
   return (
     <>
       <Scanner preset={page.theme.preset} />
@@ -150,6 +164,7 @@ export function NightHeader({ page, slots }: { page: Page; slots: HeaderSlots })
             {slots.avatar}
             <i className="nr-brackets" aria-hidden />
             <i className="nr-sweep" aria-hidden />
+            <i className="nr-holo" aria-hidden />
             <span className="nr-photo-tag" aria-hidden>SUBJ. {hex(r, 4)}</span>
           </div>
         )}
@@ -159,9 +174,12 @@ export function NightHeader({ page, slots }: { page: Page; slots: HeaderSlots })
           {slots.bio && <div className="posy-bio nr-bio">{slots.bio}</div>}
           {slots.caption && <p className="nr-caption"><i aria-hidden />ONLINE<span aria-hidden>·</span>{slots.caption}</p>}
           <div className="nr-socials">{slots.socials}</div>
-          <Barcode seed={id} className="nr-badge-code" />
+          <span className="nr-clear" aria-hidden><span>Clearance</span><b>LVL {2 + Math.floor(r() * 4)}</b><Barcode seed={id} className="nr-badge-code" /></span>
         </div>
+        <span className="nr-chip-card" aria-hidden />
+        <span className="nr-kana" aria-hidden>ネットランナー</span>
       </div>
+      <div className="nr-ticker" aria-hidden><span>{[...ticker, ...ticker].map((x, i) => <span key={i}>{x}<i>//</i></span>)}</span></div>
     </>
   );
 }
@@ -190,6 +208,7 @@ export function NightTile({ tile, index, editing }: { tile: Tile; index: number;
       <div className={cn('nr-panel nr-msg', `nr-msg-${tile.size}`)}>
         <div className="nr-in">
           <div className="nr-strip"><span className="nr-node">MSG_{hex(r, 3)}</span><span className="nr-kind">Decrypted</span><span className="nr-dots" aria-hidden /><span className="nr-ok" aria-hidden>✓</span></div>
+          <span className="nr-cipher" aria-hidden>{Array.from({ length: 10 }, () => hex(r, 2)).join(' ')}</span>
           <blockquote><RichText text={tile.text} /><i className="nr-cursor" aria-hidden /></blockquote>
         </div>
       </div>
@@ -202,6 +221,8 @@ export function NightTile({ tile, index, editing }: { tile: Tile; index: number;
         <Scan src={tile.src} alt={tile.alt}>
           <span className="nr-feed-top" aria-hidden><span><i className="nr-rec" />CAM_{String(index + 1).padStart(2, '0')}</span><span>{String(Math.floor(r() * 24)).padStart(2, '0')}:{String(Math.floor(r() * 60)).padStart(2, '0')}:{String(Math.floor(r() * 60)).padStart(2, '0')}</span></span>
           <i className="nr-cross" aria-hidden />
+          <span className="nr-lock" aria-hidden><b>Target lock</b></span>
+          <span className="nr-exif" aria-hidden>ISO {[400, 800, 1600, 3200][Math.floor(r() * 4)]} · F{(1.4 + Math.floor(r() * 4) * 0.4).toFixed(1)} · 1/{[30, 60, 125][Math.floor(r() * 3)]}</span>
         </Scan>
         {tile.caption && <figcaption className="nr-subtitle">{tile.caption}</figcaption>}
       </div>
