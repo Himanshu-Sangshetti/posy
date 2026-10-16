@@ -2,11 +2,9 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireUser } from '@/lib/session';
 import { pageForUser } from '@/lib/pages';
-import { starterPage } from '@/lib/templates';
 import { STYLE_IDS, STYLE_INFO, PREMIUM_STYLES } from '@/lib/styles';
 import { THEMES, PREMIUM_THEMES } from '@/lib/themes';
 import { entitlementsFor } from '@/lib/entitlements';
-import { Thumbnail } from '@/components/page/Thumbnail';
 import { Onboarding } from '@/components/auth/Onboarding';
 import { Logo } from '@/components/brand';
 import { AppFrame } from '@/components/dash/ui';
@@ -25,10 +23,13 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   if (await pageForUser(user.id)) redirect('/edit');
   const { username, look } = await searchParams;
   const premium = (await entitlementsFor(user.id)).premium;
-  const styles = STYLE_IDS.map(id => {
-    const page = starterPage({ name: user.name, style: id });
-    return { id, label: STYLE_INFO[id].label, note: STYLE_INFO[id].note, preset: STYLE_INFO[id].preset, layout: STYLE_INFO[id].layout, locked: !premium && PREMIUM_STYLES.has(id), preview: <Thumbnail key={id} page={page} width={1100} height={680} scale={0.26} /> };
-  });
+  // Each look is shown as a small picture, not a live page: six live scenes decode hundreds of MB of art, and phones
+  // (iOS Safari, in-app browsers) kill and reload the tab. The live preview below still shows the chosen look for real.
+  const styles = STYLE_IDS.map(id => ({
+    id, label: STYLE_INFO[id].label, note: STYLE_INFO[id].note, preset: STYLE_INFO[id].preset, layout: STYLE_INFO[id].layout, locked: !premium && PREMIUM_STYLES.has(id),
+    // eslint-disable-next-line @next/next/no-img-element
+    preview: <img key={id} src={`/looks/swatches/${id}.jpg`} alt="" loading="lazy" decoding="async" className="size-full object-cover object-top" />,
+  }));
   const themes = Object.values(THEMES).map(t => ({ id: t.id, name: t.name, bg: t.bg, accent: t.accent, text: t.text, dark: t.dark, locked: !premium && PREMIUM_THEMES.has(t.id) }));
   return (
     <AppFrame>
