@@ -59,7 +59,7 @@ export const POP_FIT = { collisionPadding: { top: 64, bottom: 88, left: 8, right
 function neighbour(tile: Tile, dir: -1 | 1): Tile | undefined {
   const page = useStudio.getState().page;
   if (!page) return;
-  const scene = !!sceneFor(page.theme.style);
+  const scene = !!sceneFor(page.theme);
   const kind = (t: Tile) => !scene ? (t.type === 'heading' ? 'h' : t.type === 'social' ? 's' : 'g') : t.type === 'text' ? (t.look === 'stamp' ? 'stamp' : 'note') : t.type === 'github' ? 'link' : t.type === 'music' || t.type === 'video' ? 'media' : t.type;
   const same = page.tiles.filter(t => kind(t) === kind(tile));
   return same[same.findIndex(t => t.id === tile.id) + dir];
@@ -90,7 +90,7 @@ export function TileToolbar({ tile }: { tile: Tile }) {
   const layout = useStudio(s => s.page?.theme.layout);
   const desk = style === 'cozy';
   const stamp = tile.type === 'text' && tile.look === 'stamp';
-  const canvas = layout === 'canvas' && !sceneFor(style);
+  const canvas = layout === 'canvas';
   const sticker = tile.type === 'social' && (style !== 'minimal' || layout === 'list');
   const inlineText = tile.type === 'text' && !stamp && (style === 'minimal' || style === 'cozy');
   const prev = canvas ? undefined : neighbour(tile, -1), next = canvas ? undefined : neighbour(tile, 1);
