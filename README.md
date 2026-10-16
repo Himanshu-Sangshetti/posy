@@ -74,7 +74,7 @@ Each look has four palettes, and you can switch any time.
   </tr>
 </table>
 
-On posy.page, Desk and Cobalt are free, and the others come with Pro. Self-hosted, every look is unlocked.
+On posy.page, Painted, Desk and Cobalt are free, and the others come with Pro. Self-hosted, every look is unlocked.
 See them live in the [looks gallery](https://docs.posy.page/looks).
 
 <details>
