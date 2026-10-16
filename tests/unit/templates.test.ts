@@ -14,6 +14,6 @@ describe('starter pages', () => {
     }
   });
   it('a sample page keeps its sample content', () => {
-    expect(starterPage({ name: 'Ada', style: 'press' }).tiles.length).toBeGreaterThan(5);
+    expect(starterPage({ name: 'Ada', style: 'cobalt' }).tiles.length).toBeGreaterThan(5);
   });
 });

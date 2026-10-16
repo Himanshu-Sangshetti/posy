@@ -8,8 +8,6 @@ export const TEMPLATES = {
   night: { label: 'Lofi', note: 'A desktop left open' },
   creator: { label: 'Minimal', note: 'Ink and paper, photos in 1-bit' },
   links: { label: 'Links', note: 'A clean list, like Linktree' },
-  press: { label: 'Press', note: 'A weekend paper' },
-  gallery: { label: 'Gallery', note: 'Work on the wall' },
   painted: { label: 'Painted', note: 'A watercolour sky' },
   neon: { label: 'Night', note: 'A HUD after dark' },
   cobalt: { label: 'Cobalt', note: 'A print in two inks' },
@@ -120,45 +118,6 @@ export function template(id: TemplateId, name: string): Page {
           { type: 'link', url: 'https://example.com/shop', title: 'Shop', size: 's' },
         ]),
       });
-    case 'press':
-      return parsePage({
-        profile: { ...profile, avatar: art('press', 'avatar'), bio: 'Writer and podcaster. A letter every Sunday about what I read, cooked and noticed.', location: 'Sunday edition' },
-        theme: { style: 'press', preset: 'newsprint', font: 'press', layout: 'bento', avatar: 'circle' },
-        tiles: ids([
-          { type: 'social', platform: 'substack', handle: 'yourname', size: 's' },
-          { type: 'social', platform: 'x', handle: 'yourname', size: 's' },
-          { type: 'social', platform: 'email', handle: 'you@example.com', size: 's' },
-          { type: 'link', url: 'https://example.com/essays/by-hand', title: 'Why I write everything by hand first', description: 'On slow drafts, fast coffee and the joy of crossing things out.', image: art('press', 'cover'), size: 'l' },
-          { type: 'link', url: 'https://substack.com', title: 'The Sunday Edition', description: 'One letter a week. No noise, just the good bits.', size: 'w' },
-          { type: 'text', text: 'Write the thing you wish someone had written for you.', size: 'w' },
-          { type: 'heading', text: 'The podcast' },
-          { type: 'video', url: VIDEO, title: 'Small towns, big stories', image: art('press', 'video'), size: 'w' },
-          { type: 'music', url: 'https://open.spotify.com/', title: 'Desk radio', artist: 'A playlist for writing', image: art('press', 'music'), size: 'w' },
-          { type: 'image', src: art('press', 'photo1'), caption: 'The corner newsstand, Saturday morning', size: 'w' },
-          { type: 'link', url: 'https://gumroad.com', title: 'Zine back issues', description: 'Printed, stapled, posted by hand', size: 's' },
-          { type: 'text', text: 'Taking pitches', look: 'stamp', size: 's' },
-        ]),
-      });
-    case 'gallery':
-      return parsePage({
-        profile: { ...profile, avatar: art('gallery', 'avatar'), bio: 'Paintings about small, quiet afternoons.', location: 'Studio in Porto' },
-        theme: { style: 'gallery', preset: 'white-cube', font: 'gallery', layout: 'bento', avatar: 'square' },
-        tiles: ids([
-          { type: 'social', platform: 'instagram', handle: 'yourname', size: 's' },
-          { type: 'social', platform: 'behance', handle: 'yourname', size: 's' },
-          { type: 'social', platform: 'email', handle: 'you@example.com', size: 's' },
-          { type: 'image', src: art('gallery', 'photo1'), caption: 'Kite Hill, gouache', size: 'l' },
-          { type: 'image', src: art('gallery', 'photo2'), caption: 'Afternoon nap, risograph', size: 's' },
-          { type: 'text', text: 'Available for commissions', look: 'stamp', size: 's' },
-          { type: 'text', text: 'I paint the quiet parts of the day.', size: 'w' },
-          { type: 'heading', text: 'New work' },
-          { type: 'link', url: 'https://example.com/seaside', title: 'Seaside', description: 'Twelve oil paintings, spring 2026', image: art('gallery', 'cover'), size: 'w' },
-          { type: 'music', url: 'https://open.spotify.com/', title: 'Painting playlist', artist: 'Spotify', image: art('gallery', 'music'), size: 's' },
-          { type: 'link', url: 'https://buttondown.email', title: 'Studio letters', description: 'New work, once a month', size: 's' },
-          { type: 'video', url: VIDEO, title: 'A day in the studio', image: art('gallery', 'video'), size: 'w' },
-          { type: 'link', url: 'https://gumroad.com', title: 'Print shop', description: 'Signed giclée prints', size: 'w' },
-        ]),
-      });
     case 'painted':
       return parsePage({
         profile: { ...profile, avatar: art('painted', 'avatar'), bio: 'Drawing a little world, one page at a time. Picture books, prints and the odd kite.', location: 'somewhere above the clouds' },
@@ -231,7 +190,7 @@ export function template(id: TemplateId, name: string): Page {
 }
 
 /** The sample content shown for each style when you start from it. */
-export const STYLE_STARTERS: Record<StyleId, TemplateId> = { cozy: 'desk', minimal: 'creator', washi: 'writer', lofi: 'night', press: 'press', gallery: 'gallery', painted: 'painted', night: 'neon', cobalt: 'cobalt' };
+export const STYLE_STARTERS: Record<StyleId, TemplateId> = { cozy: 'desk', minimal: 'creator', washi: 'writer', lofi: 'night', painted: 'painted', night: 'neon', cobalt: 'cobalt' };
 
 /** A new page from independent choices: style, layout and colours (plus sample content or an empty page). */
 export function starterPage(o: { name: string; style: StyleId; layout?: 'bento' | 'list' | 'canvas'; preset?: string; empty?: boolean }): Page {

@@ -2,7 +2,7 @@
  * The Posy brief: a short, forgiving JSON file any chat model can write and anyone can load into Posy.
  * It is the way into Posy for chats that cannot connect to the MCP server (ChatGPT, Gemini, plain chat windows).
  *
- *   { "posy": 1, "name": "Mira Sol", "bio": "…", "look": "minimal", "links": ["https://github.com/mira", {"heading": "Projects"}] }
+ *   { "posy": 1, "name": "Mira Sol", "bio": "…", "look": "cobalt", "links": ["https://github.com/mira", {"heading": "Projects"}] }
  *
  * Also accepted: the full page JSON that Posy exports. Client-safe (no database, no network).
  */
@@ -98,7 +98,7 @@ export function briefToPage(input: unknown): BriefResult {
   const known = Object.keys(Brief.shape);
   Object.keys(o).filter(k => !known.includes(k)).forEach(k => warnings.push(`Ignored "${k}": not part of the brief.`));
 
-  let look: StyleId = 'minimal';
+  let look: StyleId = STYLE_IDS[0];
   if (b.look) {
     const l = b.look.toLowerCase().trim();
     if ((STYLE_IDS as string[]).includes(l)) look = l as StyleId;

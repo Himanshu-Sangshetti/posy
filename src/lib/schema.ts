@@ -10,9 +10,12 @@ export const BASE_FONTS = ['soft', 'editorial', 'washi', 'lofi', 'press', 'galle
 export const FONTS = [...BASE_FONTS, ...Object.keys(EDITION_FONT_PAIRS)] as [string, ...string[]];
 export const RADII = ['sharp', 'soft', 'round', 'pill'] as const;
 /** The look of the whole page. Independent of the layout. */
-export const STYLES = ['cozy', 'minimal', 'press', 'gallery', 'washi', 'lofi', 'painted', 'night', 'cobalt'] as const;
+export const STYLES = ['cozy', 'minimal', 'washi', 'lofi', 'painted', 'night', 'cobalt'] as const;
+/** Retired looks that had their own palettes and font: the palette and font their pages move to (light stays light, dark stays dark). */
+const RETIRED_LOOK: Record<string, [string, string]> = { press: ['cobalt', 'cobalt'], gallery: ['morning', 'painted'] };
+const RETIRED_PRESETS: Record<string, string> = { newsprint: 'cobalt', salmon: 'vermilion', ivory: 'verdigris', 'late-edition': 'moonlit', 'white-cube': 'morning', 'gallery-sage': 'golden-hour', oxblood: 'dusk-sky', 'dark-room': 'starry' };
 /** Styles that were retired, and the look each one moves to. */
-const RETIRED_STYLES: Record<string, (typeof STYLES)[number]> = { soft: 'minimal', editorial: 'minimal', terminal: 'minimal', neon: 'lofi' };
+const RETIRED_STYLES: Record<string, (typeof STYLES)[number]> = { soft: 'minimal', editorial: 'minimal', terminal: 'minimal', neon: 'lofi', press: 'cobalt', gallery: 'painted' };
 export const LAYOUTS = ['bento', 'list', 'canvas'] as const;
 export const TEXT_LOOKS = ['note', 'stamp'] as const;
 export const ALIGNS = ['side', 'center'] as const;
@@ -123,7 +126,7 @@ export const Theme = z.object({
   accent: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().describe('Override the theme accent, e.g. "#e8a87c"'),
   font: z.enum(FONTS).default('editorial'),
   radius: z.enum(RADII).default('round'),
-  style: z.enum(STYLES).default('cozy').describe('cozy = Desk: tiles as objects on a desk (polaroids, sticky notes, records); minimal = an editorial page, paper and ink, hairlines and big type; washi = a Japanese print (woodblock print header, paper, ink, red seal); lofi = a desktop left open (tiles as little app windows with pinstriped title bars, clay clouds by day, painted anime rooms at night); press = a weekend newspaper (masthead, headlines, halftone photos, pull quotes, coupon and classified ads); gallery = a small gallery (framed works with wall labels, wall text, red dot stickers); painted = a watercolour sky (deckled paper cards, painted edges, wax seals); night = a netrunner heads-up display (an ID badge header, cut-corner HUD panels with node numbers, photos scanned in one signal colour, circuit and commit-graph readouts, decrypted-message notes, a cassette, a hazard-label stamp); cobalt = a vintage print in two inks (a cobalt night sky over a cream plain, numbered plates, photos reprinted in two inks, verse on cobalt, a sun-burst seal)'),
+  style: z.enum(STYLES).default('cozy').describe('cozy = Desk: tiles as objects on a desk (polaroids, sticky notes, records); minimal = a plain fallback (not offered: pick one of the other six); washi = a Japanese print (woodblock print header, paper, ink, red seal); lofi = a desktop left open (tiles as little app windows with pinstriped title bars, clay clouds by day, painted anime rooms at night); painted = a watercolour sky (deckled paper cards, painted edges, wax seals); night = a netrunner heads-up display (an ID badge header, cut-corner HUD panels with node numbers, photos scanned in one signal colour, circuit and commit-graph readouts, decrypted-message notes, a cassette, a hazard-label stamp); cobalt = a vintage print in two inks (a cobalt night sky over a cream plain, numbered plates, photos reprinted in two inks, verse on cobalt, a sun-burst seal)'),
   layout: z.enum(LAYOUTS).default('bento').describe('bento = grid of tiles; list = Linktree-style stacked links; canvas = free placement, each tile at its own `pos` (x, y, w, h in a 1200-wide space, rotation r, layer z)'),
   align: z.enum(ALIGNS).default('side').describe('minimal style + bento only: profile beside the grid (side) or above it (center)'),
   background: Background.default(Background.parse({})),
@@ -144,6 +147,7 @@ function migrateTheme(input: unknown) {
   // Before styles existed, "desk" was a layout. Pages saved without a style keep the look they had.
   if (t.layout === 'desk') { t.layout = 'bento'; t.style = t.style ?? 'cozy'; }
   if (t.style === undefined && t.layout !== undefined) t.style = 'minimal';
+  if (typeof t.style === 'string' && RETIRED_LOOK[t.style]) { const [preset, font] = RETIRED_LOOK[t.style]; t.preset = RETIRED_PRESETS[String(t.preset)] ?? preset; if (t.font === t.style) t.font = font; }
   if (typeof t.style === 'string' && RETIRED_STYLES[t.style]) t.style = RETIRED_STYLES[t.style];
   // Blended backgrounds were retired: pages keep their colour, as a single solid one.
   const bg = t.background as Record<string, unknown> | undefined;

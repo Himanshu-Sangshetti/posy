@@ -32,4 +32,4 @@
 }
 
 /* ================= Grid tiles are size containers, so type scales with the tile, not just the screen ================= */
-:is(.posy-style-press, .posy-style-gallery, .posy-style-painted, .posy-style-night) .posy-grid > .posy-tile { container: tile / size; }
+:is(.posy-style-painted, .posy-style-night, .posy-style-cobalt) .posy-grid > .posy-tile { container: tile / size; }

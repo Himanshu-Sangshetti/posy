@@ -10,8 +10,6 @@ import { LofiScene } from './lofi-scene';
 import { WashiScene } from './washi-scene';
 import { PaintedScene } from './painted-scene';
 import { DeskScene } from './desk-scene';
-import { PressHeader, PressTile, PressRow } from './press';
-import { GalleryHeader, GalleryTile, GalleryRow } from './gallery';
 import { PaintedHeader, PaintedTile, PaintedRow } from './painted';
 import { NightHeader, NightTile, NightRow } from './night';
 import { CobaltHeader, CobaltTile, CobaltRow } from './cobalt';
@@ -26,8 +24,6 @@ import './lofi-scene.css';
 import './washi-scene.css';
 import './painted-scene.css';
 import './desk-scene.css';
-import './press.css';
-import './gallery.css';
 import './painted.css';
 import './night.css';
 import './cobalt.css';
@@ -46,8 +42,6 @@ const RENDERERS: Partial<Record<StyleId, Renderer>> = {
   cozy: { Header: ({ slots }) => <CozyHeader slots={slots} />, Tile: DeskTile, Row: CozyRow, Scene: DeskScene },
   washi: { Header: WashiHeader, Tile: WashiTile, Row: WashiRow, Scene: WashiScene },
   lofi: { Header: ({ page, slots }) => <LofiHeader name={page.profile.name} slots={slots} />, Tile: LofiTile, Row: LofiRow, Scene: LofiScene },
-  press: { Header: PressHeader, Tile: PressTile, Row: PressRow },
-  gallery: { Header: GalleryHeader, Tile: GalleryTile, Row: GalleryRow },
   painted: { Header: PaintedHeader, Tile: PaintedTile, Row: PaintedRow, Scene: PaintedScene },
   night: { Header: NightHeader, Tile: NightTile, Row: NightRow },
   cobalt: { Header: CobaltHeader, Tile: CobaltTile, Row: CobaltRow },

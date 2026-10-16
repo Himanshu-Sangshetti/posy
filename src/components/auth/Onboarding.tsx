@@ -15,7 +15,7 @@ type StyleOpt = { id: string; label: string; note: string; preset: string; layou
 type Layout = 'bento' | 'list' | 'canvas';
 type ThemeOpt = { id: string; name: string; bg: string; accent: string; text: string; dark: boolean; locked: boolean };
 // Starter ids kept as data attributes so the choice is easy to script (the style's sample content).
-const STARTER: Record<string, string> = { cozy: 'desk', minimal: 'creator', washi: 'writer', lofi: 'night', press: 'press', gallery: 'gallery', painted: 'painted', night: 'neon' };
+const STARTER: Record<string, string> = { cozy: 'desk', minimal: 'creator', washi: 'writer', lofi: 'night', painted: 'painted', night: 'neon', cobalt: 'cobalt' };
 
 export function Onboarding({ initialUsername, initialStyle = 'cozy', styles, themes, host }: { initialUsername: string; initialStyle?: string; styles: StyleOpt[]; themes: ThemeOpt[]; host: string }) {
   const router = useRouter();
