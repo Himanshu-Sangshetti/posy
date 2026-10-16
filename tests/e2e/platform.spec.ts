@@ -48,7 +48,7 @@ test('drafts stay private until you publish', async ({ page, browser }) => {
   await page.getByRole('button', { name: 'Publish' }).click();
   await expect(page.getByText('Your page is live')).toBeVisible();
   await visitor.reload();
-  await expect(visitor.getByText('A brand new bio')).toBeVisible();
+  await expect(visitor.getByText('A brand new bio').filter({ visible: true }).first()).toBeVisible();
 });
 
 test('an agent edits the page with an API key and the editor updates live', async ({ page, request }) => {
@@ -133,8 +133,8 @@ test('the hosted MCP server lets an agent edit and publish with an API key', asy
 
   const visitor = await page.context().browser()!.newPage();
   await visitor.goto(`http://localhost:3211/${username}`);
-  await expect(visitor.getByText('Edited over MCP')).toBeVisible();
-  await expect(visitor.getByText('Hello from MCP')).toBeVisible();
+  await expect(visitor.getByText('Edited over MCP').filter({ visible: true }).first()).toBeVisible();
+  await expect(visitor.getByText('Hello from MCP').filter({ visible: true }).first()).toBeVisible();
   await visitor.close();
 });
 
