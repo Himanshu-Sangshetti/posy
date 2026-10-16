@@ -252,13 +252,32 @@ function About({ page, slots, socials }: { page: Page; slots: HeaderSlots; socia
   );
 }
 
-/** Slips hang from a cord in rows of at most five, as even as can be; a short page gets wider slips. */
-const SAG = 34, GAP = 22, PAD = 22, PER_ROW = 5;
-function rows<T>(xs: T[]) {
-  if (!xs.length) return [];
-  const n = Math.ceil(xs.length / PER_ROW), base = Math.floor(xs.length / n), extra = xs.length % n;
-  let at = 0;
-  return Array.from({ length: n }, (_, r) => { const k = base + (r < extra ? 1 : 0); const row = xs.slice(at, at + k); at += k; return row; });
+/**
+ * The screen keeps one grid. Each piece takes units out of twelve (a slip two, a note two and a half, a round fan
+ * three, a folding fan or a video four). A section starts a clean row; its slips come first, strung on
+ * one cord, and its other things fill the rest of the row in page order. A short row spreads its pieces (a little) and then sits centred, so edges line up and nothing floats on its own.
+ */
+const SAG = 34, FULL = 12, COMPACT = 6;
+// how far a short row may spread: slips stay slips, fans and stamps stay their size, so rows without a cord spread less
+const spreadOf = (row: Row, cap: number) => cap === COMPACT ? Math.min(1.5, cap / row.u) : Math.min(row.cells.some(c => 'cord' in c) ? 1.3 : 1.2, cap / row.u);
+const unitsOf = (t: Tile) => t.type === 'video' ? 4 : t.type === 'music' ? 3 : t.type === 'image' ? 4 : t.type === 'text' ? (t.look === 'stamp' ? 2 : 2.5) : 2;
+type Cell = { cord: Link[]; u: number } | { tile: Tile; u: number };
+type Row = { cells: Cell[]; u: number };
+function pack(links: Link[], extras: Tile[], cap: number): Row[] {
+  const per = Math.max(1, Math.floor(cap / 2));
+  const cells: Cell[] = [];
+  if (links.length) {
+    const n = Math.ceil(links.length / per), base = Math.floor(links.length / n), more = links.length % n;
+    let at = 0;
+    for (let r = 0; r < n; r++) { const k = base + (r < more ? 1 : 0); cells.push({ cord: links.slice(at, at + k), u: k * 2 }); at += k; }
+  }
+  extras.forEach(t => cells.push({ tile: t, u: unitsOf(t) }));
+  const rows: Row[] = [];
+  for (const c of cells) {
+    const last = rows[rows.length - 1];
+    if (last && last.u + c.u <= cap + .01) { last.cells.push(c); last.u += c.u; } else rows.push({ cells: [c], u: c.u });
+  }
+  return rows;
 }
 
 export function WashiScene({ page, slots, piece, only, editing }: SceneProps) {
@@ -266,34 +285,27 @@ export function WashiScene({ page, slots, piece, only, editing }: SceneProps) {
   const dark = isDark(page);
   const firstPic = a.links.findIndex(t => t.type === 'link' && t.image);
   const featured = firstPic >= 0 ? a.links[firstPic] : undefined;
-  const extrasOf = (g: (typeof a.groups)[number]): Tile[] => [...g.media, ...g.photos, ...g.notes];
+  const order = new Map(page.tiles.map((t, i) => [t.id, i]));
+  const extrasOf = (g: (typeof a.groups)[number]): Tile[] => [...g.media, ...g.photos, ...g.notes, ...g.stamps].sort((x, y) => (order.get(x.id) ?? 0) - (order.get(y.id) ?? 0));
   const stamps = (where: string) => a.socials.length ? a.socials.map((t, i) => piece(t, <InkStamp tile={t} i={i} />, { key: `${where}${t.id}`, className: 'wss-stamp-piece' })) : null;
+  // a first-day page (no sections, a few things) hangs beside the print instead of under it
+  const total = a.groups.reduce((s, g) => s + g.links.length * 2 + extrasOf(g).reduce((n, t) => n + unitsOf(t), 0), 0);
+  const compact = !a.headings.length && total > 0 && total <= COMPACT + 1;
+  const cap = compact ? COMPACT : FULL;
 
-  // every group's slips (its title slip first) hang from the same cords, so rows stay full across groups; a group's
-  // extras (music, video, photos, notes, stamps) follow the cord row its last slip hangs on
-  type Hung = Link | Extract<Tile, { type: 'heading' }>;
-  const hung: { t: Hung; g: number }[] = a.groups.flatMap((g, gi) => [...(g.heading ? [g.heading] : []), ...g.links].map(t => ({ t: t as Hung, g: gi })));
-  const lines = rows(hung);
-  const slipW = hung.length <= 3 ? 236 : 192;
-  const anchor: number[] = [];
-  a.groups.forEach((_, gi) => {
-    let at = anchor[gi - 1] ?? -1;
-    lines.forEach((row, r) => { if (row.some(h => h.g === gi)) at = r; });
-    anchor.push(at);
-  });
-
-  const line = (row: { t: Hung; g: number }[], r: number) => {
-    const n = row.length, w = slipW, W = n * w + (n - 1) * GAP + PAD * 2;
+  const line = (links: Link[], u: number, rowU: number, frac: number, r: number) => {
+    const n = links.length;
+    const W = Math.max(120, Math.round(frac * (cap === FULL ? 1280 : 760) * u / rowU)); // about its width on a laptop, so the cord's dash animation stays true
     return (
-      <div key={r} className="wss-line" style={{ '--n': n, '--sw': `${w}px`, '--gap': `${GAP}px`, '--pad': `${PAD}px`, width: W } as CSSProperties}>
+      <div key={links[0].id} className="wss-line" style={{ '--n': n, flexGrow: u, '--sf': (frac * 2 / rowU).toFixed(4) } as CSSProperties}>
         <svg className="wss-cord" viewBox={`0 0 ${W} ${SAG * 2}`} preserveAspectRatio="none" aria-hidden>
           <path d={`M4 4Q${W / 2} ${SAG * 2 - 4} ${W - 4} 4`} vectorEffect="non-scaling-stroke" pathLength={1} />
         </svg>
         <i className="wss-pin" aria-hidden /><i className="wss-pin wss-pin-r" aria-hidden />
-        {row.map(({ t }, i) => {
-          const f = (PAD + i * (w + GAP) + w / 2) / W;
-          const drop = (SAG * 2 - 8) * 2 * f * (1 - f) + 4; // the quadratic's height at f (control point at twice the sag)
-          return piece(t, t.type === 'heading' ? <TitleTanzaku text={t.text} /> : <Slip tile={t} form="tanzaku" feature={t === featured} />, {
+        {links.map((t, i) => {
+          const f = (i + .5) / n * .94 + .03;
+          const drop = (SAG * 2 - 8) * 2 * f * (1 - f) + 4; // the cord's height at f (control point at twice the sag)
+          return piece(t, <Slip tile={t} form="tanzaku" feature={t === featured} />, {
             key: t.id, className: 'wss-hang', style: { '--drop': `${drop.toFixed(1)}px`, '--wk': r * 4 + i } as CSSProperties,
           });
         })}
@@ -310,37 +322,60 @@ export function WashiScene({ page, slots, piece, only, editing }: SceneProps) {
     return null;
   };
 
-  const block = (r: number) => {
-    const gs = a.groups.filter((_, gi) => anchor[gi] === r);
-    const extras = gs.flatMap(extrasOf), stamps = gs.flatMap(g => g.stamps);
-    if (!extras.length && !stamps.length) return null;
+  const kind = (t: Tile) => t.type === 'text' ? (t.look === 'stamp' ? 'stamp' : 'note') : t.type;
+  const body = () => {
+    let r = 0;
     return (
-      <div key={`x${r}`} className="wss-extras">
-        {extras.map(t => <div key={t.id} className="wss-cell">{extra(t, 'desk')}</div>)}
-        {stamps.length > 0 && <div className="wss-cell wss-cell-stamps">{stamps.map(t => extra(t, 'desk'))}</div>}
+      <div className="wss-body">
+        {a.groups.map((g, gi) => {
+          const rows = pack(g.links, extrasOf(g), cap);
+          const fr = (row: Row) => Math.min(1, row.u * spreadOf(row, cap) / cap);
+          const widest = rows.reduce((m, row) => Math.max(m, fr(row)), 0) || 1;
+          return (
+            <section key={g.heading?.id ?? `g${gi}`} className="wss-sec">
+              {g.heading && <div className="wss-sec-head" style={{ '--rw': widest } as CSSProperties}>{piece(g.heading, <TitleSlip text={g.heading.text} />, { key: g.heading.id, className: 'wss-head-piece' })}</div>}
+              {rows.map((row, ri) => {
+                const frac = fr(row), hung = row.cells.some(c => 'cord' in c), at = r++;
+                return (
+                  <div key={ri} className={cn('wss-row', hung && 'wss-row-hung')} style={{ '--rw': frac } as CSSProperties}>
+                    {row.cells.map(c => 'cord' in c
+                      ? line(c.cord, c.u, row.u, frac, at)
+                      : <div key={c.tile.id} className={cn('wss-cell', `wss-cell-${kind(c.tile)}`)} style={{ flexGrow: c.u }}>{extra(c.tile, 'desk')}</div>)}
+                  </div>
+                );
+              })}
+            </section>
+          );
+        })}
       </div>
     );
   };
 
   const desktop = () => (
     <div className="wss-room">
-      <div className="wss-screen">
+      <div className={cn('wss-screen', compact && 'wss-screen-compact', compact && total <= 2 && 'wss-screen-solo')}>
         <i className="wss-folds" aria-hidden>{Array.from({ length: 6 }, (_, i) => <b key={i} />)}</i>
-        <div className="wss-top">
-          <Masthead page={page} slots={slots} />
-          <About page={page} slots={slots} socials={stamps('d')} />
-        </div>
-        {(lines.length > 0 || a.groups.some(g => extrasOf(g).length || g.stamps.length)) && (
-          <div className="wss-lines">
-            {block(-1)}
-            {lines.map((row, r) => [line(row, r), block(r)])}
+        {compact ? (
+          <div className="wss-top">
+            <Masthead page={page} slots={slots} />
+            <div className="wss-side">
+              <About page={page} slots={slots} socials={stamps('d')} />
+              {body()}
+            </div>
           </div>
+        ) : (
+          <>
+            <div className="wss-top">
+              <Masthead page={page} slots={slots} />
+              <About page={page} slots={slots} socials={stamps('d')} />
+            </div>
+            {total > 0 || a.headings.length ? body() : null}
+          </>
         )}
       </div>
       {!editing && <WashiBreeze />}
     </div>
   );
-
   const mobile = () => (
     <div className="wss-scroll">
       <div className="wss-hanger" aria-hidden><svg viewBox="0 0 120 40"><path d="M4 39 60 3l56 36" /></svg><i className="wss-rod" /></div>
@@ -350,7 +385,7 @@ export function WashiScene({ page, slots, piece, only, editing }: SceneProps) {
           <Masthead page={page} slots={slots} />
           <About page={page} slots={slots} socials={stamps('m')} />
           {a.groups.map((g, gi) => {
-            const extras = [...extrasOf(g), ...g.stamps];
+            const extras = extrasOf(g);
             return (
               <Fragment key={g.heading?.id ?? `g${gi}`}>
                 {g.heading && piece(g.heading, <TitleSlip text={g.heading.text} />, { key: 'm' + g.heading.id, className: 'wss-head-piece' })}
@@ -374,4 +409,40 @@ export function WashiScene({ page, slots, piece, only, editing }: SceneProps) {
       <Arrangements only={only} desktop={desktop} mobile={mobile} />
     </div>
   );
+}
+
+/**
+ * Canvas layout: the header and one tile in Washi's own kit. The canvas sets each box's size; every piece fills it.
+ * A link is a tall poem slip in a tall box and a long strip in a wide one (the box's shape decides, in CSS).
+ */
+export function WashiCanvasHeader({ page, slots }: { page: Page; slots: HeaderSlots }) {
+  return (
+    <div className={cn('wss wss-cvh', isDark(page) ? 'wss-dark' : 'wss-light')}>
+      <Masthead page={page} slots={slots} />
+      <About page={page} slots={slots} socials={slots.socials} />
+    </div>
+  );
+}
+
+export function WashiCanvasTile({ tile, editing }: { tile: Tile; index: number; editing?: boolean }) {
+  let node: ReactNode = null;
+  if (tile.type === 'link' || tile.type === 'github') node = (
+    <>
+      <span className="wss-cv-tall"><Slip tile={tile} form="tanzaku" feature /></span>
+      <span className="wss-cv-wide"><Slip tile={tile} form="strip" feature /></span>
+    </>
+  );
+  else if (tile.type === 'music') node = (
+    <>
+      <span className="wss-cv-tall"><Uchiwa tile={tile} /></span>
+      <span className="wss-cv-wide"><Uchiwa tile={tile} form="strip" /></span>
+    </>
+  );
+  else if (tile.type === 'video') node = <Screen tile={tile} editing={editing} />;
+  else if (tile.type === 'image') node = <Print tile={tile} />;
+  else if (tile.type === 'text') node = tile.look === 'stamp' ? <Hanko tile={tile} /> : <Shikishi tile={tile} />;
+  else if (tile.type === 'social') node = (
+    <div className="wss-strip wss-cv-social"><div className="wss-strip-row"><InkStamp tile={tile} /><span className="wss-strip-text"><b className="wss-title">{PLATFORMS[tile.platform].label}</b><span className="wss-site">{tile.handle}</span></span></div></div>
+  );
+  return <div className={cn('wss wss-cv', `wss-cv-${tile.type}`, tile.type === 'text' && tile.look === 'stamp' && 'wss-cv-stamp')}>{node}</div>;
 }

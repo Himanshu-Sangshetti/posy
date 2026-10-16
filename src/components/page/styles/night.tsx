@@ -13,6 +13,7 @@ import { cropStyle } from '@/lib/crop';
 import { RichText } from '../tiles';
 import { tileMeta, compact, seeded } from './meta';
 import type { HeaderSlots } from './types';
+import { gridPlan } from './cobalt';
 
 /** The alert colour of each palette (also in night.css). */
 const WARN: Record<string, string> = { netrunner: '#ff2b4e', ice: '#ff3d81', redline: '#f3e600', daylight: '#e3102f' };
@@ -152,6 +153,7 @@ export function NightHeader({ page, slots }: { page: Page; slots: HeaderSlots })
   const ticker = [page.profile.name, page.profile.location, `${nodes} nodes online`, 'uplink stable', `id ${id}`, 'encryption on', `ping ${8 + Math.floor(r() * 30)}ms`].filter(Boolean).map(x => String(x).toUpperCase());
   return (
     <>
+      <style dangerouslySetInnerHTML={{ __html: gridPlan(page) }} />
       <Scanner preset={page.theme.preset} />
       <PhotoExposure selector=".nr-scan img, .nr-photo .posy-avatar img" />
       <style>{`.posy-preset-${page.theme.preset}{--nr-filter:url(#nr-scan-${page.theme.preset});--nr-glitch:url(#nr-glitch-${page.theme.preset})}`}</style>

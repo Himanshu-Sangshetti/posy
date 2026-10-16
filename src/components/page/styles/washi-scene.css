@@ -11,7 +11,7 @@
   --wss-bounce: linear(0, .3 8%, .78 20%, 1.04 32%, 1.08 40%, 1.02 55%, .99 70%, 1);
   color: var(--wss-ink);
 }
-.wss-dark {
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) {
   --wss-paper: #2b2824; --wss-paper-edge: rgb(0 0 0 / .4);
   --wss-indigo: #5d77b4; --wss-violet: #9c86ba; --wss-sakura: #c27a87; --wss-moegi: #8ea86a;
   --wss-gold: #b79a5c; --wss-lacquer: #0c0b0a; --wss-cord: #b5452f; --wss-wood: #2a1d15;
@@ -37,11 +37,11 @@
   background-size: 190px 230px, 230px 190px, 260px 250px, 170px 210px, auto, 420px;
   background-blend-mode: normal, normal, normal, normal, normal, multiply;
 }
-.wss-dark :is(.wss-tz-paper, .wss-strip, .wss-masthead, .wss-portrait, .wss-mount, .wss-note, .wss-honshi, .wss-name-slip, .wss-name-band, .wss-music-strip, .wss-head) { background-blend-mode: normal, normal, normal, normal, normal, soft-light; }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) :is(.wss-tz-paper, .wss-strip, .wss-masthead, .wss-portrait, .wss-mount, .wss-note, .wss-honshi, .wss-name-slip, .wss-name-band, .wss-music-strip, .wss-head) { background-blend-mode: normal, normal, normal, normal, normal, soft-light; }
 /* handmade edges: torn, fibrous deckle instead of a cut rectangle; the shadow follows the torn edge */
 .wss-tz-paper, .wss-strip, .wss-note, .wss-mount, .wss-music-strip, .wss-portrait, .wss-head { -webkit-mask-box-image: url(/looks/washi/deckle.png) 60 fill / 14px stretch; }
 .wss-tanzaku, .wss-strip-piece, .wss-x, .wss-me, .wss-head-piece { filter: drop-shadow(0 1px 1px rgb(60 40 20 / .14)) drop-shadow(0 10px 12px rgb(60 40 20 / .2)); transition: filter .35s; }
-.wss-dark :is(.wss-tanzaku, .wss-strip-piece, .wss-x, .wss-me, .wss-head-piece) { filter: drop-shadow(0 1px 1px rgb(0 0 0 / .5)) drop-shadow(0 12px 14px rgb(0 0 0 / .55)); }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) :is(.wss-tanzaku, .wss-strip-piece, .wss-x, .wss-me, .wss-head-piece) { filter: drop-shadow(0 1px 1px rgb(0 0 0 / .5)) drop-shadow(0 12px 14px rgb(0 0 0 / .55)); }
 .sc-piece:is(:hover, .is-hover, :focus-visible) :is(.wss-tanzaku), .wss-strip-piece:is(:hover, .is-hover, :focus-visible), .wss-x:is(:hover, .is-hover, :focus-visible) { filter: drop-shadow(0 1px 1px rgb(60 40 20 / .14)) drop-shadow(0 18px 18px rgb(60 40 20 / .28)); }
 .wss-x-stamp, .wss-x-photo:has(.wss-ogi) { filter: none; }
 /* dyed clouds (uchigumori): masks cut from a rendered cloud-dyed tanzaku, coloured per slip */
@@ -49,12 +49,12 @@
 /* ---------- the site's seal and your seal ---------- */
 .wss-sseal { position: relative; display: grid; place-items: center; flex: none; width: 26px; height: 26px; background: var(--wss-red); color: var(--wss-paper);
   -webkit-mask: url(/looks/washi/ink.png) center / 100% 100%; mask: url(/looks/washi/ink.png) center / 100% 100%; rotate: -3deg; transition: scale .25s var(--wss-ease), rotate .4s var(--wss-ease); }
-.wss-dark .wss-sseal { color: #f3ead8; }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-sseal { color: #f3ead8; }
 .wss-sseal b { font-size: 17px; font-weight: 700; line-height: 1; translate: 0 -1px; }
 .wss-sseal-lg { width: 38px; height: 38px; }
 .wss-sseal-lg b { font-size: 23px; }
 .wss-seal { position: absolute; display: grid; place-items: center; width: 62px; height: 62px; rotate: -6deg; background: url(/looks/washi/seal.png) center / contain no-repeat; mix-blend-mode: multiply; }
-.wss-dark .wss-seal { mix-blend-mode: normal; filter: saturate(1.15) brightness(1.08); }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-seal { mix-blend-mode: normal; filter: saturate(1.15) brightness(1.08); }
 .wss-seal span { font-size: 18px; font-weight: 700; line-height: 1; color: #c13a26; -webkit-mask: url(/looks/washi/seal-grain.png) center / 40px; mask: url(/looks/washi/seal-grain.png) center / 40px; }
 
 /* ---------- link: a tall poem slip hanging from the cord (computer) ---------- */
@@ -65,7 +65,7 @@
 .wss-tanzaku:not(.wss-tanzaku-feature) .wss-tz-paper { justify-content: center; }
 .wss-tanzaku:not(.wss-tanzaku-feature) .wss-sign { margin-top: auto; }
 .wss-tanzaku:not(.wss-tanzaku-feature) .wss-title { margin-top: auto; }
-.wss-dark .wss-tz-paper { color: #ece4d4; }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-tz-paper { color: #ece4d4; }
 .wss-tz-paper::before, .wss-tz-paper::after { content: ""; position: absolute; left: -6%; right: -6%; height: 74px; pointer-events: none; -webkit-mask: url(/looks/washi/kumo-top.png) top center / 100% 100% no-repeat; mask: url(/looks/washi/kumo-top.png) top center / 100% 100% no-repeat; opacity: .9; transition: opacity .4s, translate 1.2s var(--wss-ease); }
 .wss-tz-paper::before { top: 0; height: 96px; background: var(--dye-a, var(--wss-indigo)); }
 .wss-tz-paper::after { bottom: 0; height: 70px; background: var(--dye-b, var(--wss-violet)); -webkit-mask-image: url(/looks/washi/kumo-bottom.png); mask-image: url(/looks/washi/kumo-bottom.png); opacity: .7; }
@@ -102,7 +102,7 @@
 
 /* ---------- link: a long slip pasted across the scroll (phone) ---------- */
 .wss-strip { position: relative; display: grid; overflow: hidden; color: #221c16; transition: scale .2s var(--wss-ease); }
-.wss-dark .wss-strip { color: #ece4d4; }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-strip { color: #ece4d4; }
 .wss-strip::before, .wss-strip::after { content: ""; position: absolute; left: -4%; right: -4%; height: 40px; pointer-events: none; -webkit-mask: url(/looks/washi/kumo-top.png) center top / 100% 100% no-repeat; mask: url(/looks/washi/kumo-top.png) center top / 100% 100% no-repeat; opacity: .62; transition: opacity .4s; }
 .wss-strip::before { top: 0; background: var(--dye-a, var(--wss-indigo)); }
 .wss-strip::after { bottom: 0; height: 30px; background: var(--dye-b, var(--wss-violet)); -webkit-mask-image: url(/looks/washi/kumo-bottom.png); mask-image: url(/looks/washi/kumo-bottom.png); opacity: .5; }
@@ -157,7 +157,7 @@
 @keyframes wss-fan { 0%, 100% { rotate: 0deg; } 20% { rotate: -9deg; } 45% { rotate: 7deg; } 70% { rotate: -3deg; } }
 /* on the phone: a small fan beside the title, on a slip of paper */
 .wss-music-strip { gap: 14px; padding: 16px 18px 16px 16px; color: #221c16; }
-.wss-dark .wss-music-strip { color: #ece4d4; }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-music-strip { color: #ece4d4; }
 .wss-music-strip .wss-uchiwa { width: 64px; margin: 0 4px; }
 .wss-music-strip .wss-uchiwa-face { width: 64px; height: 64px; box-shadow: 0 0 0 2px #b69560, var(--wss-shadow); }
 .wss-music-strip .wss-uchiwa-handle { width: 7px; height: 24px; }
@@ -169,7 +169,7 @@
 
 /* ---------- photos and video: prints on a paper mat ---------- */
 .wss-mount { position: relative; display: grid; gap: 10px; margin: 0; padding: 12px 12px 14px; transition: translate .35s var(--wss-ease), rotate .5s var(--wss-ease); color: #221c16; }
-.wss-dark .wss-mount { color: #ece4d4; }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-mount { color: #ece4d4; }
 .wss-mount-pic { position: relative; display: block; overflow: hidden; aspect-ratio: 4 / 3; background: #000; box-shadow: 0 0 0 1px rgb(0 0 0 / .1); }
 .wss-mount-pic > img, .wss-mount-pic button img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.84) sepia(.05); transition: filter .5s, scale 1.1s var(--wss-ease); }
 .wss-mount-pic > * { position: absolute; inset: 0; }
@@ -208,7 +208,7 @@
 /* ---------- note: a poem card with an ink circle ---------- */
 .wss-note { position: relative; display: grid; place-items: center; overflow: hidden; color: #221c16; }
 .wss-note::after { content: ""; position: absolute; inset: 11px; border: 1px solid color-mix(in oklab, var(--wss-gold) 65%, transparent); pointer-events: none; }
-.wss-dark .wss-note { color: #ece4d4; }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-note { color: #ece4d4; }
 .wss-note-card { width: 250px; aspect-ratio: 1 / 1.08; padding: 30px 26px; }
 .wss-note p { position: relative; z-index: 1; margin: 0; font-size: 24px; font-weight: 500; font-style: italic; line-height: 1.3; text-align: center; overflow-wrap: anywhere; }
 .wss-note[data-len="m"] p { font-size: 20px; }
@@ -217,7 +217,7 @@
 .wss-enso { position: absolute; inset: 8%; width: 84%; height: 84%; pointer-events: none; }
 .wss-enso-ink { fill: var(--wss-ink); opacity: .2; transition: opacity .5s; }
 .wss-enso-draw { fill: none; stroke: #fff; stroke-width: 44; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
-.wss-dark .wss-enso-ink { fill: #ece4d4; opacity: .2; }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-enso-ink { fill: #ece4d4; opacity: .2; }
 .posy-motion .wss:not(.wss-editing) .wss-enso-draw { animation: wss-draw 1.6s 1.1s var(--wss-ease) backwards; }
 .sc-piece:is(:hover, .is-hover) .wss-enso-draw { animation: wss-draw 1.3s var(--wss-ease); }
 .sc-piece:is(:hover, .is-hover) .wss-enso-ink { opacity: .26; }
@@ -248,8 +248,8 @@
   box-shadow: inset 0 0 0 1px #1d1a16, inset 0 0 0 4px var(--wss-paper), inset 0 0 0 5px rgb(29 26 22 / .5), 0 10px 22px -12px rgb(0 0 0 / .55); }
 .wss-name-band { position: relative; z-index: 2; display: block; width: fit-content; max-width: calc(100% + 12px); margin: -34px 0 0 -26px; padding: 12px 24px 14px; font-size: clamp(30px, 3.1vw, 46px); font-weight: 600; line-height: 1.02; letter-spacing: -.005em; overflow-wrap: anywhere;
   box-shadow: inset 0 0 0 1px #1d1a16, inset 0 0 0 4px var(--wss-paper), inset 0 0 0 5px rgb(29 26 22 / .5), 0 14px 26px -14px rgb(0 0 0 / .55); }
-.wss-dark .wss-name { color: #ece4d4; }
-.wss-dark .wss-name-slip, .wss-dark .wss-name-band { box-shadow: inset 0 0 0 1px #ece4d4, inset 0 0 0 4px var(--wss-paper), inset 0 0 0 5px rgb(236 228 212 / .45), 0 12px 24px -12px rgb(0 0 0 / .8); }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-name { color: #ece4d4; }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-name-slip, :is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-name-band { box-shadow: inset 0 0 0 1px #ece4d4, inset 0 0 0 4px var(--wss-paper), inset 0 0 0 5px rgb(236 228 212 / .45), 0 12px 24px -12px rgb(0 0 0 / .8); }
 .wss-name-band textarea { display: block; width: 100%; min-width: 8ch; field-sizing: content; resize: none; font: inherit; color: inherit; background: none; border: 0; outline: none; }
 .wss-about { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 22px 30px; }
 .wss-me { position: relative; width: 104px; }
@@ -269,38 +269,50 @@
 
 /* ============ the computer: a folding screen standing in a quiet room ============ */
 .wss-room { position: relative; display: grid; justify-items: center; align-items: start; min-height: 100vh; padding: 40px 32px 56px; }
-.wss-screen { position: relative; width: min(1360px, 100%); display: grid; gap: 56px; padding: 48px 44px 56px;
+.wss-screen { position: relative; width: min(1480px, 100%); display: grid; align-content: center; gap: 56px; padding: 48px 48px 56px;
   background: var(--wss-ground) url(/looks/washi/gold-leaf.jpg) center / cover;
   box-shadow: 0 0 0 1px color-mix(in oklab, var(--wss-gold) 60%, transparent) inset, 0 0 0 9px var(--wss-lacquer), 0 0 0 10px rgb(255 255 255 / .06), 0 50px 60px -30px rgb(40 25 10 / .55), 0 90px 80px -60px rgb(40 25 10 / .4); }
-.wss-dark .wss-screen { background: #1d1c1b url(/looks/washi/silver-leaf.jpg) center / cover;
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-screen { background: #1d1c1b url(/looks/washi/silver-leaf.jpg) center / cover;
   box-shadow: 0 0 0 1px rgb(255 255 255 / .08) inset, 0 0 0 9px var(--wss-lacquer), 0 0 0 10px rgb(255 255 255 / .05), 0 50px 70px -30px rgb(0 0 0 / .8); }
 /* six panels: each fold catches the light from the left a little differently, with a seam between them */
 .wss-folds { position: absolute; inset: 0; z-index: 1; display: grid; grid-template-columns: repeat(6, 1fr); pointer-events: none; mix-blend-mode: multiply; }
 .wss-folds b { background: linear-gradient(90deg, rgb(255 255 255 / 0), rgb(90 60 20 / .06)); }
 .wss-folds b:nth-child(even) { background: linear-gradient(90deg, rgb(90 60 20 / .11), rgb(90 60 20 / .03)); }
 .wss-folds b + b { box-shadow: inset 1px 0 0 rgb(60 40 15 / .22); }
-.wss-dark .wss-folds { mix-blend-mode: normal; }
-.wss-dark .wss-folds b { background: linear-gradient(90deg, rgb(255 255 255 / .02), rgb(0 0 0 / .1)); }
-.wss-dark .wss-folds b:nth-child(even) { background: linear-gradient(90deg, rgb(0 0 0 / .2), rgb(0 0 0 / .06)); }
-.wss-dark .wss-folds b + b { box-shadow: inset 1px 0 0 rgb(0 0 0 / .5); }
-.wss-top, .wss-lines, .wss-extras { position: relative; z-index: 2; min-width: 0; }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-folds { mix-blend-mode: normal; }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-folds b { background: linear-gradient(90deg, rgb(255 255 255 / .02), rgb(0 0 0 / .1)); }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-folds b:nth-child(even) { background: linear-gradient(90deg, rgb(0 0 0 / .2), rgb(0 0 0 / .06)); }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-folds b + b { box-shadow: inset 1px 0 0 rgb(0 0 0 / .5); }
+.wss-top, .wss-body { position: relative; z-index: 2; min-width: 0; }
 /* the top two folds' worth: the print on the left half, you on the right, split on the screen's centre seam */
 .wss-top { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 56px; align-items: center; }
 .wss-top .wss-about { align-content: center; }
-/* the cords: every row the same slip, centred on the screen */
-.wss-lines { display: grid; justify-items: center; gap: 36px; }
+/* the body: sections of rows on one grid of twelve; a row is as wide as its pieces want (up to the full width), centred */
+.wss-body { container-type: inline-size; display: grid; gap: 52px; --g: 24px; }
+.wss-sec { display: grid; gap: 30px; }
+.wss-sec-head { display: flex; width: calc(var(--rw, 1) * 100%); margin-inline: auto; margin-bottom: -6px; }
+.wss-sec-head > .wss-head-piece { justify-self: auto; }
+.wss-row { display: flex; align-items: stretch; gap: var(--g); width: calc(var(--rw, 1) * 100%); margin-inline: auto; }
+.wss-sec .wss-row + .wss-row { margin-top: 10px; }
 /* the cord: a silk cord pinned at both ends, sagging; slips hang from it on short threads */
-.wss-line { position: relative; display: grid; grid-template-columns: repeat(var(--n), var(--sw)); gap: var(--gap); padding: 0 var(--pad); align-items: stretch; max-width: 100%; }
+.wss-line { position: relative; flex: 1 1 0; min-width: 0; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 22px; padding: 0 22px; align-items: stretch; }
+/* slips stay tall and narrow however wide the row spreads them */
+.wss-line .wss-tz-paper { min-height: clamp(300px, calc(var(--sf, .16) * 100cqw * 1.42), 440px); }
 .wss-cord { position: absolute; left: 0; top: 0; width: 100%; height: 68px; overflow: visible; pointer-events: none; }
 .wss-cord path { fill: none; stroke: var(--wss-cord); stroke-width: 2.2; stroke-linecap: round; }
 .wss-pin { position: absolute; left: 0; top: 0; width: 11px; height: 11px; translate: -1px -3px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #f1d999, #9a7432); box-shadow: 0 1px 2px rgb(0 0 0 / .4); }
 .wss-pin-r { left: auto; right: 0; translate: 1px -3px; }
 .wss-x { flex: none; }
-/* the lower folds: things stand in thirds of the screen, a short last row stays centred */
-.wss-extras { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 28px 44px; width: 100%; }
-.wss-cell { flex: 0 1 auto; display: flex; justify-content: center; align-items: center; min-width: 0; }
-.wss-cell-stamps { flex-wrap: wrap; gap: 20px; }
+/* the other things take their units of the row and stand centred in them; beside a cord they sit level with the slips */
+.wss-cell { flex: 1 1 0; display: flex; justify-content: center; align-items: center; min-width: 0; }
+.wss-row-hung > .wss-cell { padding-top: 46px; }
 .wss-cell > .sc-piece, .wss-cell > .wss-x { max-width: 100%; }
+.wss-cell-video > .sc-piece, .wss-cell-note > .sc-piece { width: 100%; }
+.wss-cell-note { align-items: stretch; }
+.wss-cell-note .wss-note-card { width: 100%; max-width: 380px; margin-inline: auto; }
+.wss-row-hung .wss-cell-note .wss-note-card { height: 100%; aspect-ratio: auto; max-width: none; }
+.wss-cell-note > .sc-piece { display: flex; }
+.wss-cell-video .wss-video { width: 100%; }
 .wss-pic:has(.wss-pic-blank) { display: none; }
 .wss-tanzaku-feature .wss-tz-paper:has(.wss-pic-blank) { padding-top: 62px; }
 /* entrance: the screen settles, the print is pasted, the cord is strung, the slips drop in and swing to rest */
@@ -327,13 +339,13 @@
   box-shadow: 0 1px 0 rgb(255 255 255 / .1) inset, 0 30px 40px -24px rgb(40 25 10 / .5); }
 .posy-preset-sakura .wss-silk { background-color: #9a6a6c; background-blend-mode: luminosity; }
 .posy-preset-yomogi .wss-silk { background-color: #56664c; background-blend-mode: luminosity; }
-.wss-dark .wss-silk { background-color: #2a2d36; background-blend-mode: luminosity; box-shadow: 0 30px 40px -24px rgb(0 0 0 / .7); }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-silk { background-color: #2a2d36; background-blend-mode: luminosity; box-shadow: 0 30px 40px -24px rgb(0 0 0 / .7); }
 .wss-futai { position: absolute; left: 27%; top: 0; z-index: 2; width: 16px; height: 62px; background: #4a4a36; box-shadow: inset 0 -4px 0 color-mix(in oklab, var(--wss-gold) 80%, transparent), 0 3px 5px -2px rgb(0 0 0 / .35); }
 .wss-futai-r { left: auto; right: 27%; }
 .posy-preset-sakura .wss-futai { background: color-mix(in oklab, #8a5f62 85%, #000); }
 .posy-preset-yomogi .wss-futai { background: color-mix(in oklab, #4f5d48 85%, #000); }
-.wss-dark .wss-futai { background: #1d1f26; }
-.wss-honshi { position: relative; display: grid; gap: 22px; padding: 16px 14px 24px; box-shadow: 0 -5px 0 color-mix(in oklab, var(--wss-gold) 75%, #6b4f20), 0 5px 0 color-mix(in oklab, var(--wss-gold) 75%, #6b4f20), 0 0 0 1px rgb(0 0 0 / .1); }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-futai { background: #1d1f26; }
+.wss-honshi { position: relative; display: grid; gap: 18px; padding: 16px 14px 24px; box-shadow: 0 -5px 0 color-mix(in oklab, var(--wss-gold) 75%, #6b4f20), 0 5px 0 color-mix(in oklab, var(--wss-gold) 75%, #6b4f20), 0 0 0 1px rgb(0 0 0 / .1); }
 .wss-roller { position: relative; height: 18px; margin: 0 -2px; border-radius: 9px; background: linear-gradient(#6b4a33, #2f1f14 70%); box-shadow: 0 6px 10px -4px rgb(0 0 0 / .5); }
 .wss-roller::before, .wss-roller::after { content: ""; position: absolute; top: -3px; left: -9px; width: 14px; height: 24px; border-radius: 6px; background: linear-gradient(#2a1a10, #120a05); box-shadow: inset 2px 0 0 rgb(255 255 255 / .12); }
 .wss-roller::after { left: auto; right: -9px; }
@@ -346,10 +358,10 @@
 .wss-scroll .wss-me .wss-seal span { font-size: 15px; }
 .wss-scroll .wss-bio { font-size: 20px; line-height: 1.36; }
 .wss-scroll .wss-where { font-size: 16.5px; }
-.wss-scroll .wss-stamps { gap: 9px; }
-.wss-scroll .wss-ink { width: 44px; height: 44px; }
-.wss-strips { display: grid; gap: 12px; }
-.wss-m-extras { display: grid; gap: 18px; }
+.wss-scroll .wss-stamps { gap: 8px; }
+.wss-scroll .wss-ink { width: 42px; height: 42px; }
+.wss-strips { display: grid; gap: 10px; }
+.wss-m-extras { display: grid; gap: 16px; }
 .wss-m-extras .wss-x-stamp { justify-self: center; }
 .wss-m-extras .wss-x-stamp .wss-hanko { width: 120px; height: 120px; }
 .wss-m-extras .wss-print .wss-mount-pic { aspect-ratio: 4 / 3; }
@@ -367,10 +379,9 @@
 
 /* focus ring that belongs to the page */
 .wss .sc-piece:focus-visible > :first-child { outline: 2px solid color-mix(in oklab, var(--wss-red) 70%, transparent); outline-offset: 6px; }
-.wss-extras .wss-x-video { width: 340px; }
 
 .wss-zone-b .wss-music .wss-site, .wss-zone-a .wss-music .wss-site, .wss-where { color: color-mix(in oklab, var(--wss-ink) 72%, transparent); }
-.wss-dark .wss-seal span { color: #e5583e; }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-seal span { color: #e5583e; }
 
 /* on the computer, your half of the screen is roomy: a bigger portrait and a bigger voice */
 .wss-top .wss-me { width: 132px; }
@@ -382,7 +393,7 @@
 .wss-head-piece { position: relative; z-index: 2; justify-self: center; max-width: 100%; }
 .wss-head { position: relative; display: block; margin: 0; padding: 12px 34px 14px 46px; max-width: 100%; color: #221c16; font-size: 28px; font-weight: 600; line-height: 1.15; letter-spacing: .04em; text-align: center; overflow-wrap: anywhere; }
 .wss-head::before { content: ""; position: absolute; left: 20px; top: 50%; width: 11px; height: 11px; translate: 0 -50%; border-radius: 50%; background: var(--wss-red); }
-.wss-dark .wss-head { color: #ece4d4; }
+:is(.wss-dark, .dark .wss-cv, .dark .wss-cvh) .wss-head { color: #ece4d4; }
 .wss-scroll .wss-head-piece { justify-self: stretch; }
 .wss-scroll .wss-head { font-size: 22px; padding: 9px 20px 11px 38px; text-align: left; }
 .wss-scroll .wss-head::before { left: 16px; width: 9px; height: 9px; }
@@ -393,4 +404,101 @@
 .wss-tanzaku-head .wss-tz-paper::before { height: 18px; background: var(--wss-red); }
 .wss-tanzaku-head .wss-tz-paper::after { content: none; }
 .wss-tanzaku.wss-tanzaku-head .wss-title { margin: 0; color: inherit; font-size: 28px; line-height: 1.12; }
-.wss-lines > .wss-extras:first-child { margin-bottom: 8px; }
+
+/* a first-day page: the print on the left, you and your few slips on the right, all in the first screen */
+.wss:not(.wss-editing) .wss-screen { min-height: calc(100svh - 96px); }
+.wss-screen-compact .wss-top { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: center; }
+.wss-side { display: grid; gap: 40px; align-content: center; min-width: 0; }
+.wss-screen-compact .wss-body { gap: 0; }
+.wss-screen-compact .wss-row { margin-inline: 0; }
+/* one thing to show: the print is the page, you and your slip stand beside it */
+.wss-screen-solo .wss-top { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+/* a folding fan opens a little wider on the screen, to fill its share of the row */
+.wss-cell-image .wss-ogi { zoom: 1.18; }
+/* on a narrow computer the slips get a little closer */
+@container page (max-width: 1340px) { .wss-body { --g: 18px; } .wss-line { gap: 16px; padding: 0 16px; } .wss-cell-image .wss-ogi { zoom: 1.04; } }
+
+/* List on a computer: the same scroll, a little wider */
+@container page (min-width: 761px) { .posy-scene-list .wss-scroll { max-width: 560px; padding-top: 36px; } }
+
+/* ============ Canvas: the page is the gold screen, each box holds one piece of the kit ============ */
+.posy-page.posy-style-washi.posy-layout-canvas .posy-backdrop { background: #d6b66a; }
+.posy-page.posy-style-washi.posy-layout-canvas .posy-backdrop::before { background: url(/looks/washi/gold-leaf.jpg) center / cover; opacity: 1; mix-blend-mode: normal; filter: none; }
+.posy-page.dark.posy-style-washi.posy-layout-canvas .posy-backdrop { background: #1d1c1b; }
+.posy-page.dark.posy-style-washi.posy-layout-canvas .posy-backdrop::before { background: url(/looks/washi/silver-leaf.jpg) center / cover; opacity: 1; mix-blend-mode: normal; filter: none; }
+.posy-style-washi.posy-layout-canvas .posy-section { color: var(--text); }
+/* the header: the print with your name on the left, you on the right */
+.st-head-washi:has(.wss-cvh) { display: block; padding-bottom: 28px; border-bottom: 0; }
+.wss-cvh { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px 48px; align-items: center; }
+.wss-cvh .wss-me { width: 120px; }
+.wss-cvh .wss-bio { font-size: 24px; }
+.wss.wss-cvh .posy-social-row { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 10px; margin: 0; }
+.wss.wss-cvh .posy-social-row a { display: grid; place-items: center; width: 46px; height: 46px; padding: 0; border-radius: 0; box-shadow: none; background: var(--wss-ink); color: var(--bg);
+  -webkit-mask: url(/looks/washi/ink.png) center / 100% 100%; mask: url(/looks/washi/ink.png) center / 100% 100%; transition: background .25s, scale .3s var(--wss-bounce); }
+.wss.wss-cvh .posy-social-row a:nth-child(odd) { rotate: -2deg; }
+.wss.wss-cvh .posy-social-row a:nth-child(even) { rotate: 2deg; }
+.wss.wss-cvh .posy-social-row a:hover { background: var(--wss-red); color: #fbf3e4; scale: 1.08; transform: none; }
+.wss.wss-cvh .posy-social-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@container page (max-width: 760px) {
+  .wss-cvh { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .wss-cvh .wss-name-band { margin: -26px 0 0 -6px; font-size: clamp(28px, 8.4vw, 38px); }
+  .wss-cvh .wss-me { width: 84px; }
+  .wss-cvh .wss-bio { font-size: 20px; }
+}
+/* a tile: fills its box; the box's shape picks the slip */
+.wss-cv { position: relative; width: 100%; height: 100%; container-type: size; display: grid; place-items: center; }
+.wss-cv-tall, .wss-cv-wide { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; }
+.wss-cv-wide { display: none; }
+@container (min-aspect-ratio: 1 / 1) { .wss-cv-tall { display: none; } .wss-cv-wide { display: flex; } }
+.wss-cv :is(.wss-tanzaku, .wss-strip, .wss-cv-social, .wss-mount, .wss-note, .wss-music-strip) { filter: drop-shadow(0 1px 1px rgb(60 40 20 / .14)) drop-shadow(0 10px 12px rgb(60 40 20 / .22)); }
+.dark .wss-cv :is(.wss-tanzaku, .wss-strip, .wss-cv-social, .wss-mount, .wss-note, .wss-music-strip) { filter: drop-shadow(0 1px 1px rgb(0 0 0 / .5)) drop-shadow(0 12px 14px rgb(0 0 0 / .55)); }
+/* poem slip (tall box): no cord here, just the paper */
+.wss-cv .wss-tanzaku { display: flex; flex-direction: column; width: 100%; height: 100%; padding-top: 0; }
+.wss-cv .wss-tanzaku::before, .wss-cv .wss-tanzaku::after { content: none; }
+.wss-cv .wss-tz-paper { flex: 1; min-height: 0; }
+@container (max-height: 400px) { .wss-cv .wss-tanzaku .wss-pic { display: none; } .wss-cv .wss-tanzaku-feature .wss-tz-paper { padding-top: 62px; } }
+@container (max-width: 170px) { .wss-cv .wss-tz-paper { padding: 52px 14px 14px; } .wss-cv .wss-tanzaku .wss-title { font-size: 21px; } .wss-cv .wss-tanzaku[data-len="s"] .wss-title { font-size: 25px; } }
+/* long strip (wide box): its picture fills the space above the title when there is room */
+.wss-cv .wss-strip { width: 100%; height: 100%; grid-template-rows: minmax(0, 1fr) auto; }
+.wss-cv .wss-strip:not(.wss-strip-feature), .wss-cv .wss-strip:has(.wss-pic-blank) { grid-template-rows: 1fr; align-items: center; }
+.wss-cv .wss-strip-feature .wss-pic { aspect-ratio: auto; min-height: 0; margin: 22px 14px 0; }
+@container (max-height: 250px) { .wss-cv .wss-strip-feature .wss-pic { display: none; } .wss-cv .wss-strip-feature { grid-template-rows: 1fr; align-items: center; } .wss-cv .wss-strip-feature .wss-strip-row { padding-top: 24px; } }
+@container (max-height: 150px) { .wss-cv .wss-strip-row { min-height: 0; padding: 18px 16px 14px 18px; } .wss-cv .wss-strip .wss-title { font-size: 20px; -webkit-line-clamp: 1; } .wss-cv .wss-strip-sub { display: none; } }
+/* music: a round fan with its words beside it (tall box), or the fan on a strip (wide box) */
+.wss-cv .wss-music-full { flex-direction: column; width: auto; max-width: 100%; text-align: center; gap: 12px; }
+.wss-cv .wss-music-full .wss-music-text { justify-items: center; }
+.wss-cv .wss-music-full :is(.wss-uchiwa, .wss-uchiwa-face) { width: min(150px, 62cqw, 42cqh); }
+.wss-cv .wss-music-full .wss-uchiwa-face { height: min(150px, 62cqw, 42cqh); }
+.wss-cv .wss-music-full .wss-uchiwa-handle { height: min(60px, 12cqh); }
+.wss-cv .wss-music-strip { width: 100%; height: 100%; }
+.wss-cv .wss-music-strip :is(.wss-uchiwa, .wss-uchiwa-face) { width: clamp(52px, calc(100cqh - 90px), 200px); }
+.wss-cv .wss-music-strip .wss-uchiwa-face { height: clamp(52px, calc(100cqh - 90px), 200px); }
+/* prints, videos and notes fill the box; a seal stands in the middle of its own */
+.wss-cv .wss-mount { width: 100%; height: 100%; grid-template-rows: minmax(0, 1fr) auto; }
+.wss-cv .wss-mount-pic { aspect-ratio: auto; min-height: 0; }
+.wss-cv .wss-mount:not(:has(figcaption)) { grid-template-rows: minmax(0, 1fr); }
+.wss-cv .wss-note-card { width: 100%; height: 100%; aspect-ratio: auto; }
+.wss-cv .wss-hanko { width: min(160px, 78cqmin); height: min(160px, 78cqmin); }
+.wss-cv .wss-cv-social { width: 100%; height: 100%; align-content: center; }
+.wss-cv .wss-cv-social .wss-ink { flex: none; }
+/* the canvas wraps tiles in its own link: give them the same small reactions the screen has */
+.posy-tile:is(:hover, :focus-visible) .wss-cv .wss-title { background-size: 100% 2px; }
+.posy-tile:is(:hover, :focus-visible) .wss-cv .wss-sseal { rotate: 3deg; }
+.posy-tile:is(:hover, :focus-visible) .wss-cv .wss-tz-paper::before { opacity: 1; translate: 0 6px; }
+.posy-tile:is(:hover, :focus-visible) .wss-cv .wss-mount-pic img { filter: none; scale: 1.035; }
+.posy-tile:is(:hover, :focus-visible) .wss-cv .wss-uchiwa { animation: wss-fan 1.4s var(--wss-ease); }
+.posy-tile:is(:hover, :focus-visible) .wss-cv .wss-ink-face { background: var(--wss-red); color: #fbf3e4; }
+.posy-style-washi .posy-cv > .posy-tile { background: none; box-shadow: none; border: 0; }
+/* a big box gets a bigger slip: the title, the dyed clouds and the margins grow with it */
+.wss-cv .wss-strip:not(.wss-strip-feature) .wss-title, .wss-cv .wss-cv-social .wss-title { font-size: clamp(20px, 14cqh, 34px); }
+.wss-cv .wss-strip::before { height: clamp(40px, 24cqh, 96px); }
+.wss-cv .wss-strip::after { height: clamp(30px, 16cqh, 70px); }
+.wss-cv .wss-strip-row { padding-inline: clamp(18px, 6cqw, 34px) clamp(16px, 5cqw, 30px); }
+/* a narrow box (two across on a phone): the seal sits above the words, so titles keep whole words */
+.wss-cv .wss-title { overflow-wrap: break-word; }
+@container (max-width: 230px) {
+  .wss-cv .wss-strip-row { flex-direction: column-reverse; align-items: flex-start; justify-content: center; gap: 8px; padding: 22px 14px 14px 16px; }
+  .wss-cv .wss-strip-text { flex: none; width: 100%; }
+  .wss-cv .wss-strip .wss-title, .wss-cv .wss-strip:not(.wss-strip-feature) .wss-title { font-size: 20px; -webkit-line-clamp: 2; }
+  .wss-cv .wss-strip .wss-sseal-lg { width: 30px; height: 30px; }
+}

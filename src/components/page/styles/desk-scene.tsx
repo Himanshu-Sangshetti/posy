@@ -297,15 +297,44 @@ function Prop({ name, className }: { name: string; className?: string }) {
 
 /* ---------------- the desk ---------------- */
 
-/** Rough sizes on the computer's desk (width, height), to lay things out in zones and balance the two sides. */
-const SZ = { record: [420, 280], ticket: [440, 256], photo: [236, 276], wide: [290, 250], note: [210, 230], stamp: [150, 180] } as const;
-const LINK_H = { feat: { card: 200, envelope: 300, postcard: 388, tag: 136 }, rest: { card: 200, envelope: 258, postcard: 92, tag: 92 } };
-const GAP = 64, ZONE_GAP = 30, LETTER_H = 356, MAT_PAD = 54;
+/** How many of the desk's 12 columns each kind of object takes on the computer. */
+const SPAN = { postcard: 5, envelope: 5, card: 4, tag: 4, bigtag: 6, stack: 4, bigstack: 5, record: 5, ticket: 5, photo: 3, wide: 4, note: 3, stamp: 2 } as const;
+type CellKind = keyof typeof SPAN;
+type Cell = { key: string; kind: CellKind; node: ReactNode };
+
+/**
+ * Splits a run of objects, in order, into rows of at most 12 columns: rows as full as possible, fewest rows,
+ * and never a small thing left alone on its own row. Each row then stretches to the full width in CSS.
+ */
+function rowsOf(cells: Cell[]): Cell[][] {
+  const n = cells.length, best = Array<number>(n + 1).fill(Infinity), cut = Array<number>(n + 1).fill(0);
+  best[0] = 0;
+  for (let i = 1; i <= n; i++) {
+    let s = 0;
+    for (let j = i - 1; j >= 0; j--) {
+      s += SPAN[cells[j].kind];
+      if (s > 12 && j < i - 1) break;
+      const lone = i - j === 1 && SPAN[cells[j].kind] <= 4 ? 50 : 0;
+      const cost = best[j] + (12 - Math.min(s, 12)) ** 2 + lone + 10;
+      if (cost < best[i]) { best[i] = cost; cut[i] = j; }
+    }
+  }
+  const rows: Cell[][] = [];
+  for (let i = n; i > 0; i = cut[i]) rows.unshift(cells.slice(cut[i], i));
+  return rows;
+}
+
+/** n things in piles of at most `max`, as even as possible (5 → 3 + 2). */
+function piles<T>(ts: T[], max: number): T[][] {
+  const k = Math.ceil(ts.length / max), out: T[][] = [];
+  for (let i = 0, at = 0; i < k; i++) { const size = Math.ceil((ts.length - at) / (k - i)); out.push(ts.slice(at, at + size)); at += size; }
+  return out;
+}
 
 export function DeskScene({ page, slots, piece, only, editing }: SceneProps) {
   const a = anatomy(page.tiles);
-  const featured = a.links.slice(0, 2), rest = a.links.slice(2);
-  const [stamp, ...moreStamps] = a.stamps;
+  const featured = a.links.slice(0, 2);
+  const [stamp] = a.stamps;
   const rot = (t: Tile, spread: number, bias = 0) => ({ '--r': `${tilt(t.id, spread, bias)}deg` }) as CSSProperties;
   // each piece drops onto the desk in turn
   let n = 0;
@@ -316,79 +345,74 @@ export function DeskScene({ page, slots, piece, only, editing }: SceneProps) {
   const smallThing = (t: Tile, uid: string) =>
     t.type === 'image' ? <Polaroid tile={t} /> : t.type === 'text' && t.look === 'stamp' ? <InkStamp tile={t} uid={`${uid}-${t.id}`} /> : t.type === 'text' ? <Sticky tile={t} /> : t.type === 'music' || t.type === 'video' ? <Media tile={t} editing={editing} /> : null;
   const kindOf = (t: Tile) => t.type === 'image' ? ((t.size === 'w' || t.size === 'l') ? 'wide' : 'photo') : t.type === 'text' ? (t.look === 'stamp' ? 'stamp' : 'note') : t.type === 'music' ? 'record' : 'ticket';
-    const label = (h: Of<'heading'>) => piece(h, <Label tile={h} />, { key: h.id, className: 'dks-p-label', style: at(h, 1.8, -1) });
-  const sections = a.groups.filter((g): g is typeof g & { heading: Of<'heading'> } => !!g.heading);
+  const label = (h: Of<'heading'>) => piece(h, <Label tile={h} />, { key: h.id, className: 'dks-p-label', style: at(h, 1.8, -1) });
 
   const desktop = () => {
     n = 0;
-    // Two columns: you on the left, your links on the leather desk pad on the right. Then your things, in reading
-    // order (media, photos, notes), each as one zone, go under whichever side is shorter, so like stays with like.
-    const flowH = (ts: Tile[], w: number) => {
-      let rowW = 0, rowH = 0, total = 0;
-      for (const t of ts) {
-        const [iw, ih] = SZ[kindOf(t) as keyof typeof SZ];
-        if (rowW && rowW + ZONE_GAP + iw > w) { total += rowH + ZONE_GAP; rowW = 0; rowH = 0; }
-        rowW += (rowW ? ZONE_GAP : 0) + iw; rowH = Math.max(rowH, ih);
+    // A styled flat-lay: the letter and one hero object across the top, then each section as even rows on a
+    // 12-column grid with one gutter. Objects lie squared to the grid; the props sit at the edges of the desk.
+    const feat = new Set(featured.map(t => t.id));
+    const sq = (t: Tile, spread = .7) => at(t, spread);
+    const linkPiece = (t: LinkTile, big: boolean) =>
+      piece(t, <LinkObject tile={t} featured={big} uid={`d-${t.id}`} />, { key: t.id, className: cn(big ? 'dks-p-feat' : 'dks-p-link', `dks-p-${linkObject(t, big)}`), style: sq(t, .5) });
+    const thingPiece = (t: Tile) => piece(t, smallThing(t, 'd'), { key: t.id, className: `dks-p-${kindOf(t)}`, style: sq(t, kindOf(t) === 'note' ? 1.6 : .8) });
+
+    // the hero: the most picture-like thing before the first heading (a postcard, an envelope, an index card,
+    // the first one or two tags written large, or a record, a ticket or a photo)
+    const g0 = a.groups[0] && !a.groups[0].heading ? a.groups[0] : undefined;
+    const used = new Set<string>();
+    let hero: ReactNode = null, heroKind = '';
+    if (g0) {
+      const ls = g0.links;
+      const pick = ls.find(t => linkObject(t, true) === 'postcard') ?? ls.find(t => linkObject(t, true) === 'envelope') ?? ls.find(t => linkObject(t, true) === 'card');
+      const thing = g0.media[0] ?? g0.photos.find(p => kindOf(p) === 'wide') ?? g0.photos[0];
+      if (pick) { hero = linkPiece(pick, true); heroKind = linkObject(pick, true); used.add(pick.id); }
+      else if (ls.length) { const two = ls.slice(0, 2); hero = two.map(t => linkPiece(t, true)); heroKind = 'tags'; two.forEach(t => used.add(t.id)); }
+      else if (thing) { hero = thingPiece(thing); heroKind = kindOf(thing); used.add(thing.id); }
+    }
+
+    const cellsOf = (g: (typeof a.groups)[number]): Cell[] => {
+      const links = g.links.filter(t => !used.has(t.id));
+      const things = [...g.media, ...g.photos, ...g.notes, ...g.stamps.filter(t => t !== stamp)].filter(t => !used.has(t.id));
+      const big = (t: LinkTile) => feat.has(t.id);
+      const isTag = (t: LinkTile) => linkObject(t, big(t)) === 'tag';
+      const others = links.filter(t => !isTag(t)).length + things.length;
+      // next to other objects, tags lie in neat piles of up to three; on their own they lie side by side
+      const pileOf = new Map<string, LinkTile[]>();
+      if (others > 0) for (const p of piles(links.filter(isTag), 3)) pileOf.set(p[0].id, p);
+      const inPile = new Set([...pileOf.values()].flat().map(t => t.id));
+      const cells: Cell[] = [];
+      for (const t of links) {
+        const p = pileOf.get(t.id);
+        if (p && p.length > 1) cells.push({ key: `pile-${t.id}`, kind: 'stack', node: <div className="dks-stack">{p.map(x => linkPiece(x, big(x)))}</div> });
+        else if (p || !inPile.has(t.id)) {
+          const o = linkObject(t, big(t));
+          cells.push({ key: t.id, kind: o === 'tag' ? (big(t) ? 'bigtag' : 'tag') : o, node: linkPiece(t, big(t)) });
+        }
       }
-      return total + rowH;
+      for (const t of things) cells.push({ key: t.id, kind: kindOf(t), node: thingPiece(t) });
+      return cells;
     };
-    // a long bundle of tags is laid out two abreast
-    const two = rest.length > 8;
-    const restH = rest.reduce((s, t) => { const o = linkObject(t, false); return s + (two && o === 'tag' ? (LINK_H.rest.tag + 14) / 2 : LINK_H.rest[o] + 14); }, 0);
-    // each heading is written on the desk once, just before the first of its things in reading order (links first);
-    // a heading with nothing after it goes at the foot of the desk pad
-    const order = [...a.links, ...a.media, ...a.photos, ...a.notes, ...moreStamps];
-    const labelAt = new Map<string, Of<'heading'>>(), loose: Of<'heading'>[] = [];
-    for (const g of sections) {
-      const mine = new Set([...g.links, ...g.media, ...g.photos, ...g.notes, ...g.stamps].map(t => t.id));
-      const first = order.find(t => mine.has(t.id));
-      if (first) labelAt.set(first.id, g.heading); else loose.push(g.heading);
-    }
-    const labelled = (t: Tile, node: ReactNode) => { const h = labelAt.get(t.id); return h ? [label(h), node] : node; };
-    const linkLabels = a.links.filter(t => labelAt.has(t.id)).length + loose.length;
-    const matH = MAT_PAD + featured.reduce((s, t) => s + LINK_H.feat[linkObject(t, true)] + 30, 0) + restH + linkLabels * 64;
-    const zones = ([['media', a.media], ['photos', a.photos], ['notes', [...a.notes, ...moreStamps]]] as const).filter(([, ts]) => ts.length > 0);
-    const left: (typeof zones)[number][] = [], right: (typeof zones)[number][] = [];
-    const bioLines = Math.ceil((page.profile.bio?.length ?? 0) / 28);
-    let lh = Math.max(LETTER_H, 282 + bioLines * 24) + (a.socials.length > 7 ? 60 : 0), rh = matH;
-    for (const z of zones) {
-      if (lh <= rh) { left.push(z); lh += GAP + flowH([...z[1]], 560); } else { right.push(z); rh += GAP + flowH([...z[1]], 592); }
-    }
-    // the camera was put down at the foot of the shorter side
-    const gap = lh < rh ? 'left' : 'right';
-    const zone = ([name, ts]: (typeof zones)[number]) => (
-      <div key={name} className={cn('dks-zone', `dks-zone-${name}`)}>
-        {name === 'photos' && <Prop name="tapes" className="dks-d-tapes" />}
-        {ts.map(t => labelled(t, piece(t, smallThing(t, 'd'), { key: t.id, className: `dks-p-${kindOf(t)}`, style: at(t, kindOf(t) === 'note' ? 4 : 2.6) })))}
+    const row = (cells: Cell[], key: string) => (
+      <div key={key} className="dks-row">
+        {cells.map(c => <div key={c.key} className={cn('dks-cell', `dks-c-${c.kind}`)} style={{ '--s': SPAN[c.kind] } as CSSProperties}>{c.node}</div>)}
       </div>
     );
-    const camera = <Prop name="camera" className="dks-d-camera" />;
+
     return (
       <div className="dks-desk">
         <Prop name="coffee" className="dks-d-coffee" />
+        <Prop name="pen" className="dks-d-pen" />
         <Prop name="plant" className="dks-d-plant" />
-        <div className="dks-cols">
-          <div className="dks-col dks-col-me">
-            <Prop name="pen" className="dks-d-pen" />
-            <Letter slots={slots} uid="d" pins={pins('d')} stamp={stampPiece('d')} />
-            {left.map(zone)}
-            {gap === 'left' && camera}
-          </div>
-          <div className="dks-col dks-col-links">
-            <div className="dks-mat">
-              <span className="dks-mat-mark" aria-hidden>{monogram(page.profile.name)}</span>
-              {featured.map((t, i) => labelled(t, piece(t, <LinkObject tile={t} featured uid={`d-${t.id}`} />, { key: t.id, className: cn('dks-p-feat', `dks-p-${linkObject(t, true)}`, `dks-feat${i}`), style: at(t, 1.6, i ? .8 : -.8) })))}
-              {rest.length > 0 && (
-                <div className={cn('dks-tags', two && 'dks-tags-two')}>
-                  {rest.map(t => labelled(t, piece(t, <LinkObject tile={t} uid={`d-${t.id}`} />, { key: t.id, className: cn('dks-p-link', `dks-p-${linkObject(t, false)}`), style: at(t, 1.4) })))}
-                </div>
-              )}
-              {loose.map(label)}
-            </div>
-            {right.map(zone)}
-            {gap === 'right' && camera}
-          </div>
+        <Prop name="camera" className="dks-d-camera" />
+        <div className={cn('dks-head', !hero && 'dks-head-solo')}>
+          <Letter slots={slots} uid="d" pins={pins('d')} stamp={stampPiece('d')} />
+          {hero && <div className={cn('dks-hero', `dks-hero-${heroKind}`)}>{hero}</div>}
         </div>
+        {a.groups.map((g, gi) => [
+          g.heading && <div key={`h-${g.heading.id}`} className="dks-row dks-row-label">{label(g.heading)}</div>,
+          ...rowsOf(cellsOf(g)).map((r, ri) => row(r, `r-${gi}-${ri}`)),
+        ])}
         {!editing && <DeskObjects />}
       </div>
     );
@@ -446,3 +470,32 @@ export function DeskScene({ page, slots, piece, only, editing }: SceneProps) {
 
 /** The kit on its own, for the component lab. */
 export { Letter as DeskLetter, Pin as DeskPin, Tag as DeskTag, Postcard as DeskPostcard, Envelope as DeskEnvelope, IndexCard as DeskIndexCard, Record as DeskRecord, Ticket as DeskTicket, Polaroid as DeskPolaroid, Sticky as DeskSticky, InkStamp as DeskInkStamp, LinkObject as DeskLinkObject, Prop as DeskProp };
+
+/* ---------------- the canvas: the header and one object per box ---------------- */
+
+/** Canvas header: the same letter, with your polaroid clipped to it and your profiles as enamel pins along its edge. */
+export function DeskCanvasHeader({ slots }: { slots: SceneProps['slots'] }) {
+  return (
+    <div className="dks dkc-head">
+      <DeskDefs />
+      <Letter slots={slots} uid="cv" pins={slots.socials ?? undefined} />
+    </div>
+  );
+}
+
+/** Canvas tile: one object, as large as its box allows at its own shape, lying square in the middle of it. */
+export function DeskCanvasTile({ tile, editing }: { tile: Tile; index: number; editing?: boolean }) {
+  const uid = `cv-${tile.id}`;
+  const big = tile.size !== 's';
+  let kind: string, node: ReactNode;
+  switch (tile.type) {
+    case 'link': case 'github': kind = linkObject(tile, big); node = <LinkObject tile={tile} featured={big} uid={uid} />; break;
+    case 'music': kind = 'record'; node = <Record tile={tile} />; break;
+    case 'video': kind = 'ticket'; node = <Ticket tile={tile} editing={editing} />; break;
+    case 'image': kind = 'photo'; node = <Polaroid tile={tile} />; break;
+    case 'text': kind = tile.look === 'stamp' ? 'stamp' : 'note'; node = tile.look === 'stamp' ? <InkStamp tile={tile} uid={uid} /> : <Sticky tile={tile} />; break;
+    case 'social': kind = 'pin'; node = <Pin tile={tile} />; break;
+    case 'heading': kind = 'label'; node = <Label tile={tile} />; break;
+  }
+  return <div className={cn('dks dkc', `dkc-${kind}`)}><div className="sc-piece dkc-box">{node}</div></div>;
+}

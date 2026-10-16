@@ -71,7 +71,7 @@
 .posy-style-cobalt .posy-grid { --gap: 22px; }
 @container grid (max-width: 600px) { .posy-style-cobalt .posy-grid { --gap: 14px; } }
 .posy-style-cobalt .posy-grid-wrap + .posy-grid-wrap { margin-top: 64px; }
-.posy-style-cobalt .posy-grid > .posy-tile { container: tile / size; }
+.posy-style-cobalt :is(.posy-grid, .posy-canvas) .posy-tile { container: tile / size; } /* also in the editor, where each tile sits in a wrapper */
 
 /* ---- a plate: cream stock inside a fine double rule, numbered in the corner ---- */
 .cb-plate { position: relative; display: flex; flex-direction: column; gap: 8px; height: 100%; min-height: 0; padding: 16px; color: var(--cb-ink); background: var(--cb-paper);
@@ -123,13 +123,16 @@ figure.cb-plate { margin: 0; }
 .cb-card-art .cb-body { padding: 12px 6px 0; }
 .cb-card-art .cb-sub { -webkit-line-clamp: 2; }
 /* wide plates put the print on the left and the words beside it */
-.posy-size-w .cb-card-art { flex-direction: row; align-items: stretch; gap: 0; }
-.posy-size-w .cb-card-art .cb-art { flex: 0 0 40%; min-height: 0; }
-.posy-size-w .cb-card-art .cb-body { align-content: end; flex: 1; padding: 0 44px 4px 18px; }
-.posy-size-w .cb-card-art .cb-top { right: auto; width: calc(40% - 24px); }
-.posy-size-w .cb-card-art .cb-go { top: 16px; right: 16px; background: var(--cb-ink); color: var(--cb-paper); }
-.posy-size-w .cb-card-art .cb-go::before { background: repeating-conic-gradient(var(--cb-ink) 0 1.5deg, transparent 1.5deg 12deg); }
-.posy-size-w .cb-card-art .cb-kind { display: none; }
+/* (the grid plan can show a tile at another size than its own, so plates follow the shape of their box, not the size name) */
+@container tile (min-aspect-ratio: 8 / 5) {
+  .cb-card-art { flex-direction: row; align-items: stretch; gap: 0; }
+  .cb-card-art .cb-art { flex: 0 0 40%; min-height: 0; }
+  .cb-card-art .cb-body { align-content: end; flex: 1; padding: 0 44px 4px 18px; }
+  .cb-card-art .cb-top { right: auto; width: calc(40% - 24px); }
+  .cb-card-art .cb-go { top: 16px; right: 16px; background: var(--cb-ink); color: var(--cb-paper); }
+  .cb-card-art .cb-go::before { background: repeating-conic-gradient(var(--cb-ink) 0 1.5deg, transparent 1.5deg 12deg); }
+  .cb-card-art .cb-kind { display: none; }
+}
 
 /* ---- photos: reprinted in the two inks, with a fine halftone ---- */
 .cb-print { position: relative; display: block; flex: 1; min-height: 0; overflow: hidden; background: var(--cb-ink); }
@@ -174,10 +177,12 @@ figure.cb-plate { margin: 0; }
 .cb-text { display: grid; gap: 4px; min-width: 0; }
 .cb-music .cb-no { margin-bottom: 2px; }
 .cb-music .cb-title { -webkit-line-clamp: 2; }
-.posy-size-s .cb-music { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px; }
-.posy-size-s .cb-record { width: 56%; }
-.posy-size-s .cb-music .cb-title { font-size: 18px; }
-.posy-size-s .cb-music .cb-no { display: none; }
+@container tile (max-width: 300px) and (max-aspect-ratio: 8 / 5) {
+  .cb-music { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px; }
+  .cb-record { width: 56%; }
+  .cb-music .cb-title { font-size: 18px; }
+  .cb-music .cb-no { display: none; }
+}
 
 /* ---- newsletters: a ticket with a perforated stub ---- */
 .cb-ticket { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; height: 100%; color: var(--cb-ink); background: var(--cb-paper);
@@ -226,3 +231,9 @@ figure.cb-plate { margin: 0; }
 
 /* a picture waits for its exposure to be measured (see PhotoExposure), then fades in */
 .posy-px :is(.cb-print img, .cb-portrait .posy-avatar img):not([data-px]) { opacity: 0; }
+
+/* ---- list layout on a wide screen: a slightly wider column, and the name keeps its lettering size ---- */
+.posy-style-cobalt.posy-layout-list .posy-layout { max-width: 720px; }
+.posy-style-cobalt.posy-layout-list .cb-name { font-size: clamp(50px, calc(100cqw / max(7, var(--nlen, 10)) * 1.3), 84px); }
+.posy-style-cobalt.posy-layout-list .posy-section { margin: 26px 0 6px; font-size: 26px; }
+@container page (min-width: 700px) { .posy-style-cobalt.posy-layout-list .cb-row-photo .cb-print { aspect-ratio: 2 / 1; } }

@@ -35,12 +35,12 @@
 .lfs-lights { display: flex; gap: 7px; }
 .lfs-lights i { width: 11px; height: 11px; border-radius: 50%; background: #ff9db3; box-shadow: inset 0 -1px 1px rgb(0 0 0 / .12); }
 .lfs-lights i:nth-child(2) { background: #ffd66e; } .lfs-lights i:nth-child(3) { background: #93dbb9; }
-.lfs-title { position: absolute; left: 50%; translate: -50% 0; max-width: 60%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-family: var(--font-vt323), monospace; font-size: 19px; letter-spacing: .03em; color: var(--lfs-soft); }
+.lfs-title { position: absolute; left: 50%; translate: -50% 0; max-width: min(60%, calc(100% - 136px)); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-family: var(--font-vt323), monospace; font-size: 19px; letter-spacing: .03em; color: var(--lfs-soft); }
 .lfs-body { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 16px; gap: 12px; }
-.sc-piece:is(:hover, .is-hover) .lfs-win { box-shadow: inset 0 0 0 1px var(--lfs-line), 0 1px 2px rgb(50 30 80 / .1), 0 36px 70px -26px rgb(60 40 100 / .55); }
+:is(.sc-piece, .posy-tile):is(:hover, .is-hover) .lfs-win { box-shadow: inset 0 0 0 1px var(--lfs-line), 0 1px 2px rgb(50 30 80 / .1), 0 36px 70px -26px rgb(60 40 100 / .55); }
 
 /* ---------- the computer ---------- */
-.lfs-desk { position: relative; display: flex; flex-direction: column; min-height: 100vh; padding-bottom: 28px; }
+.lfs-desk { position: relative; display: flex; flex-direction: column; min-height: 100vh; padding-bottom: 24px; }
 .lfs-menubar { position: sticky; top: 0; z-index: 60; display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 18px; font-size: 13.5px;
   background: rgb(255 255 255 / .55); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: 0 1px 0 var(--lfs-line); color: var(--lfs-ink); }
 .lfs-night .lfs-menubar { background: rgb(20 16 40 / .55); }
@@ -48,29 +48,44 @@
 .lfs-menubar b { font-weight: 600; }
 .lfs-menu-gap { flex: 1; }
 .lfs-clock { font-family: var(--font-vt323), monospace; font-size: 19px; letter-spacing: .04em; }
-.lfs-stage { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 0 36px; width: 100%; box-sizing: border-box; max-width: 1360px; margin: 28px auto 40px; padding: 0 28px; }
-.lfs-stage:not(:has(.lfs-side)) { grid-template-columns: minmax(0, 1fr); max-width: 1160px; }
-/* the windows sit on a 12-column grid with one gap everywhere; nothing overlaps, so nothing important is covered */
-.lfs-area { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: auto; gap: 24px; }
+/* the screen: windows on the left, the desktop's icon column on the right edge; the whole thing sits centred between
+   the menu bar and the dock, so a small page fills the first screen instead of hugging the top */
+.lfs-stage { --lfs-gap: 24px; display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 0 40px; width: 100%; box-sizing: border-box;
+  max-width: 1180px; margin: auto; padding: 28px 32px 32px; }
+.lfs-stage.lfs-has-side { grid-template-columns: minmax(0, 1fr) auto; max-width: 1560px; }
+/* the windows sit on a 12-column grid with one gap everywhere; rows are always full, nothing overlaps */
+.lfs-area { --lfs-h: clamp(290px, 22vw, 380px); position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: auto; gap: var(--lfs-gap); }
+.lfs-area.lfs-few { --lfs-h: clamp(330px, 27vw, 430px); }
 .lfs-area > * { position: relative; min-width: 0; animation: lfs-open .55s var(--lfs-pop) both; }
 .lfs-area > :nth-child(2) { animation-delay: .08s; } .lfs-area > :nth-child(3) { animation-delay: .16s; } .lfs-area > :nth-child(4) { animation-delay: .24s; }
 .lfs-area > :nth-child(5) { animation-delay: .32s; } .lfs-area > :nth-child(6) { animation-delay: .4s; } .lfs-area > :nth-child(7) { animation-delay: .48s; }
 @keyframes lfs-open { from { opacity: 0; scale: .9; translate: 0 14px; } }
-.lfs-area > .lfs-a-music { grid-column: span 5; }
-.lfs-area > :is(.lfs-a-tab, .lfs-a-video, .lfs-a-photo, .lfs-a-note) { height: 312px; }
+.lfs-area > :is(.lfs-a-tab, .lfs-a-video, .lfs-a-photo, .lfs-a-music):not(.lfs-a-beside) { height: var(--lfs-h); }
 .lfs-area > .sc-piece > :first-child { height: 100%; }
-.lfs-area > .lfs-a-note { height: auto; align-self: center; justify-self: center; width: min(100%, 320px); }
-.lfs-area > .lfs-a-note > .lfs-sticky { height: 232px; }
 .lfs-area > .lfs-a-about { display: flex; }
 .lfs-area > .lfs-a-music .lfs-body { flex: 1; }
 .lfs-area > .lfs-a-about > .lfs-body { flex: 1; }
-/* the desktop's right edge: the sticker on top, then the icons, in columns that fill from the right */
-.lfs-side { display: grid; justify-items: end; gap: 22px; width: 264px; padding-top: 4px; }
-.lfs-a-stamp { justify-self: end; margin-right: 8px; }
-.lfs-a-stamp .lfs-sticker { width: 100px; margin: 0; }
-.lfs-desk-icons { display: grid; grid-template-columns: repeat(2, 124px); gap: 16px 8px; justify-content: end; }
-.lfs-desk-icons:has(> :nth-child(13)) { grid-template-columns: repeat(3, 124px); }
-.lfs-side:has(.lfs-desk-icons > :nth-child(13)) { width: 396px; }
+/* one window: a tall about window beside it, both big */
+.lfs-solo > .lfs-a-about { height: var(--lfs-h); }
+.lfs-solo > .lfs-a-about > .lfs-body { flex-direction: column; justify-content: center; align-items: flex-start; gap: 18px; padding: 28px 32px; }
+.lfs-solo .lfs-me { width: 132px; }
+.lfs-solo .lfs-name { font-size: clamp(30px, 3vw, 44px); }
+.lfs-solo .lfs-bio { -webkit-line-clamp: 5; }
+/* stickers stuck on the about window's top-right corner */
+.lfs-area > .lfs-stuck { position: absolute; top: -18px; right: -14px; z-index: 3; display: flex; gap: 6px; pointer-events: none; animation-delay: .5s; }
+.lfs-stuck > * { pointer-events: auto; }
+.lfs-a-stamp .lfs-sticker { width: 104px; margin: 0; }
+.lfs-about.lfs-stamped > .lfs-body { padding-right: 132px; }
+/* the desktop's right edge: sticky notes on top, then the icons in a tidy grid that fills from the top */
+.lfs-side { display: grid; align-content: start; gap: 22px; width: 232px; }
+.lfs-side:has(.lfs-desk-icons > :nth-child(13)) { width: 352px; }
+.lfs-side-group { display: grid; gap: 18px; width: 100%; }
+.lfs-side-group > .lfs-a-label { justify-self: start; }
+.lfs-side .lfs-a-note { padding: 6px 4px 0; }
+.lfs-side .lfs-a-note > .lfs-sticky { height: 208px; }
+.lfs-side .lfs-a-note:nth-child(even) > .lfs-sticky { rotate: 2deg; background: linear-gradient(180deg, #ffd9e6, #ffc4d8); }
+.lfs-desk-icons { display: grid; grid-template-columns: repeat(2, 112px); gap: 14px 8px; justify-content: space-between; }
+.lfs-desk-icons:has(> :nth-child(13)) { grid-template-columns: repeat(3, 112px); }
 
 /* about me */
 .lfs-about .lfs-body { flex-direction: row; align-items: center; gap: 22px; padding: 22px 26px; }
@@ -118,7 +133,14 @@
   .lfs-page-text b { -webkit-line-clamp: 1; font-size: 15.5px; }
   .lfs-page { gap: 8px; padding: 10px 12px 12px; }
 }
-@container lfsbrowser (max-height: 230px) { .lfs-hero { display: none; } }
+/* a short window keeps the preview as a small square beside the title */
+@container lfsbrowser (max-height: 230px) {
+  .lfs-page { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr auto; align-items: center; column-gap: 12px; }
+  .lfs-hero { width: 52px; height: 52px; aspect-ratio: 1; border-radius: 12px; }
+  .lfs-hero .lfs-splash-fav { width: 30px; height: 30px; padding: 7px; border-radius: 9px; }
+  .lfs-page-foot { grid-column: 1 / -1; }
+}
+@container lfsbrowser (max-height: 230px) and (max-width: 220px) { .lfs-hero { width: 40px; height: 40px; } }
 .lfs-page-foot { flex: none; margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .lfs-meta { font-size: 12.5px; color: var(--lfs-soft); }
 .lfs-open { display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 13px; border-radius: 999px; background: var(--lfs-ink); color: var(--bg); font-size: 12.5px; font-weight: 600; transition: background .25s, gap .25s, color .25s; }
@@ -126,12 +148,12 @@
 .lfs-open svg { width: 14px; height: 14px; }
 /* alive: on hover the window lifts, the preview eases in and the page starts "loading"; a press squishes it */
 .lfs-browser { transition: translate .35s var(--lfs-pop), scale .2s, box-shadow .3s; }
-.sc-piece:is(:hover, .is-hover) .lfs-browser { translate: 0 -3px; }
-.sc-piece:is(:hover, .is-hover) .lfs-hero > img { scale: 1.045; }
-.sc-piece:is(:hover, .is-hover) .lfs-loading { animation: lfs-load 1.4s cubic-bezier(.3, .7, .2, 1) forwards; }
+:is(.sc-piece, .posy-tile):is(:hover, .is-hover) .lfs-browser { translate: 0 -3px; }
+:is(.sc-piece, .posy-tile):is(:hover, .is-hover) .lfs-hero > img { scale: 1.045; }
+:is(.sc-piece, .posy-tile):is(:hover, .is-hover) .lfs-loading { animation: lfs-load 1.4s cubic-bezier(.3, .7, .2, 1) forwards; }
 @keyframes lfs-load { 0% { width: 0; opacity: 1; } 80% { width: 100%; opacity: 1; } 100% { width: 100%; opacity: 0; } }
-.sc-piece:is(:hover, .is-hover) .lfs-open { background: var(--accent); color: #fff; gap: 7px; }
-.sc-piece:is(:active, .is-press) .lfs-browser { scale: .985; translate: 0 -1px; }
+:is(.sc-piece, .posy-tile):is(:hover, .is-hover) .lfs-open { background: var(--accent); color: #fff; gap: 7px; }
+:is(.sc-piece, .posy-tile):is(:active, .is-press) .lfs-browser { scale: .985; translate: 0 -1px; }
 .sc-piece:focus-visible { outline: none; }
 .sc-piece:focus-visible .lfs-win { box-shadow: inset 0 0 0 1px var(--lfs-line), 0 0 0 3px color-mix(in oklab, var(--accent) 60%, transparent), var(--lfs-shadow); }
 
@@ -145,7 +167,7 @@
 .lfs-vinyl { position: absolute; left: 10px; top: 4px; z-index: 1; width: 96px; height: 96px; border-radius: 50%; background: repeating-radial-gradient(circle, #1c1828 0 2px, #26213a 2px 3px); box-shadow: 0 8px 16px -8px rgb(0 0 0 / .6); transition: translate .6s var(--lfs-pop); animation: lfs-spin 4s linear infinite paused; }
 .lfs-vinyl i { position: absolute; inset: 34%; border-radius: 50%; background: var(--accent); box-shadow: inset 0 0 0 5px color-mix(in oklab, var(--accent) 70%, #fff); }
 .lfs-vinyl i::after { content: ""; position: absolute; inset: 42%; border-radius: 50%; background: #1c1828; }
-.sc-piece:is(:hover, .is-hover) .lfs-vinyl { translate: 30px 0; animation-play-state: running; }
+:is(.sc-piece, .posy-tile):is(:hover, .is-hover) .lfs-vinyl { translate: 30px 0; animation-play-state: running; }
 @keyframes lfs-spin { to { rotate: 360deg; } }
 .lfs-track { display: grid; gap: 6px; min-width: 0; flex: 1; }
 .lfs-track > b { font-size: 16px; font-weight: 650; letter-spacing: -.01em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
@@ -154,11 +176,11 @@
 .lfs-eq { display: inline-flex; flex: none; align-items: flex-end; gap: 2px; height: 12px; }
 .lfs-eq i { width: 3px; height: 35%; border-radius: 2px; background: var(--accent); animation: lfs-eq .9s ease-in-out infinite alternate paused; }
 .lfs-eq i:nth-child(2) { animation-delay: -.4s; } .lfs-eq i:nth-child(3) { animation-delay: -.7s; } .lfs-eq i:nth-child(4) { animation-delay: -.2s; }
-.sc-piece:is(:hover, .is-hover) .lfs-eq i, .lfs-w-music .lfs-eq i { animation-play-state: running; }
+:is(.sc-piece, .posy-tile):is(:hover, .is-hover) .lfs-eq i, .lfs-w-music .lfs-eq i { animation-play-state: running; }
 @keyframes lfs-eq { to { height: 100%; } }
 .lfs-progress { height: 4px; border-radius: 2px; background: color-mix(in oklab, var(--lfs-ink) 12%, transparent); overflow: hidden; }
 .lfs-progress i { display: block; width: 34%; height: 100%; border-radius: 2px; background: var(--lfs-ink); }
-.sc-piece:is(:hover, .is-hover) .lfs-progress i { animation: lfs-prog 12s linear infinite; }
+:is(.sc-piece, .posy-tile):is(:hover, .is-hover) .lfs-progress i { animation: lfs-prog 12s linear infinite; }
 @keyframes lfs-prog { from { width: 0; } to { width: 100%; } }
 .lfs-controls { display: flex; align-items: center; gap: 14px; color: var(--lfs-soft); }
 .lfs-controls svg { width: 16px; height: 16px; fill: currentColor; }
@@ -166,7 +188,7 @@
 .lfs-night .lfs-play { color: #1d1a2b; }
 .lfs-play svg { grid-area: 1 / 1; width: 15px; height: 15px; transition: opacity .2s, scale .2s; }
 .lfs-p2 { opacity: 0; scale: .6; }
-.sc-piece:is(:hover, .is-hover) .lfs-p1 { opacity: 0; scale: .6; } .sc-piece:is(:hover, .is-hover) .lfs-p2 { opacity: 1; scale: 1; }
+:is(.sc-piece, .posy-tile):is(:hover, .is-hover) .lfs-p1 { opacity: 0; scale: .6; } :is(.sc-piece, .posy-tile):is(:hover, .is-hover) .lfs-p2 { opacity: 1; scale: 1; }
 
 /* photos and video */
 .lfs-photo .lfs-body { padding: 10px; gap: 8px; }
@@ -181,13 +203,13 @@
 .lfs-sticky { height: 100%; padding: 22px 20px 18px; rotate: -3deg; background: linear-gradient(180deg, #fff2a8, #ffe680); color: #3a3220; box-shadow: 0 18px 30px -18px rgb(80 60 0 / .5), 0 1px 1px rgb(0 0 0 / .06); transition: rotate .4s var(--lfs-pop); }
 .lfs-sticky::before { content: ""; position: absolute; top: -9px; left: 50%; width: 70px; height: 20px; translate: -50% 0; rotate: 3deg; background: rgb(255 255 255 / .55); box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
 .lfs-sticky p { margin: 0; font-family: var(--font-caveat), cursive; font-weight: 600; font-size: 24px; line-height: 1.15; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; }
-.sc-piece:is(:hover, .is-hover) .lfs-sticky { rotate: 0deg; }
+:is(.sc-piece, .posy-tile):is(:hover, .is-hover) .lfs-sticky { rotate: 0deg; }
 .lfs-sticker { display: grid; place-items: center; width: 120px; aspect-ratio: 1; margin-left: auto; border-radius: 50%; background: var(--accent); color: #fff; rotate: 10deg; box-shadow: 0 14px 26px -12px rgb(0 0 0 / .45); transition: rotate .5s var(--lfs-pop); }
 .lfs-sticker span { display: grid; place-items: center; width: 84%; aspect-ratio: 1; border-radius: 50%; border: 1.5px dashed rgb(255 255 255 / .7); padding: 10px; font-size: 13px; font-weight: 800; line-height: 1.1; letter-spacing: .06em; text-transform: uppercase; text-align: center; }
-.sc-piece:is(:hover, .is-hover) .lfs-sticker { rotate: -6deg; }
+:is(.sc-piece, .posy-tile):is(:hover, .is-hover) .lfs-sticker { rotate: -6deg; }
 
 /* desktop icons */
-.lfs-desk-icon { display: grid; justify-items: center; align-content: start; gap: 6px; width: 124px; padding: 6px 2px; border-radius: 12px; text-align: center; transition: background .2s; }
+.lfs-desk-icon { display: grid; justify-items: center; align-content: start; gap: 6px; width: 112px; box-sizing: border-box; padding: 6px 2px; border-radius: 12px; text-align: center; transition: background .2s; }
 .lfs-desk-icon:is(:hover, .is-hover) { background: rgb(255 255 255 / .22); }
 .lfs-label { max-width: 100%; padding: 1px 6px; border-radius: 6px; font-size: 12px; font-weight: 600; line-height: 1.25; color: var(--lfs-label); text-shadow: var(--lfs-label-glow); overflow-wrap: anywhere; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .lfs-desk-icon:is(:hover, .is-hover) .lfs-label { background: var(--accent); color: #fff; text-shadow: none; }
@@ -216,7 +238,7 @@
 .lfs-status-icons svg { height: 11px; fill: currentColor; }
 .lfs-widget { position: relative; border-radius: 26px; padding: 16px; background: var(--lfs-glass); -webkit-backdrop-filter: blur(20px) saturate(1.3); backdrop-filter: blur(20px) saturate(1.3); box-shadow: inset 0 0 0 1px var(--lfs-line), var(--lfs-shadow); color: var(--lfs-ink); overflow: hidden; }
 .lfs-phone .sc-piece, .lfs-phone .lfs-widget { transition: scale .25s var(--lfs-pop); }
-.lfs-phone .sc-piece:is(:active, .is-press) { scale: .95; }
+.lfs-phone :is(.sc-piece, .posy-tile):is(:active, .is-press) { scale: .95; }
 .lfs-w-me { display: flex; align-items: center; gap: 16px; padding: 18px; animation: lfs-open .55s var(--lfs-pop) both; }
 .lfs-w-me .lfs-me { width: 78px; }
 .lfs-w-me .lfs-me .posy-avatar { border-radius: 22px; }
@@ -254,10 +276,10 @@
 
 /* every window answers the pointer the same way: it lifts a little, its picture eases in, a press squishes it */
 .lfs-win { transition: translate .35s var(--lfs-pop), scale .2s, box-shadow .3s; }
-.sc-piece:is(:hover, .is-hover) .lfs-win { translate: 0 -3px; }
-.sc-piece:is(:active, .is-press) .lfs-win { scale: .985; translate: 0 -1px; }
+:is(.sc-piece, .posy-tile):is(:hover, .is-hover) .lfs-win { translate: 0 -3px; }
+:is(.sc-piece, .posy-tile):is(:active, .is-press) .lfs-win { scale: .985; translate: 0 -1px; }
 .lfs-photo-img, .lfs-screen img { transition: scale .9s cubic-bezier(.2, .8, .2, 1); }
-.sc-piece:is(:hover, .is-hover) .lfs-photo-img, .sc-piece:is(:hover, .is-hover) .lfs-screen img { scale: 1.04; }
+:is(.sc-piece, .posy-tile):is(:hover, .is-hover) .lfs-photo-img, :is(.sc-piece, .posy-tile):is(:hover, .is-hover) .lfs-screen img { scale: 1.04; }
 .lfs-photo .lfs-body > .lfs-photo-img { border-radius: 10px; }
 .lfs-photo .lfs-body { overflow: hidden; }
 /* the handwriting sizes itself to the note, so long notes end cleanly instead of running off */
@@ -266,7 +288,7 @@
 .lfs-sticky:has(p:not(:empty)) { display: flex; flex-direction: column; }
 
 /* icons: a press sinks the icon a little, like tapping a real one */
-.sc-piece:is(:active, .is-press) .lfs-icon { scale: .92; translate: 0 1px; transition-duration: .12s; }
+:is(.sc-piece, .posy-tile):is(:active, .is-press) .lfs-icon { scale: .92; translate: 0 1px; transition-duration: .12s; }
 
 /* section titles: a folder label across the desktop's grid, or above its run of widgets on the phone */
 .lfs-section { display: inline-flex; align-items: center; gap: 9px; max-width: 100%; margin: 0; font-family: var(--font-vt323), monospace; font-size: 26px; font-weight: 400; line-height: 1; letter-spacing: .04em; color: var(--lfs-label); text-shadow: var(--lfs-label-glow); }
@@ -275,13 +297,11 @@
 .lfs-area > .lfs-a-label { grid-column: 1 / -1; height: auto; padding: 6px 0 4px; position: relative; z-index: 2; }
 .lfs-section { padding: 4px 12px 4px 9px; border-radius: 10px; background: color-mix(in oklab, var(--lfs-glass, #000) 55%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 .lfs-area > .lfs-a-label > .lfs-section { height: auto; }
-.lfs-side-group { display: grid; justify-items: end; gap: 18px; width: 100%; }
-.lfs-side-group > .lfs-a-label { justify-self: end; }
 .lfs-m-label { padding: 6px 4px 0; }
 .lfs-m-label .lfs-section { font-size: 24px; }
 
 /* a photo as an icon is the photo itself in a white mat; on the phone the extra photos sit in a roll of thumbnails */
-.lfs-icon-photo { width: 104px; height: 104px; padding: 5px; box-sizing: border-box; border-radius: 14px; background: #fff; rotate: -3deg; box-shadow: 0 8px 16px -8px rgb(40 20 80 / .5); }
+.lfs-icon-photo { width: 88px; height: 88px; padding: 5px; box-sizing: border-box; border-radius: 14px; background: #fff; rotate: -3deg; box-shadow: 0 8px 16px -8px rgb(40 20 80 / .5); }
 .lfs-desk-icon:nth-child(even) .lfs-icon-photo { rotate: 3deg; }
 .lfs-icon-photo > img { border-radius: 11px; box-shadow: none; }
 .lfs-roll { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
@@ -306,3 +326,108 @@
 .lfs-w-video .lfs-w-play svg { width: 14px; height: 14px; }
 .lfs-w-vcap { position: absolute; inset: auto 0 0 0; padding: 26px 14px 11px; background: linear-gradient(180deg, transparent, rgb(8 6 20 / .82)); color: #fff; font-size: 14px; font-weight: 600; line-height: 1.25; text-shadow: 0 1px 3px rgb(0 0 0 / .6);
   overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; }
+
+/* music in a tall window (a row of windows, or a canvas box): the sleeve and record on top, bigger, the track below */
+.lfs-music { container: lfsmusic / size; }
+@container lfsmusic (min-height: 250px) and (max-width: 560px) {
+  .lfs-music .lfs-body { flex-direction: column; align-items: stretch; justify-content: center; gap: 18px; padding: 18px 22px 20px; }
+  .lfs-music .lfs-deck { align-self: center; width: min(190px, 62cqw); height: auto; aspect-ratio: 190 / 150; }
+  .lfs-music .lfs-sleeve { width: auto; height: 100%; aspect-ratio: 1; }
+  .lfs-music .lfs-vinyl { left: 10%; top: 4%; width: auto; height: 92%; aspect-ratio: 1; }
+  .lfs-music .lfs-controls { justify-content: center; }
+}
+@container lfsmusic (max-height: 150px) {
+  .lfs-music .lfs-body { padding: 10px 14px; gap: 14px; }
+  .lfs-music .lfs-deck { width: 92px; height: 76px; } .lfs-music .lfs-sleeve { width: 76px; height: 76px; } .lfs-music .lfs-vinyl { width: 70px; height: 70px; }
+  .lfs-music .lfs-progress { display: none; }
+}
+
+/* the phone's music widget: a spinning record with the cover as its label, the track and the artist */
+.lfs-disc { position: relative; display: grid; place-items: center; aspect-ratio: 1; border-radius: 50%;
+  background: repeating-radial-gradient(circle, #1c1828 0 2px, #2a2440 2px 3px); box-shadow: 0 10px 20px -10px rgb(0 0 0 / .6), inset 0 0 0 1px rgb(255 255 255 / .06); animation: lfs-spin 6s linear infinite; }
+.lfs-disc::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(135deg, rgb(255 255 255 / .16), transparent 45%); }
+.lfs-disc-label { display: grid; place-items: center; width: 44%; aspect-ratio: 1; overflow: hidden; border-radius: 50%; background: var(--accent); color: #fff; box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 60%, #fff); }
+.lfs-disc-label img { width: 100%; height: 100%; object-fit: cover; }
+.lfs-disc-label svg { width: 42%; height: 42%; }
+.lfs-w-music .lfs-disc { width: 62%; }
+.lfs-w-track { display: grid; gap: 2px; min-width: 0; max-width: 100%; }
+.lfs-w-track b { font-size: 14.5px; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; }
+.lfs-w-track span { font-size: 12px; color: var(--lfs-soft); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.lfs-w-music > .lfs-eq { position: absolute; top: 16px; right: 16px; }
+.lfs-m-wide > .lfs-w-music { display: flex; align-items: center; gap: 16px; }
+.lfs-m-wide > .lfs-w-music .lfs-disc { width: 92px; flex: none; }
+.lfs-m-wide > .lfs-w-music .lfs-w-track b { font-size: 16px; }
+.lfs-roll-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.lfs-phone-dock.lfs-dock-few { width: max-content; justify-self: center; gap: 18px; padding: 10px 14px; }
+@media (prefers-reduced-motion: reduce) { .lfs-disc { animation: none; } }
+.lfs-app-stamp { align-self: start; }
+.lfs-app-stamp .lfs-sticker { width: 68px; margin: 0; }
+.lfs-app-stamp .lfs-sticker span { padding: 4px; font-size: 9.5px; letter-spacing: .04em; }
+
+/* ---------- desktop List: the phone, a little wider on a big screen ---------- */
+@container page (min-width: 761px) { .posy-scene-list .lfs-phone { max-width: 500px; padding-top: 20px; } }
+
+/* ---------- Canvas: the same wallpaper and kit, each tile in the box the canvas gives it ---------- */
+.dark .lfs-cv, .dark .lfs-cv-head {
+  --lfs-ink: #f2eeff; --lfs-soft: #b5aed0; --lfs-glass: rgb(24 20 44 / .72); --lfs-line: rgb(255 255 255 / .12);
+  --lfs-bar: linear-gradient(180deg, rgb(255 255 255 / .1), rgb(255 255 255 / .03));
+  --lfs-shadow: 0 1px 2px rgb(0 0 0 / .3), 0 30px 60px -24px rgb(0 0 0 / .7);
+  --lfs-label: #fff; --lfs-label-glow: 0 1px 6px rgb(0 0 0 / .8);
+}
+.dark .lfs-cv .lfs-open, .dark .lfs-cv .lfs-play { color: #1d1a2b; }
+.posy-style-lofi.posy-layout-canvas { --lfs-wall: url(/looks/lofi/wall-day-desk.jpg); }
+.posy-style-lofi.posy-layout-canvas.dark { --lfs-wall: url(/looks/lofi/wall-night-desk.jpg); }
+@container page (max-width: 760px) {
+  .posy-style-lofi.posy-layout-canvas .posy-backdrop::before { --lfs-wall: url(/looks/lofi/wall-day-phone.jpg); }
+  .posy-style-lofi.posy-layout-canvas.dark .posy-backdrop::before { --lfs-wall: url(/looks/lofi/wall-night-phone.jpg); }
+}
+.posy-page.posy-style-lofi.posy-layout-canvas .posy-backdrop { background: var(--bg); }
+.posy-page.posy-style-lofi.posy-layout-canvas .posy-backdrop::before { content: ""; position: absolute; inset: 0; width: auto; height: auto; background: var(--lfs-wall) center / cover no-repeat; opacity: 1; mix-blend-mode: normal; filter: none; mask: none; }
+.posy-page.posy-style-lofi.posy-layout-canvas .posy-backdrop::after { content: ""; position: absolute; inset: 0; background: none; }
+.posy-style-lofi.posy-layout-canvas .lf-clouds { display: none; }
+.posy-style-lofi.posy-layout-canvas .lf-menubar { height: 32px; font-size: 13.5px; border-bottom: 0; box-shadow: 0 1px 0 rgb(40 30 60 / .1); color: #1d1a2b;
+  background: rgb(255 255 255 / .55); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+.posy-style-lofi.posy-layout-canvas.dark .lf-menubar { background: rgb(20 16 40 / .55); color: #f2eeff; box-shadow: 0 1px 0 rgb(255 255 255 / .12); }
+.posy-style-lofi.posy-layout-canvas .lf-clock { font-family: var(--font-vt323), monospace; font-size: 19px; letter-spacing: .04em; }
+.posy-style-lofi.posy-layout-canvas .posy-section { width: max-content; max-width: 100%; margin: 0; padding: 4px 12px 4px 10px; border-radius: 10px; font-family: var(--font-vt323), monospace; font-size: 26px; font-weight: 400; letter-spacing: .04em; text-transform: none;
+  color: #1d1a2b; background: rgb(255 252 247 / .5); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.posy-style-lofi.posy-layout-canvas.dark .posy-section { color: #fff; background: rgb(24 20 44 / .5); }
+.posy-style-lofi.posy-layout-canvas .posy-section::before { width: 12px; height: 12px; border-radius: 3px; }
+.posy-style-lofi.posy-layout-canvas .posy-section::after { display: none; }
+
+/* the header: one about window across the top */
+.st-head-lofi:has(> * > .lfs-cv-head), .st-head-lofi:has(> .lfs-cv-head) { display: block; }
+.lfs-cv-head { color: var(--lfs-ink); }
+.lfs-cv-head .lfs-about { height: auto; }
+.lfs-cv-head .lfs-about .lfs-body { padding: 26px 30px; gap: 28px; }
+.lfs-cv-head .lfs-me { width: clamp(110px, 13vw, 150px); }
+.lfs-cv-head .lfs-name { font-size: clamp(30px, 3.4vw, 48px); }
+.lfs-cv-head .lfs-bio { max-width: 62ch; }
+.lfs-cv-head .lfs-me-text { gap: 10px; }
+.posy-style-lofi .lfs-cv-socials .posy-social-row { justify-content: flex-start; gap: 10px; margin: 6px 0 0; }
+.posy-style-lofi .lfs-cv-socials .posy-social-row a { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; gap: 0; border: 0; border-radius: 13px; background: #fff; color: var(--brand);
+  box-shadow: 0 6px 14px -8px rgb(40 20 80 / .5); transition: scale .3s var(--lfs-pop), translate .3s var(--lfs-pop); }
+.posy-style-lofi .lfs-cv-socials .posy-social-row a > :first-child { width: auto; height: auto; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+.posy-style-lofi .lfs-cv-socials .posy-social-row a:hover { scale: 1.12; translate: 0 -3px; background: #fff; color: var(--brand); }
+.posy-style-lofi .lfs-cv-socials .posy-social-row a:hover > :first-child { background: none; color: inherit; translate: none; }
+.posy-style-lofi .lfs-cv-socials .posy-social-label { display: none; }
+@container page (max-width: 560px) {
+  .lfs-cv-head .lfs-about .lfs-body { flex-direction: column; align-items: flex-start; padding: 20px; gap: 16px; }
+  .lfs-cv-head .lfs-me { width: 96px; }
+}
+
+/* tiles */
+.lfs-cv { width: 100%; height: 100%; color: var(--lfs-ink); }
+.lfs-cv > .lfs-win, .lfs-cv > .lfs-sticky { height: 100%; }
+.lfs-cv img { width: auto; height: auto; }
+.lfs-cv .lfs-hero > img, .lfs-cv .lfs-photo-img, .lfs-cv .lfs-screen img, .lfs-cv .lfs-sleeve img, .lfs-cv .lfs-icon > img { width: 100%; height: 100%; }
+.lfs-cv .lfs-badge img { width: 15px; height: 15px; }
+.lfs-cv .lfs-tab-fav img, .lfs-cv .lfs-splash-fav img { width: 100%; height: 100%; object-fit: contain; }
+.lfs-cv-center { display: grid; place-items: center; align-content: center; width: 100%; height: 100%; }
+.lfs-cv-center > .lfs-sticker { margin: 0; width: min(130px, 80%); }
+.lfs-cv-social .lfs-desk-icon { width: 100%; }
+.lfs-cv-text:not(:has(.lfs-sticker)) { padding: 8px 6px 0; box-sizing: border-box; }
+.lfs-cv-text .lfs-sticky { rotate: -1.5deg; }
+/* a short box drops the toolbar, then the preview; the title and the button stay */
+@container lfsbrowser (max-height: 180px) { .lfs-toolbar { display: none; } }
+@container lfsbrowser (max-width: 260px) { .lfs-nav { display: none; } .lfs-page-text b { font-size: 15px; } }

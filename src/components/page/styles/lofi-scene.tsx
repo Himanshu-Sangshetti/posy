@@ -12,6 +12,7 @@ import { Favicon, LiveClock, VideoPlayer } from '../islands';
 import { BrandIcon, RichText } from '../tiles';
 import { tileMeta, compact } from './meta';
 import { anatomy, Arrangements, type SceneProps } from './scene';
+import type { HeaderSlots } from './types';
 import { LofiWindows, SafeImg } from '../islands';
 
 const Img = ({ src, className, crop }: { src: string; className?: string; crop?: CSSProperties }) => (
@@ -155,7 +156,8 @@ export function LofiScene({ page, slots, piece, only, editing }: SceneProps) {
   const dock = a.socials.slice(0, 5), extraSocials = a.socials.slice(5), phoneExtra = a.socials.slice(4);
 
   // the computer shows three links as windows (the rest become desktop icons); the first music, video and photo get
-  // windows too, every note is a sticky, and any further photo is an icon that is its own thumbnail
+  // windows too. Windows tile in even rows on a 12-column grid; the right edge holds sticky notes and the desktop
+  // icons in a neat column; stamps are stickers stuck on the about window; socials sit in the dock.
   const tabs = a.links.slice(0, 3);
   const music = a.media.find(t => t.type === 'music'), video = a.media.find(t => t.type === 'video'), photo = a.photos[0];
   const top = a.groups[0] && !a.groups[0].heading ? a.groups[0] : undefined;
@@ -165,20 +167,38 @@ export function LofiScene({ page, slots, piece, only, editing }: SceneProps) {
     ...(music && music !== besideMe && g.media.includes(music) ? [{ tile: music as Tile, node: <Player tile={music} />, cls: 'lfs-a-music' }] : []),
     ...(video && g.media.includes(video) ? [{ tile: video as Tile, node: <Player tile={video} editing={editing} />, cls: 'lfs-a-video' }] : []),
     ...(photo && g.photos.includes(photo) ? [{ tile: photo as Tile, node: <Photo tile={photo} />, cls: 'lfs-a-photo' }] : []),
-    ...g.notes.map(t => ({ tile: t as Tile, node: <Sticky tile={t} />, cls: 'lfs-a-note' })),
   ];
   const shelfOf = (g: Group): Tile[] => [...g.links.filter(t => !tabs.includes(t)), ...g.photos.filter(t => t !== photo), ...g.media.filter(t => t !== music && t !== video)];
-  const sideOf = (g: Group, gi: number) => shelfOf(g).length + g.stamps.length + (gi === 0 ? extraSocials.length : 0);
+  const sideOf = (g: Group, gi: number) => shelfOf(g).length + g.notes.length + (gi === 0 ? extraSocials.length : 0);
   const showSide = a.groups.some((g, gi) => sideOf(g, gi) > 0) || extraSocials.length > 0;
+  // rows of at most three windows, every row full width: 4 is 2 + 2, 5 is 3 + 2, 7 is 3 + 2 + 2
+  const rowsOf = (n: number): number[] => n <= 3 ? (n ? [n] : []) : n === 4 ? [2, 2] : [3, ...rowsOf(n - 3)];
+  const winRows = a.groups.reduce((s, g) => s + rowsOf(winsOf(g).length).length, 0);
+  const winCount = a.groups.reduce((s, g) => s + winsOf(g).length, 0);
+  // one window and nothing else: it sits beside a tall about window, both large
+  const solo = winCount === 1 && !besideMe && a.headings.length === 0;
+
+  // the icon column: one tidy grid of every loose icon, then a labelled run for each section that has no windows
+  const sideRuns = () => {
+    const loose: Tile[] = [];
+    const own: { key: string; heading?: Extract<Tile, { type: 'heading' }>; icons: Tile[] }[] = [];
+    a.groups.forEach(g => {
+      if (g.heading && winsOf(g).length === 0) own.push({ key: g.heading.id, heading: g.heading, icons: shelfOf(g) });
+      else loose.push(...shelfOf(g));
+    });
+    loose.push(...extraSocials);
+    return [...(loose.length ? [{ key: 'loose', icons: loose }] : []), ...own];
+  };
+  const aboutCols = solo ? '1 / span 5' : besideMe ? '1 / span 7' : '1 / -1';
 
   const desktop = () => (
     <div className="lfs-desk">
       <div className="lfs-menubar">
         <span className="lfs-menu-logo" aria-hidden>✿</span><b>{slots.name}</b><span className="lfs-menu-gap" /><span className="lfs-clock"><LiveClock /></span>
       </div>
-      <div className="lfs-stage">
-        <div className="lfs-area">
-          <Win title="about_me.txt" className="lfs-about lfs-a-about" style={{ gridColumn: besideMe ? 'span 7' : 'span 12' }}>
+      <div className={cn('lfs-stage', showSide && 'lfs-has-side')}>
+        <div className={cn('lfs-area', winRows <= 1 && 'lfs-few', solo && 'lfs-solo')}>
+          <Win title="about_me.txt" className={cn('lfs-about lfs-a-about', a.stamps.length > 0 && 'lfs-stamped')} style={{ gridColumn: aboutCols }}>
             {slots.avatar && <div className="lfs-me">{slots.avatar}</div>}
             <div className="lfs-me-text">
               <h1 className="posy-head lfs-name">{slots.name}</h1>
@@ -186,36 +206,34 @@ export function LofiScene({ page, slots, piece, only, editing }: SceneProps) {
               {slots.caption && <p className="lfs-online"><i aria-hidden />{slots.caption}</p>}
             </div>
           </Win>
-          {besideMe && piece(besideMe, <Player tile={besideMe} editing={editing} />, { key: besideMe.id, className: 'lfs-a-music' })}
+          {/* the stickers are stuck on the about window's corner (an absolute box placed in the about window's grid area) */}
+          {a.stamps.length > 0 && <div className="lfs-stuck" style={{ gridColumn: aboutCols, gridRow: 1 }}>{a.stamps.map(t => piece(t, <Sticker tile={t} />, { key: t.id, className: 'lfs-a-stamp' }))}</div>}
+          {besideMe && piece(besideMe, <Player tile={besideMe} editing={editing} />, { key: besideMe.id, className: 'lfs-a-music lfs-a-beside', style: { gridColumn: 'span 5' } })}
           {a.groups.map((g, gi) => {
             const wins = winsOf(g);
-            const n = wins.length, per = n ? Math.ceil(n / Math.ceil(n / 3)) : 3, span = n === 1 ? 6 : 12 / Math.min(per, 3);
-            const label = g.heading && (n > 0 || sideOf(g, gi) === 0);
+            const spans = rowsOf(wins.length).flatMap(k => Array<number>(k).fill(12 / k));
+            const label = g.heading && (wins.length > 0 || sideOf(g, gi) === 0);
             return [
               label && g.heading && piece(g.heading, <Folderlabel text={g.heading.text} />, { key: g.heading.id, className: 'lfs-a-label' }),
-              ...wins.map(w => piece(w.tile, w.node, { key: w.tile.id, className: w.cls, style: { gridColumn: `span ${span}` } })),
+              ...wins.map((w, i) => piece(w.tile, w.node, { key: w.tile.id, className: w.cls, style: { gridColumn: `span ${solo ? 7 : spans[i]}` } })),
             ];
           })}
         </div>
         {showSide && (
           <div className="lfs-side">
-            {a.groups.map((g, gi) => {
-              const shelf = shelfOf(g), socials = gi === 0 ? extraSocials : [];
-              if (!shelf.length && !socials.length && !g.stamps.length) return null;
-              const label = g.heading && winsOf(g).length === 0;
-              return (
-                <div key={g.heading?.id ?? `g${gi}`} className="lfs-side-group">
-                  {label && g.heading && piece(g.heading, <Folderlabel text={g.heading.text} />, { key: g.heading.id, className: 'lfs-a-label' })}
-                  {g.stamps.map(t => piece(t, <Sticker tile={t} />, { key: t.id, className: 'lfs-a-stamp' }))}
-                  {(shelf.length > 0 || socials.length > 0) && (
-                    <div className="lfs-desk-icons">
-                      {shelf.map(t => piece(t, <><AppIcon tile={t} /><span className="lfs-label">{label_(t)}</span></>, { key: t.id, className: 'lfs-desk-icon' }))}
-                      {socials.map(t => piece(t, <><SocialTile tile={t} /><span className="lfs-label">{PLATFORMS[t.platform].label}</span></>, { key: t.id, className: 'lfs-desk-icon' }))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            {a.notes.map(t => piece(t, <Sticky tile={t} />, { key: t.id, className: 'lfs-a-note' }))}
+            {sideRuns().map(run => (
+              <div key={run.key} className="lfs-side-group">
+                {run.heading && piece(run.heading, <Folderlabel text={run.heading.text} />, { key: run.heading.id, className: 'lfs-a-label' })}
+                {run.icons.length > 0 && (
+                  <div className="lfs-desk-icons">
+                    {run.icons.map(t => piece(t, t.type === 'social'
+                      ? <><SocialTile tile={t} /><span className="lfs-label">{PLATFORMS[t.platform].label}</span></>
+                      : <><AppIcon tile={t} /><span className="lfs-label">{label_(t)}</span></>, { key: t.id, className: 'lfs-desk-icon' }))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -225,15 +243,28 @@ export function LofiScene({ page, slots, piece, only, editing }: SceneProps) {
   );
 
   const widgetFor = (t: Tile) => t.type === 'music'
-    ? <div className="lfs-widget lfs-w-music"><div className="lfs-disc">{tileMeta(t).image ? <Img src={tileMeta(t).image!} crop={cropStyle(t)} /> : <span />}</div><b>{tileMeta(t).title}</b><span className="lfs-eq" aria-hidden><i /><i /><i /><i /><i /></span></div>
+    ? (
+      <div className="lfs-widget lfs-w-music">
+        <span className="lfs-disc" aria-hidden><span className="lfs-disc-label">{tileMeta(t).image ? <Img src={tileMeta(t).image!} crop={cropStyle(t)} /> : <Music2 />}</span></span>
+        <span className="lfs-w-track"><b>{tileMeta(t).title}</b>{tileMeta(t).sub && <span>{tileMeta(t).sub}</span>}</span>
+        <span className="lfs-eq" aria-hidden><i /><i /><i /><i /><i /></span>
+      </div>
+    )
     : t.type === 'video'
       ? <div className="lfs-widget lfs-w-photo lfs-w-video">{tileMeta(t).image && <Img src={tileMeta(t).image!} crop={cropStyle(t)} />}<span className="lfs-w-play"><Play /></span><span className="lfs-w-vcap">{tileMeta(t).title}</span></div>
       : t.type === 'image' ? <div className="lfs-widget lfs-w-photo"><Img src={t.src} crop={cropStyle(t)} />{t.caption && <span className="lfs-w-cap">{t.caption}</span>}</div> : null;
 
   const phoneGroup = (g: Group, gi: number) => {
     const feat = g.links.filter(t => featured.includes(t)), apps = g.links.filter(t => !featured.includes(t));
-    const widgets: Tile[] = [...g.media, ...g.photos.slice(0, 1)], roll = g.photos.slice(1);
+    // one or two extra photos join the widgets as squares; three or more get their own roll of thumbnails
+    const extra = g.photos.slice(1), rolled = extra.length >= 3;
+    const widgets: Tile[] = [...g.media, ...g.photos.slice(0, 1), ...(rolled ? [] : extra)], roll = rolled ? extra : [];
+    // video is always wide; the squares pair up, and an odd last one goes wide so no row is half empty
+    const squares = widgets.filter(t => t.type !== 'video');
+    const wide = (t: Tile) => t.type === 'video' || (squares.length % 2 === 1 && t === squares[squares.length - 1]);
     const socials = gi === 0 ? phoneExtra : [];
+    // a stamp takes a free spot on the row of app icons, if the row has room, instead of floating on its own
+    const icons = apps.length + socials.length, stampsInApps = icons > 0 && g.stamps.length > 0 && (icons % 4) + g.stamps.length <= 4 && icons % 4 !== 0;
     return [
       g.heading && piece(g.heading, <Folderlabel text={g.heading.text} />, { key: g.heading.id, className: 'lfs-m-wide lfs-m-label' }),
       ...feat.map(t => piece(t, (
@@ -245,18 +276,19 @@ export function LofiScene({ page, slots, piece, only, editing }: SceneProps) {
       ), { key: t.id, className: 'lfs-m-wide' })),
       widgets.length > 0 && (
         <div key={`w${gi}`} className="lfs-widgets">
-          {widgets.map((t, i) => piece(t, widgetFor(t), { key: t.id, className: cn('lfs-m-square', (t.type === 'video' || (widgets.length % 2 === 1 && i === widgets.length - 1)) && 'lfs-m-wide') }))}
+          {widgets.map(t => piece(t, widgetFor(t), { key: t.id, className: cn('lfs-m-square', wide(t) && 'lfs-m-wide') }))}
         </div>
       ),
-      roll.length > 0 && <div key={`r${gi}`} className="lfs-roll">{roll.map(t => piece(t, widgetFor(t), { key: t.id, className: 'lfs-m-thumb' }))}</div>,
+      roll.length > 0 && <div key={`r${gi}`} className={cn('lfs-roll', roll.length === 4 && 'lfs-roll-2')}>{roll.map(t => piece(t, widgetFor(t), { key: t.id, className: 'lfs-m-thumb' }))}</div>,
       (apps.length > 0 || socials.length > 0) && (
         <div key={`a${gi}`} className="lfs-apps">
           {apps.map(t => piece(t, <><AppIcon tile={t} /><span className="lfs-label">{label_(t)}</span></>, { key: t.id, className: 'lfs-app' }))}
           {socials.map(t => piece(t, <><SocialTile tile={t} /><span className="lfs-label">{PLATFORMS[t.platform].label}</span></>, { key: t.id, className: 'lfs-app' }))}
+          {stampsInApps && g.stamps.map(t => piece(t, <Sticker tile={t} />, { key: t.id, className: 'lfs-app lfs-app-stamp' }))}
         </div>
       ),
       ...g.notes.map(t => piece(t, <div className="lfs-widget lfs-w-note"><p><RichText text={t.text} /></p></div>, { key: t.id, className: 'lfs-m-wide' })),
-      g.stamps.length > 0 && <div key={`s${gi}`} className="lfs-m-stamps">{g.stamps.map(t => piece(t, <Sticker tile={t} />, { key: t.id, className: 'lfs-m-stamp' }))}</div>,
+      !stampsInApps && g.stamps.length > 0 && <div key={`s${gi}`} className="lfs-m-stamps">{g.stamps.map(t => piece(t, <Sticker tile={t} />, { key: t.id, className: 'lfs-m-stamp' }))}</div>,
     ];
   };
 
@@ -275,7 +307,7 @@ export function LofiScene({ page, slots, piece, only, editing }: SceneProps) {
       {a.groups.length === 0 && phoneExtra.length > 0 && (
         <div className="lfs-apps">{phoneExtra.map(t => piece(t, <><SocialTile tile={t} /><span className="lfs-label">{PLATFORMS[t.platform].label}</span></>, { key: t.id, className: 'lfs-app' }))}</div>
       )}
-      {dock.length > 0 && <div className="lfs-dock lfs-phone-dock">{dock.slice(0, 4).map(t => piece(t, <SocialTile tile={t} />, { key: t.id, className: 'lfs-dock-item' }))}</div>}
+      {dock.length > 0 && <div className={cn('lfs-dock lfs-phone-dock', dock.length < 3 && 'lfs-dock-few')}>{dock.slice(0, 4).map(t => piece(t, <SocialTile tile={t} />, { key: t.id, className: 'lfs-dock-item' }))}</div>}
     </div>
   );
 
@@ -288,3 +320,31 @@ export function LofiScene({ page, slots, piece, only, editing }: SceneProps) {
 
 /** The kit on its own, for the component lab. */
 export { Browser as LofiBrowser, AppIcon as LofiAppIcon, SocialTile as LofiSocial, Player as LofiPlayer, Photo as LofiPhoto, Sticky as LofiSticky, Sticker as LofiSticker, Win as LofiWin, label_ as lofiLabel };
+
+/** Canvas layout: one tile in Lofi's own kit. It fills the box the canvas gives it (from about 180×120 to 800×500). */
+export function LofiCanvasTile({ tile, editing }: { tile: Tile; index: number; editing?: boolean }) {
+  const node = tile.type === 'link' || tile.type === 'github' ? <Browser tile={tile} />
+    : tile.type === 'music' || tile.type === 'video' ? <Player tile={tile} editing={editing} />
+    : tile.type === 'image' ? <Photo tile={tile} />
+    : tile.type === 'text' ? (tile.look === 'stamp' ? <div className="lfs-cv-center"><Sticker tile={tile} /></div> : <Sticky tile={tile} />)
+    : tile.type === 'social' ? <div className="lfs-cv-center lfs-desk-icon"><SocialTile tile={tile} /><span className="lfs-label">{PLATFORMS[tile.platform].label}</span></div>
+    : null;
+  return <div className={cn('lfs lfs-cv', `lfs-cv-${tile.type}`)}>{node}</div>;
+}
+
+/** Canvas layout: the header is the about window, with your socials along its bottom like a little dock. */
+export function LofiCanvasHeaderBase({ name, slots }: { name: string; slots: HeaderSlots }) {
+  return (
+    <div className="lfs lfs-cv-head">
+      <Win title="about_me.txt" className="lfs-about">
+        {slots.avatar && <div className="lfs-me">{slots.avatar}</div>}
+        <div className="lfs-me-text">
+          <h1 className="posy-head lfs-name" aria-label={name}>{slots.name}</h1>
+          {slots.bio && <div className="lfs-bio">{slots.bio}</div>}
+          {slots.caption && <p className="lfs-online"><i aria-hidden />{slots.caption}</p>}
+          {slots.socials && <div className="lfs-cv-socials">{slots.socials}</div>}
+        </div>
+      </Win>
+    </div>
+  );
+}

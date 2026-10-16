@@ -79,9 +79,13 @@ figure.nr-panel { margin: 0; }
 
 .nr-card-art .nr-art { min-height: 0; }
 /* wide panels put the readout on the left and the words beside it */
-.posy-size-w .nr-card-art > .nr-in { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 10px 16px; }
-.posy-size-w .nr-card-art .nr-strip { grid-column: 1 / -1; }
-.posy-size-w .nr-card-art .nr-body { align-self: end; padding-bottom: 2px; }
+/* (the grid plan can show a tile at another size than its own, so panels follow the shape of their box, not the size name) */
+@container tile (min-aspect-ratio: 8 / 5) {
+  .nr-card-art > .nr-in { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 10px 16px; }
+  .nr-card-art .nr-strip { grid-column: 1 / -1; }
+  .nr-card-art .nr-body { align-self: end; padding-bottom: 2px; }
+}
+.posy-style-night :is(.posy-grid, .posy-canvas) .posy-tile { container: tile / size; }
 
 /* shops: a market listing, hazard stripes along the foot and a price tag */
 .nr-stripes { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: repeating-linear-gradient(-45deg, var(--nr-sig) 0 7px, transparent 7px 14px); }
@@ -320,3 +324,9 @@ figcaption.nr-subtitle::before { content: "▸ "; color: var(--nr-sig); }
 /* a picture waits for its exposure to be measured (see PhotoExposure), then fades in */
 .posy-px :is(.nr-scan img, .nr-photo .posy-avatar img):not([data-px]) { opacity: 0; }
 :is(.nr-scan img, .nr-photo .posy-avatar img) { transition: opacity .25s; }
+
+/* ---- list layout on a wide screen: room for the badge, and the name keeps its size ---- */
+.posy-style-night.posy-layout-list .posy-layout { max-width: 780px; }
+.posy-style-night.posy-layout-list .nr-name { font-size: clamp(40px, calc(100cqw / max(8, var(--nlen, 10)) * 1.15), 52px); }
+.posy-style-night.posy-layout-list .posy-section { margin: 22px 0 4px; }
+@container page (min-width: 700px) { .posy-style-night.posy-layout-list .nr-row-photo .nr-scan { aspect-ratio: 2 / 1; } }
