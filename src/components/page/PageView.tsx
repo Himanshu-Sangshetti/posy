@@ -9,7 +9,9 @@ import { MotionProvider, MotionShell, MotionHeader } from './motion';
 import { ShareButton, TileEffects, DraggableWindows, DitherPhotos } from './islands';
 import { TileContent, tileHref, brandHex, RichText, ListItem, BrandIcon } from './tiles';
 import { deskTilt } from './desk';
-import { StyleHeader, StyleTile, StyleRow, headerClass, socialsInHeader, type StyleId } from './styles';
+import { StyleHeader, StyleTile, StyleRow, headerClass, socialsInHeader, sceneFor, type StyleId } from './styles';
+import type { HeaderSlots } from './styles/types';
+import type { PieceFn } from './styles/scene';
 import { Halftone, LofiMenuBar } from './styles/lofi';
 import { Clouds3D } from './Clouds3D';
 import { placeTiles, looseStyle, canvasHeight, readingOrder, boxSize } from '@/lib/canvas-layout';
@@ -41,14 +43,16 @@ export function Backdrop() {
 
 export function PageFrame({ page, children, profile, className, interactive = true }: { page: Page; children: ReactNode; profile?: ReactNode; className?: string; interactive?: boolean }) {
   const fx = page.theme.effect === 'tilt' || page.theme.effect === 'glow';
+  const scene = !!sceneFor(page.theme.style);
   return (
     <div className={cn(pageClasses(page), className)} style={{ ...pageStyle(page), colorScheme: isDark(page) ? 'dark' : 'light' }}>
       <Backdrop />
       {/* the WebGL clouds only run on a real page, never in thumbnails and previews (each one is a full-size canvas) */}
-      {interactive && page.theme.style === 'lofi' && !isDark(page) && page.theme.ambient && <Clouds3D />}
+      {/* looks with their own scene draw their own weather, bars and interactions */}
+      {interactive && !scene && page.theme.style === 'lofi' && !isDark(page) && page.theme.ambient && <Clouds3D />}
       {(page.theme.style === 'lofi' || page.theme.style === 'night') && isDark(page) && page.theme.ambient && <div aria-hidden className="lf-rain" />}
-      {page.theme.style === 'lofi' && <LofiMenuBar name={page.profile.name} pinned={interactive} />}
-      {interactive && page.theme.style === 'lofi' && page.theme.layout === 'canvas' && <DraggableWindows />}
+      {!scene && page.theme.style === 'lofi' && <LofiMenuBar name={page.profile.name} pinned={interactive} />}
+      {interactive && !scene && page.theme.style === 'lofi' && page.theme.layout === 'canvas' && <DraggableWindows />}
       <MotionProvider enabled={page.theme.motion}>
         <div className="posy-layout">
           {profile ?? <Profile page={page} interactive={interactive} />}
@@ -108,20 +112,26 @@ export function DeskName({ name }: { name: string }) {
 
 export const socialTiles = (page: Page) => page.tiles.filter((t): t is Extract<Tile, { type: 'social' }> => t.type === 'social');
 
-export function Profile({ page, interactive = true }: { page: Page; interactive?: boolean }) {
+/** The header's pieces as plain content, for styled headers and scenes. */
+export function profileSlots(page: Page): HeaderSlots {
   const { name, bio, location, avatar } = page.profile;
+  const style = page.theme.style;
+  return {
+    avatar: page.theme.avatar === 'hidden' ? null : style === 'lofi' && avatar ? <Halftone src={avatar} className="posy-avatar" /> : <Avatar page={page} />,
+    name: style === 'cozy' ? <DeskName name={name} /> : name,
+    bio: bio ? <RichText text={bio} /> : null,
+    caption: location || null,
+    socials: <SocialRow tiles={socialTiles(page)} />,
+  };
+}
+
+export function Profile({ page, interactive = true }: { page: Page; interactive?: boolean }) {
+  const { name, bio, location } = page.profile;
   const { style, layout } = page.theme;
   if (style !== 'minimal') {
-    const av = page.theme.avatar === 'hidden' ? null : style === 'lofi' && avatar ? <Halftone src={avatar} className="posy-avatar" /> : <Avatar page={page} />;
     return (
       <MotionHeader className={headerClass(style)}>
-        <StyleHeader page={page} slots={{
-          avatar: av,
-          name: style === 'cozy' ? <DeskName name={name} /> : name,
-          bio: bio ? <RichText text={bio} /> : null,
-          caption: location || null,
-          socials: <SocialRow tiles={socialTiles(page)} />,
-        }} />
+        <StyleHeader page={page} slots={profileSlots(page)} />
       </MotionHeader>
     );
   }
@@ -255,8 +265,20 @@ function CanvasTiles({ page }: { page: Page }) {
   );
 }
 
+/** On the public page every piece of a scene is a link (or a plain block), with the usual entrance. */
+// Plain wrappers (not TileShell), so the grid's size and object rules never reach a scene's own pieces.
+const publicPiece = (_style: StyleId): PieceFn => (tile, node, o) => (
+  <MotionShell key={o.key} href={tileHref(tile, true)} index={0} lift={false} label={ariaLabel(tile)} tileId={tile.id} className={cn('sc-piece', `sc-type-${tile.type}`, o.className)} style={o.style}>{node}</MotionShell>
+);
+
 /** The public, read-only page. `contained` renders it inside a box (previews, thumbnails, mockups). */
 export function PageView({ page, contained }: { page: Page; contained?: boolean }) {
+  const Scene = sceneFor(page.theme.style);
+  if (Scene) return (
+    <PageFrame page={page} className={cn('posy-scene', contained && 'posy-contained')} interactive={!contained} profile={<></>}>
+      <Scene page={page} slots={profileSlots(page)} piece={publicPiece(page.theme.style)} />
+    </PageFrame>
+  );
   return (
     <PageFrame page={page} className={contained ? 'posy-contained' : undefined} interactive={!contained}>
       {page.theme.layout === 'list' ? <ListTiles page={page} /> : page.theme.layout === 'canvas' ? <CanvasTiles page={page} /> : <BentoTiles page={page} />}
