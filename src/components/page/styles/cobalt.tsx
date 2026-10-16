@@ -21,19 +21,29 @@ const INKS: Record<string, [string, string]> = {
 
 const hex = (h: string) => { const n = parseInt(h.replace('#', '').padEnd(6, '0').slice(0, 6), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => (v / 255).toFixed(3)); };
 
-/** One SVG filter that turns any photo into a two-ink print: luminance mapped from the ink to the paper colour. */
+/**
+ * The print every picture goes through, so a selfie, a product shot or a bright YouTube thumbnail all come out as the same
+ * kind of object: a stippled two-ink print. The picture is flattened to its light, pushed in contrast, then a fine grain of
+ * noise decides, dot by dot, whether each spot takes ink, half ink or none (three tones), and those are printed in the
+ * palette's ink and paper colours.
+ */
 function Inks({ preset }: { preset: string }) {
   const t = THEMES[preset] ?? THEMES.cobalt;
   const [ink, paper] = INKS[preset] ?? [t.dark ? t.bg : t.text, t.dark ? t.text : t.surface];
   const a = hex(ink), b = hex(paper);
-  // three steps per channel: ink, a slightly heavier mid-tone (prints darken in the middle), paper
-  const ch = (i: number) => `${a[i]} ${(+a[i] * 0.55 + +b[i] * 0.45).toFixed(3)} ${b[i]}`;
+  const ch = (i: number) => `${a[i]} ${(+a[i] * 0.42 + +b[i] * 0.58).toFixed(3)} ${b[i]}`;
+  const lin = (slope: number, icpt: number) => <><feFuncR type="linear" slope={slope} intercept={icpt} /><feFuncG type="linear" slope={slope} intercept={icpt} /><feFuncB type="linear" slope={slope} intercept={icpt} /></>;
+  const steps = <><feFuncR type="discrete" tableValues="0 .5 1" /><feFuncG type="discrete" tableValues="0 .5 1" /><feFuncB type="discrete" tableValues="0 .5 1" /></>;
   return (
     <svg aria-hidden width="0" height="0" style={{ position: 'absolute', width: 0, height: 0 }}>
-      <filter id={`cb-duo-${OWN.has(preset) ? preset : 'cobalt'}`} colorInterpolationFilters="sRGB">
-        <feColorMatrix type="matrix" values="0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0 0 0 1 0" />
-        <feComponentTransfer><feFuncR type="linear" slope="1.25" intercept="-0.1" /><feFuncG type="linear" slope="1.25" intercept="-0.1" /><feFuncB type="linear" slope="1.25" intercept="-0.1" /></feComponentTransfer>
-        <feComponentTransfer><feFuncR type="table" tableValues={ch(0)} /><feFuncG type="table" tableValues={ch(1)} /><feFuncB type="table" tableValues={ch(2)} /></feComponentTransfer>
+      <filter id={`cb-duo-${OWN.has(preset) ? preset : 'cobalt'}`} x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
+        <feColorMatrix type="matrix" values="0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0 0 0 1 0" result="light" />
+        <feComponentTransfer in="light" result="bold">{lin(1.45, -0.2)}</feComponentTransfer>
+        <feTurbulence type="fractalNoise" baseFrequency="0.62" numOctaves="2" seed="7" result="noise" />
+        <feColorMatrix in="noise" type="matrix" values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 0 1" result="grain" />
+        <feComposite in="bold" in2="grain" operator="arithmetic" k1="0" k2="1" k3="0.62" k4="-0.31" result="dither" />
+        <feComponentTransfer in="dither" result="tones">{steps}</feComponentTransfer>
+        <feComponentTransfer in="tones"><feFuncR type="table" tableValues={ch(0)} /><feFuncG type="table" tableValues={ch(1)} /><feFuncB type="table" tableValues={ch(2)} /></feComponentTransfer>
       </filter>
     </svg>
   );
@@ -53,6 +63,44 @@ const ROMAN: [number, string][] = [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, '
 const roman = (n: number) => { let s = ''; for (const [v, r] of ROMAN) while (n >= v) { s += r; n -= v; } return s; };
 /** Every plate on the page carries its number, like the plates in an old book. */
 const No = ({ index }: { index: number }) => <span className="cb-no">Pl. {roman(index + 1)}</span>;
+
+/** A small, fast, repeatable random series from a tile's id, so each plate gets its own print that never changes. */
+const seeded = (id: string) => { let h = 2166136261; for (let i = 0; i < id.length; i++) h = Math.imul(h ^ id.charCodeAt(i), 16777619); let x = h >>> 0 || 1; return () => ((x = (Math.imul(x, 1664525) + 1013904223) >>> 0) / 4294967296); };
+const f1 = (n: number) => Math.round(n * 10) / 10;
+
+/**
+ * A plate's own little print, drawn from its id: a cobalt sky with a burst of cream lines rising from a point on the horizon,
+ * a crescent somewhere in the sky and stipple on the plain. Links without a picture get one, so a page of plain links still
+ * reads as a folio of prints. Repositories get a constellation instead, and shops a star.
+ */
+function Burst({ seed, kind = 'link' }: { seed: string; kind?: 'link' | 'repo' | 'shop' }) {
+  const r = seeded(seed + kind);
+  const W = 200, H = 120, horizon = kind === 'repo' ? H : 74 + r() * 8;
+  const ox = 30 + r() * 140, oy = horizon;
+  let rays = '';
+  if (kind !== 'repo') {
+    const n = 70 + Math.floor(r() * 50);
+    for (let i = 0; i < n; i++) {
+      const a = Math.PI + (i + r() * .8) / n * Math.PI, r0 = 4 + r() * 14, r1 = r0 + 18 + r() * (kind === 'shop' ? 60 : 130);
+      rays += `M${f1(ox + Math.cos(a) * r0)} ${f1(oy + Math.sin(a) * r0)}L${f1(ox + Math.cos(a) * r1)} ${f1(oy + Math.sin(a) * r1)}`;
+    }
+  }
+  // a constellation: a few stars joined in a line, like a chart
+  const stars = kind === 'repo' ? Array.from({ length: 7 }, () => [20 + r() * 160, 18 + r() * 84]) : [];
+  const chart = stars.map(([x, y], i) => `${i ? 'L' : 'M'}${f1(x)} ${f1(y)}`).join('');
+  const mx = (ox + 60 + r() * 80) % (W - 30) + 15, my = 14 + r() * 18;
+  const dots = kind === 'repo' ? [] : Array.from({ length: 70 }, () => { const y = horizon + 2 + Math.pow(r(), 0.7) * (H - horizon); return [f1(r() * W), f1(y), f1(.35 + r() * .9 * ((y - horizon) / (H - horizon) + .3))]; });
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" className="cb-burst" aria-hidden>
+      <rect width={W} height={horizon} className="cb-b-sky" />
+      {rays && <path d={rays} className="cb-b-rays" />}
+      {chart && <><path d={chart} className="cb-b-chart" />{stars.map(([x, y], i) => <circle key={i} cx={f1(x)} cy={f1(y)} r={i % 3 ? 1.6 : 2.6} className="cb-b-star" />)}</>}
+      {kind === 'shop' && <path d={`M${f1(ox)} ${f1(oy - 9)}L${f1(ox + 2)} ${f1(oy - 2)}L${f1(ox + 9)} ${f1(oy)}L${f1(ox + 2)} ${f1(oy + 2)}L${f1(ox)} ${f1(oy + 9)}L${f1(ox - 2)} ${f1(oy + 2)}L${f1(ox - 9)} ${f1(oy)}L${f1(ox - 2)} ${f1(oy - 2)}Z`} className="cb-b-star" />}
+      {kind !== 'repo' && <path d={`M${f1(mx)} ${f1(my)}a7 7 0 1 0 6.2 10.4a5.6 5.6 0 0 1-6.2-10.4Z`} className="cb-b-moon" />}
+      {dots.map(([x, y, rr], i) => <circle key={i} cx={x} cy={y} r={rr} className="cb-b-dot" />)}
+    </svg>
+  );
+}
 
 const Moon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" aria-hidden className={cn('cb-moon', className)}><path d="M15.5 3.2a8.8 8.8 0 1 0 5.3 15.1A9.6 9.6 0 0 1 15.5 3.2Z" /></svg>
@@ -133,13 +181,16 @@ export function CobaltTile({ tile, index, editing }: { tile: Tile; index: number
   );
 
   if (tile.type === 'github') return (
-    <div className="cb-plate cb-card">
+    <div className="cb-plate cb-card cb-card-art">
+      <span className="cb-art"><Burst seed={tile.id} kind="repo" /></span>
       <div className="cb-top"><No index={index} /><span className="cb-kind">Repository</span></div>
-      <b className="cb-title cb-mono">{tile.repo}</b>
-      {tile.description && <p className="cb-sub">{tile.description}</p>}
-      {(tile.stars !== undefined || tile.language) && (
-        <span className="cb-meta">{tile.stars !== undefined && <><Star aria-hidden className="cb-star" />{compact(tile.stars)}</>}{tile.stars !== undefined && tile.language && ' · '}{tile.language}</span>
-      )}
+      <div className="cb-body">
+        <b className="cb-title cb-mono">{tile.repo}</b>
+        {tile.description && <p className="cb-sub">{tile.description}</p>}
+        {(tile.stars !== undefined || tile.language) && (
+          <span className="cb-meta">{tile.stars !== undefined && <><Star aria-hidden className="cb-star" />{compact(tile.stars)}</>}{tile.stars !== undefined && tile.language && ' · '}{tile.language}</span>
+        )}
+      </div>
       <span className="cb-go" aria-hidden><ArrowUpRight /></span>
     </div>
   );
@@ -159,11 +210,14 @@ export function CobaltTile({ tile, index, editing }: { tile: Tile; index: number
   const pic = tile.size !== 's' && m.image;
   const host = tile.type === 'link' ? hostOf(tile.url) : '';
   return (
-    <article className={cn('cb-plate cb-card', pic && 'cb-card-pic', m.kind === 'shop' && 'cb-shop')}>
+    <article className={cn('cb-plate cb-card', pic ? 'cb-card-pic' : 'cb-card-art', m.kind === 'shop' && 'cb-shop')}>
+      {!pic && <span className="cb-art"><Burst seed={tile.id} kind={m.kind === 'shop' ? 'shop' : 'link'} /></span>}
       <div className="cb-top"><No index={index} /><span className="cb-kind">{m.kind === 'shop' ? 'Editions' : m.kind === 'link' ? host : m.kind}</span></div>
       {pic && <Print src={m.image!} />}
-      <b className="cb-title">{m.title}</b>
-      {m.sub && m.sub !== m.title && m.sub !== host && <p className="cb-sub">{m.sub}</p>}
+      <div className="cb-body">
+        <b className="cb-title">{m.title}</b>
+        {m.sub && m.sub !== m.title && m.sub !== host && <p className="cb-sub">{m.sub}</p>}
+      </div>
       <span className="cb-go" aria-hidden><ArrowUpRight /></span>
     </article>
   );
@@ -175,7 +229,7 @@ export function CobaltRow({ tile, index }: { tile: Tile; index: number }) {
   return (
     <div className="cb-plate cb-row">
       <span className="cb-row-no">{roman(index + 1)}</span>
-      {m.image && <Print src={m.image} className="cb-row-pic" />}
+      {m.image ? <Print src={m.image} className="cb-row-pic" /> : <span className="cb-art cb-row-pic"><Burst seed={tile.id} kind={tile.type === 'github' ? 'repo' : 'link'} /></span>}
       <span className="cb-text"><b className="cb-title">{m.title || 'Photo'}</b>{m.sub && m.sub !== m.title && tile.type !== 'image' && <span className="cb-sub">{m.sub}</span>}</span>
       <span className="cb-go" aria-hidden><ArrowUpRight /></span>
     </div>

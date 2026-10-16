@@ -12,8 +12,19 @@ export const dynamic = 'force-dynamic';
 
 const pic = (n: string) => `/looks/cobalt/${n}.jpg`;
 const t = (tiles: Record<string, unknown>[]) => tiles.map(x => ({ ...x, id: newId() }));
-const page = (name: string, preset: string, tiles: Record<string, unknown>[], bio = ''): Page =>
-  parsePage({ profile: { name, bio, avatar: pic('avatar'), location: 'Lab' }, theme: { style: 'cobalt', preset, font: 'cobalt', layout: 'bento', align: 'center', avatar: 'circle' }, tiles: t(tiles) });
+const page = (name: string, preset: string, tiles: Record<string, unknown>[], bio = '', avatar = pic('avatar')): Page =>
+  parsePage({ profile: { name, bio, avatar, location: 'Lab' }, theme: { style: 'cobalt', preset, font: 'cobalt', layout: 'bento', align: 'center', avatar: 'circle' }, tiles: t(tiles) });
+
+/** Pictures that are nothing like ours: a neon street, a violet room, flowers, a colourful album cover, a painted portrait. */
+const THEIRS: Record<string, unknown>[] = [
+  { type: 'image', src: '/looks/night/bg-street.jpg', caption: 'A neon street (their photo)', size: 'l' },
+  { type: 'link', url: 'https://example.com/shop', title: 'My shop', description: 'Handmade ceramics', image: '/samples/berries.jpg', size: 'w' },
+  { type: 'image', src: '/samples/flowers.jpg', caption: 'Flowers', size: 's' },
+  { type: 'image', src: '/looks/lofi/room-violet.jpg', size: 't' },
+  { type: 'video', url: 'https://www.youtube.com/watch?v=jfKfPfyJRdk', title: 'A bright, busy thumbnail', image: '/looks/lofi/photo1.jpg', size: 'w' },
+  { type: 'music', url: 'https://open.spotify.com/', title: 'A colourful album', artist: 'Someone else', image: '/looks/night/music.jpg', size: 'w' },
+  { type: 'link', url: 'https://example.com/blog', title: 'Blog post with a screenshot', image: '/samples/lemon.jpg', size: 'w' },
+];
 
 const SETS: [string, Record<string, unknown>[]][] = [
   ['Plates: links in every size and length', [
@@ -70,6 +81,12 @@ export default function CobaltLab() {
             </div>
           ))}
         </section>
+      ))}
+      <h2 className="lab-h">Their own pictures: the look has to survive them</h2>
+      {['cobalt', 'moonlit'].map(preset => (
+        <div key={preset}><p className="lab-k">{THEMES[preset].name}</p>
+          <div className="lab-row"><Frame w={1200} p={page('Mira Sol', preset, THEIRS, 'With a selfie and photos that are nothing like the sample art.', '/looks/press/avatar.jpg')} /><Frame w={390} p={page('Mira Sol', preset, THEIRS, 'With a selfie and photos that are nothing like the sample art.', '/looks/press/avatar.jpg')} /></div>
+        </div>
       ))}
       <h2 className="lab-h">The starter page in every palette</h2>
       {palettes.map(preset => {
