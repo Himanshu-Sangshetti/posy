@@ -15,7 +15,7 @@ export function PaintReveal({ src, sketch, focus = CENTER, className }: { src: s
     const ctx = cv.getContext('2d')!;
     const img = new Image(); // its source is set when the painting is about to scroll into view (below)
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let raf = 0, visible = false, dpr = 1, lastMove = 0;
+    let raf = 0, visible = false, dpr = 1, lastMove = 0, gone = false;
     let pointer: { x: number; y: number } | null = null, last: { x: number; y: number } | null = null;
 
     const paintSketch = (a: number) => {
@@ -52,9 +52,9 @@ export function PaintReveal({ src, sketch, focus = CENTER, className }: { src: s
         stroke(last ?? p, p, r * 0.8); last = p;
       }
       paintSketch(HEAL);
-      if (visible) raf = requestAnimationFrame(tick);
+      if (visible && !gone) raf = requestAnimationFrame(tick);
     };
-    const kick = () => { if (!raf && visible) raf = requestAnimationFrame(tick); };
+    const kick = () => { if (!raf && visible && !gone) raf = requestAnimationFrame(tick); };
     const move = (e: PointerEvent) => {
       const b = box.getBoundingClientRect();
       if (e.clientX < b.left || e.clientX > b.right || e.clientY < b.top || e.clientY > b.bottom) { if (pointer) leave(); return; }
@@ -66,8 +66,9 @@ export function PaintReveal({ src, sketch, focus = CENTER, className }: { src: s
     const ro = new ResizeObserver(fit);
     // the sketch is a big image: fetch it only when the painting is within about a screen of view
     const pre = new IntersectionObserver(([e]) => { if (e.isIntersecting) { img.src = sketch; pre.disconnect(); } }, { rootMargin: '900px' }); pre.observe(box);
-    img.onload = () => { fit(); ro.observe(box); box.dataset.ready = '1'; kick(); };
-    return () => { cancelAnimationFrame(raf); pre.disconnect(); io.disconnect(); ro.disconnect(); window.removeEventListener('pointermove', move); document.removeEventListener('pointerleave', leave); };
+    img.onload = () => { if (gone) return; fit(); ro.observe(box); box.dataset.ready = '1'; kick(); };
+    // once the painting leaves the page (say, logging in moves on to the editor) nothing may start the brush again
+    return () => { gone = true; visible = false; img.onload = null; cancelAnimationFrame(raf); pre.disconnect(); io.disconnect(); ro.disconnect(); window.removeEventListener('pointermove', move); document.removeEventListener('pointerleave', leave); };
   }, [sketch, focus]);
 
   return (
