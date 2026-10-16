@@ -1,0 +1,11 @@
+.ptk-lab { padding: 40px 40px 120px; }
+.plab-h { margin: 52px 0 22px; font: 600 15px/1 var(--font-geist), sans-serif; letter-spacing: .02em; color: #fffefb; text-shadow: 0 1px 8px rgb(20 30 60 / .6); }
+.plab-row { display: flex; flex-wrap: wrap; gap: 26px; align-items: flex-start; margin-bottom: 30px; }
+.plab-case { width: 110px; flex: none; font: 500 12px/1.3 var(--font-geist-mono), monospace; color: #fffefb; text-shadow: 0 1px 6px rgb(20 30 60 / .7); }
+.plab-cell { position: relative; display: grid; gap: 12px; align-content: start; }
+.plab-state { font: 500 11px/1 var(--font-geist-mono), monospace; color: #fffefb; text-shadow: 0 1px 6px rgb(20 30 60 / .7); }
+.plab-side { width: 340px; }
+.plab-ph { width: 380px; }
+.ptk-lab .plab-phone { width: 100%; max-width: 380px; padding: 60px 0 0; margin: 0; }
+.plab-lead { width: 560px; }
+.plab-col { width: 340px; }

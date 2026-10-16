@@ -1,0 +1,19 @@
+/* Washi lab: pieces shown on the materials they live on (the screen's leaf ground, the scroll's paper). */
+.wsl-lab { padding: 36px 32px 140px; }
+.wsl-h { margin: 46px 0 16px; font: 600 15px/1 var(--font-geist), sans-serif; letter-spacing: .02em; color: var(--text); }
+.wsl-ground, .wsl-paper { padding: 34px 30px 10px; }
+.wsl-ground { background: url(/looks/washi/gold-leaf.jpg) center / 1200px; box-shadow: 0 0 0 6px var(--wss-lacquer); }
+.wss-dark .wsl-ground { background-image: url(/looks/washi/silver-leaf.jpg); }
+.wsl-paper, .wsl-on-paper { background: var(--wss-paper) url(/looks/washi/paper.jpg) center / 420px; background-blend-mode: multiply; }
+.wsl-on-paper { padding: 14px; }
+.wsl-row { display: flex; flex-wrap: wrap; gap: 26px; align-items: flex-start; margin-bottom: 30px; }
+.wsl-case { width: 120px; flex: none; font: 500 12px/1.3 var(--font-geist-mono), monospace; color: var(--text); opacity: .75; }
+.wsl-cell { position: relative; display: grid; gap: 8px; align-content: start; }
+.wsl-state { font: 500 11px/1 var(--font-geist-mono), monospace; color: var(--text); opacity: .6; }
+.wsl-tz > .sc-piece { width: 176px; }
+.wsl-strip { width: 360px; }
+.wsl-video > .sc-piece { width: 360px; }
+.wsl-print > .sc-piece { width: 260px; }
+.wsl-phones { gap: 40px; }
+.wsl-phone { width: 390px; container: page / inline-size; }
+.wsl-lab .wss-room { min-height: 0; }
