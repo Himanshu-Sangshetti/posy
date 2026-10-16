@@ -20,14 +20,16 @@ export function assertAllowed(page: Page, e: Entitlements) {
 
 /** What visitors see if a plan lapses: fall back gracefully instead of breaking the page. */
 export function applyEntitlements(page: Page, e: Entitlements): Page {
+  // a Pro look falls back to Painted with its own palette and type; otherwise only Pro palettes and fonts fall back
+  const lapsed = !e.premium && PREMIUM_STYLES.has(page.theme.style);
   return {
     ...page,
     badge: e.removeBranding ? page.badge : true,
     theme: {
       ...page.theme,
-      style: !e.premium && PREMIUM_STYLES.has(page.theme.style) ? 'cozy' : page.theme.style,
-      preset: !e.premium && PREMIUM_THEMES.has(page.theme.preset) ? 'cream' : page.theme.preset,
-      font: !e.premium && PREMIUM_FONTS.has(page.theme.font) ? 'editorial' : page.theme.font,
+      style: lapsed ? 'painted' : page.theme.style,
+      preset: lapsed ? 'morning' : !e.premium && PREMIUM_THEMES.has(page.theme.preset) ? 'cream' : page.theme.preset,
+      font: lapsed ? 'painted' : !e.premium && PREMIUM_FONTS.has(page.theme.font) ? 'editorial' : page.theme.font,
     },
   };
 }

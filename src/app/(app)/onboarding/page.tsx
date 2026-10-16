@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: 'Claim your page · Posy' };
 /** The look picked on the landing page ("desk" is the Desk style's public name), if it's one this person can use. */
 function pickLook(look: string | undefined, premium: boolean) {
   const id = look === 'desk' ? 'cozy' : look;
-  return STYLE_IDS.find(s => s === id && (premium || !PREMIUM_STYLES.has(s))) ?? 'cozy';
+  return STYLE_IDS.find(s => s === id && (premium || !PREMIUM_STYLES.has(s))) ?? 'painted';
 }
 
 export default async function OnboardingPage({ searchParams }: { searchParams: Promise<{ username?: string; look?: string }> }) {
