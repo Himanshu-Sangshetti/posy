@@ -7,7 +7,9 @@ import { useState } from 'react';
 import { MapPin, ImagePlus, X } from 'lucide-react';
 import type { Page, Tile } from '@/lib/schema';
 import { PageFrame, TileShell, Avatar, sections, ordinals } from '@/components/page/PageView';
-import { StyleHeader, StyleTile, StyleRow, headerClass, socialsInHeader, type StyleId } from '@/components/page/styles';
+import { StyleHeader, StyleTile, StyleRow, headerClass, socialsInHeader, sceneFor, type StyleId } from '@/components/page/styles';
+import type { HeaderSlots } from '@/components/page/styles/types';
+import type { Device, PieceFn } from '@/components/page/styles/scene';
 import { TileContent, ListItem, BrandIcon } from '@/components/page/tiles';
 import { tileBackground } from '@/lib/style';
 import { brandHex } from '@/components/page/tiles';
@@ -48,13 +50,11 @@ function AvatarPicker({ page, className }: { page: Page; className?: string }) {
   );
 }
 
-function EditableStyledProfile({ page }: { page: Page }) {
+function useEditableSlots(page: Page): HeaderSlots {
   const update = useStudio(s => s.updateProfile);
   const { name, bio, location } = page.profile;
   const style = page.theme.style;
-  return (
-    <header className={headerClass(style)} onClick={() => useStudio.getState().select(null)}>
-      <StyleHeader page={page} slots={{
+  return {
         avatar: page.theme.avatar === 'hidden' ? null : <AvatarPicker page={page} />,
         name: <textarea aria-label="Name" rows={1} value={name} placeholder="Your name" onChange={e => update({ name: e.target.value })} className={cn(blank, 'st-edit-name')} />,
         bio: <textarea aria-label="Bio" value={bio} placeholder="A line about you" onChange={e => update({ bio: e.target.value })} className={cn(blank, 'st-edit-bio')} />,
@@ -64,9 +64,40 @@ function EditableStyledProfile({ page }: { page: Page }) {
             {page.tiles.filter((t): t is Extract<Tile, { type: 'social' }> => t.type === 'social').map(t => <SortableSocialIcon key={t.id} tile={t} desk={style === 'cozy'} />)}
           </div>
         ),
-      }} />
+  };
+}
+
+function EditableStyledProfile({ page }: { page: Page }) {
+  const slots = useEditableSlots(page);
+  return (
+    <header className={headerClass(page.theme.style)} onClick={() => useStudio.getState().select(null)}>
+      <StyleHeader page={page} slots={slots} />
     </header>
   );
+}
+
+/** A piece of a scene in the editor: click to select it, drag to reorder it among the others. */
+function ScenePiece({ tile, children, className, style }: { tile: Tile; children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
+  const selected = useStudio(s => s.selected === tile.id);
+  const select = useStudio(s => s.select);
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: tile.id });
+  return (
+    <div ref={setNodeRef} data-tile={tile.id} aria-label={tileLabel(tile)}
+      className={cn('sc-piece relative cursor-grab active:cursor-grabbing', className, isDragging && 'opacity-30', selected && 'sc-selected')}
+      style={{ ...style, transform: CSS.Translate.toString(transform), transition, zIndex: selected ? 20 : style?.zIndex }}
+      onClick={e => { e.preventDefault(); e.stopPropagation(); select(tile.id); }} {...attributes} {...listeners}>
+      {children}
+      {selected && <TileToolbar tile={tile} />}
+    </div>
+  );
+}
+
+const editPiece: PieceFn = (tile, node, o) => <ScenePiece key={o.key} tile={tile} className={o.className} style={o.style}>{node}</ScenePiece>;
+
+function EditableScene({ page, device }: { page: Page; device: Device }) {
+  const Scene = sceneFor(page.theme.style)!;
+  const slots = useEditableSlots(page);
+  return <Scene page={page} slots={slots} piece={editPiece} only={device} editing />;
 }
 
 function EditableProfile({ page }: { page: Page }) {
@@ -212,7 +243,7 @@ function CanvasHeading({ tile, selected }: { tile: Extract<Tile, { type: 'headin
   );
 }
 
-export function EditableCanvas({ page }: { page: Page }) {
+export function EditableCanvas({ page, device = 'desktop' }: { page: Page; device?: Device }) {
   const { moveTile, select } = useStudio();
   const [active, setActive] = useState<Tile | null>(null);
   const sensors = useSensors(
@@ -229,6 +260,11 @@ export function EditableCanvas({ page }: { page: Page }) {
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={onStart} onDragEnd={onEnd} onDragCancel={() => setActive(null)}>
       <SortableContext items={page.tiles.map(t => t.id)} strategy={rectSortingStrategy}>
+    {sceneFor(look) ? (
+      <PageFrame page={{ ...page, badge: false }} className="posy-scene" profile={<></>} interactive={false}>
+        <div onClick={() => select(null)}><EditableScene page={page} device={device} /></div>
+      </PageFrame>
+    ) : (
     <PageFrame page={{ ...page, badge: false }} profile={<EditableProfile page={page} />} interactive={false}>
           <div onClick={() => select(null)} className="min-h-[50vh] pb-40">
             {list && (
@@ -260,6 +296,7 @@ export function EditableCanvas({ page }: { page: Page }) {
             )}
           </div>
     </PageFrame>
+    )}
         </SortableContext>
         <DragOverlay dropAnimation={{ duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)' }}>
           {active && look !== 'minimal' && active.type !== 'heading' && active.type !== 'social' && (

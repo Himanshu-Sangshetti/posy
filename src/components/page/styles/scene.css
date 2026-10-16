@@ -1,0 +1,11 @@
+/* ================= Scenes: looks that compose the whole page themselves ================= */
+.posy-page.posy-scene.posy-scene .posy-layout { max-width: none; padding: 0; display: block; gap: 0; }
+.posy-scene .posy-footer { padding-top: 8px; }
+/* the public page has both arrangements; the width decides which one shows (the editor renders just one) */
+.sc-desktop:not([data-only]), .sc-mobile:not([data-only]) { display: contents; }
+@container page (max-width: 760px) { .sc-desktop:not([data-only]) { display: none; } }
+@container page (min-width: 761px) { .sc-mobile:not([data-only]) { display: none; } }
+.sc-piece { display: block; color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.posy-scene .posy-obj.posy-tile { overflow: visible; rotate: none; }
+/* editor: the selected piece gets the vermilion ring */
+.sc-selected > :first-child { outline: 2px solid #e4572e; outline-offset: 4px; }

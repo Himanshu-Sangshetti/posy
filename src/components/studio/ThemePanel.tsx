@@ -9,6 +9,7 @@ import { THEMES, THEME_IDS, PREMIUM_THEMES, type ThemeId } from '@/lib/themes';
 import { ALL_FONT_PAIRS as FONT_PAIRS, FONT_VARS, PREMIUM_FONTS, photoLook } from '@/lib/style';
 import { useEntitlements } from './entitlements';
 import { STYLE_IDS, STYLE_INFO, STYLE_PALETTES, PREMIUM_STYLES, type StyleId } from '@/lib/styles';
+import { sceneFor } from '@/components/page/styles';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
@@ -246,7 +247,8 @@ export function ThemePanel({ page, tab = 'style', onTab }: { page: Page; tab?: D
       </TabsContent>
 
       <TabsContent value="layout" className="grid min-h-0 content-start gap-6 overflow-y-auto px-5 pb-8 pt-1">
-        <div className="grid gap-2.5">
+        {/* looks with their own scene arrange the page themselves */}
+        <div className="grid gap-2.5" hidden={!!sceneFor(t.style)}>
           <Label>Layout</Label>
           <div className={cn('grid gap-2', t.style === 'minimal' ? 'grid-cols-2' : 'grid-cols-3')}>
             {(t.style === 'minimal'

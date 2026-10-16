@@ -170,7 +170,7 @@ export function Studio({ init }: { init: StudioInit }) {
     </div>
   );
 
-  const canvas = <EditableCanvas page={page} />;
+  const canvas = <EditableCanvas page={page} device={device} />;
   const url = `${init.site}/${init.username}`;
   const canPublish = unpublished && !publishing && saveState === 'saved';
   const openDesign = (tab: DesignTab) => { setDesignTab(tab); setDesignOpen(true); };

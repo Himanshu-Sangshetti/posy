@@ -3,7 +3,7 @@
 // Small interactive bits of the public page.
 import { useEffect, useRef, useState } from 'react';
 import { Link2, Play, Share2, Check } from 'lucide-react';
-import { hostOf } from '@/lib/url';
+import { hostOf, faviconHost } from '@/lib/url';
 
 /** A small live clock, like a desktop menubar (Lofi). Renders the time on the server too, so nothing jumps. */
 export function LiveClock() {
@@ -16,7 +16,7 @@ export function Favicon({ url }: { url: string }) {
   const [failed, setFailed] = useState(false);
   const ref = useRef<HTMLImageElement>(null);
   useEffect(() => { const i = ref.current; if (i && i.complete && i.naturalWidth === 0) setFailed(true); }, []);
-  const host = hostOf(url);
+  const host = faviconHost(url);
   if (failed || !host.includes('.')) return <Link2 className="size-[18px]" />;
   // eslint-disable-next-line @next/next/no-img-element
   return <img ref={ref} src={`https://icons.duckduckgo.com/ip3/${host}.ico`} alt="" width={20} height={20} className="size-5 rounded-[5px]" onError={() => setFailed(true)} loading="lazy" />;
@@ -255,6 +255,122 @@ export function DitherPhotos() {
     scan();
     const mo = new MutationObserver(scan); mo.observe(page, { childList: true, subtree: true });
     return () => { mo.disconnect(); cleanups.forEach(f => f()); };
+  }, []);
+  return null;
+}
+
+/** Lofi scene on a computer: pick a window up by its title bar and move it; clicking a window brings it to the front.
+ *  Nothing is saved, and a click that ends a drag doesn't open the link. */
+export function LofiWindows() {
+  useEffect(() => {
+    let top = 50;
+    let drag: { el: HTMLElement; x: number; y: number; ox: number; oy: number; moved: boolean } | null = null;
+    let swallow = false;
+    const down = (e: PointerEvent) => {
+      const t = e.target as HTMLElement;
+      const win = t.closest<HTMLElement>('.lfs-area > .sc-piece, .lfs-area > .lfs-win');
+      if (!win || e.button !== 0) return;
+      win.style.zIndex = String(++top);
+      if (!t.closest('.lfs-bar')) return;
+      const [ox, oy] = (win.style.translate || '0px 0px').split(' ').map(v => parseFloat(v) || 0);
+      drag = { el: win, x: e.clientX, y: e.clientY, ox, oy, moved: false };
+      win.classList.add('lfs-dragging');
+      e.preventDefault();
+    };
+    const move = (e: PointerEvent) => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+      drag.el.style.translate = `${drag.ox + dx}px ${drag.oy + dy}px`;
+    };
+    const up = () => { if (!drag) return; swallow = drag.moved; drag.el.classList.remove('lfs-dragging'); drag = null; };
+    const click = (e: MouseEvent) => { if (swallow) { e.preventDefault(); e.stopPropagation(); swallow = false; } };
+    document.addEventListener('pointerdown', down);
+    window.addEventListener('pointermove', move, { passive: true });
+    window.addEventListener('pointerup', up);
+    document.addEventListener('click', click, true);
+    return () => { document.removeEventListener('pointerdown', down); window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); document.removeEventListener('click', click, true); };
+  }, []);
+  return null;
+}
+
+/** A picture from someone else's site (link previews): if it fails to load, show the fallback instead of a broken image. */
+export function SafeImg({ src, className, fallback }: { src: string; className?: string; fallback: React.ReactNode }) {
+  const [failed, setFailed] = useState(false);
+  const ref = useRef<HTMLImageElement>(null);
+  useEffect(() => { const i = ref.current; if (i && i.complete && i.naturalWidth === 0) setFailed(true); }, []);
+  // eslint-disable-next-line @next/next/no-img-element
+  return failed ? <>{fallback}</> : <img ref={ref} src={src} alt="" loading="lazy" draggable={false} className={className} onError={() => setFailed(true)} />;
+}
+
+/** Washi scene on a computer: the poem slips hang from a cord, so a pointer brushing past sets them swinging like
+ *  paper in a breeze (a damped spring per slip). Purely visual; nothing moves with reduced motion. */
+export function WashiBreeze() {
+  useEffect(() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const slips = Array.from(document.querySelectorAll<HTMLElement>('.sc-desktop .wss-hang'));
+    if (!slips.length) return;
+    const st = slips.map(el => ({ el, a: 0, v: 0 }));
+    let raf = 0, lx = 0, ly = 0, lt = 0, running = false;
+    const tick = () => {
+      let alive = false;
+      for (const s of st) {
+        s.v += (-s.a * 0.045) - s.v * 0.06; s.a += s.v;
+        if (Math.abs(s.a) > 0.02 || Math.abs(s.v) > 0.02) alive = true; else { s.a = 0; s.v = 0; }
+        s.el.style.rotate = s.a ? `${s.a.toFixed(2)}deg` : '';
+      }
+      running = alive; if (alive) raf = requestAnimationFrame(tick);
+    };
+    const move = (e: PointerEvent) => {
+      const now = performance.now(), dt = Math.max(8, now - lt), vx = (e.clientX - lx) / dt;
+      for (const s of st) {
+        const r = s.el.getBoundingClientRect();
+        const crossed = (lx < r.left + r.width / 2) !== (e.clientX < r.left + r.width / 2);
+        if (crossed && e.clientY > r.top && e.clientY < r.bottom && lt && now - lt < 120) s.v += Math.max(-1.6, Math.min(1.6, -vx * 1.4));
+      }
+      lx = e.clientX; ly = e.clientY; lt = now; void ly;
+      if (!running) { running = true; raf = requestAnimationFrame(tick); }
+    };
+    window.addEventListener('pointermove', move, { passive: true });
+    return () => { window.removeEventListener('pointermove', move); cancelAnimationFrame(raf); };
+  }, []);
+  return null;
+}
+
+/** Desk scene on a computer: pick anything up off the desk and put it down somewhere else. It lifts while you hold it
+ *  and settles where you drop it; nothing is saved, and a click that ends a drag doesn't open the link. */
+export function DeskObjects() {
+  useEffect(() => {
+    let top = 40;
+    let drag: { el: HTMLElement; x: number; y: number; ox: number; oy: number; moved: boolean } | null = null;
+    let swallow = false;
+    const wide = () => window.matchMedia('(min-width: 761px)').matches;
+    const down = (e: PointerEvent) => {
+      const t = e.target as HTMLElement;
+      const el = t.closest<HTMLElement>('.dks-desk .sc-piece');
+      if (!el || e.button !== 0 || e.pointerType !== 'mouse' || !wide() || t.closest('iframe, button')) return;
+      const [ox, oy] = (el.style.translate || '0px 0px').split(' ').map(v => parseFloat(v) || 0);
+      drag = { el, x: e.clientX, y: e.clientY, ox, oy, moved: false };
+    };
+    const move = (e: PointerEvent) => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 5) return;
+      if (!drag.moved) { drag.moved = true; drag.el.style.zIndex = String(++top); drag.el.classList.add('is-held'); }
+      drag.el.style.translate = `${drag.ox + dx}px ${drag.oy + dy}px`;
+    };
+    const up = () => { if (!drag) return; swallow = drag.moved; drag.el.classList.remove('is-held'); drag = null; };
+    const click = (e: MouseEvent) => { if (swallow) { e.preventDefault(); e.stopPropagation(); swallow = false; } };
+    const nativeDrag = (e: DragEvent) => { if ((e.target as HTMLElement | null)?.closest?.('.dks-desk')) e.preventDefault(); };
+    document.addEventListener('pointerdown', down);
+    window.addEventListener('pointermove', move, { passive: true });
+    window.addEventListener('pointerup', up);
+    document.addEventListener('click', click, true);
+    document.addEventListener('dragstart', nativeDrag);
+    return () => {
+      document.removeEventListener('pointerdown', down); window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up);
+      document.removeEventListener('click', click, true); document.removeEventListener('dragstart', nativeDrag);
+    };
   }, []);
   return null;
 }

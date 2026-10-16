@@ -1,0 +1,14 @@
+.lab .lab-wrap { padding: 40px 32px 120px; }
+.lab-h { margin: 48px 0 18px; font: 600 15px/1 var(--font-geist), sans-serif; letter-spacing: .02em; color: var(--lfs-label); text-shadow: var(--lfs-label-glow); }
+.lab-row { display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start; margin-bottom: 26px; }
+.lab-case { width: 120px; flex: none; font: 500 12px/1.3 var(--font-geist-mono), monospace; color: var(--lfs-label); text-shadow: var(--lfs-label-glow); }
+.lab-cell { position: relative; display: grid; gap: 8px; }
+.lab-state { font: 500 11px/1 var(--font-geist-mono), monospace; color: var(--lfs-label); opacity: .75; text-shadow: var(--lfs-label-glow); }
+.lab-win > .sc-piece { width: 400px; height: 320px; }
+.lab-win-sm > .sc-piece { width: 300px; height: 250px; }
+.lab-icons { gap: 10px; }
+.lab-phonecol { width: 360px; }
+.lab-phone-inner { padding: 0; margin: 0; max-width: 360px; }
+.lab-media > .sc-piece { width: 380px; height: 230px; }
+.lab-photo > .sc-piece { width: 300px; height: 280px; }
+.lab-note > .sc-piece { width: 220px; height: 200px; }

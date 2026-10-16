@@ -32,3 +32,11 @@ Made for Posy with Krea 2 Turbo (open weights, Krea 2 Community License; Krea cl
 | night/bg-street.jpg | A rainy neon alley at night, shown blurred behind the Night look |
 | painted/deckle.png, painted/blob.png | Torn-paper edge and painted-blob masks, drawn procedurally for Posy |
 | {desk,minimal,press,gallery,washi,lofi,painted,night}/{avatar,photo1,photo2,cover,music,video}.jpg | Placeholder pictures for each look's starter page, painted in that look's style |
+| desk/{coffee,plant,sprig}.webp, desk/grain.jpg | Props and grain for the Desk scene: a latte, a pilea plant, a eucalyptus sprig, wood grain (generated for Posy) |
+| lofi/wall-{day,night}-{desk,phone}.jpg, lofi/icons/*.png | Lofi wallpapers (afternoon sky, rainy window) and the clay app icons (generated for Posy) |
+
+## Fonts
+
+| File | Font | Licence |
+|---|---|---|
+| desk/special-elite.woff2 | Special Elite by Astigmatic | Apache License 2.0 |
