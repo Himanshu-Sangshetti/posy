@@ -249,12 +249,25 @@ function CanvasHeading({ tile, selected }: { tile: Extract<Tile, { type: 'headin
   );
 }
 
+/** Space and Enter pick a tile up for keyboard dragging, but not while typing: keys from a text field (including one in a
+ * popover, whose React events still bubble to the tile) must reach the field. */
+class TypingSafeKeyboardSensor extends KeyboardSensor {
+  static activators = KeyboardSensor.activators.map(a => ({
+    ...a,
+    handler: (...args: Parameters<typeof a.handler>) => {
+      const t = args[0].nativeEvent.target as HTMLElement | null;
+      if (t?.closest('input, textarea, select, [contenteditable=""], [contenteditable="true"]')) return false;
+      return a.handler(...args);
+    },
+  }));
+}
+
 export function EditableCanvas({ page, device = 'desktop' }: { page: Page; device?: Device }) {
   const { moveTile, select } = useStudio();
   const [active, setActive] = useState<Tile | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(TypingSafeKeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
   const onStart = (e: DragStartEvent) => { setActive(page.tiles.find(t => t.id === e.active.id) ?? null); select(String(e.active.id)); };
   const onEnd = (e: DragEndEvent) => { setActive(null); if (e.over && e.active.id !== e.over.id) moveTile(String(e.active.id), String(e.over.id)); };
