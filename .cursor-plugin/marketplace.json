@@ -1,0 +1,21 @@
+{
+  "name": "posy",
+  "owner": {
+    "name": "Himanshu Sangshetti",
+    "email": "hello@posy.page"
+  },
+  "metadata": {
+    "description": "Posy, a hand-made link-in-bio page."
+  },
+  "plugins": [
+    {
+      "name": "posy",
+      "source": "plugin",
+      "description": "Make and edit a Posy link-in-bio page. Adds the Posy MCP server.",
+      "homepage": "https://posy.page",
+      "repository": "https://github.com/Himanshu-Sangshetti/posy",
+      "license": "MIT",
+      "logo": "https://posy.page/brand/posy-app-512.png"
+    }
+  ]
+}
