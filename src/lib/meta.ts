@@ -17,3 +17,17 @@ export function profileMeta(name: string, bio: string | undefined, username: str
   const title = raw.length <= 60 ? raw : `${raw.slice(0, 59).replace(/\s+\S*$/, '').replace(/[.,;:\s]+$/, '')}…`;
   return { title, description };
 }
+
+/** A description that fits a search snippet (160 characters): whole sentences if they fit, else cut at a word. */
+export function snippet(text: string, max = 160) {
+  const t = text.replace(/\s+/g, ' ').trim();
+  if (t.length <= max) return t;
+  const sentences = t.match(/[^.!?]+[.!?]+/g) ?? [];
+  let out = '';
+  for (const s of sentences) { if ((out + s).trim().length > max) break; out += s; }
+  if (out.trim().length >= 110) return out.trim();
+  return `${t.slice(0, max - 1).replace(/\s+\S*$/, '').replace(/[.,;:\s]+$/, '')}…`;
+}
+
+/** "Title · Posy" when it fits in 60 characters, otherwise the title alone. */
+export const pageTitle = (title: string) => (title.length + 7 <= 60 ? `${title} · Posy` : title);
