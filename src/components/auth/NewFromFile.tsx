@@ -24,14 +24,17 @@ export function NewFromFile({ signedIn, hasPage, site, query = '' }: { signedIn:
   const [copied, setCopied] = useState(false);
   const [serverError, setServerError] = useState('');
   const file = useRef<HTMLInputElement>(null);
+  /** The page came ready-made in the link (a chat, an importer): show it first and keep the file out of the way. */
+  const [fromLink, setFromLink] = useState(false);
+  const fromLinktree = params.get('from') === 'linktree';
 
   // /new#p=<encoded brief> (a link a chat can hand out), or the draft saved before sign-up
   useEffect(() => {
     try {
       const h = window.location.hash.match(/^#p=(.+)$/);
-      if (h) { setText(JSON.stringify(decodeBrief(h[1]), null, 2)); return; }
+      if (h) { setText(JSON.stringify(decodeBrief(h[1]), null, 2)); setFromLink(true); return; }
       const fromQuery = briefFromQuery(params);
-      if (fromQuery) { setText(JSON.stringify(fromQuery, null, 2)); return; }
+      if (fromQuery) { setText(JSON.stringify(fromQuery, null, 2)); setFromLink(true); return; }
       const saved = localStorage.getItem(KEY);
       if (saved && (finish || signedIn)) setText(saved);
     } catch { /* a bad link just starts empty */ }
@@ -75,15 +78,25 @@ export function NewFromFile({ signedIn, hasPage, site, query = '' }: { signedIn:
   }
 
   const needsName = signedIn && !hasPage;
+  const ready = fromLink && !!parsed && !finish;
+  const fileBox = (
+    <div className="mt-6 grid gap-1.5">
+          <Label htmlFor="brief">{finish ? 'Your page file' : 'Paste the chat’s reply here'}</Label>
+          <textarea id="brief" value={text} onChange={e => setText(e.target.value)} spellCheck={false} rows={finish ? 5 : 12}
+            placeholder={'{ "name": "Mira Sol", "links": ["https://github.com/mira"] }'}
+            className="ac-input !h-auto min-h-40 w-full resize-y !py-3 font-mono !text-[13px] leading-relaxed" />
+        </div>
+  );
+
   return (
     <main className="mx-auto grid w-full max-w-[1180px] gap-10 px-5 pb-20 pt-28 lg:grid-cols-[minmax(0,440px)_minmax(0,1fr)] lg:gap-14">
       <section className="ac-rise">
-        <h1 className="ac-display text-[44px] leading-[1.02] sm:text-[56px]">{finish ? <>Almost <i>there</i></> : <>Make a page from a <i>file</i></>}</h1>
+        <h1 className="ac-display text-[44px] leading-[1.02] sm:text-[56px]">{finish ? <>Almost <i>there</i></> : ready ? (fromLinktree ? <>Your Linktree, now a <i>Posy</i> page</> : <>Your page is <i>ready</i></>) : <>Make a page from a <i>file</i></>}</h1>
         <p className="ac-lede mt-4">
-          {finish ? 'You’re signed in. Pick an address and your page is ready.' : 'Ask any chat to write it, then paste the result. Nothing is saved until you say so.'}
+          {finish ? 'You’re signed in. Pick an address and your page is ready.' : ready ? 'Pick an address and make it yours. You can change the look, the links and everything else afterwards. Nothing is saved until you do.' : 'Ask any chat to write it, then paste the result. Nothing is saved until you say so.'}
         </p>
 
-        {!finish && (
+        {!finish && !ready && (
           <div className="mt-7 flex flex-wrap gap-2.5">
             <Button type="button" onClick={copyPrompt} className="ac-btn ac-btn-primary">{copied ? <Check className="size-4" /> : <Copy className="size-4" />}Copy a prompt for your chat</Button>
             <Button type="button" variant="outline" onClick={() => file.current?.click()} className="ac-btn ac-btn-soft"><Upload className="size-4" />Upload a file</Button>
@@ -91,12 +104,7 @@ export function NewFromFile({ signedIn, hasPage, site, query = '' }: { signedIn:
           </div>
         )}
 
-        <div className="mt-6 grid gap-1.5">
-          <Label htmlFor="brief">{finish ? 'Your page file' : 'Paste the chat’s reply here'}</Label>
-          <textarea id="brief" value={text} onChange={e => setText(e.target.value)} spellCheck={false} rows={finish ? 5 : 12}
-            placeholder={'{ "name": "Mira Sol", "links": ["https://github.com/mira"] }'}
-            className="ac-input !h-auto min-h-40 w-full resize-y !py-3 font-mono !text-[13px] leading-relaxed" />
-        </div>
+        {!ready && fileBox}
 
         {read && !read.ok && (
           <p role="alert" className="mt-3 flex items-start gap-2 rounded-xl bg-[var(--ac-rose-bg)] px-3.5 py-2.5 text-[14px] text-[#a43f5c]"><TriangleAlert className="mt-0.5 size-4 shrink-0" />{read.error}</p>
@@ -123,12 +131,19 @@ export function NewFromFile({ signedIn, hasPage, site, query = '' }: { signedIn:
             {hasPage && <p className="text-[13.5px] text-[var(--muted)]">Your current draft is replaced. Your published page stays as it is until you publish.</p>}
           </div>
         )}
+
+        {ready && (
+          <details className="mt-8 text-[14px] text-[var(--muted)]">
+            <summary className="cursor-pointer select-none">See or edit the page file</summary>
+            {fileBox}
+          </details>
+        )}
       </section>
 
-      <section aria-label="Preview" className="min-w-0">
+      <section aria-label="Preview" className={`min-w-0 ${ready ? 'max-lg:order-first' : ''}`}>
         {parsed ? (
           <div className="overflow-hidden rounded-[22px] border border-[var(--input)] shadow-[0_30px_60px_-30px_rgb(22_20_15/.35)]">
-            <div className="relative isolate h-[min(760px,80svh)] overflow-y-auto [transform:translateZ(0)]"><div className="relative min-h-full"><PageView page={parsed.page} contained /></div></div>
+            <div className={`relative isolate ${ready ? 'h-[min(760px,62svh)]' : 'h-[min(760px,80svh)]'} overflow-y-auto [transform:translateZ(0)]`}><div className="relative min-h-full"><PageView page={parsed.page} contained /></div></div>
           </div>
         ) : (
           <div className="grid h-full min-h-72 place-items-center rounded-[22px] border border-dashed border-[var(--input)] p-8 text-center text-[var(--muted)]">
