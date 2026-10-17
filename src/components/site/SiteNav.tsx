@@ -1,14 +1,15 @@
 'use client';
 // The public site's top bar (Aceternity Resizable Navbar): full width and clear at the top, a floating frosted pill
 // once you scroll. `tone` says what is behind it at the top: a dark painting (white text) or light paper (ink).
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { Navbar, NavBody, NavItems, MobileNav, MobileNavHeader, MobileNavMenu, MobileNavToggle } from '@/components/ui/resizable-navbar';
 import { Logo } from '@/components/brand';
 import { cn } from '@/lib/utils';
 import './site.css';
 
-export function SiteNav({ items, tone = 'dark', signedIn, pinned }: { items: { name: string; link: string }[]; tone?: 'dark' | 'light'; signedIn?: boolean; pinned?: boolean }) {
+/** `extra` sits before the account links, e.g. an edition's GitHub button. */
+export function SiteNav({ items, tone = 'dark', signedIn, pinned, extra }: { items: { name: string; link: string }[]; tone?: 'dark' | 'light'; signedIn?: boolean; pinned?: boolean; extra?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const ext = (href: string) => href.startsWith('http');
   return (
@@ -17,6 +18,7 @@ export function SiteNav({ items, tone = 'dark', signedIn, pinned }: { items: { n
         <Link href="/" aria-label="Posy home" className="relative z-20 lp-logo"><Logo /></Link>
         <NavItems items={items} className="lp-navitems" />
         <div className="relative z-20 flex items-center gap-1">
+          {extra}
           {signedIn ? <Link href="/edit" className="lp-cta">Open my page</Link> : <>
             <Link href="/login" className="lp-link">Log in</Link>
             <Link href="/signup" className="lp-cta">Make my page</Link>
