@@ -154,7 +154,7 @@ test.describe('the Posy page file', () => {
     await page.getByLabel('Paste the chat’s reply here').fill('nonsense');
     await expect(page.locator('p[role=alert]')).toContainText('JSON');
     await page.getByLabel('Paste the chat’s reply here').fill(reply);
-    await expect(page.getByText('Fiona File').first()).toBeVisible();
+    await expect(page.getByText('Fiona File').filter({ visible: true }).first()).toBeVisible();
     await page.getByLabel('Your address').fill(id);
     await page.getByRole('button', { name: 'Make it mine' }).click();
     await page.waitForURL(/signup\?draft=1/);
@@ -175,7 +175,8 @@ test.describe('the Posy page file', () => {
   test('one plain link from a chat opens a preview with an address already suggested, and signing up finishes it', async ({ page }) => {
     const name = `Quinn ${Date.now().toString(36)}`;
     await page.goto(`/new?name=${encodeURIComponent(name)}&bio=Hello&links=https://github.com/octocat,hi@example.com`);
-    await expect(page.getByText(name).first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: /your page is ready/i })).toBeVisible();
+    await expect(page.getByText(name).filter({ visible: true }).first()).toBeVisible();
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     await expect(page.getByLabel('Your address')).toHaveValue(slug);
     await page.getByRole('button', { name: 'Make it mine' }).click();
