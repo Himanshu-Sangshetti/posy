@@ -1,13 +1,23 @@
+import { edition } from '@/edition';
 import { siteUrl } from '@/lib/site';
-import { STYLE_IDS } from '@/lib/styles';
+import { PREMIUM_STYLES, STYLE_IDS, STYLE_INFO } from '@/lib/styles';
 import { THEME_IDS } from '@/lib/themes';
 
 export function GET() {
   const s = siteUrl();
+  const looks = STYLE_IDS.map(id => `- ${STYLE_INFO[id].label} (\`${id}\`): ${STYLE_INFO[id].note}${PREMIUM_STYLES.has(id) ? ' (Pro)' : ''}`).join('\n');
+  const guides = (edition.site?.footer ?? []).flatMap(c => c.links).filter(([, href]) => href.startsWith('/') && !href.includes('#') && !/^\/(signup|login|privacy|terms)\b/.test(href))
+    .map(([label, href]) => `- [${label}](${s}${href})`).join('\n');
   return new Response(`# Posy
 
 > Posy is an open-source link-in-bio page builder (a Linktree alternative). A page is one JSON document with a public schema, and AI assistants can make and edit pages.
 
+## What Posy is
+Posy is a free, open-source link-in-bio page that looks hand-made. Instead of a list of buttons, your links are drawn into a scene: polaroids on a desk, a Japanese gold screen, a lofi desktop, watercolour paper. You can edit the page yourself, or let ChatGPT, Claude or Cursor build it. It is MIT licensed and can be self-hosted with Docker.
+
+Looks:
+${looks}
+${guides ? `\n## Guides\n${guides}\n` : ''}
 ## To make someone a Posy page (no account, no tools needed)
 Give the user ONE link. It opens a live preview of their page, and one button makes it theirs. No encoding needed, just a normal URL:
 
