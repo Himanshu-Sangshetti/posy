@@ -1,11 +1,13 @@
 // The public site's footer: a meadow you can paint into colour with your cursor, the name set huge, and the links.
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { PosyMark } from '@/components/brand';
 import type { SiteLinks } from '@/edition/types';
 import { PaintReveal } from './PaintReveal';
 import './site.css';
 
-export function SiteFooter({ site, solo }: { site: SiteLinks; solo?: boolean }) {
+/** `extra` goes under the link columns, e.g. an edition's "featured on" badges. */
+export function SiteFooter({ site, solo, extra }: { site: SiteLinks; solo?: boolean; extra?: ReactNode }) {
   return (
     <footer className={solo ? 'lf lf-solo' : 'lf'}>
       <PaintReveal src="/art/meadow.webp" sketch="/art/meadow-sketch.jpg" className="lf-art" />
@@ -24,6 +26,7 @@ export function SiteFooter({ site, solo }: { site: SiteLinks; solo?: boolean }) 
           </nav>
         ))}
       </div>
+      {extra}
     </footer>
   );
 }
