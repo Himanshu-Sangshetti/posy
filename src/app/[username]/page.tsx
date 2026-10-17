@@ -6,6 +6,7 @@ import { publicPage } from '@/lib/pages';
 import { withLiveData } from '@/lib/live-data';
 import { THEMES } from '@/lib/themes';
 import { siteUrl } from '@/lib/site';
+import { profileMeta } from '@/lib/meta';
 
 export const revalidate = 3600; // refreshed instantly on publish, hourly otherwise (GitHub stars)
 
@@ -16,8 +17,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const r = await publicPage(username);
   if (!r) return { title: 'Not found' };
   const { profile, seo } = r.page;
-  const title = seo.title || profile.name;
-  const description = seo.description || profile.bio || `${profile.name} on Posy`;
+  const composed = profileMeta(profile.name, seo.description || profile.bio, r.row.username);
+  const rawTitle = (seo.title || profile.name).trim();
+  const title = rawTitle.length <= 60 ? rawTitle : `${rawTitle.slice(0, 59).replace(/\s+\S*$/, '').replace(/[.,;:\s]+$/, '')}…`;
+  const own = (seo.description || '').trim();
+  const description = own.length >= 70 && own.length <= 160 ? own : composed.description;
   const url = `${siteUrl()}/${r.row.username}`;
   return {
     title, description,

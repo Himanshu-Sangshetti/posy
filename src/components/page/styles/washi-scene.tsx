@@ -13,7 +13,7 @@ import { cleanTitle, hostOf, siteName, youtubeId } from '@/lib/url';
 import { SafeImg, VideoPlayer, WashiBreeze } from '../islands';
 import { BrandIcon, RichText } from '../tiles';
 import { compact, tileMeta } from './meta';
-import { anatomy, Arrangements, type SceneProps } from './scene';
+import { anatomy, Arrangements, SceneName, SceneTitle, type SceneProps } from './scene';
 import type { HeaderSlots } from './types';
 import { WASHI_PRINTS } from './washi';
 
@@ -219,7 +219,7 @@ export function TitleTanzaku({ text }: { text: string }) {
 const Seal = ({ name }: { name: string }) => <span className="wss-seal" aria-hidden><span>{initials(name)}</span></span>;
 
 /** The print with your name on its title slip, the way a woodblock print names itself. */
-function Masthead({ page, slots }: { page: Page; slots: HeaderSlots }) {
+function Masthead({ page, slots, heading = true }: { page: Page; slots: HeaderSlots; heading?: boolean }) {
   const art = WASHI_PRINTS[page.theme.preset] ?? WASHI_PRINTS.kinari;
   const name = page.profile.name.trim();
   const slip = typeof slots.name === 'string' && name.length <= 15;
@@ -230,8 +230,8 @@ function Masthead({ page, slots }: { page: Page; slots: HeaderSlots }) {
         <img src={art.src} alt={`${art.title}, ${art.artist}`} draggable={false} />
       </span>
       {slip
-        ? <h1 className="posy-head wss-name wss-name-slip" aria-label={name} style={{ '--nlen': name.length } as CSSProperties}><span aria-hidden>{slots.name}</span></h1>
-        : <h1 className="posy-head wss-name wss-name-band">{slots.name}</h1>}
+        ? <SceneName heading={heading} className="posy-head wss-name wss-name-slip" aria-label={name} style={{ '--nlen': name.length } as CSSProperties}><span aria-hidden>{slots.name}</span></SceneName>
+        : <SceneName heading={heading} className="posy-head wss-name wss-name-band">{slots.name}</SceneName>}
     </figure>
   );
 }
@@ -357,7 +357,7 @@ export function WashiScene({ page, slots, piece, only, editing }: SceneProps) {
         <i className="wss-folds" aria-hidden>{Array.from({ length: 6 }, (_, i) => <b key={i} />)}</i>
         {compact ? (
           <div className="wss-top">
-            <Masthead page={page} slots={slots} />
+            <Masthead page={page} slots={slots} heading={!!only} />
             <div className="wss-side">
               <About page={page} slots={slots} socials={stamps('d')} />
               {body()}
@@ -366,7 +366,7 @@ export function WashiScene({ page, slots, piece, only, editing }: SceneProps) {
         ) : (
           <>
             <div className="wss-top">
-              <Masthead page={page} slots={slots} />
+              <Masthead page={page} slots={slots} heading={!!only} />
               <About page={page} slots={slots} socials={stamps('d')} />
             </div>
             {total > 0 || a.headings.length ? body() : null}
@@ -382,7 +382,7 @@ export function WashiScene({ page, slots, piece, only, editing }: SceneProps) {
       <div className="wss-silk">
         <i className="wss-futai" aria-hidden /><i className="wss-futai wss-futai-r" aria-hidden />
         <div className="wss-honshi">
-          <Masthead page={page} slots={slots} />
+          <Masthead page={page} slots={slots} heading={!!only} />
           <About page={page} slots={slots} socials={stamps('m')} />
           {a.groups.map((g, gi) => {
             const extras = extrasOf(g);
@@ -406,6 +406,7 @@ export function WashiScene({ page, slots, piece, only, editing }: SceneProps) {
 
   return (
     <div className={cn('wss', dark ? 'wss-dark' : 'wss-light', editing && 'wss-editing')}>
+      {!only && <SceneTitle name={page.profile.name} />}
       <Arrangements only={only} desktop={desktop} mobile={mobile} />
     </div>
   );

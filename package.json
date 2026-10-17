@@ -2,7 +2,7 @@
   "name": "posy",
   "version": "2.0.0",
   "private": true,
-  "description": "A link-in-bio page that looks hand-made. Pick a look, add your links, publish. Open source and self-hostable.",
+  "description": "A link-in-bio page that looks hand-made. Pick a look, add your links, publish. Edit it yourself or let your AI do it.",
   "license": "MIT",
   "type": "module",
   "scripts": {

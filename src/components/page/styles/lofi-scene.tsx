@@ -11,7 +11,7 @@ import { cleanTitle, hostOf, pathOf, siteName, youtubeId } from '@/lib/url';
 import { Favicon, LiveClock, VideoPlayer } from '../islands';
 import { BrandIcon, RichText } from '../tiles';
 import { tileMeta, compact } from './meta';
-import { anatomy, Arrangements, type SceneProps } from './scene';
+import { anatomy, Arrangements, SceneName, SceneTitle, type SceneProps } from './scene';
 import type { HeaderSlots } from './types';
 import { LofiWindows, SafeImg } from '../islands';
 
@@ -201,7 +201,7 @@ export function LofiScene({ page, slots, piece, only, editing }: SceneProps) {
           <Win title="about_me.txt" className={cn('lfs-about lfs-a-about', a.stamps.length > 0 && 'lfs-stamped')} style={{ gridColumn: aboutCols }}>
             {slots.avatar && <div className="lfs-me">{slots.avatar}</div>}
             <div className="lfs-me-text">
-              <h1 className="posy-head lfs-name">{slots.name}</h1>
+              <SceneName heading={!!only} className="posy-head lfs-name">{slots.name}</SceneName>
               {slots.bio && <div className="lfs-bio">{slots.bio}</div>}
               {slots.caption && <p className="lfs-online"><i aria-hidden />{slots.caption}</p>}
             </div>
@@ -298,7 +298,7 @@ export function LofiScene({ page, slots, piece, only, editing }: SceneProps) {
       <div className="lfs-widget lfs-w-me">
         {slots.avatar && <div className="lfs-me">{slots.avatar}</div>}
         <div className="lfs-me-text">
-          <h1 className="posy-head lfs-name">{slots.name}</h1>
+          <SceneName heading={!!only} className="posy-head lfs-name">{slots.name}</SceneName>
           {slots.bio && <div className="lfs-bio">{slots.bio}</div>}
           {slots.caption && <p className="lfs-online"><i aria-hidden />{slots.caption}</p>}
         </div>
@@ -313,6 +313,7 @@ export function LofiScene({ page, slots, piece, only, editing }: SceneProps) {
 
   return (
     <div className={cn('lfs', page.theme.preset === 'daydream' ? 'lfs-day' : 'lfs-night')}>
+      {!only && <SceneTitle name={page.profile.name} />}
       <Arrangements only={only} desktop={desktop} mobile={mobile} />
     </div>
   );

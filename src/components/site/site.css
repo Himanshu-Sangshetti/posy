@@ -31,7 +31,7 @@
 .lf-mark { width: 44px !important; height: 44px !important; }
 .lf-mark circle { fill: #fff; }
 .lf nav { display: grid; align-content: start; gap: 10px; font-size: 15px; }
-.lf h4 { margin-bottom: 6px; font-family: var(--serif); font-size: 26px; font-weight: 400; letter-spacing: -.01em; color: #ffe2b8; }
+.lf .lf-label { margin: 0 0 6px; font-family: var(--serif); font-size: 26px; font-weight: 400; letter-spacing: -.01em; color: #ffe2b8; }
 .lf nav a { color: rgb(255 255 255 / .85); text-shadow: 0 1px 10px rgb(0 0 0 / .45); transition: color .2s; } .lf nav a:hover { color: #fff; }
 @media (max-width: 760px) { .lf-inner { grid-template-columns: 1fr 1fr; } .lf-brand { grid-column: span 2; } }
 

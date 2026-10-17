@@ -19,7 +19,7 @@ export function SiteFooter({ site, solo, extra }: { site: SiteLinks; solo?: bool
         </div>
         {site.footer.map(col => (
           <nav key={col.title} aria-label={col.title}>
-            <h4>{col.title}</h4>
+            <p className="lf-label">{col.title}</p>
             {col.links.map(([label, href]) => href.startsWith('http')
               ? <a key={label} href={href} target="_blank" rel="noopener">{label}</a>
               : <Link key={label} href={href}>{label}</Link>)}

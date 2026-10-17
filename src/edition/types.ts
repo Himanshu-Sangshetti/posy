@@ -25,6 +25,8 @@ export type Edition = {
   nav?: { href: string; label: string }[];
   /** The public site's top bar and footer (sign up, log in, marketing pages). */
   site?: SiteLinks;
+  /** Extra facts for llms.txt and llms-full.txt about this instance (plans, its own guide pages). Markdown, starting with a `##` heading. */
+  llms?: string;
   /** Product analytics hook. Optional; must be fire-and-forget. */
   track?: (e: ProductEvent) => void;
 };

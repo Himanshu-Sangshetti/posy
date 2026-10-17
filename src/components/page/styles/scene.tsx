@@ -2,7 +2,7 @@
 // It draws a phone and a desktop arrangement of the same things (the public page shows the one that fits the width;
 // the editor asks for the device it previews), and wraps every tile in `piece`, which the public page turns into a
 // link and the editor into something you can select and drag.
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import type { Page, Tile } from '@/lib/schema';
 import type { HeaderSlots } from './types';
 
@@ -40,6 +40,17 @@ export function anatomy(tiles: Tile[]) {
   }
   flush();
   return { ...sort(tiles), headings: tiles.filter((t): t is Of<'heading'> => t.type === 'heading'), groups };
+}
+
+/** One h1 for a scene that draws the name twice. Clipped, so it does not show, and not display:none, so it stays in the outline on both widths. */
+export function SceneTitle({ name }: { name: string }) {
+  return <h1 className="sc-h1">{name}</h1>;
+}
+
+/** The visible name. `heading` is the h1 when only one arrangement is drawn (the editor). Otherwise it is a paragraph, and SceneTitle is the h1. */
+export function SceneName({ heading, className, children, ...rest }: { heading: boolean; className?: string; children: ReactNode } & Omit<HTMLAttributes<HTMLElement>, 'children' | 'className'>) {
+  if (heading) return <h1 className={className} {...rest}>{children}</h1>;
+  return <p className={className} aria-hidden="true" {...rest}>{children}</p>;
 }
 
 /** Both arrangements on the public page (CSS shows the one that fits); just one in the editor. */

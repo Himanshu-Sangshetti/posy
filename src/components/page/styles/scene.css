@@ -1,6 +1,7 @@
 /* ================= Scenes: looks that compose the whole page themselves ================= */
 .posy-page.posy-scene.posy-scene .posy-layout { max-width: none; padding: 0; display: block; gap: 0; }
 .posy-scene .posy-footer { padding-top: 8px; }
+.sc-h1 { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; pointer-events: none; }
 /* the public page has both arrangements; the width decides which one shows (the editor renders just one) */
 .sc-desktop:not([data-only]), .sc-mobile:not([data-only]) { display: contents; }
 @container page (max-width: 760px) { .sc-desktop:not([data-only]) { display: none; } }

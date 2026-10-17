@@ -13,7 +13,7 @@ import { cleanTitle, hostOf, siteName, youtubeId } from '@/lib/url';
 import { Favicon, SafeImg, VideoPlayer } from '../islands';
 import { BrandIcon, RichText } from '../tiles';
 import { compact, tileMeta } from './meta';
-import { anatomy, Arrangements, type PieceFn, type SceneProps } from './scene';
+import { anatomy, Arrangements, SceneName, SceneTitle, type PieceFn, type SceneProps } from './scene';
 import type { HeaderSlots } from './types';
 
 type Of<T extends Tile['type']> = Extract<Tile, { type: T }>;
@@ -136,11 +136,11 @@ function Social({ tile }: { tile: Of<'social'> }) {
 }
 
 /** You: your portrait, your name in the serif, your line, a small handwritten caption, and your socials. */
-function Profile({ slots, socials, stamps, piece, nlen = 12 }: { slots: HeaderSlots; socials: Of<'social'>[]; stamps: Of<'text'>[]; piece: PieceFn; nlen?: number }) {
+function Profile({ slots, socials, stamps, piece, nlen = 12, heading = true }: { slots: HeaderSlots; socials: Of<'social'>[]; stamps: Of<'text'>[]; piece: PieceFn; nlen?: number; heading?: boolean }) {
   return (
     <div className="ptc ptc-me" style={{ '--nlen': nlen } as CSSProperties}>
       {slots.avatar && <div className="ptc-portrait">{slots.avatar}</div>}
-      <h1 className="posy-head ptc-name">{slots.name}</h1>
+      <SceneName heading={heading} className="posy-head ptc-name">{slots.name}</SceneName>
       {slots.bio && <div className="ptc-bio">{slots.bio}</div>}
       {slots.caption && <p className="ptc-hand ptc-where">{slots.caption}</p>}
       {socials.length > 0 && <div className="ptc-socials">{socials.map(t => piece(t, <Social tile={t} />, { key: t.id, className: 'ptc-social-piece' }))}</div>}
@@ -208,7 +208,7 @@ export function PaintedScene({ page, slots, piece, only, editing }: SceneProps) 
   };
   const heading = (g: Group, cls?: string) => g.heading && piece(g.heading, <Label text={g.heading.text} />, { key: g.heading.id, className: cn('pts-label', cls) });
   const leadCard = (g: Group) => g.links[0] === lead && lead && piece(lead, <LinkCard tile={lead} big />, { key: lead.id, className: 'pts-card pts-lead' });
-  const profile = <Profile slots={slots} socials={a.socials} stamps={a.stamps} piece={piece} nlen={page.profile.name.length} />;
+  const profile = <Profile slots={slots} socials={a.socials} stamps={a.stamps} piece={piece} nlen={page.profile.name.length} heading={!!only} />;
 
   const desktop = () => {
     // the first row: you, and beside you the link you lead with (one with a picture, if one of your first three has
@@ -278,7 +278,7 @@ export function PaintedScene({ page, slots, piece, only, editing }: SceneProps) 
     </div>
   );
 
-  return <Arrangements only={only} desktop={desktop} mobile={mobile} />;
+  return <>{!only && <SceneTitle name={page.profile.name} />}<Arrangements only={only} desktop={desktop} mobile={mobile} /></>;
 }
 
 /** The kit on its own, for the component lab. */

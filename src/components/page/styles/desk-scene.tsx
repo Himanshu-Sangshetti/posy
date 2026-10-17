@@ -12,7 +12,7 @@ import { cleanTitle, hostOf, siteName, youtubeId } from '@/lib/url';
 import { DeskObjects, Favicon, SafeImg, VideoPlayer } from '../islands';
 import { BrandIcon, RichText } from '../tiles';
 import { compact, tileMeta } from './meta';
-import { anatomy, Arrangements, type SceneProps } from './scene';
+import { anatomy, Arrangements, SceneName, SceneTitle, type SceneProps } from './scene';
 
 type Of<K extends Tile['type']> = Extract<Tile, { type: K }>;
 type LinkTile = Of<'link'> | Of<'github'>;
@@ -86,12 +86,12 @@ export function DeskDefs() {
 /* ---------------- the objects ---------------- */
 
 /** You: a letter on good paper with your polaroid clipped to it. Pins go along its edge, a stamp on its corner. */
-function Letter({ slots, pins, stamp, uid }: { slots: SceneProps['slots']; pins?: ReactNode; stamp?: ReactNode; uid: string }) {
+function Letter({ slots, pins, stamp, uid, heading = true }: { slots: SceneProps['slots']; pins?: ReactNode; stamp?: ReactNode; uid: string; heading?: boolean }) {
   return (
     <div className={cn('dks-letter', !slots.avatar && 'dks-letter-solo')} data-uid={uid}>
       <div className="dks-sheet">
         <span className="dks-type dks-from" aria-hidden>From the desk of</span>
-        <h1 className="posy-head dks-name">{slots.name}</h1>
+        <SceneName heading={heading} className="posy-head dks-name">{slots.name}</SceneName>
         {slots.bio && <div className="dks-bio">{slots.bio}</div>}
         {!slots.avatar && slots.caption && <div className="dks-hand dks-sign">{slots.caption}</div>}
       </div>
@@ -406,7 +406,7 @@ export function DeskScene({ page, slots, piece, only, editing }: SceneProps) {
         <Prop name="plant" className="dks-d-plant" />
         <Prop name="camera" className="dks-d-camera" />
         <div className={cn('dks-head', !hero && 'dks-head-solo')}>
-          <Letter slots={slots} uid="d" pins={pins('d')} stamp={stampPiece('d')} />
+          <Letter slots={slots} uid="d" pins={pins('d')} stamp={stampPiece('d')} heading={!!only} />
           {hero && <div className={cn('dks-hero', `dks-hero-${heroKind}`)}>{hero}</div>}
         </div>
         {a.groups.map((g, gi) => [
@@ -435,7 +435,7 @@ export function DeskScene({ page, slots, piece, only, editing }: SceneProps) {
     return (
       <div className="dks-phone">
         <Prop name="coffee" className="dks-m-coffee" />
-        <Letter slots={slots} uid="m" pins={pins('m')} stamp={stampPiece('m')} />
+        <Letter slots={slots} uid="m" pins={pins('m')} stamp={stampPiece('m')} heading={!!only} />
         {a.groups.map((g, gi) => {
           const things = [...g.media, ...g.photos, ...g.notes, ...g.stamps.filter(t => t !== stamp)];
           return [
@@ -461,6 +461,7 @@ export function DeskScene({ page, slots, piece, only, editing }: SceneProps) {
 
   return (
     <div className="dks">
+      {!only && <SceneTitle name={page.profile.name} />}
       <DeskDefs />
       <span className="dks-lamp" aria-hidden />
       <Arrangements only={only} desktop={desktop} mobile={mobile} />
