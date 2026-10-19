@@ -50,6 +50,11 @@ const SERVER_INFO = {
 } as { name: string; version: string };
 
 const handler = createMcpHandler(server => {
+  // Connector directories (Claude's among them) read the display name from annotations.title, not the tool's title.
+  const register = server.registerTool.bind(server);
+  server.registerTool = ((name: string, config: { title?: string; annotations?: object }, cb: unknown) =>
+    register(name, { ...config, annotations: { title: config.title, ...config.annotations } } as never, cb as never)) as typeof server.registerTool;
+
   server.registerTool('get_page', {
     title: 'Get page',
     description: 'The current draft (profile, theme, tiles with ids), public URL, version and whether there are unpublished changes.',
