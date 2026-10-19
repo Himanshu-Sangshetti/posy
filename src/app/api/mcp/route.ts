@@ -25,7 +25,8 @@ Flow: get_page first. If it says there is no page, ask the user for a username a
 add_tile (use "inputs" to add many at once), optionally set_profile and set_theme, then publish and give them the public URL.
 Tiles have stable ids. Sizes: s=1x1, w=2x1, t=1x2, l=2x2. "heading" tiles start sections.
 add_tile accepts any link (profiles, YouTube, Spotify, GitHub repos, images), an email, owner/repo, or plain text and picks the right tile.
-Keep pages calm: a few well-chosen tiles beat many. Ask before deleting things the user added.`;
+Pass empty: true to create_page when you will add the user's own links. list_options lists the looks and the palettes each offers.
+Keep pages calm: a few well-chosen tiles beat many. Ask before deleting things the user added, and before import_page replaces a draft.`;
 
 const READ = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
 const WRITE = { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false };
@@ -67,14 +68,14 @@ const handler = createMcpHandler(server => {
 
   server.registerTool('create_page', {
     title: 'Create page',
-    description: 'Claim a username and create the user\'s page (one per account). Do this once, when get_page says there is no page. Pass `style` to pick a look (see list_options for the looks and what each is like); omit it for a starter template. Then add tiles and publish.',
+    description: 'Claim a username and create the user\'s page (one per account). `style` picks a look; without it the page starts from a starter template.',
     inputSchema: z.object({
       username: z.string().describe('3–30 letters, numbers, - or _. This becomes the public URL.'),
       style: z.enum(STYLE_IDS).optional().describe('The look of the page: cozy (Desk), washi, lofi, painted, cobalt or night. Omit to use a starter template.'),
       layout: z.enum(LAYOUTS).optional(),
       preset: z.enum(THEME_IDS).optional().describe('Colour theme'),
       template: z.enum(Object.keys(TEMPLATES) as [keyof typeof TEMPLATES, ...(keyof typeof TEMPLATES)[]]).optional(),
-      empty: z.boolean().optional().describe('Start blank instead of with sample tiles (recommended when you will add the user\'s own links).'),
+      empty: z.boolean().optional().describe('Start blank instead of with sample tiles.'),
     }),
     annotations: WRITE,
   }, run(async (userId, a: Record<string, unknown>) => ({ ...(await createPageFor(userId, a)), next: 'Add the user\'s links with add_tile (inputs[]), then publish.' })));
@@ -85,7 +86,7 @@ const handler = createMcpHandler(server => {
     inputSchema: z.object({
       file: z.union([z.string(), z.record(z.string(), z.unknown())]).describe('The brief or page JSON, as an object or text. Format: /docs/format'),
       username: z.string().optional(),
-      replace: z.boolean().optional().describe('Overwrite an existing draft. Ask the user first.'),
+      replace: z.boolean().optional().describe('Overwrite an existing draft.'),
     }),
     annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false },
   }, run(async (userId, a: { file: string | Record<string, unknown>; username?: string; replace?: boolean }) => ({ ...(await importBrief(userId, a.file, a)), next: 'Review with get_page, then publish.' })));
@@ -95,7 +96,7 @@ const handler = createMcpHandler(server => {
     description: 'Add tiles. Pass `inputs` (several links, emails, owner/repos or notes) or `input` (one) to auto-detect, or a full `tile` object.',
     inputSchema: z.object({
       input: z.string().optional().describe('e.g. "https://github.com/user", "owner/repo", "hi@me.com", "Open to work"'),
-      inputs: z.array(z.string()).max(30).optional().describe('Several inputs at once, added in order. Prefer this when the user gives you a list of links.'),
+      inputs: z.array(z.string()).max(30).optional().describe('Several inputs at once, added in order.'),
       tile: z.record(z.string(), z.unknown()).optional().describe('Full tile object, e.g. {"type":"heading","text":"Projects"}'),
       after: z.string().optional().describe('Insert after this tile id (default: end)'),
       size: z.enum(SIZES).optional(),
@@ -125,7 +126,7 @@ const handler = createMcpHandler(server => {
 
   server.registerTool('set_theme', {
     title: 'Set theme',
-    description: 'Change colours, fonts, layout and other theme settings. Only pass what should change. `style` switches the look (cozy = Desk, washi, lofi, painted, cobalt, night); `preset` picks a palette (list_options shows which palettes each look offers).',
+    description: 'Change colours, fonts, layout and other theme settings. Only pass what should change. `style` switches the look (cozy = Desk, washi, lofi, painted, cobalt, night); `preset` picks one of the palettes the chosen look offers.',
     inputSchema: z.object({
       style: z.enum(STYLE_IDS).optional().describe('The look: cozy (Desk), washi, lofi, painted, cobalt or night'),
       preset: z.enum(THEME_IDS).optional(), accent: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
