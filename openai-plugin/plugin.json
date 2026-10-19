@@ -1,0 +1,107 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "posy",
+  "version": "1.0.0",
+  "description": "Make and edit a hand-made link-in-bio page: add links, pick a look, publish.",
+  "author": {
+    "name": "Himanshu Sangshetti",
+    "email": "hello@posy.page",
+    "url": "https://posy.page"
+  },
+  "homepage": "https://posy.page",
+  "repository": "https://github.com/Himanshu-Sangshetti/posy",
+  "license": "MIT",
+  "keywords": [
+    "link in bio",
+    "personal website",
+    "linktree alternative"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Posy",
+        "shortDescription": "Hand-made link-in-bio page",
+        "longDescription": "Posy is a free, open-source link-in-bio page that looks hand-made. Ask ChatGPT to build your page: it can claim your username, pick a look (Painted, Desk, Lofi, Washi, Cobalt or Night), add your links, socials, music and videos as tiles, change colours and fonts, and publish at posy.page/you. Nothing goes live until you publish. The free plan includes unlimited links and three looks; Pro adds a custom domain and three more looks.",
+        "developerName": "Himanshu Sangshetti",
+        "category": "Productivity",
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
+        "websiteURL": "https://posy.page",
+        "supportURL": "mailto:hello@posy.page",
+        "privacyPolicyURL": "https://posy.page/privacy",
+        "termsOfServiceURL": "https://posy.page/terms",
+        "defaultPrompt": [
+          "Make me a Posy page with my GitHub, portfolio and newsletter.",
+          "Add my new podcast episode to the top of my Posy page.",
+          "Switch my Posy page to the Lofi look and publish it."
+        ],
+        "brandColor": "#E4572E",
+        "brandColorDark": "#F28A5C",
+        "composerIcon": "./assets/icon.png",
+        "composerIconDark": "./assets/icon-dark.png",
+        "logo": "./assets/logo.png",
+        "logoDark": "./assets/logo-dark.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Show the current page",
+              "prompt": "Show me my Posy page.",
+              "tools_triggered": "get_page",
+              "expected_behavior": "Returns the page's public URL, its tiles and whether anything is unpublished."
+            },
+            {
+              "description": "Add a link",
+              "prompt": "Add https://posy.page/looks to my Posy page.",
+              "tools_triggered": "add_tile",
+              "expected_behavior": "Adds a link tile for https://posy.page/looks to the draft and says it is not live until published."
+            },
+            {
+              "description": "Reorder tiles",
+              "prompt": "Move the link I just added to the top of my page.",
+              "tools_triggered": "get_page, move_tile",
+              "expected_behavior": "Moves that tile to position 0 in the draft."
+            },
+            {
+              "description": "Change the look",
+              "prompt": "Switch my Posy page to the Lofi look.",
+              "tools_triggered": "set_theme",
+              "expected_behavior": "Sets the theme style to lofi on the draft and confirms the change."
+            },
+            {
+              "description": "Publish",
+              "prompt": "Publish my Posy page and give me the link.",
+              "tools_triggered": "publish",
+              "expected_behavior": "Makes the draft live and returns https://posy.page/posy-review."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Delete the account",
+              "prompt": "Delete my Posy account.",
+              "expected_behavior": "Not supported: the tools edit the page only and cannot delete accounts. Explain that account deletion is done in Posy's settings."
+            },
+            {
+              "description": "Edit someone else's page",
+              "prompt": "Change the bio on posy.page/mira.",
+              "expected_behavior": "The connection only reaches the signed-in user's own page. Explain it cannot edit other people's pages."
+            },
+            {
+              "description": "Unrelated request",
+              "prompt": "Book me a flight to Tokyo next week.",
+              "expected_behavior": "Unrelated to Posy. The plugin should not call any Posy tool."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "The plugin does not sell anything or process payments. Pro is bought on posy.page, not through the plugin."
+      },
+      "publication": {
+        "release_notes": "First release: build, edit and publish a Posy link-in-bio page from ChatGPT."
+      }
+    }
+  }
+}
