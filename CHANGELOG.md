@@ -5,6 +5,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+
+- Music tiles can be edited in the editor: change the title and artist, and paste or upload your own cover art.
+
 ### Changed
 
 - Every look follows the layout again. Grid shows the look's own arrangement, List shows its phone arrangement on every screen, and Canvas places the look's own pieces freely.

@@ -282,7 +282,13 @@ export function TileFields({ tile }: { tile: Tile }) {
       </>}
       {tile.type === 'text' && <Field label="Text"><Textarea value={tile.text} rows={2} onChange={e => set({ text: e.target.value })} /></Field>}
       {tile.type === 'video' && <>{text('url', tile.url, 'YouTube link')}{text('title', tile.title, 'Title')}<Field label="Thumbnail (optional)"><div className="flex min-w-0 gap-2"><Input className="min-w-0 truncate" value={tile.image ?? ''} placeholder="YouTube's own" onChange={e => set({ image: e.target.value || undefined })} /><ImagePicker label="Upload" onPick={src => set({ image: src, focus: undefined, zoom: undefined })} /></div></Field>{tile.image && <CropControl src={tile.image} crop={tile} aspect={16 / 9} onChange={c => set(c)} />}</>}
-      {tile.type === 'music' && <>{text('url', tile.url, 'Spotify link')}{tile.image && <CropControl src={tile.image} crop={tile} onChange={c => set(c)} />}</>}
+      {tile.type === 'music' && <>
+        {text('url', tile.url, 'Spotify link')}
+        {text('title', tile.title, 'Title', 'Listen on Spotify')}
+        {text('artist', tile.artist, 'Artist', 'Spotify')}
+        <Field label="Cover art"><div className="flex min-w-0 gap-2"><Input className="min-w-0 truncate" value={tile.image ?? ''} placeholder="Spotify's own" onChange={e => set({ image: e.target.value || undefined })} /><ImagePicker label="Upload" onPick={src => set({ image: src, focus: undefined, zoom: undefined })} /></div></Field>
+        {tile.image && <CropControl src={tile.image} crop={tile} onChange={c => set(c)} />}
+      </>}
       {tile.type === 'github' && text('repo', tile.repo, 'Repository', 'owner/name')}
     </div>
   );
