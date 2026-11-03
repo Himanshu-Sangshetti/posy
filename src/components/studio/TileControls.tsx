@@ -267,7 +267,7 @@ export function TileFields({ tile }: { tile: Tile }) {
         <Field label="Platform">
           <Select value={tile.platform} onValueChange={v => set({ platform: v })}>
             <SelectTrigger className="h-9 w-full rounded-[10px] border-[var(--line)] bg-[var(--bg)] shadow-none"><SelectValue /></SelectTrigger>
-            <SelectContent className={cn(CHROME, 'sc-pop')}>{PLATFORM_IDS.map(p => <SelectItem key={p} value={p}>{PLATFORMS[p].label}</SelectItem>)}</SelectContent>
+            <SelectContent className={cn(CHROME, 'sc-pop z-[80]')}>{PLATFORM_IDS.map(p => <SelectItem key={p} value={p}>{PLATFORMS[p].label}</SelectItem>)}</SelectContent>
           </Select>
         </Field>
         {text('handle', tile.handle, tile.platform === 'email' ? 'Email' : 'Username')}
