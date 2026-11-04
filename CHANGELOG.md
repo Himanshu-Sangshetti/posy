@@ -18,6 +18,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Fixed
 
 - The painting on the sign-in pages kept animating after you moved on to the editor.
+- The platform list on a social tile opened behind the edit panel.
 
 ## [2.0.0] - 2026-10-16
 

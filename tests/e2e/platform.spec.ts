@@ -263,3 +263,22 @@ test('edit a music tile: title, artist and cover art', async ({ page }) => {
   await expect(tile).toContainText('My own mix');
   await expect(tile).toContainText('Someone');
 });
+
+test('the platform list opens above the tile edit panel', async ({ page }) => {
+  await newUser(page);
+  const id = ((await draft(page)).page.tiles as { id: string; type: string }[]).find(t => t.type === 'social')!.id;
+  await page.locator(`[data-tile="${id}"]`).first().click();
+  await page.getByRole('button', { name: 'Edit' }).click();
+  await page.getByRole('combobox').click();
+  const list = page.getByRole('listbox');
+  await expect(list).toBeVisible();
+  // an open Select turns off pointer events everywhere else, so compare stacking order instead of hit-testing
+  const z = await list.evaluate(el => {
+    const layer = (n: Element) => { while (n.parentElement && n.parentElement !== document.body) n = n.parentElement; return +getComputedStyle(n).zIndex || 0; };
+    const panel = [...document.querySelectorAll('[data-radix-popper-content-wrapper]')].find(w => w.textContent?.includes('Username'))!;
+    return { list: layer(el), panel: layer(panel) };
+  });
+  expect(z.list).toBeGreaterThan(z.panel);
+  await page.getByRole('option', { name: 'GitHub' }).click();
+  await expect.poll(async () => (await draft(page)).page.tiles.find((t: { id: string }) => t.id === id)?.platform).toBe('github');
+});
