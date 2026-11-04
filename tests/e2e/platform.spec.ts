@@ -244,3 +244,22 @@ test('canvas layout: drag a tile anywhere and the position saves', async ({ page
   const tiles = (await draft(page)).page.tiles as { type: string; pos?: object }[];
   expect(tiles.filter(t => t.type !== 'social').every(t => t.pos)).toBe(true);
 });
+
+test('edit a music tile: title, artist and cover art', async ({ page }) => {
+  await newUser(page);
+  const id = ((await draft(page)).page.tiles as { id: string; type: string }[]).find(t => t.type === 'music')!.id;
+  const tile = page.locator(`[data-tile="${id}"]`).first();
+  await tile.click();
+  await page.getByRole('button', { name: 'Edit' }).click();
+  const panel = page.locator('[data-radix-popper-content-wrapper]').filter({ has: page.getByText('Spotify link') });
+  await panel.getByPlaceholder('Listen on Spotify').fill('My own mix');
+  await panel.getByPlaceholder('Spotify', { exact: true }).fill('Someone');
+  await panel.locator('input[type=file]').setInputFiles('public/looks/painted/photo1.jpg');
+  await expect.poll(async () => {
+    const t = (await draft(page)).page.tiles.find((t: { id: string }) => t.id === id);
+    return [t.title, t.artist, /^\/uploads\//.test(t.image ?? '')];
+  }).toEqual(['My own mix', 'Someone', true]);
+  await page.keyboard.press('Escape');
+  await expect(tile).toContainText('My own mix');
+  await expect(tile).toContainText('Someone');
+});
