@@ -44,6 +44,13 @@ export function tileFromInput(input: string): Tile {
     handle = handle.replace(/^@/, '');
     if (handle && !(RESERVED[pid] ?? []).includes(handle)) return { id, type: 'social', platform: pid, handle, size: 's', color: 'auto' };
   }
+  // Mastodon lives on any instance: a /@user path on a host that matched no
+  // known platform is a Mastodon profile. Keep the instance in the handle
+  // (user@instance) so profileUrl() rebuilds the same link.
+  const at = parts[0] ?? '';
+  if (/^@[\w.-]+$/.test(at)) {
+    return { id, type: 'social', platform: 'mastodon', handle: `${at.slice(1)}@${host}`, size: 's', color: 'auto' };
+  }
   return { id, type: 'link', url: href, size: 's', color: 'auto' };
 }
 
