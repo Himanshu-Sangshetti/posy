@@ -8,6 +8,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Added
 
 - Music tiles can be edited in the editor: change the title and artist, and paste or upload your own cover art.
+- Pasting a Mastodon profile link from any instance, or a Threads profile link, makes a social tile with the right icon.
 
 ### Changed
 

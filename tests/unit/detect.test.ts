@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { tileFromInput, youtubeId, spotifyEmbed, isImageRef } from '@/lib/detect';
+import { profileUrl } from '@/lib/platforms';
 
 const t = (s: string) => tileFromInput(s);
 describe('pasting a link picks the right tile', () => {
@@ -13,6 +14,19 @@ describe('pasting a link picks the right tile', () => {
     expect(t('https://writer.substack.com')).toMatchObject({ platform: 'substack', handle: 'writer' });
     expect(t('https://github.com/octocat')).toMatchObject({ platform: 'github', handle: 'octocat' });
     expect(t('hello@example.com')).toMatchObject({ platform: 'email', handle: 'hello@example.com' });
+  });
+  it('threads and mastodon profiles', () => {
+    expect(t('https://www.threads.net/@alice')).toMatchObject({ type: 'social', platform: 'threads', handle: 'alice' });
+    expect(t('threads.net/@alice')).toMatchObject({ type: 'social', platform: 'threads', handle: 'alice' });
+    expect(t('https://mastodon.social/@alice')).toMatchObject({ type: 'social', platform: 'mastodon', handle: 'alice' });
+    // Mastodon lives on any instance: the instance stays in the handle.
+    expect(t('https://fosstodon.org/@alice')).toMatchObject({ type: 'social', platform: 'mastodon', handle: 'alice@fosstodon.org' });
+    expect(t('https://hachyderm.io/@alice')).toMatchObject({ type: 'social', platform: 'mastodon', handle: 'alice@hachyderm.io' });
+    expect(t('https://mas.to/@alice')).toMatchObject({ type: 'social', platform: 'mastodon', handle: 'alice@mas.to' });
+    expect(t('https://fosstodon.org/@alice/109123456789')).toMatchObject({ type: 'social', platform: 'mastodon', handle: 'alice@fosstodon.org' });
+    // The tile links back to the profile it came from.
+    expect(profileUrl('mastodon', 'alice@fosstodon.org')).toBe('https://fosstodon.org/@alice');
+    expect(profileUrl('threads', 'alice')).toBe('https://threads.net/@alice');
   });
   it('rich tiles', () => {
     expect(t('https://github.com/vercel/next.js')).toMatchObject({ type: 'github', repo: 'vercel/next.js', size: 'w' });
